@@ -1,0 +1,138 @@
+{
+  "nm": {
+    "sta": {
+      "Open": "开放注册",
+      "Registering": "正在注册",
+      "Normal": "正常使用",
+      "Grace": "宽限期",
+      "Booked": "已预约",
+      "Premium": "溢价期",
+      "Reopen": "重新开放",
+      "Unknown": "未知"
+    },
+    "staTit": "点击更新此域名信息"
+  },
+  "tb": {
+    "holder": "输入域名标签（多个标签用空格分开）",
+    "btn": {
+      "add": "添加域名",
+      "regAll": "全部注册",
+      "sgl": {
+        "reg": "注册",
+        "estTit": "估算注册费用",
+        "regingTit": "正在注册中",
+        "book": "预约",
+        "bookTit": "正在等待该域名重新开放注册"
+      }
+    },
+    "th": {
+      "no": "#",
+      "lb": "域名标签",
+      "lu": "信息",
+      "sta": "状态",
+      "reg": "注册",
+      "del": "删除"
+    },
+    "lookup": {
+      "Etherscan": "Etherscan",
+      "Opensea": "Opensea",
+      "Metadata": "查看元数据",
+      "eth.link": "eth.link",
+      "DNSRelated": "同名 DNS 注册情况"
+    }
+  },
+  "conf": {
+    "title": "自定义配置",
+    "instructions": "配置说明",
+    "instructionsUrl": "blob/main/README_CN.md#自定义配置",
+    "attention": "注意: 如果您对这些配置项不够了解，我们建议您只修改 “全局” 和 “显示” 内的条目，而将其它条目保持默认值。",
+    "global": {
+      "title": "全局",
+      "operatorPrivateKey": "操作员私钥",
+      "network": "网络",
+      "receiverAddress": "接收者地址",
+      "infuraID": "Infura ID",
+      "pageTag": "页面标记",
+      "pageTagColorTip": "为标记选择一个背景颜色"
+    },
+    "commit": {
+      "title": "承诺",
+      "gasPrice": "Gas 价格",
+      "gasLimit": "Gas 上限",
+      "waitConfirms": "确认数"
+    },
+    "register": {
+      "title": "注册",
+      "duration": "时长",
+      "value": "ETH 数量",
+      "gasPrice": "Gas 价格",
+      "gasLimit": "Gas 上限",
+      "waitConfirms": "确认数",
+      "registerWithConfig": "注册时进行配置"
+    },
+    "book": {
+      "title": "预约注册",
+      "activeDuration": "启动区间",
+      "timeSlot": "时隙"
+    },
+    "display": {
+      "title": "显示",
+      "time": "时间显示",
+      "lookup": "信息查询显示"
+    },
+    "donate": {
+      "title": "捐赠",
+      "donatePercentage": "百分比"
+    }
+  },
+  "msg": {
+    "nameNormalizeError": "错误: {{errMsg}}",
+    "book": "{{duration}} 之后会再次检查 {{label}}.eth 的注册状态。",
+    "register00": "{{label}}.eth 即将注册给 {{owner}}，注册时长为 {{duration}} 天。",
+    "register10": "{{label}}.eth 承诺已经提交。",
+    "register11": {
+      "succeed": "步骤 1 已完成: {{label}}.eth 承诺 {{txLink}} 已经确认， 等待一段时间后会自动进行一下步。",
+      "fail": "{{label}}.eth 承诺失败。你可以检查这笔 {{txLink}}。"
+    },
+    "register20": "步骤 2 已完成: {{label}}.eth 已经准备好了，即将进行最后一笔注册交易。",
+    "register30": {
+      "succeed": "步骤 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功，并捐赠了 {{donationValue}} ETH。",
+      "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
+    },
+    "estimatePrice": "{{label}}.eth 注册费用预估 ≈ {{price}} ETH。",
+    "estimatePriceAll": "注册这些域名总费用预估 ≈ {{price}} ETH。",
+    "setAndStoreNameInfo": {
+      "succeed": "域名信息完成更新和保存。",
+      "fail": "域名信息保存失败。"
+    },
+    "setAndStoreConfInfo": {
+      "succeed": "配置信息完成更新和保存。",
+      "fail": "配置信息保存失败。"
+    }
+  },
+  "modal": {
+    "title": "需要确认",
+    "reg": "您确定注册 {{label}}.eth ？ 该注册进程启动后，请不要在注册完成前关闭这个页面。",
+    "regAll": "您确定注册这些域名？",
+    "removeNames": "您确定清空域名列表？"
+  },
+  "c": {
+    "true": "是",
+    "false": "否",
+    "reset": "重置",
+    "save": "保存",
+    "confirm": "确认",
+    "cancel": "取消",
+    "tx": "交易",
+    "ropsten": "Ropsten",
+    "mainnet": "主网",
+    "expiresTime": "到期时间",
+    "releaseTime": "释放时间",
+    "eth": "ETH",
+    "gwei": "Gwei",
+    "seconds": "秒",
+    "hours": "小时",
+    "days": "天",
+    "percent": "%"
+  }
+}

@@ -1,0 +1,46 @@
+/* ===== ebr-normal: Quicksand ===== */
+@font-face {
+  font-family: 'ebr-light';
+  src: url('./Quicksand/Quicksand-Light.ttf') format('truetype');
+  font-display: fallback;
+}
+@font-face {
+  font-family: 'ebr-regular';
+  src: url('./Quicksand/Quicksand-Regular.ttf') format('truetype');
+  font-display: fallback;
+}
+@font-face {
+  font-family: 'ebr-medium';
+  src: url('./Quicksand/Quicksand-Medium.ttf') format('truetype'); 
+  font-display: fallback;
+}
+@font-face {
+  font-family: 'ebr-semibold';
+  src: url('./Quicksand/Quicksand-SemiBold.ttf') format('truetype'); 
+  font-display: fallback;
+}@font-face {
+  font-family: 'ebr-bold';
+  src: url('./Quicksand/Quicksand-Bold.ttf') format('truetype'); 
+  font-display: fallback;
+}
+
+/* ===== ebr-code: SpaceMono ===== */
+@font-face {
+  font-family: 'ebr-code-regular';
+  src: url('./SpaceMono/SpaceMono-Regular.ttf') format('truetype');
+  font-display: fallback;
+}
+@font-face {
+  font-family: 'ebr-code-italic';
+  src: url('./SpaceMono/SpaceMono-Italic.ttf') format('truetype'); 
+  font-display: fallback;
+}
+@font-face {
+  font-family: 'ebr-code-bold-italic';
+  src: url('./SpaceMono/SpaceMono-BoldItalic.ttf') format('truetype'); 
+  font-display: fallback;
+}@font-face {
+  font-family: 'ebr-code-bold';
+  src: url('./SpaceMono/SpaceMono-Bold.ttf') format('truetype'); 
+  font-display: fallback;
+}

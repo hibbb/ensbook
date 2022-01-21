@@ -1,0 +1,138 @@
+{
+  "nm": {
+    "sta": {
+      "Open": "Open",
+      "Registering": "Registering",
+      "Normal": "Normal",
+      "Grace": "Grace",
+      "Booked": "Booked",
+      "Premium": "Premium",
+      "Reopen": "Reopen",
+      "Unknown": "Unknown"
+    },
+    "staTit": "Click to Update the Info of This Name"
+  },
+  "tb": {
+    "holder": "Enter name labels separated by spaces",
+    "btn": {
+      "add": "Add Names",
+      "regAll": "Register All",
+      "sgl": {
+        "reg": "Reg",
+        "estTit": "Estimate The Registration Cost",
+        "regingTit": "Registering",
+        "book": "Book",
+        "bookTit": "Waiting for the name reopening"
+      }
+    },
+    "th": {
+      "no": "#",
+      "lb": "Label",
+      "lu": "Lookup",
+      "sta": "Status",
+      "reg": "Reg",
+      "del": "Del"
+    },
+    "lookup": {
+      "Etherscan": "Etherscan",
+      "Opensea": "Opensea",
+      "Metadata": "Metadata",
+      "eth.link": "eth.link",
+      "DNSRelated": "DNS with Same Label"
+    }
+  },
+  "conf": {
+    "title": "Custom Configuration",
+    "instructions": "Custom Instructions",
+    "instructionsUrl": "#custom-configuration",
+    "attention": "Attention: If you are not familiar with these configurations, we recommend that you'd better not change the configurations other than the Global and Display items.",
+    "global": {
+      "title": "Global",
+      "operatorPrivateKey": "Operator's Private Key",
+      "network": "Network",
+      "receiverAddress": "Receiver's Address",
+      "infuraID": "Infura ID",
+      "pageTag": "Page Tag",
+      "pageTagColorTip": "Choose a Background Color for Your Tag"
+    },
+    "commit": {
+      "title": "Commit",
+      "gasPrice": "Gas Price",
+      "gasLimit": "Gas Limit",
+      "waitConfirms": "Confirms"
+    },
+    "register": {
+      "title": "Register",
+      "duration": "Duration",
+      "value": "Value",
+      "gasPrice": "Gas Price",
+      "gasLimit": "Gas Limit",
+      "waitConfirms": "Confirms",
+      "registerWithConfig": "Register With Config"
+    },
+    "book": {
+      "title": "Book",
+      "activeDuration": "Active Duration",
+      "timeSlot": "Time Slot"
+    },
+    "display": {
+      "title": "Display",
+      "time": "Time Display",
+      "lookup": "Lookup Display"
+    },
+    "donate": {
+      "title": "Donate",
+      "donatePercentage": "Percentage"
+    }
+  },
+  "msg": {
+    "nameNormalizeError": "Error: {{errMsg}}",
+    "book": "The status of {{label}}.eth will be rechecked in {{duration}}.",
+    "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} days.",
+    "register10": "{{label}}.eth commit submitted.",
+    "register11": {
+      "succeed": "SETP 1 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
+      "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
+    },
+    "register20": "SETP 2 FINISHED: {{label}}.eth is ready for registration.",
+    "register30": {
+      "succeed": "SETP 3 FINISHED: {{label}}.eth register {{regTxLink}} COMPLETED with a {{donationValue}} ETH donation.",
+      "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
+    },
+    "estimatePrice": "{{label}}.eth registration estimated cost ≈ {{price}} ETH.",
+    "estimatePriceAll": "Registrations estimated TOTAL COST ≈ {{price}} ETH.",
+    "setAndStoreNameInfo": {
+      "succeed": "Name information updated and stored.",
+      "fail": "Name information stored failed."
+    },
+    "setAndStoreConfInfo": {
+      "succeed": "Configurations updated and stored.",
+      "fail": "Configurations stored failed."
+    }
+  },
+  "modal": {
+    "title": "Need Confirmation",
+    "reg": "Are you sure to register {{label}}.eth? After the registration process has started, do not close this page until the registration is completed.",
+    "regAll": "Are you sure to register THESE ENS names?",
+    "removeNames": "Are you sure to CLEAR the table?"
+  },
+  "c": {
+    "true": "True",
+    "false": "False",
+    "reset": "Reset",
+    "save": "Save",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "tx": "transaction",
+    "ropsten": "Ropsten",
+    "mainnet": "Mainnet",
+    "expiresTime": "Expires",
+    "releaseTime": "Release",
+    "eth": "ETH",
+    "gwei": "Gwei",
+    "seconds": "Seconds",
+    "hours": "Hours",
+    "days": "Days",
+    "percent": "%"
+  }
+}

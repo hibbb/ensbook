@@ -1,0 +1,20 @@
+{
+  "short_name": "ENSBook",
+  "name": "ENSBook",
+  "icons": [
+    {
+      "src": "img/favicon.png",
+      "sizes": "32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "img/apple-touch-icon-236x236.png",
+      "type": "image/png",
+      "sizes": "236x236"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#483c32",
+  "background_color": "#f5f5f5"
+}
