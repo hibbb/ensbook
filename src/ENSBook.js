@@ -185,35 +185,33 @@ class ENSBook extends Component {
     }
     // create an Array(originLabelsSet) including the original labels
     const originLabelsSet = new Set()
-    nameInfo.map(row => {
-      return originLabelsSet.add(row.label)
-    })
+    nameInfo.map(row => originLabelsSet.add(row.label))
     // split the string by spaces to labels and remove duplicates
     const newLabelsSet = new Set(labels.split(/\s+/));
     // only retain the labels whose length >= 3
-    const newLabelsArr = [...newLabelsSet].filter(label => label.length >= 3)
-    // caculate the differences between the new and original label, to avoid duplicates 
+    let newLabelsArr = [...newLabelsSet].filter(label => label.length >= 3)
+    try {
+      newLabelsArr.map((label, index) => newLabelsArr[index] = namehash.normalize(label))
+    } catch (err) {
+      this.MessageToasts.messageShow(
+        "nameNormalizeError", 
+        this.t('msg.nameNormalizeError', {errMsg: err.message}),
+        "msg-warning"
+      )
+    }
+    // caculate the differences between the new and original labels, to avoid duplicates 
     let diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]; 
 
     const originNameInfoLen = nameInfo.length
 
-    diffLabelsArr.map(label => {
-      try {
-        nameInfo.push({
-          "label": namehash.normalize(label),
-          "level": 0,
-          "status": "Unknown",
-          "tokenId": utils.id(label)
-        })
-      } catch (err) {
-        this.MessageToasts.messageShow(
-          "nameNormalizeError", 
-          this.t('msg.nameNormalizeError', {errMsg: err.message}),
-          "msg-warning"
-        )
-      }
-      return false
-    })
+    diffLabelsArr.map(label => 
+      nameInfo.push({
+        "label": label,
+        "level": 0,
+        "status": "Unknown",
+        "tokenId": utils.id(label)
+      })
+    )
     this.setState({nameInfo: nameInfo})
 
     // update the status of newly added names
