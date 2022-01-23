@@ -385,5 +385,5 @@ button.btn-plain[disabled] {
 }
 
 .btn-temp {
-  /* display: none; */
+  display: none;
 }
