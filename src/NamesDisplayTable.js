@@ -2,8 +2,10 @@ import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import './Utils/RegisterConfirmModal';
 import RegisterConfirmModal from './Utils/RegisterConfirmModal';
-import moment from 'moment'
-import { BoxArrowUpRight, XCircle, Calculator, Robot } from 'react-bootstrap-icons';
+import RegisterAllConfirmModal from './Utils/RegisterAllConfirmModal';
+import RemoveNamesConfirmModal from './Utils/RemoveNamesConfirmModal';
+import moment from 'moment';
+import { BoxArrowUpRight, XCircle, Calculator, Robot, ArrowRepeat } from 'react-bootstrap-icons';
 
 let ascFlag = {
   "label": true,
@@ -46,36 +48,80 @@ const TableHeader = (props) => {
     <thead>
       <tr className="ebr-tb-row">
         <th>
-          <span id="th-level" className="th-sortable" 
-            onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "level"))}}
-          >
-            {t('tb.th.no')}
-          </span>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.no')}</Tooltip>}>
+            <span id="th-level" className="th-sortable" 
+              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "level"))}}
+            >
+              {t('tb.th.no')}
+            </span>
+          </OverlayTrigger>
         </th>
         <th>
-          <span id="th-label" className="th-sortable" 
-            onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "label"))}}
-          >
-            {t('tb.th.lb')}
-          </span>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.lb')}</Tooltip>}>
+            <span id="th-label" className="th-sortable" 
+              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "label"))}}
+            >
+              {t('tb.th.lb')}
+            </span>
+          </OverlayTrigger>
         </th>
         <th>{t('tb.th.lu')}</th>
         <th>
-          <span id={"th-" + timeDisplay} className="th-sortable"
-            onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, timeDisplay))}}
-          >
-            {t('c.' + timeDisplay)}
-          </span>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.ti')}</Tooltip>}>
+            <span id={"th-" + timeDisplay} className="th-sortable"
+              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, timeDisplay))}}
+            >
+              {t('c.' + timeDisplay)}
+            </span>
+          </OverlayTrigger>
         </th>
         <th>
-          <span id="th-status" className="th-sortable"
-            onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "status"))}}
-          >
-            {t('tb.th.sta')}
-          </span>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}>
+            <span id="th-status" className="th-sortable"
+              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "status"))}}
+            >
+              {t('tb.th.sta')}
+            </span>
+          </OverlayTrigger>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}>
+            <button type="button" className="btn-plain btn-update-all ms-2" 
+              onClick={props.updateNames}
+            >
+              <ArrowRepeat />
+            </button>
+          </OverlayTrigger>
         </th>
-        <th>{t('tb.th.reg')}</th>
-        <th>{t('tb.th.del')}</th>
+        <th>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.regAll')}</Tooltip>}>
+            <button
+              type="button" 
+              className="btn-plain btn-reg" 
+              data-bs-toggle="modal" 
+              data-bs-target="#registerAllConfirmModal"
+              >
+              {t('tb.th.reg')}
+            </button>
+          </OverlayTrigger>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.estAll')}</Tooltip>}>
+            <button type="button" id="btn-estimate-all" className="btn-plain btn-reg-sub ms-2" 
+              onClick={props.estimatePriceAll}
+            >
+              <Calculator />
+            </button>
+          </OverlayTrigger>
+          <RegisterAllConfirmModal registerAll={props.registerAll} t={t} />
+        </th>
+        <th>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.remAll')}</Tooltip>}>
+            <button type="button" className="btn-plain btn-del-name" 
+              data-bs-toggle="modal" 
+              data-bs-target="#removeNamesConfirmModal"
+            >
+              <XCircle />
+            </button>
+          </OverlayTrigger>
+          <RemoveNamesConfirmModal removeNames={props.removeNames}  t={t}/>
+        </th>
       </tr>
     </thead>
   )
@@ -344,6 +390,10 @@ class NamesDisplayTable extends React.Component {
           nameInfo={this.props.nameInfo}
           timeDisplay={this.props.conf.custom.display.time}
           setAndStoreNameInfo={this.props.setAndStoreNameInfo}
+          updateNames={this.props.updateNames}
+          registerAll={this.props.registerAll}
+          removeNames={this.props.removeNames}
+          estimatePriceAll={this.props.estimatePriceAll}
           t={this.props.t}
         />
         <TableBody 

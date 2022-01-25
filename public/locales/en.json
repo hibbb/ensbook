@@ -19,7 +19,7 @@
       "regAll": "Register All",
       "sgl": {
         "reg": "Reg",
-        "estTit": "Estimate The Registration Cost",
+        "estTit": "Estimate the Registration Cost",
         "regingTit": "Registering",
         "book": "Book",
         "bookTit": "Waiting for the name reopening"
@@ -31,7 +31,17 @@
       "lu": "Lookup",
       "sta": "Status",
       "reg": "Reg",
-      "del": "Del"
+      "del": "Del",
+      "tips": {
+        "no": "Sort by Special",
+        "lb": "Sort by Label",
+        "ti": "Sort by Time",
+        "sta": "Sort by Status",
+        "update": "Update Name Informations",
+        "regAll": "Register All Available Names",
+        "estAll": "Estimate the Cost of All Available Registrations",
+        "remAll": "Remove All Names"
+      }
     },
     "lookup": {
       "Etherscan": "Etherscan",

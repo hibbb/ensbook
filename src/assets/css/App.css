@@ -189,11 +189,19 @@ h1 a .title-ens {
 
 .main-wrapper {
   margin: 1.2rem auto 7rem;
-  max-width: 800px;
+  max-width: 880px;
   font-family: "ebr-regular";
 }
+.header-left, .header-right {
+  text-align: center;
+}
 .header-right {
-  text-align: right;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+}
+@media (min-width: 768px) { 
+  .header-left {text-align: left;}
+  .header-right {text-align: right; padding-top: 0; padding-bottom: 0;}
 }
 .page-tag {
   border-radius: 0.1rem;
@@ -202,8 +210,14 @@ h1 a .title-ens {
   font-size: 0.88rem;
   font-weight: 400;
 }
+.table-wrapper {
+  overflow-x: auto;
+}
 .table-wrapper table thead {
   font-family: "ebr-medium";
+}
+.ebr-tb {
+  min-width: 620px;
 }
 .form-add-names {
   margin: 1rem auto;
@@ -211,6 +225,9 @@ h1 a .title-ens {
 .btn-add-names {
   margin: 0;
   width: 100%;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
 .th-sortable {
   cursor: pointer;
@@ -316,19 +333,9 @@ button.btn-plain[disabled] {
 .current-version {
   font-size: 0.8rem;
 }
-.btns-container {
+.footnode-right {
   text-align: right;
 }
-.btns-container button {
-  margin: 0.25rem;
-}
-.btns-container .btn#btn-reg-all, .btns-container .btn#btn-update-all {
-  margin-right: 0;
-}
-.btns-container .btn#btn-estimate, .btns-container .btn#btn-remove-all {
-  border-left: solid 1px #f5f5f5;
-}
-
 .reg-waiting {
   color: #0dcaf0;
   width: 1rem;

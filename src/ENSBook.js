@@ -7,14 +7,12 @@ import lt from 'long-timeout'
 import NamesDisplayTable from './NamesDisplayTable'
 import AddNamesForm from './AddNamesForm'
 import namehash from '@ensdomains/eth-ens-namehash'
-import RegisterAllConfirmModal from './Utils/RegisterAllConfirmModal'
-import RemoveNamesConfirmModal from './Utils/RemoveNamesConfirmModal'
 import ConfigureForm from './Utils/ConfigureForm'
 import MessageToasts from './Utils/MessageToasts'
 import LanguageSwitcher from './Utils/LanguageSwitcher'
 import AppTitle from './Utils/AppTitle'
 import packageJson from '../package.json'
-import { Github, Calculator, ArrowRepeat, XCircle } from 'react-bootstrap-icons';
+import { Github, Twitter } from 'react-bootstrap-icons';
 
 let provider
 let walletWithProvider
@@ -523,10 +521,10 @@ class ENSBook extends Component {
     return (
       <div id="main-wrapper" className="container main-wrapper">
         <div className="row mb-3">
-          <div className="header-left col-6 justify-content-start">
+          <div className="header-left col-md-6">
             <AppTitle pageTag={conf.custom.pageTag} pageTagColor={conf.custom.pageTagColor} />
           </div>
-          <div className="header-right col-6 align-self-center">
+          <div className="header-right col-md-6 align-self-center">
             <LanguageSwitcher />
             <span className={"network px-2 network-"+ conf.custom.network}>{this.t('c.' + conf.custom.network)}</span>
             <span className="wallet-address">
@@ -551,7 +549,7 @@ class ENSBook extends Component {
           t={this.t} 
           getLabels={this.getLabels}
         />
-        <div className="table-wrapper">
+        <div className="row table-wrapper">
           <NamesDisplayTable 
             nameInfo={nameInfo} 
             conf={conf}
@@ -559,37 +557,33 @@ class ENSBook extends Component {
             updateName={this.updateName}
             updateNames={this.updateNames} 
             register={this.register} 
+            registerAll={this.registerAll}
             removeName={this.removeName} 
+            removeNames={this.removeNames}
             estimatePrice={this.estimatePrice}
+            estimatePriceAll={this.estimatePriceAll}
             book={this.book}
             cancelBook={this.cancelBook}
             setAndStoreNameInfo={this.setAndStoreNameInfo}
             t={this.t}
           />
-          <div className="row">
-            <div className="align-self-center col-5">
-              <div className="footnotes px-2">
-                <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
-                <span className="current-version px-2">v{packageJson.version}</span>
-              </div>
-            </div>
-            <div className="btns-container col-7">
-              <button type="button" id="btn-temp-1" className="btn-temp btn btn-primary" 
-              onClick={()=>{this.tempFunc1()}}>T1</button>
-              <button type="button" id="btn-temp-2" className="btn-temp btn btn-primary" 
-              onClick={()=>{this.tempFunc2()}}>T2</button>
-              <div className="btn-group">
-                <button type="button" id="btn-reg-all" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerAllConfirmModal">{this.t('tb.btn.regAll')}</button>
-                <button type="button" id="btn-estimate" className="btn btn-primary" title="Estimate The Registrations Cost" onClick={this.estimatePriceAll}><Calculator /></button>
-              </div>
-              <div className="btn-group">
-                <button type="button" id="btn-update-all" className="btn btn-primary" onClick={this.updateNames}><ArrowRepeat /></button>
-                <button type="button" id="btn-remove-all" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#removeNamesConfirmModal"><XCircle /></button>
-              </div>
+        </div>
+        <div className="row">
+          <div className="footnode-left align-self-center col-6">
+            <div className="footnotes px-2">
+              <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer"><Twitter /></a>
             </div>
           </div>
-          <RegisterAllConfirmModal registerAll={this.registerAll} t={this.t} />
-          <RemoveNamesConfirmModal removeNames={this.removeNames}  t={this.t}/>
+          <div className="footnode-right align-self-center col-6">
+            <button type="button" id="btn-temp-1" className="btn-temp btn btn-primary" 
+            onClick={()=>{this.tempFunc1()}}>T1</button>
+            <button type="button" id="btn-temp-2" className="btn-temp btn btn-primary" 
+            onClick={()=>{this.tempFunc2()}}>T2</button>
+            <div className="footnotes px-2">
+              <span className="current-version px-2">v{packageJson.version}</span>
+              <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
+            </div>
+          </div>
         </div>
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
       </div>
