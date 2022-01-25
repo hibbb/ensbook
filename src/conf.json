@@ -1,7 +1,7 @@
 {
   "projectName": "ENSBook",
   "author": "liubenben.eth",
-  "host": "local",
+  "host": "remote",
   "repository": "https://github.com/hibbb/ensbook/",
   "custom": {
     "operatorPrivateKey": [

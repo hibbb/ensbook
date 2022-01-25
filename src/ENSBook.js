@@ -7,14 +7,12 @@ import lt from 'long-timeout'
 import NamesDisplayTable from './NamesDisplayTable'
 import AddNamesForm from './AddNamesForm'
 import namehash from '@ensdomains/eth-ens-namehash'
-import RegisterAllConfirmModal from './Utils/RegisterAllConfirmModal'
-import RemoveNamesConfirmModal from './Utils/RemoveNamesConfirmModal'
 import ConfigureForm from './Utils/ConfigureForm'
 import MessageToasts from './Utils/MessageToasts'
 import LanguageSwitcher from './Utils/LanguageSwitcher'
 import AppTitle from './Utils/AppTitle'
 import packageJson from '../package.json'
-import { Github, Calculator, ArrowRepeat, XCircle } from 'react-bootstrap-icons';
+import { Github, Twitter } from 'react-bootstrap-icons';
 
 let provider
 let walletWithProvider
@@ -559,8 +557,11 @@ class ENSBook extends Component {
             updateName={this.updateName}
             updateNames={this.updateNames} 
             register={this.register} 
+            registerAll={this.registerAll}
             removeName={this.removeName} 
+            removeNames={this.removeNames}
             estimatePrice={this.estimatePrice}
+            estimatePriceAll={this.estimatePriceAll}
             book={this.book}
             cancelBook={this.cancelBook}
             setAndStoreNameInfo={this.setAndStoreNameInfo}
@@ -569,27 +570,21 @@ class ENSBook extends Component {
           <div className="row">
             <div className="align-self-center col-5">
               <div className="footnotes px-2">
-                <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
-                <span className="current-version px-2">v{packageJson.version}</span>
+                <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer"><Twitter /></a>
               </div>
             </div>
-            <div className="btns-container col-7">
+            <div className="btns-container align-self-center col-7">
               <button type="button" id="btn-temp-1" className="btn-temp btn btn-primary" 
               onClick={()=>{this.tempFunc1()}}>T1</button>
               <button type="button" id="btn-temp-2" className="btn-temp btn btn-primary" 
               onClick={()=>{this.tempFunc2()}}>T2</button>
-              <div className="btn-group">
-                <button type="button" id="btn-reg-all" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerAllConfirmModal">{this.t('tb.btn.regAll')}</button>
-                <button type="button" id="btn-estimate" className="btn btn-primary" title="Estimate The Registrations Cost" onClick={this.estimatePriceAll}><Calculator /></button>
-              </div>
-              <div className="btn-group">
-                <button type="button" id="btn-update-all" className="btn btn-primary" onClick={this.updateNames}><ArrowRepeat /></button>
-                <button type="button" id="btn-remove-all" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#removeNamesConfirmModal"><XCircle /></button>
+              <div className="footnotes px-2">
+                <span className="current-version px-2">v{packageJson.version}</span>
+                <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
               </div>
             </div>
+
           </div>
-          <RegisterAllConfirmModal registerAll={this.registerAll} t={this.t} />
-          <RemoveNamesConfirmModal removeNames={this.removeNames}  t={this.t}/>
         </div>
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
       </div>

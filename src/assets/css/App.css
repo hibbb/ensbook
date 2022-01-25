@@ -212,6 +212,9 @@ h1 a .title-ens {
   margin: 0;
   width: 100%;
 }
+.cursor-pointer {
+  cursor: pointer;
+}
 .th-sortable {
   cursor: pointer;
 }
@@ -385,5 +388,5 @@ button.btn-plain[disabled] {
 }
 
 .btn-temp {
-  /* display: none; */
+  display: none;
 }
