@@ -521,10 +521,10 @@ class ENSBook extends Component {
     return (
       <div id="main-wrapper" className="container main-wrapper">
         <div className="row mb-3">
-          <div className="header-left col-6 justify-content-start">
+          <div className="header-left col-md-6">
             <AppTitle pageTag={conf.custom.pageTag} pageTagColor={conf.custom.pageTagColor} />
           </div>
-          <div className="header-right col-6 align-self-center">
+          <div className="header-right col-md-6 align-self-center">
             <LanguageSwitcher />
             <span className={"network px-2 network-"+ conf.custom.network}>{this.t('c.' + conf.custom.network)}</span>
             <span className="wallet-address">
@@ -549,7 +549,7 @@ class ENSBook extends Component {
           t={this.t} 
           getLabels={this.getLabels}
         />
-        <div className="table-wrapper">
+        <div className="row table-wrapper">
           <NamesDisplayTable 
             nameInfo={nameInfo} 
             conf={conf}
@@ -567,23 +567,22 @@ class ENSBook extends Component {
             setAndStoreNameInfo={this.setAndStoreNameInfo}
             t={this.t}
           />
-          <div className="row">
-            <div className="align-self-center col-5">
-              <div className="footnotes px-2">
-                <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer"><Twitter /></a>
-              </div>
+        </div>
+        <div className="row">
+          <div className="footnode-left align-self-center col-6">
+            <div className="footnotes px-2">
+              <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer"><Twitter /></a>
             </div>
-            <div className="btns-container align-self-center col-7">
-              <button type="button" id="btn-temp-1" className="btn-temp btn btn-primary" 
-              onClick={()=>{this.tempFunc1()}}>T1</button>
-              <button type="button" id="btn-temp-2" className="btn-temp btn btn-primary" 
-              onClick={()=>{this.tempFunc2()}}>T2</button>
-              <div className="footnotes px-2">
-                <span className="current-version px-2">v{packageJson.version}</span>
-                <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
-              </div>
+          </div>
+          <div className="footnode-right align-self-center col-6">
+            <button type="button" id="btn-temp-1" className="btn-temp btn btn-primary" 
+            onClick={()=>{this.tempFunc1()}}>T1</button>
+            <button type="button" id="btn-temp-2" className="btn-temp btn btn-primary" 
+            onClick={()=>{this.tempFunc2()}}>T2</button>
+            <div className="footnotes px-2">
+              <span className="current-version px-2">v{packageJson.version}</span>
+              <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
             </div>
-
           </div>
         </div>
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
