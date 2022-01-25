@@ -62,8 +62,6 @@ class AddNamesForm extends React.Component {
             {t('tb.btn.add')}
           </button>
         </div>
-        
-
       </form>
     )
   }
