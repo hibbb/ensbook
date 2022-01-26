@@ -5,7 +5,7 @@ import RegisterConfirmModal from './Utils/RegisterConfirmModal';
 import RegisterAllConfirmModal from './Utils/RegisterAllConfirmModal';
 import RemoveNamesConfirmModal from './Utils/RemoveNamesConfirmModal';
 import moment from 'moment';
-import { BoxArrowUpRight, XCircle, Calculator, Robot, ArrowRepeat } from 'react-bootstrap-icons';
+import { BoxArrowUpRight, XCircle, Calculator, ChevronBarContract, ChevronBarExpand, Robot, ArrowRepeat } from 'react-bootstrap-icons';
 
 let ascFlag = {
   "label": true,
@@ -13,6 +13,11 @@ let ascFlag = {
   "expiresTime": true,
   "releaseTime": true,
   "status": true
+}
+
+let hideFlag = {
+  hideButton: true,
+  hideNames: false
 }
 
 const TableHeader = (props) => {
@@ -42,6 +47,30 @@ const TableHeader = (props) => {
     }
     let displaySpan = document.getElementById("th-" + key)
     displaySpan.classList.add("sort-asc-" + ascFlag[key])
+  }
+
+
+  const HideShowButton = () => {
+    const haveUnregistrableName = nameInfo.findIndex(
+      item => ['Open', 'Reopen', 'Premium'].indexOf(item.status)
+    )
+    const hideUnregistrableNames = () => {
+      hideFlag.hideNames = !hideFlag.hideNames
+      setAndStoreNameInfo(nameInfo)
+    }
+    if (haveUnregistrableName < 0) {
+      return null
+    }
+    
+    return (
+      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideFlag.hideNames ? 'show' : 'hide'))}</Tooltip>}>
+        <button type="button" className="btn-plain btn-reg-sub ms-2" 
+            onClick={hideUnregistrableNames}
+          >
+          { hideFlag.hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
+        </button>
+      </OverlayTrigger>
+    )  
   }
 
   return (
@@ -109,6 +138,7 @@ const TableHeader = (props) => {
               <Calculator />
             </button>
           </OverlayTrigger>
+          <HideShowButton />
           <RegisterAllConfirmModal registerAll={props.registerAll} t={t} />
         </th>
         <th>
@@ -130,6 +160,9 @@ const TableHeader = (props) => {
 const TableBody = (props) => {
   const {conf, t} = props
   const rows = props.nameInfo.map((row, index) => {
+    if (hideFlag.hideNames && row.status !== 'Open' && row.status !== 'Reopen') {
+      return null
+    }
     // for td-label
     const nameLink = "https://app.ens.domains/name/" + row.label + ".eth"
     let labelClickCount = 0
