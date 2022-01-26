@@ -40,7 +40,11 @@
         "update": "Update Name Informations",
         "regAll": "Register All Available Names",
         "estAll": "Estimate the Cost of All Available Registrations",
-        "remAll": "Remove All Names"
+        "remAll": "Remove All Names",
+        "hideNames": {
+          "hide": "Hide Unregistrable Names",
+          "show": "Show Unregistrable Names"
+        }
       }
     },
     "lookup": {
