@@ -20,6 +20,8 @@ let hideFlag = {
   hideNames: false
 }
 
+const registrableStatuses = ['Open', 'Reopen', 'Premium']
+
 const TableHeader = (props) => {
   const {nameInfo, timeDisplay, setAndStoreNameInfo, t} = props
 
@@ -49,14 +51,13 @@ const TableHeader = (props) => {
     displaySpan.classList.add("sort-asc-" + ascFlag[key])
   }
 
-
   const HideShowButton = () => {
     const haveUnregistrableName = nameInfo.findIndex(
-      item => ['Open', 'Reopen', 'Premium'].indexOf(item.status)
+      item => registrableStatuses.indexOf(item.status)
     )
     const hideUnregistrableNames = () => {
       hideFlag.hideNames = !hideFlag.hideNames
-      setAndStoreNameInfo(nameInfo)
+      setAndStoreNameInfo(nameInfo, false)
     }
     if (haveUnregistrableName < 0) {
       return null
@@ -160,7 +161,7 @@ const TableHeader = (props) => {
 const TableBody = (props) => {
   const {conf, t} = props
   const rows = props.nameInfo.map((row, index) => {
-    if (hideFlag.hideNames && row.status !== 'Open' && row.status !== 'Reopen') {
+    if (hideFlag.hideNames && registrableStatuses.indexOf(row.status) < 0) {
       return null
     }
     // for td-label
