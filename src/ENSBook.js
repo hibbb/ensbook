@@ -19,7 +19,6 @@ let walletWithProvider
 let conf
 
 class ENSBook extends Component {
-
   t = this.props.t
 
   constructor(props) {
@@ -225,7 +224,6 @@ class ENSBook extends Component {
   } 
 
   register = async (label, booked = false) => {
-
     let owner = conf.custom.receiverAddress      // address
     let duration = conf.custom.regTxConf.duration    // days
     let ourValue = conf.custom.regTxConf.value  // Ether
@@ -463,7 +461,6 @@ class ENSBook extends Component {
   }
 
   estimatePriceAll = async () => {
-
     let cg = null
     let rg = null
     const cccg = conf.custom.commitTxConf.gasPrice
