@@ -13,7 +13,6 @@ import LanguageSwitcher from './Utils/LanguageSwitcher'
 import AppTitle from './Utils/AppTitle'
 import packageJson from '../package.json'
 import { Github, Twitter } from 'react-bootstrap-icons';
-import TestBar from './Utils/TestBar'
 
 let provider
 let walletWithProvider
