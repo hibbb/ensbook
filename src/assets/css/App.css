@@ -391,6 +391,14 @@ button.btn-plain[disabled] {
   100%{-webkit-transform:rotate(0deg);}
 }
 
-.btn-temp {
-  display: none;
+.test-bar {
+  border-radius: 0.25rem;
+  background-color: #eaeaea;
+}
+.test-bar > span {
+  cursor: pointer;
+  color: #0dcaf0;
+}
+.test-bar > span:hover {
+  text-decoration: underline;
 }

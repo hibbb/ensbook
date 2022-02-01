@@ -1,7 +1,5 @@
 import React from 'react';
 
-
-
 function getPageTag(props) {
   const pageTag = props.pageTag
   const pageTagStyle = { backgroundColor: props.pageTagColor }

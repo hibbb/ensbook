@@ -70,7 +70,7 @@
       "pageTagColorTip": "为标记选择一个背景颜色"
     },
     "commit": {
-      "title": "承诺",
+      "title": "请求",
       "gasPrice": "Gas 价格",
       "gasLimit": "Gas 上限",
       "waitConfirms": "确认数"
@@ -103,10 +103,10 @@
     "nameNormalizeError": "错误: {{errMsg}}",
     "book": "{{duration}} 之后会再次检查 {{label}}.eth 的注册状态。",
     "register00": "{{label}}.eth 即将注册给 {{owner}}，注册时长为 {{duration}} 天。",
-    "register10": "{{label}}.eth 承诺已经提交。",
+    "register10": "{{label}}.eth 请求已经提交。",
     "register11": {
-      "succeed": "步骤 1 已完成: {{label}}.eth 承诺 {{txLink}} 已经确认， 等待一段时间后会自动进行一下步。",
-      "fail": "{{label}}.eth 承诺失败。你可以检查这笔 {{txLink}}。"
+      "succeed": "步骤 1 已完成: {{label}}.eth 请求 {{txLink}} 已经确认， 等待一段时间后会自动进行一下步。",
+      "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
     },
     "register20": "步骤 2 已完成: {{label}}.eth 已经准备好了，即将进行最后一笔注册交易。",
     "register30": {
