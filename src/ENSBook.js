@@ -13,6 +13,7 @@ import LanguageSwitcher from './Utils/LanguageSwitcher'
 import AppTitle from './Utils/AppTitle'
 import packageJson from '../package.json'
 import { Github, Twitter } from 'react-bootstrap-icons';
+import TestBar from './Utils/TestBar'
 
 let provider
 let walletWithProvider
@@ -502,13 +503,6 @@ class ENSBook extends Component {
     this.setAndStoreNameInfo([])
   }
 
-  tempFunc1 = async () => {
-  }
-
-  tempFunc2 = async () => {
-  }
-
-
   render() {
     const {nameInfo, walletInfo} = this.state
     const walletAddr = walletInfo.address
@@ -572,16 +566,13 @@ class ENSBook extends Component {
             </div>
           </div>
           <div className="footnode-right align-self-center col-6">
-            <button type="button" id="btn-temp-1" className="btn-temp btn btn-primary" 
-            onClick={()=>{this.tempFunc1()}}>T1</button>
-            <button type="button" id="btn-temp-2" className="btn-temp btn btn-primary" 
-            onClick={()=>{this.tempFunc2()}}>T2</button>
             <div className="footnotes px-2">
               <span className="current-version px-2">v{packageJson.version}</span>
               <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
             </div>
           </div>
         </div>
+        <TestBar />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
       </div>
     )
