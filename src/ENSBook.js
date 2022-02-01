@@ -572,7 +572,6 @@ class ENSBook extends Component {
             </div>
           </div>
         </div>
-        <TestBar />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
       </div>
     )
