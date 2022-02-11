@@ -388,18 +388,16 @@ class ENSBook extends Component {
     return donateETH
   }
 
-  nameRegistrable = () => {
+  getRegistrableNames = () => {
     return this.state.nameInfo.filter((nameItem, i) => {
-      return nameItem.status === 'Open' || nameItem.status === "Reopen"
+      return nameItem.status === 'Open' || nameItem.status === "Reopen" || nameItem.status === "Premium"
     })
   }
 
   registerAll = async () => {
-    const nameRegistrable = this.state.nameInfo.filter((nameItem, i) => {
-      return nameItem.status === 'Open' || nameItem.status === "Reopen"
-    })
-    for (let i = 0; i < nameRegistrable.length; i++) {
-      await this.register(nameRegistrable[i].label)
+    const registrableNames = this.getRegistrableNames()
+    for (let i = 0; i < registrableNames.length; i++) {
+      await this.register(registrableNames[i].label)
     }
   }
 
@@ -475,11 +473,11 @@ class ENSBook extends Component {
       rg = ccrg > 0 ? utils.parseUnits(ccrg.toString(), 'gwei') : gasPrice
     }
 
-    const nameRegistrable = this.nameRegistrable()
+    const registrableNames = this.getRegistrableNames()
     let priceWei = ethers.BigNumber.from(0)
-    for (let i = 0; i < nameRegistrable.length; i++) {
+    for (let i = 0; i < registrableNames.length; i++) {
       priceWei = priceWei.add(
-        await this.estimatePrice(nameRegistrable[i].label, false, cg, rg)
+        await this.estimatePrice(registrableNames[i].label, false, cg, rg)
       )
     }
     const priceEther = utils.formatEther(priceWei)

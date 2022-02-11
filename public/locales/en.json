@@ -9,22 +9,13 @@
       "Premium": "Premium",
       "Reopen": "Reopen",
       "Unknown": "Unknown"
-    },
-    "staTit": "Click to Update the Info of This Name"
+    }
+  },
+  "form": {
+    "holder": "Enter name labels separated by spaces",
+    "btn": "Add Names"
   },
   "tb": {
-    "holder": "Enter name labels separated by spaces",
-    "btn": {
-      "add": "Add Names",
-      "regAll": "Register All",
-      "sgl": {
-        "reg": "Reg",
-        "estTit": "Estimate the Registration Cost",
-        "regingTit": "Registering",
-        "book": "Book",
-        "bookTit": "Waiting for the name reopening"
-      }
-    },
     "th": {
       "no": "#",
       "lb": "Label",
@@ -47,11 +38,26 @@
         }
       }
     },
+    "td": {
+      "reg": "Reg",
+      "book": "Book",
+      "tips": {
+        "lb": "Click to Highlight This Name",
+        "sta": "Click to Update This Name",
+        "est": "Estimate the Registration Cost",
+        "reg": "Register {{label}}.eth",
+        "reging": "Registering",
+        "book": "Book {{label}}.eth",
+        "booked": "Waiting for the name reopening",
+        "cbook": "Cancel This Book",
+        "del": "Remove {{label}}.eth"
+      }
+    },
     "lookup": {
       "Etherscan": "Etherscan",
       "Opensea": "Opensea",
       "Metadata": "Metadata",
-      "eth.link": "eth.link",
+      "eth.link": "{{label}}.eth.link",
       "DNSRelated": "DNS with Same Label"
     }
   },
@@ -116,12 +122,12 @@
     "estimatePrice": "{{label}}.eth registration estimated cost ≈ {{price}} ETH.",
     "estimatePriceAll": "Registrations estimated TOTAL COST ≈ {{price}} ETH.",
     "setAndStoreNameInfo": {
-      "succeed": "Name information updated and stored.",
-      "fail": "Name information stored failed."
+      "succeed": "Name information has been updated and stored.",
+      "fail": "Failed to store the name information."
     },
     "setAndStoreConfInfo": {
-      "succeed": "Configurations updated and stored.",
-      "fail": "Configurations stored failed."
+      "succeed": "Configurations have been updated and stored.",
+      "fail": "Failed to store the configurations."
     }
   },
   "modal": {
@@ -140,8 +146,11 @@
     "tx": "transaction",
     "ropsten": "Ropsten",
     "mainnet": "Mainnet",
+    "relatedTime": "Related Times",
+    "currentTime": "Current",
     "expiresTime": "Expires",
     "releaseTime": "Release",
+    "premiumEnd": "Reopen",
     "eth": "ETH",
     "gwei": "Gwei",
     "seconds": "Seconds",
