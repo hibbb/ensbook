@@ -27,20 +27,11 @@
 /* ===== ebr-code: SpaceMono ===== */
 @font-face {
   font-family: 'ebr-code-regular';
-  src: url('./SpaceMono/SpaceMono-Regular.ttf') format('truetype');
+  src: url('./Lato/Lato-Regular.ttf') format('truetype');
   font-display: fallback;
 }
 @font-face {
-  font-family: 'ebr-code-italic';
-  src: url('./SpaceMono/SpaceMono-Italic.ttf') format('truetype'); 
-  font-display: fallback;
-}
-@font-face {
-  font-family: 'ebr-code-bold-italic';
-  src: url('./SpaceMono/SpaceMono-BoldItalic.ttf') format('truetype'); 
-  font-display: fallback;
-}@font-face {
   font-family: 'ebr-code-bold';
-  src: url('./SpaceMono/SpaceMono-Bold.ttf') format('truetype'); 
+  src: url('./Lato/Lato-Bold.ttf') format('truetype'); 
   font-display: fallback;
 }

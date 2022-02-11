@@ -50,7 +50,7 @@ class AddNamesForm extends React.Component {
             name="labels"
             id="labels"
             autoFocus
-            placeholder={t('tb.holder')} 
+            placeholder={t('form.holder')} 
             value={labels}
             onChange={this.handleChange} 
             onKeyDown={this.handleKeyDown}
@@ -59,7 +59,7 @@ class AddNamesForm extends React.Component {
           <button type="button" 
           className="btn btn-primary" 
           onClick={this.submitForm}>
-            {t('tb.btn.add')}
+            {t('form.btn')}
           </button>
         </div>
       </form>

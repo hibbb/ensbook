@@ -1,11 +1,9 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import './Utils/RegisterConfirmModal';
-import RegisterConfirmModal from './Utils/RegisterConfirmModal';
+import { LabelCell, LookupCell, TimeCell, StatusCell, RegisterCell, DelCell } from './Utils/TableCells';
 import RegisterAllConfirmModal from './Utils/RegisterAllConfirmModal';
 import RemoveNamesConfirmModal from './Utils/RemoveNamesConfirmModal';
-import moment from 'moment';
-import { BoxArrowUpRight, XCircle, Calculator, ChevronBarContract, ChevronBarExpand, Robot, ArrowRepeat } from 'react-bootstrap-icons';
+import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat } from 'react-bootstrap-icons';
 
 let ascFlag = {
   "label": true,
@@ -159,122 +157,56 @@ const TableHeader = (props) => {
 }
 
 const TableBody = (props) => {
-  const {conf, t} = props
+  const {conf, levelUp, removeName, t} = props
   const rows = props.nameInfo.map((row, index) => {
     if (hideFlag.hideNames && registrableStatuses.indexOf(row.status) < 0) {
       return null
     }
-    // for td-label
-    const nameLink = "https://app.ens.domains/name/" + row.label + ".eth"
-    let labelClickCount = 0
-    const oneClickToLevelUp = () => {
-      labelClickCount += 1;
-      setTimeout(() => {
-        if (labelClickCount === 1) {
-          props.levelUp(index)
-        }
-        labelClickCount = 0;
-      }, 350);
-    }
-    
-    // for td-lookup
-    const { lookup } = conf.custom.display
-    // When you modify lookupLinks, you also need to modify:
-    // 1. the custom.display.lookup filed of conf.json
-    // 2. the nm.tb.lookup filed of en.json and cn.json
-    const lookupLinks = {
-      "Etherscan": "https://" + (conf.custom.network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + row.label + ".eth",
-      "Opensea": "https://opensea.io/assets/" + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + "/" + row.tokenId,
-      "Metadata": "https://metadata.ens.domains/" + conf.custom.network + "/" + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + "/" + row.tokenId,
-      "eth.link": "https://" + row.label + ".eth.link/",
-      "DNSRelated": "https://domains.google.com/registrar/search?tab=1&searchTerm=" + row.label
-    }
 
-    // for expiresTime or releaseTime
-    const displayTime = conf.custom.display.time === 'expiresTime' ? moment.unix(row.expiresTime) : moment.unix(row.releaseTime)
-    let readableTime, accurateTime
-
-    // for td-status
-    switch(row.status) {
-      case 'Open':
-        readableTime = row.expiresTime    // 0
-        accurateTime = row.expiresTime
-        break
-      case 'Normal':
-        readableTime = displayTime.format('YYYY-MM-DD')
-        accurateTime = displayTime.format('YYYY-MM-DD HH:mm:ss')
-        break
-      case 'Grace':
-      case 'Booked': 
-      case 'Premium':
-      case 'Reopen':
-        readableTime = displayTime.fromNow()
-        accurateTime = displayTime.format('YYYY-MM-DD HH:mm:ss')
-        break
-      default:
-        readableTime = t('nm.sta.Unknown')
-    } 
-
-    
     return (
       <tr key={index} className='ebr-tb-row'>
         <td>{index + 1}</td>
         <td className='td-name-label'>
-          <span className={'td-level td-level-' + row.level} 
-            onClick={()=>oneClickToLevelUp()}
-          >
-            {row.label}
-          </span> 
-          <OverlayTrigger
-            key={'name-label-' + row.label}
-            placement="top"
-            overlay={
-              <Tooltip id={'tooltip-name-label-' + row.label}>
-                ENS APP
-              </Tooltip>
-            }>
-            <a href={nameLink} target="_blank" rel="noreferrer">
-              <BoxArrowUpRight className="external-link-icon" />
-            </a>
-          </OverlayTrigger>
+          <LabelCell
+            label={row.label}
+            level={row.level}
+            index={index}
+            levelUp={levelUp}
+          />
         </td>
         <td className='td-lookup'>
-          {Object.keys(lookupLinks).map(item => 
-            lookup[item]
-            ? (<OverlayTrigger
-                key={'lookup-' + item}
-                placement="top"
-                overlay={
-                  <Tooltip id={'tooltip-' + item + '-' + row.label}>
-                    {t('tb.lookup.' + item)}
-                  </Tooltip>
-                }>
-                  <a href={lookupLinks[item]} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
-              </OverlayTrigger>)
-            : null
-          )}
+          <LookupCell
+            conf={conf}
+            label={row.label}
+            tokenId={row.tokenId}
+            t={t}
+          />
         </td>
         <td>
-          <OverlayTrigger
-            key={'displaytime-' + row.label}
-            placement="top"
-            overlay={
-              <Tooltip id={'tooltip-displaytime-' + row.label}>
-                {accurateTime}
-              </Tooltip>
-            }>
-            <span>{readableTime}</span>
-          </OverlayTrigger>
+          <TimeCell
+            displayTime={conf.custom.display.time}
+            status={row.status} 
+            label={row.label} 
+            releaseTime={row.releaseTime}
+            expiresTime={row.expiresTime}
+            updateName={props.updateName}
+            index={index}
+            t={t}
+          />
         </td>
         <td>
-          <span className={'px-1 td-status status' + row.status} title={t('nm.staTit')}
-            onClick={()=>{props.updateName(index)}}
-          >
-            {t('nm.sta.' + row.status)}
-          </span>
+          <StatusCell
+            status={row.status} 
+            label={row.label} 
+            releaseTime={row.releaseTime}
+            expiresTime={row.expiresTime}
+            updateName={props.updateName}
+            index={index}
+            t={t}
+          />
         </td>
         <td>
-          <SingleRegisterButton 
+          <RegisterCell 
             status={row.status} 
             register={props.register} 
             label={row.label} 
@@ -287,11 +219,11 @@ const TableBody = (props) => {
           />
         </td>
         <td>
-          <button type="button" className="btn-plain btn-del-name" 
-            onClick={()=>props.removeName(index)}
-          >
-            <XCircle />
-          </button>
+          <DelCell
+            label={row.label}
+            removeName={removeName}
+            index={index}
+          />
         </td>
       </tr>
     )
@@ -302,145 +234,53 @@ const TableBody = (props) => {
   )
 }
 
-const SingleRegisterButton = (props) => {
-  const {status, register, label, expiresTime, index, estimatePrice, book, cancelBook, t} = props
-  if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
-    return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <button
-          type="button" 
-          id={"register-btn-" + label}
-          className="btn-plain btn-reg" 
-          data-bs-toggle="modal" data-bs-target={"#registerConfirmModal-" + label}
-          >
-          {t('tb.btn.sgl.reg')}
-        </button>
-        <OverlayTrigger
-          key={"estimate-" + label}
-          placement="top"
-          overlay={
-            <Tooltip id={"tooltip-estimate-" + label}>
-              {t('tb.btn.sgl.estTit')}
-            </Tooltip>
-          }
-        >
-          <button type="button" id={"reg-sub-btn" + label} className="btn-plain btn-reg-sub ms-2" 
-            onClick={()=>{estimatePrice(label)}}
-          >
-            <Calculator />
-          </button>
-        </OverlayTrigger>
-        <RegisterConfirmModal register={register} label={label} t={t} />
-      </div>
-    )
-  }
-
-  const expiresTimeMilli = moment.unix(expiresTime)
-  const nowT = moment()
-  const bookActiveDurationFlag = nowT.add(24, 'hours') > expiresTimeMilli.add(90, 'days')
-
-  if (status === 'Grace' && bookActiveDurationFlag) {
-    return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <button 
-          type="button" 
-          id={"register-btn-" + label}
-          className="btn-plain btn-book" 
-          data-bs-toggle="modal" data-bs-target={"#registerConfirmModal-" + label}
-          >
-          {t('tb.btn.sgl.book')}
-        </button>
-        <button type="button" id={"reg-sub-btn" + label} className="btn-plain btn-reg-sub ms-2"></button>
-        <RegisterConfirmModal register={book} label={label} t={t} />
-      </div>
-    )
-  }
-
-  if (status === 'Registering') {
-    return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <button 
-          type="button" 
-          id={"register-btn-" + label}
-          className="btn-plain"
-          disabled={true}
-          >
-          {t('tb.btn.sgl.reg')}
-        </button>
-        <button 
-          type="button" 
-          id={"reg-sub-btn" + label} 
-          className="btn-plain btn-reg-sub ms-2" 
-          title={t('tb.btn.sgl.regingTit')}>
-          <div className="spinner-border reg-waiting" role="status">
-            <span className="visually-hidden">Registering...</span>
-          </div>
-        </button>
-      </div>
-    )
-  }
-
-  if (status === 'Booked') {
-    return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <button type="button" id={"register-btn-" + label} className="btn-plain"
-          disabled={false}
-          onClick={()=>{cancelBook(index)}}
-        >
-          {t('c.cancel')}
-        </button>
-        <button 
-          type="button" 
-          id={"reg-sub-btn" + label} 
-          className="btn-plain btn-reg-sub book-waiting ms-2" 
-          title={t('tb.btn.sgl.bookTit')}>
-          <Robot />
-        </button>
-      </div>
-    )
-  }
-
-  return (
-    <div id={"register-" + label} className="btn-group" role="group" aria-label="Register">
-      <button 
-        type="button" 
-        className="btn-plain" 
-        disabled={true}>
-        {t('tb.btn.sgl.reg')}
-      </button>
-    </div>
-  )
-}
-
 class NamesDisplayTable extends React.Component {
   componentDidMount() {
     this.props.updateNames(false)
   }
 
   render() {
+    const { 
+      nameInfo, 
+      conf, 
+      setAndStoreNameInfo, 
+      levelUp, 
+      updateName, 
+      updateNames, 
+      estimatePrice, 
+      estimatePriceAll, 
+      register, 
+      registerAll, 
+      book, 
+      cancelBook, 
+      removeNames, 
+      removeName, 
+      t
+    } = this.props
+
     return (
       <table className="table table-hover ebr-tb">
         <TableHeader
-          nameInfo={this.props.nameInfo}
-          timeDisplay={this.props.conf.custom.display.time}
-          setAndStoreNameInfo={this.props.setAndStoreNameInfo}
-          updateNames={this.props.updateNames}
-          registerAll={this.props.registerAll}
-          removeNames={this.props.removeNames}
-          estimatePriceAll={this.props.estimatePriceAll}
-          t={this.props.t}
+          nameInfo={nameInfo}
+          timeDisplay={conf.custom.display.time}
+          setAndStoreNameInfo={setAndStoreNameInfo}
+          updateNames={updateNames}
+          registerAll={registerAll}
+          removeNames={removeNames}
+          estimatePriceAll={estimatePriceAll}
+          t={t}
         />
         <TableBody 
-          nameInfo={this.props.nameInfo} 
-          conf={this.props.conf}
-          levelUp={this.props.levelUp}
-          updateName={this.props.updateName}
-          register={this.props.register} 
-          removeName={this.props.removeName} 
-          estimatePrice={this.props.estimatePrice} 
-          book={this.props.book}
-          cancelBook={this.props.cancelBook}
-          t={this.props.t}
+          nameInfo={nameInfo} 
+          conf={conf}
+          levelUp={levelUp}
+          updateName={updateName}
+          register={register} 
+          removeName={removeName} 
+          estimatePrice={estimatePrice} 
+          book={book}
+          cancelBook={cancelBook}
+          t={t}
         />
       </table>
     )

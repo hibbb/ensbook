@@ -7931,7 +7931,14 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.nlark.com/mkdirp/download/mkdirp-1.0.4.tgz"
   integrity sha1-PrXtYmInVteaXw4qIh3+utdcL34=
 
-moment@^2.29.1:
+moment-timezone@^0.5.34:
+  version "0.5.34"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.34.tgz#a75938f7476b88f155d3504a9343f7519d9a405c"
+  integrity sha512-3zAEHh2hKUs3EXLESx/wsgw6IQdusOT8Bxm3D9UrHPQR7zlMmzwybC8zHEM1tQ4LJwP7fcxrWr8tuBg05fFCbg==
+  dependencies:
+    moment ">= 2.9.0"
+
+"moment@>= 2.9.0", moment@^2.29.1:
   version "2.29.1"
   resolved "https://registry.npm.taobao.org/moment/download/moment-2.29.1.tgz"
   integrity sha1-sr52n6MZQL6e7qZGnAdeNQBvo9M=
@@ -9755,6 +9762,16 @@ react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npm.taobao.org/react-lifecycles-compat/download/react-lifecycles-compat-3.0.4.tgz"
   integrity sha1-TxonOv38jzSIqMUWv9p4+HI1I2I=
+
+react-live-clock@^5.6.1:
+  version "5.6.1"
+  resolved "https://registry.yarnpkg.com/react-live-clock/-/react-live-clock-5.6.1.tgz#0ac520a4411cc75b0cfcc2e9610c9ab48b22a325"
+  integrity sha512-3q1ajHFEMc/vR6YflK/Ix2ejjiDTFin05zCt5Yr6rRUQ/kfsaPu5u95T5FYy7ROW/SGLakbPeDQwuISP8XaZ/A==
+
+react-moment@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/react-moment/-/react-moment-1.1.1.tgz#5fe9fb257039590c804e2b3aedfc3ceb0a6ffb16"
+  integrity sha512-WjwvxBSnmLMRcU33do0KixDB+9vP3e84eCse+rd+HNklAMNWyRgZTDEQlay/qK6lcXFPRuEIASJTpEt6pyK7Ww==
 
 react-refresh@^0.8.3:
   version "0.8.3"
