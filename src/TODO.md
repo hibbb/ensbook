@@ -4,6 +4,8 @@
 
 ## Priority 1
 
+* add tooltip for premium with the ending time of premium
+
 ## Priority 2
 
 * insert registrant to state.nameInfo for every name, then upgrade to v1.4
