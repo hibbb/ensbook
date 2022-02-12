@@ -4,7 +4,10 @@
 
 ## Priority 1
 
-* add tooltip for premium with the ending time of premium
+* move refresh button to the time column
+* add reminder feature for names which will reopen, according to its time/price, maybe we need a email reminder.
+* disable the whole page when updating name
+* @ add more tooltip
 
 ## Priority 2
 

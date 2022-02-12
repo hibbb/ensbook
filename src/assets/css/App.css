@@ -161,7 +161,7 @@ h1 a .title-ens {
 .statusRegistering, .statusBooked {
   background-color: #0dcaf065;
 }
-.td-level, .td-status {
+.td-level {
   cursor: default;
 }
 .td-level-0 {
@@ -172,6 +172,9 @@ h1 a .title-ens {
 }
 .td-level-2 {
   color: indianred;
+}
+.reopen-reminder {
+  background-image: linear-gradient(to right, #ffe69c65 0%, #ffe69c65 30%, #a6e9d5 100%);
 }
 
 .tooltip-inner {
@@ -282,7 +285,11 @@ h1 a .title-ens {
 .td-name-label {
   font-family: "ebr-semibold";
 }
+.td-time {
+  cursor: default;
+}
 .td-status {
+  cursor: default;
   border-radius: 0.15rem;
   text-transform: uppercase;
   font-size: 0.88rem;
@@ -309,7 +316,7 @@ h1 a .title-ens {
   padding: 0;
   background-color: transparent;
   text-decoration: none;
-  font-weight: 400;
+  font-weight: 300;
 }
 .btn-plain:hover {
   text-decoration: underline;

@@ -3,7 +3,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import RegisterConfirmModal from './RegisterConfirmModal';
 import moment from 'moment';
 import Clock from 'react-live-clock';
-import { BoxArrowUpRight, XCircle, Calculator, Robot } from 'react-bootstrap-icons';
+import { BoxArrowUpRight, XCircle, Calculator, Robot, ArrowRepeat } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 
 
@@ -89,9 +89,96 @@ export const LookupCell = (props) => {
 
 }
 
-export const TimeCell = (props) => {
-  const {displayTime, status, label, releaseTime, expiresTime, t} = props
+// export const TimeCell = (props) => {
+//   const {label, index, status, displayTime, releaseTime, expiresTime, updateName, t} = props
   
+//   const jsonSortByNumber = (array, key) => {
+//     if (array.length < 2 || !key || typeof array[0] !== "object" || typeof array[0][key] !== "number") {
+//       return array
+//     }
+//     array.sort(function(x, y) {return x[key] - y[key]})
+//     return array;
+//   }
+
+//   // for expiresTime or releaseTime
+//   let readableTime
+//   let tooltipArray = []
+
+//   if (expiresTime > 0) {
+//     switch(displayTime) {
+//       case 'expiresTime':
+//         readableTime = moment.unix(expiresTime).fromNow()
+//         break
+//       case 'releaseTime':
+//         readableTime = moment.unix(releaseTime).fromNow()
+//         break
+//       default:
+//         readableTime = t('nm.sta.Unknown')
+//     }
+
+//     switch(status) {
+//       case 'Normal':
+//       case 'Grace':
+//       case 'Booked': 
+//         tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
+//         tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
+//         tooltipArray[2] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
+//         break
+//       case 'Premium':
+//       case 'Reopen':
+//         tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
+//         tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
+//         tooltipArray[2] = {label: t('c.premiumEnd'), unixTime: releaseTime + moment.duration(28, 'days').asSeconds()}
+//         tooltipArray[3] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
+//         break
+//       default:
+//         tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
+//     }  
+//   } else {
+//     readableTime = t('nm.sta.Unknown')
+//     tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
+//   }
+
+//   return (
+//     <OverlayTrigger
+//       key={'relatedtime-' + label}
+//       placement="top"
+//       overlay={
+//         <Tooltip id={'tooltip-displaytime-' + label}>
+//           { 
+//             jsonSortByNumber(tooltipArray, "unixTime").map((item, index) => {
+//               return (
+//                 <p key={index} className={'d-flex justify-content-between current-' + item.current ?? 'false'}>
+//                   <span className="tooltip-time-label me-1">{item.label}:</span>
+//                   <span className="tooltip-time-text">
+//                   {
+//                     typeof item.unixTime === "number" 
+//                     ? (
+//                         item.current 
+//                         ? <Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} />
+//                         : moment.unix(item.unixTime).format('YYYY-MM-DD HH:mm:ss')
+//                       )
+//                     : item.unixTime
+//                   }
+//                   </span>
+//                 </p>
+//               )
+//             }) 
+//           }
+//         </Tooltip>
+//       }>
+//       <span className="td-time" title={t('tb.td.tips.tm')} onClick={()=>updateName(index)}>
+//         {readableTime}
+//       </span>
+//     </OverlayTrigger>
+//   )
+// }
+
+export const StatusCell = (props) => {
+  const {label, index, status, releaseTime, expiresTime, updateName, t} = props
+  const reopenReminderFlag = status === 'Premium' && moment() > moment.unix(releaseTime).add(26, 'days')
+  const reopenReminderClass = reopenReminderFlag ? ' reopen-reminder' : ''
+
   const jsonSortByNumber = (array, key) => {
     if (array.length < 2 || !key || typeof array[0] !== "object" || typeof array[0][key] !== "number") {
       return array
@@ -100,22 +187,9 @@ export const TimeCell = (props) => {
     return array;
   }
 
-  // for expiresTime or releaseTime
-  let readableTime
   let tooltipArray = []
 
   if (expiresTime > 0) {
-    switch(displayTime) {
-      case 'expiresTime':
-        readableTime = moment.unix(expiresTime).fromNow()
-        break
-      case 'releaseTime':
-        readableTime = moment.unix(releaseTime).fromNow()
-        break
-      default:
-        readableTime = t('nm.sta.Unknown')
-    }
-
     switch(status) {
       case 'Normal':
       case 'Grace':
@@ -135,61 +209,57 @@ export const TimeCell = (props) => {
         tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
     }  
   } else {
-    readableTime = t('nm.sta.Unknown')
     tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
-  }
+  }  
 
   return (
-    <OverlayTrigger
-      key={'relatedtime-' + label}
-      placement="top"
-      overlay={
-        <Tooltip id={'tooltip-displaytime-' + label}>
-          { 
-            jsonSortByNumber(tooltipArray, "unixTime").map((item, index) => {
-              return (
-                <p key={index} className={'d-flex justify-content-between current-' + item.current ?? 'false'}>
-                  <span className="tooltip-time-label me-1">{item.label}:</span>
-                  <span className="tooltip-time-text">
-                  {
-                    typeof item.unixTime === "number" 
-                    ? (
-                        item.current 
-                        ? <Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} />
-                        : moment.unix(item.unixTime).format('YYYY-MM-DD HH:mm:ss')
-                      )
-                    : item.unixTime
-                  }
-                  </span>
-                </p>
-              )
-            }) 
-          }
-        </Tooltip>
-      }>
-      <span>
-        {readableTime}
-      </span>
-    </OverlayTrigger>
-  )
-}
-
-export const StatusCell = (props) => {
-  const {status, label, updateName, index, t} = props
-
-  return (
-    <OverlayTrigger
-      key={'trigger-status-' + label}
-      placement="top"
-      overlay={
-        <Tooltip id={'tooltip-relatedtime-' + label}>
-          {t('tb.td.tips.sta')}
-        </Tooltip>
-      }>
-      <span className={'px-1 td-status status' + status} onClick={()=>updateName(index)}>
-        {t('nm.sta.' + status)}
-      </span>
-    </OverlayTrigger>
+    <>
+      <OverlayTrigger
+        key={'relatedtime-' + label}
+        placement="top"
+        overlay={
+          <Tooltip id={'tooltip-displaytime-' + label}>
+            { 
+              jsonSortByNumber(tooltipArray, "unixTime").map((item, index) => {
+                return (
+                  <p key={index} className={'d-flex justify-content-between current-' + item.current ?? 'false'}>
+                    <span className="tooltip-time-label me-1">{item.label}:</span>
+                    <span className="tooltip-time-text">
+                    {
+                      typeof item.unixTime === "number" 
+                      ? (
+                          item.current 
+                          ? <Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} />
+                          : moment.unix(item.unixTime).format('YYYY-MM-DD HH:mm:ss')
+                        )
+                      : item.unixTime
+                    }
+                    </span>
+                  </p>
+                )
+              }) 
+            }
+          </Tooltip>
+        }>        
+        <span className={'px-1 td-status status' + status + reopenReminderClass}>
+          {t('nm.sta.' + status)}
+        </span>
+      </OverlayTrigger>
+      <OverlayTrigger
+        key={'trigger-status-' + label}
+        placement="top"
+        overlay={
+          <Tooltip id={'tooltip-relatedtime-' + label}>
+            {t('tb.td.tips.tm')}
+          </Tooltip>
+        }>
+        <button type="button" id={"status-sub-btn-" + label} className="btn-plain td-status ms-2" 
+          onClick={()=>{updateName(index)}}
+        >
+          <ArrowRepeat />
+        </button>
+      </OverlayTrigger>
+    </>
   )
 }
 
@@ -223,7 +293,7 @@ export const RegisterCell = (props) => {
               {t('tb.td.tips.est')}
             </Tooltip>
           }>
-          <button type="button" id={"reg-sub-btn" + label} className="btn-plain btn-reg-sub ms-2" 
+          <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-reg-sub ms-2" 
             onClick={()=>{estimatePrice(label)}}
           >
             <Calculator />
@@ -234,10 +304,8 @@ export const RegisterCell = (props) => {
     )
   }
 
-  const expiresTimeMilli = moment.unix(expiresTime)
-  const bookActiveDurationFlag = moment().add(24, 'hours') > expiresTimeMilli.add(90, 'days')
-
-  if (status === 'Grace' && bookActiveDurationFlag) {
+  //bookActiveDurationFlag: moment().add(24, 'hours') > moment.unix(expiresTime).add(90, 'days')
+  if (status === 'Grace' && moment().add(24, 'hours') > moment.unix(expiresTime).add(90, 'days')) {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
         <OverlayTrigger

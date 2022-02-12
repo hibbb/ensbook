@@ -24,11 +24,11 @@
       "reg": "Reg",
       "del": "Del",
       "tips": {
-        "no": "Sort by Special",
+        "no": "Sort by Highlight Color",
         "lb": "Sort by Label",
         "ti": "Sort by Time",
         "sta": "Sort by Status",
-        "update": "Update Name Informations",
+        "update": "Update Informations of All Names",
         "regAll": "Register All Available Names",
         "estAll": "Estimate the Cost of All Available Registrations",
         "remAll": "Remove All Names",
@@ -43,7 +43,7 @@
       "book": "Book",
       "tips": {
         "lb": "Click to Highlight This Name",
-        "sta": "Click to Update This Name",
+        "tm": "Click to Update This Name",
         "est": "Estimate the Registration Cost",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",

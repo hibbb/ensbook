@@ -94,7 +94,7 @@ const TableHeader = (props) => {
           </OverlayTrigger>
         </th>
         <th>{t('tb.th.lu')}</th>
-        <th>
+        {/* <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.ti')}</Tooltip>}>
             <span id={"th-" + timeDisplay} className="th-sortable"
               onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, timeDisplay))}}
@@ -102,11 +102,11 @@ const TableHeader = (props) => {
               {t('c.' + timeDisplay)}
             </span>
           </OverlayTrigger>
-        </th>
+        </th> */}
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}>
-            <span id="th-status" className="th-sortable"
-              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "status"))}}
+            <span id="th-expiresTime" className="th-sortable"
+              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))}}
             >
               {t('tb.th.sta')}
             </span>
@@ -169,50 +169,50 @@ const TableBody = (props) => {
         <td className='td-name-label'>
           <LabelCell
             label={row.label}
-            level={row.level}
             index={index}
+            level={row.level}
             levelUp={levelUp}
           />
         </td>
         <td className='td-lookup'>
           <LookupCell
-            conf={conf}
             label={row.label}
             tokenId={row.tokenId}
+            conf={conf}
             t={t}
           />
         </td>
-        <td>
+        {/* <td>
           <TimeCell
-            displayTime={conf.custom.display.time}
-            status={row.status} 
             label={row.label} 
-            releaseTime={row.releaseTime}
-            expiresTime={row.expiresTime}
-            updateName={props.updateName}
             index={index}
+            status={row.status} 
+            displayTime={conf.custom.display.time}
+            expiresTime={row.expiresTime}
+            releaseTime={row.releaseTime}
+            updateName={props.updateName}
             t={t}
           />
-        </td>
+        </td> */}
         <td>
           <StatusCell
-            status={row.status} 
             label={row.label} 
-            releaseTime={row.releaseTime}
-            expiresTime={row.expiresTime}
-            updateName={props.updateName}
             index={index}
+            status={row.status} 
+            expiresTime={row.expiresTime}
+            releaseTime={row.releaseTime}
+            updateName={props.updateName}
             t={t}
           />
         </td>
         <td>
           <RegisterCell 
-            status={row.status} 
-            register={props.register} 
             label={row.label} 
-            expiresTime={row.expiresTime}
             index={index}
+            status={row.status} 
+            expiresTime={row.expiresTime}
             estimatePrice={props.estimatePrice}
+            register={props.register} 
             book={props.book}
             cancelBook={props.cancelBook}
             t={t}
@@ -221,8 +221,8 @@ const TableBody = (props) => {
         <td>
           <DelCell
             label={row.label}
-            removeName={removeName}
             index={index}
+            removeName={removeName}
           />
         </td>
       </tr>
