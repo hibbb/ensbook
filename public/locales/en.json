@@ -24,7 +24,7 @@
       "reg": "Reg",
       "del": "Del",
       "tips": {
-        "no": "Sort by Highlight Color",
+        "no": "Sort by Label Color",
         "lb": "Sort by Label",
         "ti": "Sort by Time",
         "sta": "Sort by Status",
@@ -44,7 +44,7 @@
       "reged": "Registered", 
       "book": "Book",
       "tips": {
-        "lb": "Click to Highlight This Name",
+        "lb": "Click to Change the Label Color",
         "renew": "Renew {{label}}.eth",
         "est": "Registration Cost Estimation",
         "reg": "Register {{label}}.eth",

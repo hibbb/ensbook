@@ -294,7 +294,7 @@ h1 a .title-ens {
   font-size: 0.88rem;
 }
 .ebr-tb-row:hover > td > .td-status {
-  box-shadow: 0 0 0 1px #ffffff99;
+  box-shadow: 0 0 0 1px rgba(13, 202, 242, 0.275);
 }
 .td-lookup a {
   display: inline-block;

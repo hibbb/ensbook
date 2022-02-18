@@ -23,15 +23,6 @@ class ENSBook extends React.Component {
 
   constructor(props) {
     super(props)
-
-    try {
-      if (!window.localStorage) {
-        throw new Error("Your browser must support LocalStorage to use this APP.")
-      }
-    } catch (error) {
-      throw error
-    }
-
     // setState: nameInfo
     const nameInfoStr = window.localStorage.getItem("nameInfo")
     const nameInfo = nameInfoStr !== null ? JSON.parse(nameInfoStr) : []
@@ -60,7 +51,7 @@ class ENSBook extends React.Component {
       throw error
     }
     const walletInfo = { address: walletWithProvider.address, balance: "" }
-    this.state = {nameInfo: nameInfo, walletInfo: walletInfo}
+    this.state = { nameInfo: nameInfo, walletInfo: walletInfo }
   }
 
   storeContent = (key, value) => {  // store content at localStorage and return a bool
@@ -118,15 +109,6 @@ class ENSBook extends React.Component {
     return expiresTimeBignumber.toNumber() // unix timestamp
   }
 
-  logOperators = async () => {
-    let keys = conf.custom.operatorPrivateKey
-    console.log('Operators:')
-    for (let i = 0; i < keys.length; i ++) {
-      const op = (new ethers.Wallet(keys[i])).address
-      console.log('%s...%s : %s', op.slice(0, 7), op.slice(-5), utils.formatEther(await provider.getBalance(op)).slice(0,7))
-    }
-  }
-
   updateName = async (index, messageShowFlag = true) => {
     const {nameInfo} = this.state
     const expiresTimeStamp = await this.getExpiresTimeStamp(nameInfo[index].label) // unix timestamp
@@ -170,13 +152,7 @@ class ENSBook extends React.Component {
     this.getAndStoreWalletInfo()
   }
 
-  levelUp = (index) => {
-    const {nameInfo} = this.state
-    nameInfo[index].level = (nameInfo[index].level + 1) % 2
-    this.setAndStoreNameInfo(nameInfo, false)
-  } 
-
-  register = async (label, booked = false) => {
+  register = async (label) => {
     let owner = conf.custom.receiverAddress      // address
     let duration = conf.custom.regTxConf.duration    // days
     let ourValue = conf.custom.regTxConf.value  // Ether
@@ -187,7 +163,7 @@ class ENSBook extends React.Component {
       walletWithProvider)
     // set the status of the name to 'Regsitering', but no storing
     const nameInfo = this.state.nameInfo
-    nameInfo.find(item => item.label === label).status = booked ? 'Booked' : 'Registering'
+    nameInfo.find(item => item.label === label).status = 'Registering'
     this.setState({nameInfo: nameInfo})
 
     owner = owner.trim().length < 1 ? walletWithProvider.address : owner
@@ -248,49 +224,17 @@ class ENSBook extends React.Component {
     }
 
     // Step 2.
-    const wait = ms => new Promise(resolve => lt.setTimeout(resolve, ms)) 
     // long-timeout is necessary for >24.8 days
-    if (booked) {
-      let expiresTimeStamp = await this.getExpiresTimeStamp(label)   // unix timestamp
-      let diffT = moment.unix(expiresTimeStamp).add(90, 'days').diff(moment())
-      let refreshT = parseInt(diffT / 2)   // as milisecs
-      const activeDuration = moment.duration(24, 'hours')   // as milisecs
-  
-      this.bookFlags[label] = true
-      // Cycle to get the latest status and prepare for registration
-      while (diffT < activeDuration && diffT > 30000 && this.bookFlags[label]) {
-        this.MessageToasts.messageShow(
-          "book", 
-          this.t('msg.book', { label: label, duration: moment.duration(refreshT).toISOString() })
-        )
-        await wait(refreshT)
-        expiresTimeStamp = await this.getExpiresTimeStamp(label)
-        nameInfo.find(item => item.label === label).expiresTime = expiresTimeStamp
-        this.setState({nameInfo: nameInfo})    
-        diffT = moment.unix(expiresTimeStamp).add(90, 'days').diff(moment())
-        refreshT = parseInt(diffT / 2)
-      }
-      this.bookFlags[label] = false
+    const wait = ms => new Promise(resolve => lt.setTimeout(resolve, ms)) 
+    // wait for 2nd pharse of registration
+    await wait(conf.fixed.ensConf.minCommitmentAge * 1000)
 
-      if (diffT < 30001 && diffT > 0) {
-        await wait(diffT + conf.custom.book.timeSlot * 1000)
-      } else {
-        return await this.updateNameByLabel(label)
-      }
-    } else {
-      // wait for 2nd pharse of registration
-      await wait(conf.fixed.ensConf.minCommitmentAge * 1000) 
-    }
     this.MessageToasts.messageShow(
       "register20", 
       this.t('msg.register20', { label: label }),
     )
 
     // Step 3.
-    if (booked) {
-      nameInfo.find(item => item.label === label).status = 'Registering'
-      this.setState({nameInfo: nameInfo})  
-    }
     if (conf.custom.regTxConf.gasPrice > 0) { // conf.custom.regTxConf.gasPrice: gwei
       regOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
     }
@@ -357,7 +301,6 @@ class ENSBook extends React.Component {
   bookFlags = {}
 
   book = (label) => {
-    this.register(label, true)
   }
 
   cancelBook = (index) => {
@@ -484,7 +427,6 @@ class ENSBook extends React.Component {
               resetAndStoreConfInfo={this.resetAndStoreConfInfo}
               confFile={confFile}
               updateNames={this.updateNames} 
-              logOperators={this.logOperators}
               t={this.t}
             />
           </div>
@@ -499,7 +441,6 @@ class ENSBook extends React.Component {
           <NamesDisplayTable 
             nameInfo={nameInfo} 
             conf={conf}
-            levelUp={this.levelUp}
             updateName={this.updateName}
             updateNames={this.updateNames} 
             register={this.register} 

@@ -8,7 +8,7 @@ import { t } from 'i18next';
 
 
 export const LabelCell = (props) => {
-  const { label, level, index, levelUp } = props
+  const { label, level, index, nameInfo, setAndStoreNameInfo } = props
   // for td-label
   const nameLink = "https://app.ens.domains/name/" + label + ".eth"
   let labelClickCount = 0
@@ -21,6 +21,11 @@ export const LabelCell = (props) => {
       labelClickCount = 0;
     }, 350);
   }
+
+  const levelUp = (index) => {
+    nameInfo[index].level = (nameInfo[index].level + 1) % 2
+    setAndStoreNameInfo(nameInfo, false)
+  } 
   
   return (
     <>
@@ -66,91 +71,6 @@ export const LookupCell = (props) => {
     )
   )
 }
-
-// export const TimeCell = (props) => {
-//   const {label, index, status, displayTime, releaseTime, expiresTime, updateName, t} = props
-  
-//   const jsonSortByNumber = (array, key) => {
-//     if (array.length < 2 || !key || typeof array[0] !== "object" || typeof array[0][key] !== "number") {
-//       return array
-//     }
-//     array.sort(function(x, y) {return x[key] - y[key]})
-//     return array;
-//   }
-
-//   // for expiresTime or releaseTime
-//   let readableTime
-//   let tooltipArray = []
-
-//   if (expiresTime > 0) {
-//     switch(displayTime) {
-//       case 'expiresTime':
-//         readableTime = moment.unix(expiresTime).fromNow()
-//         break
-//       case 'releaseTime':
-//         readableTime = moment.unix(releaseTime).fromNow()
-//         break
-//       default:
-//         readableTime = t('nm.sta.Unknown')
-//     }
-
-//     switch(status) {
-//       case 'Normal':
-//       case 'Grace':
-//       case 'Booked': 
-//         tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
-//         tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
-//         tooltipArray[2] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
-//         break
-//       case 'Premium':
-//       case 'Reopen':
-//         tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
-//         tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
-//         tooltipArray[2] = {label: t('c.premiumEnd'), unixTime: releaseTime + moment.duration(28, 'days').asSeconds()}
-//         tooltipArray[3] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
-//         break
-//       default:
-//         tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
-//     }  
-//   } else {
-//     readableTime = t('nm.sta.Unknown')
-//     tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
-//   }
-
-//   return (
-//     <OverlayTrigger
-//       key={'relatedtime-' + label}
-//       placement="top"
-//       overlay={
-//         <Tooltip id={'tooltip-displaytime-' + label}>
-//           { 
-//             jsonSortByNumber(tooltipArray, "unixTime").map((item, index) => {
-//               return (
-//                 <p key={index} className={'d-flex justify-content-between current-' + item.current ?? 'false'}>
-//                   <span className="tooltip-time-label me-1">{item.label}:</span>
-//                   <span className="tooltip-time-text">
-//                   {
-//                     typeof item.unixTime === "number" 
-//                     ? (
-//                         item.current 
-//                         ? <Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} />
-//                         : moment.unix(item.unixTime).format('YYYY-MM-DD HH:mm:ss')
-//                       )
-//                     : item.unixTime
-//                   }
-//                   </span>
-//                 </p>
-//               )
-//             }) 
-//           }
-//         </Tooltip>
-//       }>
-//       <span className="td-time" title={t('tb.td.tips.tm')} onClick={()=>updateName(index)}>
-//         {readableTime}
-//       </span>
-//     </OverlayTrigger>
-//   )
-// }
 
 export const StatusCell = (props) => {
   const {label, index, status, releaseTime, expiresTime, updateName, t} = props

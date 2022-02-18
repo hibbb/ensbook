@@ -1,10 +1,21 @@
 import React from 'react';
 import { Form } from 'react-bootstrap'
-import { utils } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, Gift, CheckCircle } from 'react-bootstrap-icons';
 
 class ConfigureForm extends React.Component {
   conf = JSON.parse(window.localStorage.getItem("confInfo"))
+  provider = new ethers.providers.InfuraProvider(this.conf.custom.network, this.conf.custom.infuraID)
+
+  logOperators = async () => {
+    let keys = this.state.operatorPrivateKey.replace(/\s/g, "").split(",")
+    console.log('Operators:')
+    for (let i = 0; i < keys.length; i ++) {
+      const op = (new ethers.Wallet(keys[i])).address
+      console.log('%s...%s : %s', op.slice(0, 7), op.slice(-5), utils.formatEther(await this.provider.getBalance(op)).slice(0,7))
+    }
+  }
+
   state = {
     operatorPrivateKey: this.conf.custom.operatorPrivateKey.join(),
     network: this.conf.custom.network,
@@ -161,7 +172,7 @@ class ConfigureForm extends React.Component {
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.global.title')}</h6>
               <div className="input-group input-group-sm mb-2">
                 <span className="input-group-text" id="conf-key-privatekey"
-                onDoubleClick={this.props.logOperators}>
+                onDoubleClick={this.logOperators}>
                   {t('conf.global.operatorPrivateKey')}
                 </span>
                 <input type="password" className="form-control" aria-label="operatorPrivateKey" aria-describedby="your-operatorPrivateKey" 
@@ -378,7 +389,6 @@ class ConfigureForm extends React.Component {
       </div>
     )
   }
-
 
 }
 
