@@ -2,6 +2,7 @@
 
 body {
   background-color: #f5f5f5;
+  font-family: "ebr-regular";
 }
 h1 {
   padding: 0 0.5rem;
@@ -16,7 +17,6 @@ h1 a {
   border-collapse:separate; 
   border-spacing:0 0.25rem;
 }
-
 .ebr-tb-row td:first-child, .ebr-tb-row th:first-child {
   padding-left: 1.25rem;
   border-top-left-radius: 0.25rem;
@@ -58,7 +58,7 @@ h1 a .title-ens {
   --bs-table-active-color: #483c32;
   --bs-table-active-bg: rgba(0, 0, 0, 0.1);
   --bs-table-hover-color: #483c32;
-  --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+  --bs-table-hover-bg: rgba(13, 202, 242, 0.175);
   width: 100%;
   margin-bottom: 1rem;
   color: #483c32;
@@ -144,7 +144,7 @@ h1 a .title-ens {
   color: #666;
 }
 .statusUnknown, .statusNormal {
-  background-color: #ffffff65;
+  background-color: #cccccc65;
 }
 .statusOpen {
   background-color: #a6e9d565;
@@ -183,7 +183,7 @@ h1 a .title-ens {
   background-color: #483c32;
   box-shadow: 0px 0px 7px #999999;
   color: #ffffff;
-
+  font-family: 'ebr-medium';
 }
 .tooltip-inner p {
   margin: 0 0 0.3rem 0;
@@ -203,7 +203,7 @@ h1 a .title-ens {
   border-top-color: #483c32;
 }
 .tooltip-time-text {
-  font-family: 'ebr-code-regular';
+  font-family: 'ebr-number-light';
 }
 
 
@@ -213,7 +213,6 @@ h1 a .title-ens {
 .main-wrapper {
   margin: 1.2rem auto 7rem;
   max-width: 900px;
-  font-family: "ebr-regular";
 }
 .header-left, .header-right {
   text-align: center;
@@ -294,6 +293,9 @@ h1 a .title-ens {
   text-transform: uppercase;
   font-size: 0.88rem;
 }
+.ebr-tb-row:hover > td > .td-status {
+  box-shadow: 0 0 0 1px #ffffff99;
+}
 .td-lookup a {
   display: inline-block;
   border-radius: 0.6rem;
@@ -329,13 +331,7 @@ button.btn-plain[disabled] {
   background-color: #e9ecef;
   color: #21252950;
 }
-.btn-reg-sub {
-  font-size: 0.85rem;
-}
-.btn-reg-sub:hover {
-  text-decoration: none;
-}
-.btn-del-name {
+.btn-sub {
   font-size: 0.88rem;
 }
 .network-ropsten {
@@ -358,7 +354,8 @@ button.btn-plain[disabled] {
   color: black;
 }
 .current-version {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  font-family: 'ebr-number-light';
 }
 .footnode-right {
   text-align: right;

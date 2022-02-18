@@ -1,9 +1,9 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import RegisterConfirmModal from './RegisterConfirmModal';
+import RegisterConfirmModal from '../../Utils/RegisterConfirmModal';
 import moment from 'moment';
 import Clock from 'react-live-clock';
-import { BoxArrowUpRight, XCircle, Calculator, Robot, ArrowRepeat } from 'react-bootstrap-icons';
+import { BoxArrowUpRight, XCircle, Calculator, Robot, Calendar2Plus } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 
 
@@ -24,28 +24,12 @@ export const LabelCell = (props) => {
   
   return (
     <>
-      <OverlayTrigger
-        key={'name-label-' + label}
-        placement="top"
-        overlay={
-          <Tooltip id={'tooltip-name-label-' + label}>
-            {t('tb.td.tips.lb')}
-          </Tooltip>
-        }>
-        <span className={'td-level td-level-' + level} 
-          onClick={()=>oneClickToLevelUp()}
-        >
+      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}>
+        <span className={'td-level td-level-' + level} onClick={()=>oneClickToLevelUp()}>
           {label}
         </span>
       </OverlayTrigger>
-      <OverlayTrigger
-        key={'name-ensapp-' + label}
-        placement="top"
-        overlay={
-          <Tooltip id={'tooltip-name-ensapp-' + label}>
-            ENS APP
-          </Tooltip>
-        }>
+      <OverlayTrigger placement="top" overlay={<Tooltip>ENS APP</Tooltip>}>
         <a href={nameLink} target="_blank" rel="noreferrer">
           <BoxArrowUpRight className="external-link-icon" />
         </a>
@@ -73,20 +57,14 @@ export const LookupCell = (props) => {
   return (
     Object.keys(lookupLinks).map(item => 
       lookup[item]
-      ? (<OverlayTrigger
-          key={'lookup-' + item}
-          placement="top"
-          overlay={
-            <Tooltip id={'tooltip-' + item + '-' + label}>
-              {t('tb.lookup.' + item, {label: label})}
-            </Tooltip>
-          }>
-            <a href={lookupLinks[item]} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
-        </OverlayTrigger>)
+      ? (
+        <OverlayTrigger key={'lookup-key-' + item} placement="top" overlay={<Tooltip>{t('tb.lookup.' + item, {label: label})}</Tooltip>}>
+          <a href={lookupLinks[item]} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
+        </OverlayTrigger>
+      )
       : null
     )
   )
-
 }
 
 // export const TimeCell = (props) => {
@@ -214,16 +192,13 @@ export const StatusCell = (props) => {
 
   return (
     <>
-      <OverlayTrigger
-        key={'relatedtime-' + label}
-        placement="top"
-        overlay={
-          <Tooltip id={'tooltip-displaytime-' + label}>
+      <OverlayTrigger placement="top" overlay={
+          <Tooltip>
             { 
               jsonSortByNumber(tooltipArray, "unixTime").map((item, index) => {
                 return (
                   <p key={index} className={'d-flex justify-content-between current-' + item.current ?? 'false'}>
-                    <span className="tooltip-time-label me-1">{item.label}:</span>
+                    <span className="tooltip-time-title me-1">{item.label}:</span>
                     <span className="tooltip-time-text">
                     {
                       typeof item.unixTime === "number" 
@@ -241,22 +216,15 @@ export const StatusCell = (props) => {
             }
           </Tooltip>
         }>        
-        <span className={'px-1 td-status status' + status + reopenReminderClass}>
+        <span className={'px-1 td-status status' + status + reopenReminderClass} onClick={()=>{updateName(index)}}>
           {t('nm.sta.' + status)}
         </span>
       </OverlayTrigger>
-      <OverlayTrigger
-        key={'trigger-status-' + label}
-        placement="top"
-        overlay={
-          <Tooltip id={'tooltip-relatedtime-' + label}>
-            {t('tb.td.tips.tm')}
-          </Tooltip>
-        }>
-        <button type="button" id={"status-sub-btn-" + label} className="btn-plain td-status ms-2" 
-          onClick={()=>{updateName(index)}}
+      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>}>
+        <button type="button" id={"status-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
+          onClick={null}
         >
-          <ArrowRepeat />
+          <Calendar2Plus />
         </button>
       </OverlayTrigger>
     </>
@@ -268,14 +236,7 @@ export const RegisterCell = (props) => {
   if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <OverlayTrigger
-          key={"trigger-reg-" + label}
-          placement="top"
-          overlay={
-            <Tooltip id={"tooltip-reg-" + label}>
-              {t('tb.td.tips.reg', {label: label})}
-            </Tooltip>
-          }>
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.reg', {label: label})}</Tooltip>}>
           <button
             type="button" 
             id={"register-btn-" + label}
@@ -285,15 +246,8 @@ export const RegisterCell = (props) => {
             {t('tb.td.reg')}
           </button>
         </OverlayTrigger>
-        <OverlayTrigger
-          key={"estimate-" + label}
-          placement="top"
-          overlay={
-            <Tooltip id={"tooltip-estimate-" + label}>
-              {t('tb.td.tips.est')}
-            </Tooltip>
-          }>
-          <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-reg-sub ms-2" 
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.est')}</Tooltip>}>
+          <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
             onClick={()=>{estimatePrice(label)}}
           >
             <Calculator />
@@ -308,14 +262,7 @@ export const RegisterCell = (props) => {
   if (status === 'Grace' && moment().add(24, 'hours') > moment.unix(expiresTime).add(90, 'days')) {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <OverlayTrigger
-          key={"trigger-book-" + label}
-          placement="top"
-          overlay={
-            <Tooltip id={"tooltip-book-" + label}>
-              {t('tb.td.tips.book', {label: label})}
-            </Tooltip>
-          }>
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.book', {label: label})}</Tooltip>}>
           <button 
             type="button" 
             id={"register-btn-" + label}
@@ -344,7 +291,7 @@ export const RegisterCell = (props) => {
         <button 
           type="button" 
           id={"reg-sub-btn-" + label} 
-          className="btn-plain btn-reg-sub ms-2" 
+          className="btn-plain btn-sub ms-2" 
           title={t('tb.td.tips.reging')}>
           <div className="spinner-border reg-waiting" role="status">
             <span className="visually-hidden">Registering...</span>
@@ -357,14 +304,7 @@ export const RegisterCell = (props) => {
   if (status === 'Booked') {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <OverlayTrigger
-          key={"trigger-cbook-" + label}
-          placement="top"
-          overlay={
-            <Tooltip id={"tooltip-cbook-" + label}>
-              {t('tb.td.tips.cbook')}
-            </Tooltip>
-          }>
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.cbook')}</Tooltip>}>
           <button type="button" id={"register-btn-" + label} className="btn-plain"
             disabled={false}
             onClick={()=>{cancelBook(index)}}
@@ -375,7 +315,7 @@ export const RegisterCell = (props) => {
         <button 
           type="button" 
           id={"reg-sub-btn-" + label} 
-          className="btn-plain btn-reg-sub book-waiting ms-2" 
+          className="btn-plain btn-sub book-waiting ms-2" 
           title={t('tb.td.tips.booked')}>
           <Robot />
         </button>
@@ -384,12 +324,9 @@ export const RegisterCell = (props) => {
   }
 
   return (
-    <div id={"register-" + label} className="btn-group" role="group" aria-label="Register">
-      <button 
-        type="button" 
-        className="btn-plain" 
-        disabled={true}>
-        {t('tb.td.reg')}
+    <div id={"trigger-reged-" + label} className="btn-group" role="group" aria-label="Register">
+      <button type="button" className="btn-plain" disabled={true}>
+        {t('tb.td.reged')}
       </button>
     </div>
   )
@@ -399,17 +336,8 @@ export const DelCell = (props) => {
   const { label, removeName, index } = props
 
   return (
-    <OverlayTrigger
-      key={'name-remove-' + label}
-      placement="top"
-      overlay={
-        <Tooltip id={'tooltip-name-remove-' + label}>
-          {t('tb.td.tips.del', {label: label})}
-        </Tooltip>
-      }>
-      <button type="button" className="btn-plain btn-del-name" 
-        onClick={()=>removeName(index)}
-      >
+    <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.del', {label: label})}</Tooltip>}>
+      <button type="button" className="btn-plain btn-sub" onClick={()=>removeName(index)}>
         <XCircle />
       </button>
     </OverlayTrigger>

@@ -28,9 +28,10 @@
         "lb": "Sort by Label",
         "ti": "Sort by Time",
         "sta": "Sort by Status",
-        "update": "Update Informations of All Names",
-        "regAll": "Register All Available Names",
-        "estAll": "Estimate the Cost of All Available Registrations",
+        "renew": "Batch Renewal",
+        "update": "Update Information",
+        "regAll": "Batch Registration",
+        "estAll": "Batch Registration Cost Estimation",
         "remAll": "Remove All Names",
         "hideNames": {
           "hide": "Hide Unregistrable Names",
@@ -39,16 +40,17 @@
       }
     },
     "td": {
-      "reg": "Reg",
+      "reg": "Register",
+      "reged": "Registered", 
       "book": "Book",
       "tips": {
         "lb": "Click to Highlight This Name",
-        "tm": "Click to Update This Name",
-        "est": "Estimate the Registration Cost",
+        "renew": "Renew {{label}}.eth",
+        "est": "Registration Cost Estimation",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",
         "book": "Book {{label}}.eth",
-        "booked": "Waiting for the name reopening",
+        "booked": "Waiting for the Name to Reopen",
         "cbook": "Cancel This Book",
         "del": "Remove {{label}}.eth"
       }

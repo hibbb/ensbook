@@ -1,16 +1,15 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { ethers, utils, Contract } from 'ethers'
 import confFile from './conf.json'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import lt from 'long-timeout'
-import NamesDisplayTable from './NamesDisplayTable'
-import AddNamesForm from './AddNamesForm'
-import namehash from '@ensdomains/eth-ens-namehash'
-import ConfigureForm from './Utils/ConfigureForm'
+import NamesDisplayTable from './Table/NamesDisplayTable'
+import AddNamesForm from './Components/AddNamesForm'
+import ConfigureForm from './Components/ConfigureForm'
 import MessageToasts from './Utils/MessageToasts'
-import LanguageSwitcher from './Utils/LanguageSwitcher'
-import AppTitle from './Utils/AppTitle'
+import LanguageSwitcher from './Components/LanguageSwitcher'
+import AppTitle from './Components/AppTitle'
 import packageJson from '../package.json'
 import { Github, Twitter } from 'react-bootstrap-icons';
 import TestBar from './Utils/TestBar'
@@ -19,7 +18,7 @@ let provider
 let walletWithProvider
 let conf
 
-class ENSBook extends Component {
+class ENSBook extends React.Component {
   t = this.props.t
 
   constructor(props) {
@@ -109,10 +108,6 @@ class ENSBook extends Component {
     this.setAndStoreConfInfo(confFile)
   }
 
-  getLabels = () => {
-    return this.state.nameInfo.map(item => item.label).join(' ')
-  }
-
   getExpiresTimeStamp = async (label) => {
     const BaseRegImpCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
@@ -132,7 +127,7 @@ class ENSBook extends Component {
     }
   }
 
-  updateName = async (index, messageShow = true) => {
+  updateName = async (index, messageShowFlag = true) => {
     const {nameInfo} = this.state
     const expiresTimeStamp = await this.getExpiresTimeStamp(nameInfo[index].label) // unix timestamp
     const nowT = moment()
@@ -159,7 +154,7 @@ class ENSBook extends Component {
         nameInfo[index].status = 'Unknown'
       }
     }
-    this.setAndStoreNameInfo(nameInfo, messageShow)
+    this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     return expiresTimeStamp
   }
 
@@ -168,54 +163,11 @@ class ENSBook extends Component {
     return this.updateName(index, messageShow)
   }
 
-  updateNames = async (messageShow = true) => {
+  updateNames = async (messageShowFlag = true) => {
     this.state.nameInfo.map(async (row, index) => {
-      return await this.updateName(index, messageShow)
+      return await this.updateName(index, messageShowFlag)
     })
     this.getAndStoreWalletInfo()
-  }
-
-  addNames = async (labels) => {
-    const {nameInfo} = this.state
-    labels = labels.replace(/[,.'"?!@#$%^&*()]/g, ' ').trim()
-    if (labels.length < 1) {
-      return false
-    }
-    // create an Array(originLabelsSet) including the original labels
-    const originLabelsSet = new Set()
-    nameInfo.map(row => originLabelsSet.add(row.label))
-    // split the string by spaces to labels and remove duplicates
-    const newLabelsSet = new Set(labels.split(/\s+/));
-    // only retain the labels whose length >= 3
-    let newLabelsArr = [...newLabelsSet].filter(label => label.length >= 3)
-    try {
-      newLabelsArr.map((label, index) => newLabelsArr[index] = namehash.normalize(label))
-    } catch (err) {
-      this.MessageToasts.messageShow(
-        "nameNormalizeError", 
-        this.t('msg.nameNormalizeError', {errMsg: err.message}),
-        "msg-warning"
-      )
-    }
-    // caculate the differences between the new and original labels, to avoid duplicates 
-    let diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]; 
-
-    const originNameInfoLen = nameInfo.length
-
-    diffLabelsArr.map(label => 
-      nameInfo.push({
-        "label": label,
-        "level": 0,
-        "status": "Unknown",
-        "tokenId": utils.id(label)
-      })
-    )
-    this.setState({nameInfo: nameInfo})
-
-    // update the status of newly added names
-    for(let i = originNameInfoLen; i < nameInfo.length; i++) {
-      this.updateName(i)
-    }
   }
 
   levelUp = (index) => {
@@ -413,6 +365,10 @@ class ENSBook extends Component {
     this.updateName(index)
   }
 
+  renewName = async (label, duration) => {
+
+  }
+
   estimatePrice = async (
     label, 
     messageShow = true, 
@@ -534,9 +490,10 @@ class ENSBook extends Component {
           </div>
         </div>
         <AddNamesForm 
-          addNames={this.addNames} 
+          nameInfo={nameInfo}
+          setAndStoreNameInfo={this.setAndStoreNameInfo}
+          updateName={this.updateName}
           t={this.t} 
-          getLabels={this.getLabels}
         />
         <div className="row table-wrapper">
           <NamesDisplayTable 

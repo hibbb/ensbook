@@ -1,9 +1,9 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { LabelCell, LookupCell, TimeCell, StatusCell, RegisterCell, DelCell } from './Utils/TableCells';
-import RegisterAllConfirmModal from './Utils/RegisterAllConfirmModal';
-import RemoveNamesConfirmModal from './Utils/RemoveNamesConfirmModal';
-import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat } from 'react-bootstrap-icons';
+import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './TBody/TableCells';
+import RegisterAllConfirmModal from '../Utils/RegisterAllConfirmModal';
+import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
+import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
 
 let ascFlag = {
   "label": true,
@@ -21,7 +21,7 @@ let hideFlag = {
 const registrableStatuses = ['Open', 'Reopen', 'Premium']
 
 const TableHeader = (props) => {
-  const {nameInfo, timeDisplay, setAndStoreNameInfo, t} = props
+  const {nameInfo, setAndStoreNameInfo, t} = props
 
   const jsonSort = (array, key) => {
     if(array.length < 2 || !key || typeof array[0] !== "object") return array
@@ -63,7 +63,7 @@ const TableHeader = (props) => {
     
     return (
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideFlag.hideNames ? 'show' : 'hide'))}</Tooltip>}>
-        <button type="button" className="btn-plain btn-reg-sub ms-2" 
+        <button type="button" className="btn-plain btn-sub ms-2" 
             onClick={hideUnregistrableNames}
           >
           { hideFlag.hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
@@ -111,8 +111,15 @@ const TableHeader = (props) => {
               {t('tb.th.sta')}
             </span>
           </OverlayTrigger>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
+            <button type="button" className="btn-plain btn-sub ms-2"
+              onClick={null}
+            >
+              <Calendar2Plus />
+            </button>
+          </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}>
-            <button type="button" className="btn-plain btn-update-all ms-2" 
+            <button type="button" className="btn-plain ms-2" 
               onClick={props.updateNames}
             >
               <ArrowRepeat />
@@ -131,7 +138,7 @@ const TableHeader = (props) => {
             </button>
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.estAll')}</Tooltip>}>
-            <button type="button" id="btn-estimate-all" className="btn-plain btn-reg-sub ms-2" 
+            <button type="button" id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
               onClick={props.estimatePriceAll}
             >
               <Calculator />
@@ -262,7 +269,6 @@ class NamesDisplayTable extends React.Component {
       <table className="table table-hover ebr-tb">
         <TableHeader
           nameInfo={nameInfo}
-          timeDisplay={conf.custom.display.time}
           setAndStoreNameInfo={setAndStoreNameInfo}
           updateNames={updateNames}
           registerAll={registerAll}
