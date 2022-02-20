@@ -17,8 +17,9 @@ export const TableHead = (props) => {
     nameInfo, 
     setAndStoreNameInfo, 
     updateNames, 
+    isRenewable, 
     registerAll, 
-    registrableStatuses, 
+    isRegistrable, 
     hideNames, 
     switchHideFlag, 
     removeNames, 
@@ -52,23 +53,36 @@ export const TableHead = (props) => {
     displaySpan.classList.add("sort-asc-" + ascFlag[key])
   }
 
-  const HideShowButton = () => {
-    const haveUnregistrableName = nameInfo.findIndex(
-      row => registrableStatuses.indexOf(row.status)
-    )
-    if (haveUnregistrableName < 0) {
-      return null
+  const RenewNamesButton = () => {
+    const haveRenewableName = nameInfo.findIndex(row => isRenewable(row.status)) >= 0
+    if (haveRenewableName) { 
+      return (
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
+          <button type="button" className="btn-plain btn-sub ms-2"
+            onClick={null}
+          >
+            <Calendar2Plus />
+          </button>
+        </OverlayTrigger>
+      )
     }
-    
-    return (
-      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
-        <button type="button" className="btn-plain btn-sub ms-2" 
-          onClick={switchHideFlag}
-        >
-          { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
-        </button>
-      </OverlayTrigger>
-    )  
+    return null 
+  }
+
+  const HideShowButton = () => {
+    const haveUnregistrableName = nameInfo.findIndex(row => !isRegistrable(row.status)) >= 0
+    if (haveUnregistrableName) {
+      return (
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
+          <button type="button" className="btn-plain btn-sub ms-2" 
+            onClick={switchHideFlag}
+          >
+            { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
+          </button>
+        </OverlayTrigger>
+      )  
+    }
+    return null
   }
 
   return (
@@ -101,13 +115,7 @@ export const TableHead = (props) => {
               {t('tb.th.sta')}
             </span>
           </OverlayTrigger>
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
-            <button type="button" className="btn-plain btn-sub ms-2"
-              onClick={null}
-            >
-              <Calendar2Plus />
-            </button>
-          </OverlayTrigger>
+          <RenewNamesButton />
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}>
             <button type="button" className="btn-plain ms-2" 
               onClick={updateNames}

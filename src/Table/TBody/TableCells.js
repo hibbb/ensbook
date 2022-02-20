@@ -73,9 +73,12 @@ export const LookupCell = (props) => {
 }
 
 export const StatusCell = (props) => {
-  const {label, index, status, releaseTime, expiresTime, updateName, t} = props
-  const reopenReminderFlag = status === 'Premium' && moment() > moment.unix(releaseTime).add(26, 'days')
-  const reopenReminderClass = reopenReminderFlag ? ' reopen-reminder' : ''
+  const {label, index, status, releaseTime, expiresTime, updateName, isRenewable, t} = props
+
+  const graceEndingFlag = status === 'Grace' && moment().add(18, 'days') > moment.unix(releaseTime)
+  const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
+  const premiumEndingFlag = status === 'Premium' && moment() > moment.unix(releaseTime).add(26, 'days')
+  const premiumEndingClass = premiumEndingFlag ? ' premium-ending' : ''
 
   const jsonSortByNumber = (array, key) => {
     if (array.length < 2 || !key || typeof array[0] !== "object" || typeof array[0][key] !== "number") {
@@ -110,6 +113,21 @@ export const StatusCell = (props) => {
     tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
   }  
 
+  const RenewNameButton = () => {
+    if (isRenewable(status)) return (
+      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>}>
+        <button type="button" 
+          id={"status-sub-btn-" + label} 
+          className="btn-plain btn-sub ms-2" 
+          onClick={null}
+        >
+          <Calendar2Plus />
+        </button>
+      </OverlayTrigger>
+    )
+    return null
+  }
+
   return (
     <>
       <OverlayTrigger placement="top" overlay={
@@ -136,17 +154,11 @@ export const StatusCell = (props) => {
             }
           </Tooltip>
         }>        
-        <span className={'px-1 td-status status' + status + reopenReminderClass} onClick={()=>{updateName(index)}}>
+        <span className={'px-1 td-status status' + status + graceEndingClass + premiumEndingClass} onClick={()=>{updateName(index)}}>
           {t('nm.sta.' + status)}
         </span>
       </OverlayTrigger>
-      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>}>
-        <button type="button" id={"status-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
-          onClick={null}
-        >
-          <Calendar2Plus />
-        </button>
-      </OverlayTrigger>
+      <RenewNameButton />
     </>
   )
 }

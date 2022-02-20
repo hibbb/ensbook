@@ -173,9 +173,28 @@ h1 a .title-ens {
 .td-level-2 {
   color: indianred;
 }
-.reopen-reminder {
-  background-image: linear-gradient(to right, #ffe69c65 0%, #ffe69c65 30%, #a6e9d5 100%);
+.grace-ending {
+  /* animation: grace-ending 3s infinite linear; */
+  background-image: linear-gradient(to right, #f1aeb565 0%, #f1aeb565 35%, #ffe69c 100%);
 }
+.premium-ending {
+  /* animation: premium-ending 3s infinite linear; */
+  background-image: linear-gradient(to right, #ffe69c65 0%, #ffe69c65 35%, #a6e9d5cc 100%);
+}
+/* @keyframes grace-ending {
+  0%{background-color: #f1aeb565;}
+  25%{background-color: #ffe69ccc;}
+  50%{background-color: #f1aeb565;}
+  75%{background-color: #ffe69ccc;}
+  100%{background-color: #f1aeb565;}
+}
+@keyframes premium-ending {
+  0%{background-color: #ffe69c65;}
+  25%{background-color: #a6e9d565;}
+  50%{background-color: #ffe69c65;}
+  75%{background-color: #a6e9d565;}
+  100%{background-color: #ffe69c65;}
+} */
 
 .tooltip-inner {
   max-width: 275px;
@@ -203,7 +222,7 @@ h1 a .title-ens {
   border-top-color: #483c32;
 }
 .tooltip-time-text {
-  font-family: 'ebr-number-light';
+  font-family: 'ebr-number-regular';
 }
 
 
@@ -353,9 +372,12 @@ button.btn-plain[disabled] {
 .footnotes a:hover {
   color: black;
 }
-.current-version {
+.version-v {
   font-size: 0.75rem;
-  font-family: 'ebr-number-light';
+  font-family: 'ebr-number-regular';
+}
+.version-number {
+  font-size: 0.75rem;
 }
 .footnode-right {
   text-align: right;

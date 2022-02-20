@@ -128,9 +128,9 @@ class ENSBook extends React.Component {
         nameInfo[index].status = 'Normal'
       } else if (nowT <= releaseTime) {
         nameInfo[index].status = 'Grace'
-      } else if (nowT <= releaseTime.add(28, 'days')) {
+      } else if (nowT <= releaseTime.add(28, 'days')) { // here releaseTime itself add 28 days
         nameInfo[index].status = 'Premium'
-      } else if (nowT > releaseTime.add(28, 'days')) {
+      } else if (nowT > releaseTime) {
         nameInfo[index].status = 'Reopen'
       } else {
         nameInfo[index].status = 'Unknown'
@@ -463,7 +463,8 @@ class ENSBook extends React.Component {
           </div>
           <div className="footnode-right align-self-center col-6">
             <div className="footnotes px-2">
-              <span className="current-version px-2">v{packageJson.version}</span>
+              <span className="version-v ps-2">v</span>
+              <span className="version-number pe-2">{packageJson.version}</span>
               <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
             </div>
           </div>

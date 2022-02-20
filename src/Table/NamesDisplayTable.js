@@ -35,6 +35,13 @@ class NamesDisplayTable extends React.Component {
     }
   
     const registrableStatuses = ['Open', 'Reopen', 'Premium']
+    const isRegistrable = (status) => {
+      return registrableStatuses.indexOf(status) >= 0
+    }
+    const renewableStatuses = ['Normal', 'Grace']
+    const isRenewable = (status) => {
+      return renewableStatuses.indexOf(status) >=0
+    }
   
     return (
       <table className="table table-hover ebr-tb">
@@ -42,8 +49,9 @@ class NamesDisplayTable extends React.Component {
           nameInfo={nameInfo}
           setAndStoreNameInfo={setAndStoreNameInfo}
           updateNames={updateNames}
+          isRenewable={isRenewable}
           registerAll={registerAll}
-          registrableStatuses={registrableStatuses}
+          isRegistrable={isRegistrable}
           hideNames={this.state.hideNames}
           switchHideFlag={switchHideFlag}
           removeNames={removeNames}
@@ -55,9 +63,10 @@ class NamesDisplayTable extends React.Component {
           setAndStoreNameInfo={setAndStoreNameInfo}
           conf={conf}
           updateName={updateName}
+          isRenewable={isRenewable}
           register={register} 
           hideNames={this.state.hideNames}
-          registrableStatuses={registrableStatuses}
+          isRegistrable={isRegistrable}
           removeName={removeName} 
           estimatePrice={estimatePrice} 
           book={book}

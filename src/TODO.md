@@ -4,7 +4,7 @@
 
 - [ ] move refresh button to the time column
 - [ ] add reminder feature for names which will reopen, according to its time/price, maybe we need a email reminder.
-- [ ] remove book feature
+- [x] remove book feature
 - [ ] disable the whole page when updating name
 - [x] add more tooltip
 

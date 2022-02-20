@@ -7,9 +7,10 @@ export const TableBody = (props) => {
     setAndStoreNameInfo, 
     conf, 
     updateName, 
+    isRenewable, 
     register, 
     hideNames, 
-    registrableStatuses, 
+    isRegistrable, 
     removeName, 
     estimatePrice,
     book, 
@@ -18,7 +19,7 @@ export const TableBody = (props) => {
   } = props
 
   const rows = props.nameInfo.map((row, index) => {
-    if (hideNames && registrableStatuses.indexOf(row.status) < 0) {
+    if (hideNames && !isRegistrable(row.status)) {
       return null
     }
 
@@ -50,6 +51,7 @@ export const TableBody = (props) => {
             expiresTime={row.expiresTime}
             releaseTime={row.releaseTime}
             updateName={updateName}
+            isRenewable={isRenewable}
             t={t}
           />
         </td>
