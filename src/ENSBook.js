@@ -150,9 +150,9 @@ class ENSBook extends Component {
         nameInfo[index].status = 'Normal'
       } else if (nowT <= releaseTime) {
         nameInfo[index].status = 'Grace'
-      } else if (nowT <= releaseTime.add(28, 'days')) {
+      } else if (nowT <= releaseTime.add(28, 'days')) { // here releaseTime itself add 28 days
         nameInfo[index].status = 'Premium'
-      } else if (nowT > releaseTime.add(28, 'days')) {
+      } else if (nowT > releaseTime) {
         nameInfo[index].status = 'Reopen'
       } else {
         nameInfo[index].status = 'Unknown'
