@@ -15,7 +15,7 @@ import { Github, Twitter } from 'react-bootstrap-icons';
 import TestBar from './Utils/TestBar'
 
 let provider
-let walletWithProvider
+let signer
 let conf
 
 class ENSBook extends React.Component {
@@ -41,27 +41,31 @@ class ENSBook extends React.Component {
     }
     //setState walletInfo
     try {
-      if (conf.custom.infuraID.trim().length >= 1) {
-        provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-        walletWithProvider = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
-      } else {
-        throw new Error("You must correctly configure the conf.json file at first.")
-      }
+      this.getProviderAndSigner()
     } catch (error) {
       throw error
     }
-    const walletInfo = { address: walletWithProvider.address, balance: "" }
+    const walletInfo = { address: "", balance: "" }
     this.state = { nameInfo: nameInfo, walletInfo: walletInfo }
   }
 
   storeContent = (key, value) => {  // store content at localStorage and return a bool
-    window.localStorage.setItem(key, value)
-    return true  
+    return window.localStorage.setItem(key, value)
+  }
+
+  getProviderAndSigner = () => {
+    if (conf.custom.operatorPrivateKey[0].trim().length > 1) {
+      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
+      signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
+    } else {
+      provider = new ethers.providers.Web3Provider(window.ethereum)
+      signer = provider.getSigner()
+    }
   }
 
   getAndStoreWalletInfo = async () => { // update walletInfo in state
-    const walletAddress = walletWithProvider.address
-    const walletBalance = utils.formatEther(await walletWithProvider.getBalance())
+    const walletAddress = await signer.getAddress()
+    const walletBalance = utils.formatEther(await signer.getBalance())
     const walletInfo = { "address": walletAddress, "balance": walletBalance }
     this.setState({walletInfo: walletInfo})
     return walletInfo
@@ -69,30 +73,17 @@ class ENSBook extends React.Component {
 
   setAndStoreNameInfo = (value, messageShow = true) => { // update nameInfo in state and store it
     this.setState({"nameInfo": value})
-    const isStored = this.storeContent("nameInfo", JSON.stringify(value))
+    this.storeContent("nameInfo", JSON.stringify(value))
     if (messageShow) {
-      this.MessageToasts.messageShow(
-        "setAndStoreNameInfo", 
-        isStored ? this.t('msg.setAndStoreNameInfo.succeed') : this.t('msg.setAndStoreNameInfo.fail'),
-        isStored ? "msg-default" : "msg-warning",
-        "true",
-        "5000"
-      )  
+      this.MessageToasts.messageShow("setAndStoreNameInfo", this.t('msg.setAndStoreNameInfo'), "msg-default", "true", "5000")  
     }
   }
 
   setAndStoreConfInfo = (value) => { // update confInfo in variable "conf" and store it
-    const isStored = this.storeContent("confInfo", JSON.stringify(value))
-    if (isStored) {
-      conf = value
-      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-      walletWithProvider = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
-    }
-    this.MessageToasts.messageShow(
-      "setAndStoreConfInfo", 
-      isStored ? this.t('msg.setAndStoreConfInfo.succeed') : this.t('msg.setAndStoreConfInfo.fail'),
-      isStored ? "msg-default" : "msg-warning"
-    )
+    this.storeContent("confInfo", JSON.stringify(value))
+    conf = value
+    this.getProviderAndSigner()
+    this.MessageToasts.messageShow("setAndStoreConfInfo", this.t('msg.setAndStoreConfInfo'))
   }
 
   resetAndStoreConfInfo = () => {
@@ -103,14 +94,20 @@ class ENSBook extends React.Component {
     const BaseRegImpCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
       conf.fixed.contract.abi.BaseRegImp, 
-      walletWithProvider)
+      signer)
     const tokenId = utils.id(label)
     const expiresTimeBignumber = await BaseRegImpCon.nameExpires(tokenId) // return a BigNumber Object
     return expiresTimeBignumber.toNumber() // unix timestamp
   }
 
+  getMetadata = async (tokenId) => {
+    const url = 'https://metadata.ens.domains/mainnet/' + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + '/' + tokenId
+    const response = await fetch(url)
+    return response.ok ? response.json() : null
+  }
+
   updateName = async (index, messageShowFlag = true) => {
-    const {nameInfo} = this.state
+    const { nameInfo } = this.state
     const expiresTimeStamp = await this.getExpiresTimeStamp(nameInfo[index].label) // unix timestamp
     const nowT = moment()
     const expiresTime = moment.unix(expiresTimeStamp)
@@ -160,13 +157,13 @@ class ENSBook extends React.Component {
     const ETHRegCtrlCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
       conf.fixed.contract.abi.ETHRegCtrl, 
-      walletWithProvider)
+      signer)
     // set the status of the name to 'Regsitering', but no storing
     const nameInfo = this.state.nameInfo
     nameInfo.find(item => item.label === label).status = 'Registering'
-    this.setState({nameInfo: nameInfo})
+    this.setState({ nameInfo: nameInfo })
 
-    owner = owner.trim().length < 1 ? walletWithProvider.address : owner
+    owner = owner.trim().length < 1 ? await signer.getAddress() : owner
     duration = Math.max(duration, conf.fixed.ensConf.MIN_REGISTRATION_DURATION)
     const durationSeconds = moment.duration(duration, 'days').asSeconds()
 
@@ -209,16 +206,13 @@ class ENSBook extends React.Component {
       this.MessageToasts.messageShow(
         "register11", 
         this.t('msg.register11.succeed', { label: label, txLink: commitTxLink}),
-        "msg-default",
-        "true",
-        "60000"
+        "msg-default", "true", "60000"
       )
     } else {
       this.MessageToasts.messageShow(
         "register11", 
         this.t('msg.register11.fail', { label: label, txLink: commitTxLink }),
-        "msg-fail",
-        "false"
+        "msg-fail", "false"
       )  
       return await this.updateNameByLabel(label) 
     }
@@ -250,22 +244,20 @@ class ENSBook extends React.Component {
 
     const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, durationSeconds, secret, resolverAddr, resolveToAddr, regOverrides)
     const tx31 = await provider.waitForTransaction(tx30.hash, conf.custom.regTxConf.waitConfirms)
-    const donateEth = tx31.status ? await this.donate(tx30.value, walletWithProvider) : 0
+    const donateEth = tx31.status ? await this.donate(tx30.value, signer) : 0
     const regTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
 
     if (tx31.status) {
       this.MessageToasts.messageShow(
         "register30", 
         this.t('msg.register30.succeed', { label: label, regTxLink: regTxLink, donationValue: donateEth }),
-        "msg-success",
-        "false"
+        "msg-success", "false"
       )
     } else {
       this.MessageToasts.messageShow(
         "register30", 
         this.t('msg.register30.fail', { label: label, regTxLink: regTxLink }),
-        "msg-fail",
-        "false"
+        "msg-fail", "false"
       )      
     }
   
@@ -321,7 +313,7 @@ class ENSBook extends React.Component {
     const ETHRegCtrlCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
       conf.fixed.contract.abi.ETHRegCtrl, 
-      walletWithProvider
+      signer
     )
     const duration = (
       conf.custom.regTxConf.duration < conf.fixed.ensConf.MIN_REGISTRATION_DURATION
@@ -401,10 +393,10 @@ class ENSBook extends React.Component {
   }
 
   render() {
-    const {nameInfo, walletInfo} = this.state
+    const { nameInfo, walletInfo } = this.state
     const walletAddr = walletInfo.address
-    const walletScanLink = conf.fixed.scanConf[conf.custom.network] + "address/" + walletAddr
-    document.title = conf.custom.pageTag.length > 0 ? conf.custom.pageTag + ' - ' + conf.projectName : conf.projectName
+    const walletScanLink = `${conf.fixed.scanConf[conf.custom.network]}address/${walletAddr}`
+    document.title = conf.custom.pageTag.length > 0 ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
     return (
       <div id="main-wrapper" className="container main-wrapper">

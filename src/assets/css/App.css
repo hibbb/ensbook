@@ -143,24 +143,13 @@ h1 a .title-ens {
   background-color: #f1aeb5;
   color: #666;
 }
-.statusUnknown, .statusNormal {
-  background-color: #cccccc65;
-}
-.statusOpen {
-  background-color: #a6e9d565;
-}
-.statusGrace {
-  background-color: #f1aeb565;
-}
-.statusPremium {
-  background-color: #ffe69c65;
-}
-.statusReopen {
-  background-color: #a6e9d565;
-}
-.statusRegistering, .statusBooked {
-  background-color: #0dcaf065;
-}
+.statusUnknown  { background-color: #ffffff; }
+.statusNormal   { background-color: #cccccc65; }
+.statusOpen     { background-color: #a6e9d565; }
+.statusGrace    { background-color: #f1aeb565; }
+.statusPremium  { background-color: #ffe69c65; }
+.statusReopen   { background-color: #a6e9d565; }
+.statusRegistering, .statusBooked { background-color: #0dcaf065; }
 .td-level {
   cursor: default;
 }

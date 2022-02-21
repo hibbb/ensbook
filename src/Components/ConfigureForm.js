@@ -117,7 +117,7 @@ class ConfigureForm extends React.Component {
 
   render() {
     if (this.props.host !== "remote") {
-      return false
+      return null
     }
 
     const lookupList = JSON.parse(window.localStorage.getItem("lookupList"))

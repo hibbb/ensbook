@@ -123,14 +123,8 @@
     },
     "estimatePrice": "{{label}}.eth 注册费用预估 ≈ {{price}} ETH。",
     "estimatePriceAll": "注册这些域名总费用预估 ≈ {{price}} ETH。",
-    "setAndStoreNameInfo": {
-      "succeed": "域名信息完成更新和保存。",
-      "fail": "域名信息保存失败。"
-    },
-    "setAndStoreConfInfo": {
-      "succeed": "配置信息完成更新和保存。",
-      "fail": "配置信息保存失败。"
-    }
+    "setAndStoreNameInfo": "域名信息完成更新和保存。",
+    "setAndStoreConfInfo": "配置信息完成更新和保存。"
   },
   "modal": {
     "title": "需要确认",

@@ -123,14 +123,8 @@
     },
     "estimatePrice": "{{label}}.eth registration estimated cost ≈ {{price}} ETH.",
     "estimatePriceAll": "Registrations estimated TOTAL COST ≈ {{price}} ETH.",
-    "setAndStoreNameInfo": {
-      "succeed": "Name information has been updated and stored.",
-      "fail": "Failed to store the name information."
-    },
-    "setAndStoreConfInfo": {
-      "succeed": "Configurations have been updated and stored.",
-      "fail": "Failed to store the configurations."
-    }
+    "setAndStoreNameInfo": "Name information has been updated and stored.",
+    "setAndStoreConfInfo": "Configurations have been updated and stored."
   },
   "modal": {
     "title": "Need Confirmation",

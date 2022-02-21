@@ -55,33 +55,29 @@ export const TableHead = (props) => {
 
   const RenewNamesButton = () => {
     const haveRenewableName = nameInfo.findIndex(row => isRenewable(row.status)) >= 0
-    if (haveRenewableName) { 
-      return (
-        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
-          <button type="button" className="btn-plain btn-sub ms-2"
-            onClick={null}
-          >
-            <Calendar2Plus />
-          </button>
-        </OverlayTrigger>
-      )
-    }
+    if (haveRenewableName) return (
+      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
+        <button type="button" className="btn-plain btn-sub ms-2"
+          onClick={null}
+        >
+          <Calendar2Plus />
+        </button>
+      </OverlayTrigger>
+    )
     return null 
   }
 
   const HideShowButton = () => {
     const haveUnregistrableName = nameInfo.findIndex(row => !isRegistrable(row.status)) >= 0
-    if (haveUnregistrableName) {
-      return (
-        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
-          <button type="button" className="btn-plain btn-sub ms-2" 
-            onClick={switchHideFlag}
-          >
-            { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
-          </button>
-        </OverlayTrigger>
-      )  
-    }
+    if (haveUnregistrableName) return (
+      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
+        <button type="button" className="btn-plain btn-sub ms-2" 
+          onClick={switchHideFlag}
+        >
+          { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
+        </button>
+      </OverlayTrigger>
+    )
     return null
   }
 
