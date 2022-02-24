@@ -13,8 +13,6 @@ export const TableBody = (props) => {
     isRegistrable, 
     removeName, 
     estimatePrice,
-    book, 
-    cancelBook, 
     t 
   } = props
 
@@ -60,11 +58,8 @@ export const TableBody = (props) => {
             label={row.label} 
             index={index}
             status={row.status} 
-            expiresTime={row.expiresTime}
             estimatePrice={estimatePrice}
             register={register} 
-            book={book}
-            cancelBook={cancelBook}
             t={t}
           />
         </td>

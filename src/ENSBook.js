@@ -1,22 +1,20 @@
 import React from 'react'
 import { ethers, utils, Contract } from 'ethers'
-import confFile from './conf.json'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import lt from 'long-timeout'
-import NamesDisplayTable from './Table/NamesDisplayTable'
-import AddNamesForm from './Components/AddNamesForm'
-import ConfigureForm from './Components/ConfigureForm'
-import MessageToasts from './Utils/MessageToasts'
-import LanguageSwitcher from './Components/LanguageSwitcher'
-import AppTitle from './Components/AppTitle'
-import packageJson from '../package.json'
-import { Github, Twitter } from 'react-bootstrap-icons';
-import TestBar from './Utils/TestBar'
+import confFile from './conf.json'
+import { getConf, getProvider, getSignerWithProvider } from './Components/Globals'
+import Header from './Components/Header/Header'
+import AddNamesForm from './Components/Form/Form'
+import Table from './Components/Table/MainTable'
+import Footer from './Components/Footer/Footer'
+import TestBar from './Components/Utils/TestBar'
+import MessageToasts from './Components/Utils/MessageToasts'
 
-let provider
-let signer
-let conf
+let conf = getConf()
+let provider = getProvider(conf)
+let signer = getSignerWithProvider(conf)
 
 class ENSBook extends React.Component {
   t = this.props.t
@@ -29,22 +27,14 @@ class ENSBook extends React.Component {
     // store the newest lookupList to localstorage, keep the list in configform up to date.
     const lookupList = Object.keys(confFile.custom.display.lookup)
     window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
-    // setState: conf
-    if (confFile.host === "remote") {
-      conf = JSON.parse(window.localStorage.getItem("confInfo"))
-      if (!conf) {
-        conf = confFile
-        this.storeContent("confInfo", JSON.stringify(conf))
-      }      
-    } else {
-      conf = confFile
-    }
+    // set: conf
+    //conf = getConf()
     //setState walletInfo
-    try {
-      this.getProviderAndSigner()
-    } catch (error) {
-      throw error
-    }
+    // try {
+    //   this.getProviderAndSigner()
+    // } catch (error) {
+    //   throw error
+    // }
     const walletInfo = { address: "", balance: "" }
     this.state = { nameInfo: nameInfo, walletInfo: walletInfo }
   }
@@ -53,21 +43,21 @@ class ENSBook extends React.Component {
     return window.localStorage.setItem(key, value)
   }
 
-  getProviderAndSigner = () => {
-    if (conf.custom.operatorPrivateKey[0].trim().length > 1) {
-      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-      signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
-    } else {
-      provider = new ethers.providers.Web3Provider(window.ethereum)
-      signer = provider.getSigner()
-    }
-  }
+  // getProviderAndSigner = () => {
+  //   if (conf.custom.operatorPrivateKey[0].trim().length > 1) {
+  //     provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
+  //     signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
+  //   } else {
+  //     provider = new ethers.providers.Web3Provider(window.ethereum)
+  //     signer = provider.getSigner()
+  //   }
+  // }
 
   getAndStoreWalletInfo = async () => { // update walletInfo in state
     const walletAddress = await signer.getAddress()
     const walletBalance = utils.formatEther(await signer.getBalance())
     const walletInfo = { "address": walletAddress, "balance": walletBalance }
-    this.setState({walletInfo: walletInfo})
+    this.setState({ walletInfo: walletInfo })
     return walletInfo
   }
 
@@ -80,9 +70,10 @@ class ENSBook extends React.Component {
   }
 
   setAndStoreConfInfo = (value) => { // update confInfo in variable "conf" and store it
-    this.storeContent("confInfo", JSON.stringify(value))
     conf = value
-    this.getProviderAndSigner()
+    provider = getProvider(conf)
+    signer = getSignerWithProvider(conf, provider)
+    this.storeContent("confInfo", JSON.stringify(conf))
     this.MessageToasts.messageShow("setAndStoreConfInfo", this.t('msg.setAndStoreConfInfo'))
   }
 
@@ -163,13 +154,13 @@ class ENSBook extends React.Component {
     nameInfo.find(item => item.label === label).status = 'Registering'
     this.setState({ nameInfo: nameInfo })
 
-    owner = owner.trim().length < 1 ? await signer.getAddress() : owner
+    owner = utils.isAddress(owner) ? owner : await signer.getAddress()
     duration = Math.max(duration, conf.fixed.ensConf.MIN_REGISTRATION_DURATION)
     const durationSeconds = moment.duration(duration, 'days').asSeconds()
 
     const secret = ethers.Wallet.createRandom().privateKey
     //secret = ethers.Wallet.createRandom().privateKey.slice(0, 54) + "eb" + moment().format("X")
-    this.storeContent("lastCommitSecret", secret)
+    this.storeContent("lastCommit", `{ name: ${label}, owner: ${owner}, secret: ${secret} }`)
 
     let resolverAddr = "0x0000000000000000000000000000000000000000"
     let resolveToAddr = "0x0000000000000000000000000000000000000000"
@@ -394,73 +385,44 @@ class ENSBook extends React.Component {
 
   render() {
     const { nameInfo, walletInfo } = this.state
-    const walletAddr = walletInfo.address
-    const walletScanLink = `${conf.fixed.scanConf[conf.custom.network]}address/${walletAddr}`
     document.title = conf.custom.pageTag.length > 0 ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
     return (
       <div id="main-wrapper" className="container main-wrapper">
-        <div className="row mb-3">
-          <div className="header-left col-md-6">
-            <AppTitle pageTag={conf.custom.pageTag} pageTagColor={conf.custom.pageTagColor} />
-          </div>
-          <div className="header-right col-md-6 align-self-center">
-            <LanguageSwitcher />
-            <span className={"network px-2 network-"+ conf.custom.network}>{this.t('c.' + conf.custom.network)}</span>
-            <span className="wallet-address">
-              <a href={walletScanLink} target="_blank" rel="noreferrer" title={walletAddr}>
-                {walletAddr.slice(0, 5) + '...' + walletAddr.slice(-4)}
-              </a>
-            </span>
-            <span className="wallet-balance px-2">Ξ { walletInfo.balance.slice(0, 6) }</span>
-            <ConfigureForm 
-              host={conf.host}
-              setAndStoreConfInfo={this.setAndStoreConfInfo} 
-              resetAndStoreConfInfo={this.resetAndStoreConfInfo}
-              confFile={confFile}
-              updateNames={this.updateNames} 
-              t={this.t}
-            />
-          </div>
-        </div>
+        <Header 
+          conf={conf}
+          walletInfo={walletInfo}
+          setAndStoreConfInfo={this.setAndStoreConfInfo} 
+          resetAndStoreConfInfo={this.resetAndStoreConfInfo}
+          confFile={confFile}
+          updateNames={this.updateNames} 
+          t={this.t}
+        />
         <AddNamesForm 
           nameInfo={nameInfo}
           setAndStoreNameInfo={this.setAndStoreNameInfo}
           updateName={this.updateName}
           t={this.t} 
         />
-        <div className="row table-wrapper">
-          <NamesDisplayTable 
-            nameInfo={nameInfo} 
-            conf={conf}
-            updateName={this.updateName}
-            updateNames={this.updateNames} 
-            register={this.register} 
-            registerAll={this.registerAll}
-            removeName={this.removeName} 
-            removeNames={this.removeNames}
-            estimatePrice={this.estimatePrice}
-            estimatePriceAll={this.estimatePriceAll}
-            book={this.book}
-            cancelBook={this.cancelBook}
-            setAndStoreNameInfo={this.setAndStoreNameInfo}
-            t={this.t}
-          />
-        </div>
-        <div className="row">
-          <div className="footnode-left align-self-center col-6">
-            <div className="footnotes px-2">
-              <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer"><Twitter /></a>
-            </div>
-          </div>
-          <div className="footnode-right align-self-center col-6">
-            <div className="footnotes px-2">
-              <span className="version-v ps-2">v</span>
-              <span className="version-number pe-2">{packageJson.version}</span>
-              <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
-            </div>
-          </div>
-        </div>
+        <Table 
+          nameInfo={nameInfo} 
+          conf={conf}
+          updateName={this.updateName}
+          updateNames={this.updateNames} 
+          register={this.register} 
+          registerAll={this.registerAll}
+          removeName={this.removeName} 
+          removeNames={this.removeNames}
+          estimatePrice={this.estimatePrice}
+          estimatePriceAll={this.estimatePriceAll}
+          book={this.book}
+          cancelBook={this.cancelBook}
+          setAndStoreNameInfo={this.setAndStoreNameInfo}
+          t={this.t}
+        />
+        <Footer 
+          repository={conf.repository}
+        />
         <TestBar />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
       </div>

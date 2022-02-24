@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form } from 'react-bootstrap'
+import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { ethers, utils } from 'ethers';
 import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, Gift, CheckCircle } from 'react-bootstrap-icons';
 
@@ -150,9 +150,11 @@ class ConfigureForm extends React.Component {
 
     return (
       <div style={configureDivStyle}>
-        <button className="btn-plain" type="button" data-bs-toggle="offcanvas" data-bs-target="#configureContainer" aria-controls="configureContainer">
-          <Gear />
-        </button>
+        <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.title')}</Tooltip>}>
+          <button className="btn-plain" type="button" data-bs-toggle="offcanvas" data-bs-target="#configureContainer" aria-controls="configureContainer">
+            <Gear />
+          </button>
+        </OverlayTrigger>
         <div className="offcanvas offcanvas-start" data-bs-scroll="true" tabIndex="-1" id="configureContainer" aria-labelledby="configureContainerLabel">
           <div className="offcanvas-header">
             <h5 className="offcanvas-title" id="configureContainerLabel"><Gear /> {t('conf.title')}</h5>

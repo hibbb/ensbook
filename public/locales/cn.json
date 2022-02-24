@@ -11,6 +11,11 @@
       "Unknown": "未知"
     }
   },
+  "header": {
+    "account": "操作员账户",
+    "balance": "操作员余额",
+    "language": "语言"
+  },
   "form": {
     "holder": "输入域名标签 (多个标签用空格分开)",
     "btn": "添加域名"

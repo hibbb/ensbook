@@ -11,6 +11,11 @@
       "Unknown": "Unknown"
     }
   },
+  "header": {
+    "account": "Operator's Account",
+    "balance": "Operator's Balance",
+    "language": "Language"
+  },
   "form": {
     "holder": "Enter name labels separated by spaces",
     "btn": "Add Names"

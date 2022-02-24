@@ -12,7 +12,7 @@ class AddNamesForm extends React.Component {
     const { nameInfo, setAndStoreNameInfo, updateName } = this.props
 
     labels = labels.replace(/[,.'"?!@#$%^&*()/\\\\]/g, ' ').trim()
-    if (labels.length < 1) { return false}
+    if (labels.length < 1) { return false }
     // create an Array(originLabelsSet) including the original labels
     const originLabelsSet = new Set()
     nameInfo.map(row => originLabelsSet.add(row.label))

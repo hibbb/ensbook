@@ -132,7 +132,7 @@ h1 a .title-ens {
   color: #666;
 }
 .msg-warning {
-  background-color: #ffe69c;
+  background-color: #eede01;
   color: #666;
 }
 .msg-success {
@@ -143,13 +143,16 @@ h1 a .title-ens {
   background-color: #f1aeb5;
   color: #666;
 }
-.statusUnknown  { background-color: #ffffff; }
-.statusNormal   { background-color: #cccccc65; }
-.statusOpen     { background-color: #a6e9d565; }
-.statusGrace    { background-color: #f1aeb565; }
-.statusPremium  { background-color: #ffe69c65; }
-.statusReopen   { background-color: #a6e9d565; }
-.statusRegistering, .statusBooked { background-color: #0dcaf065; }
+.td-status {
+  padding: 0.07rem 0.35rem;
+}
+.status-Unknown  { background-color: #ffffff; }
+.status-Normal   { background-color: #cccccc65; }
+.status-Open     { background-color: #a6e9d565; }
+.status-Grace    { background-color: #f1aeb565; }
+.status-Premium  { background-color: #eede0165; }
+.status-Reopen   { background-color: #a6e9d565; }
+.status-Registering, .status-Booked { background-color: #0dcaf065; }
 .td-level {
   cursor: default;
 }
@@ -164,25 +167,25 @@ h1 a .title-ens {
 }
 .grace-ending {
   /* animation: grace-ending 3s infinite linear; */
-  background-image: linear-gradient(to right, #f1aeb565 0%, #f1aeb565 35%, #ffe69c 100%);
+  background-image: linear-gradient(to right, #f1aeb565 0%, #f1aeb565 35%, #eede01cc 100%);
 }
 .premium-ending {
   /* animation: premium-ending 3s infinite linear; */
-  background-image: linear-gradient(to right, #ffe69c65 0%, #ffe69c65 35%, #a6e9d5cc 100%);
+  background-image: linear-gradient(to right, #eede0165 0%, #eede0165 35%, #a6e9d5cc 100%);
 }
 /* @keyframes grace-ending {
   0%{background-color: #f1aeb565;}
-  25%{background-color: #ffe69ccc;}
+  25%{background-color: #eede01cc;}
   50%{background-color: #f1aeb565;}
-  75%{background-color: #ffe69ccc;}
+  75%{background-color: #eede01cc;}
   100%{background-color: #f1aeb565;}
 }
 @keyframes premium-ending {
-  0%{background-color: #ffe69c65;}
+  0%{background-color: #eede0165;}
   25%{background-color: #a6e9d565;}
-  50%{background-color: #ffe69c65;}
+  50%{background-color: #eede0165;}
   75%{background-color: #a6e9d565;}
-  100%{background-color: #ffe69c65;}
+  100%{background-color: #eede0165;}
 } */
 
 .tooltip-inner {
@@ -209,6 +212,9 @@ h1 a .title-ens {
 }
 .bs-tooltip-top .tooltip-arrow::before {
   border-top-color: #483c32;
+}
+.bs-tooltip-bottom .tooltip-arrow::before {
+  border-bottom-color: #483c32;
 }
 .tooltip-time-text {
   font-family: 'ebr-number-regular';

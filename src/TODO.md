@@ -2,6 +2,7 @@
 
 ## Priority 1
 
+- [ ] add lookupAddress for operator's address
 - [x] move refresh button to the status column
 - [x] remove book feature
 - [x] add more tooltip
@@ -12,6 +13,8 @@
 - [ ] get registration data from metadata
 - [ ] disable the whole page when updating name
 - [ ] support inputing an address to get all name owned by the address
+- [ ] remove donation feature
+- [ ] switch book function for premium names
 - [x] move deleteAll to the table header
 - [x] add a button that can hide unregistrable names
 - [x] match mobile display

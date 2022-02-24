@@ -1,8 +1,8 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import RegisterAllConfirmModal from '../../Utils/RegisterAllConfirmModal';
-import RemoveNamesConfirmModal from '../../Utils/RemoveNamesConfirmModal';
 import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
+import RegisterAllConfirmModal from '../Utils/RegisterAllConfirmModal';
+import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
 
 let ascFlag = {
   "label": true,

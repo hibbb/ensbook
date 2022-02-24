@@ -1,16 +1,16 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import RegisterConfirmModal from '../../Utils/RegisterConfirmModal';
+import RegisterConfirmModal from '../Utils/RegisterConfirmModal';
 import moment from 'moment';
 import Clock from 'react-live-clock';
-import { BoxArrowUpRight, XCircle, Calculator, Robot, Calendar2Plus } from 'react-bootstrap-icons';
+import { BoxArrowUpRight, XCircle, Calculator, Calendar2Plus } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 
 
 export const LabelCell = (props) => {
   const { label, level, index, nameInfo, setAndStoreNameInfo } = props
   // for td-label
-  const nameLink = "https://app.ens.domains/name/" + label + ".eth"
+  const nameLink = `https://app.ens.domains/name/${label}.eth`
   let labelClickCount = 0
   const oneClickToLevelUp = () => {
     labelClickCount += 1;
@@ -30,7 +30,7 @@ export const LabelCell = (props) => {
   return (
     <>
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}>
-        <span className={'td-level td-level-' + level} onClick={()=>oneClickToLevelUp()}>
+        <span className={`td-level td-level-${level}`} onClick={()=>oneClickToLevelUp()}>
           {label}
         </span>
       </OverlayTrigger>
@@ -53,10 +53,10 @@ export const LookupCell = (props) => {
   // 2. the nm.tb.lookup filed of en.json and cn.json
   const lookupLinks = {
     "Etherscan": "https://" + (conf.custom.network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
-    "Opensea": "https://opensea.io/assets/" + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + "/" + tokenId,
-    "Metadata": "https://metadata.ens.domains/" + conf.custom.network + "/" + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + "/" + tokenId,
-    "eth.link": "https://" + label + ".eth.link/",
-    "DNSRelated": "https://domains.google.com/registrar/search?tab=1&searchTerm=" + label
+    "Opensea": `https://opensea.io/assets/${conf.fixed.contract.addr[conf.custom.network].BaseRegImp}/${tokenId}`,
+    "Metadata": `https://metadata.ens.domains/${conf.custom.network}/${conf.fixed.contract.addr[conf.custom.network].BaseRegImp}/${tokenId}`,
+    "eth.link": `https://${label}.eth.link/`,
+    "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
   }
 
   return (
@@ -94,7 +94,6 @@ export const StatusCell = (props) => {
     switch(status) {
       case 'Normal':
       case 'Grace':
-      case 'Booked': 
         tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
         tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
         tooltipArray[2] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
@@ -154,7 +153,7 @@ export const StatusCell = (props) => {
             }
           </Tooltip>
         }>        
-        <span className={'px-1 td-status status' + status + graceEndingClass + premiumEndingClass} onClick={()=>{updateName(index)}}>
+        <span className={'td-status status-' + status + graceEndingClass + premiumEndingClass} onClick={()=>{updateName(index)}}>
           {t('nm.sta.' + status)}
         </span>
       </OverlayTrigger>
@@ -164,7 +163,7 @@ export const StatusCell = (props) => {
 }
 
 export const RegisterCell = (props) => {
-  const {status, register, label, expiresTime, index, estimatePrice, book, cancelBook, t} = props
+  const {status, register, label, estimatePrice, t} = props
   if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
@@ -186,25 +185,6 @@ export const RegisterCell = (props) => {
           </button>
         </OverlayTrigger>
         <RegisterConfirmModal register={register} label={label} t={t} />
-      </div>
-    )
-  }
-
-  //bookActiveDurationFlag: moment().add(24, 'hours') > moment.unix(expiresTime).add(90, 'days')
-  if (status === 'Grace' && moment().add(24, 'hours') > moment.unix(expiresTime).add(90, 'days')) {
-    return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.book', {label: label})}</Tooltip>}>
-          <button 
-            type="button" 
-            id={"register-btn-" + label}
-            className="btn-plain btn-book" 
-            data-bs-toggle="modal" data-bs-target={"#registerConfirmModal-" + label}
-            >
-            {t('tb.td.book')}
-          </button>
-        </OverlayTrigger>
-        <RegisterConfirmModal register={book} label={label} t={t} />
       </div>
     )
   }
@@ -233,23 +213,33 @@ export const RegisterCell = (props) => {
     )
   }
 
-  if (status === 'Booked') {
+  // if (status === 'Booked') {
+  //   return (
+  //     <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
+  //       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.cbook')}</Tooltip>}>
+  //         <button type="button" id={"register-btn-" + label} className="btn-plain"
+  //           disabled={false}
+  //           onClick={()=>{cancelBook(index)}}
+  //         >
+  //           {t('c.cancel')}
+  //         </button>
+  //       </OverlayTrigger>
+  //       <button 
+  //         type="button" 
+  //         id={"reg-sub-btn-" + label} 
+  //         className="btn-plain btn-sub book-waiting ms-2" 
+  //         title={t('tb.td.tips.booked')}>
+  //         <Robot />
+  //       </button>
+  //     </div>
+  //   )
+  // }
+
+  if (status === 'Unknown') {
     return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.cbook')}</Tooltip>}>
-          <button type="button" id={"register-btn-" + label} className="btn-plain"
-            disabled={false}
-            onClick={()=>{cancelBook(index)}}
-          >
-            {t('c.cancel')}
-          </button>
-        </OverlayTrigger>
-        <button 
-          type="button" 
-          id={"reg-sub-btn-" + label} 
-          className="btn-plain btn-sub book-waiting ms-2" 
-          title={t('tb.td.tips.booked')}>
-          <Robot />
+      <div id={"trigger-unknown-" + label} className="btn-group" role="group" aria-label="Unknown">
+        <button type="button" className="btn-plain" disabled={true}>
+          {t('nm.sta.Unknown')}
         </button>
       </div>
     )
