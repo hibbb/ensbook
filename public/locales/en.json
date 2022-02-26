@@ -106,10 +106,6 @@
       "title": "Display",
       "time": "Time Display",
       "lookup": "Lookup Display"
-    },
-    "donate": {
-      "title": "Donate",
-      "donatePercentage": "Percentage"
     }
   },
   "msg": {
@@ -123,7 +119,7 @@
     },
     "register20": "SETP 2 FINISHED: {{label}}.eth is ready for registration.",
     "register30": {
-      "succeed": "SETP 3 FINISHED: {{label}}.eth register {{regTxLink}} COMPLETED with a {{donationValue}} ETH donation.",
+      "succeed": "SETP 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
       "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
     },
     "estimatePrice": "{{label}}.eth registration estimated cost ≈ {{price}} ETH.",
@@ -138,6 +134,7 @@
     "removeNames": "Are you sure to CLEAR the table?"
   },
   "c": {
+    "EMPTY": "",
     "true": "True",
     "false": "False",
     "reset": "Reset",
@@ -147,6 +144,9 @@
     "tx": "transaction",
     "ropsten": "Ropsten",
     "mainnet": "Mainnet",
+    "homestead": "Mainnet",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
     "relatedTime": "Related Times",
     "currentTime": "Current",
     "expiresTime": "Expires",

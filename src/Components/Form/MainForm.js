@@ -2,7 +2,7 @@ import React from 'react';
 import { utils } from 'ethers';
 import namehash from '@ensdomains/eth-ens-namehash'
 
-class AddNamesForm extends React.Component {
+class MainForm extends React.Component {
   initialState = {
     labels: ''
   }
@@ -108,4 +108,4 @@ class AddNamesForm extends React.Component {
   }
 }
 
-export default AddNamesForm
+export default MainForm

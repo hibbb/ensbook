@@ -3,6 +3,7 @@
 ## Priority 1
 
 - [ ] add lookupAddress for operator's address
+- [ ] collate account and network display logic
 - [x] move refresh button to the status column
 - [x] remove book feature
 - [x] add more tooltip
@@ -15,6 +16,8 @@
 - [ ] support inputing an address to get all name owned by the address
 - [ ] remove donation feature
 - [ ] switch book function for premium names
+- [ ] optional duration for registration & renewal
+- [ ] add renew feature
 - [x] move deleteAll to the table header
 - [x] add a button that can hide unregistrable names
 - [x] match mobile display

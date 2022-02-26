@@ -106,10 +106,6 @@
       "title": "显示",
       "time": "时间显示",
       "lookup": "信息查询显示"
-    },
-    "donate": {
-      "title": "捐赠",
-      "donatePercentage": "百分比"
     }
   },
   "msg": {
@@ -123,7 +119,7 @@
     },
     "register20": "步骤 2 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
     "register30": {
-      "succeed": "步骤 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功, 并捐赠了 {{donationValue}} ETH。",
+      "succeed": "步骤 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
       "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
     },
     "estimatePrice": "{{label}}.eth 注册费用预估 ≈ {{price}} ETH。",
@@ -138,6 +134,7 @@
     "removeNames": "您确定清空域名列表?"
   },
   "c": {
+    "EMPTY": "",
     "true": "是",
     "false": "否",
     "reset": "重置",
@@ -147,6 +144,9 @@
     "tx": "交易",
     "ropsten": "Ropsten",
     "mainnet": "主网",
+    "homestead": "主网",
+    "connect": "连接",
+    "disconnect": "断开连接",
     "relatedTime": "相关时间",
     "currentTime": "当前时间",
     "expiresTime": "到期时间",

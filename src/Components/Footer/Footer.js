@@ -1,10 +1,9 @@
 import React from "react";
 import { Github, Twitter } from 'react-bootstrap-icons';
+import { getConf } from '../Global/globals'
 import packageJson from '../../../package.json'
 
-export default function Footer(props) {
-  const { repository } = props
-
+export default function Footer() {
   return (
     <div className="row">
       <div className="footnode-left align-self-center col-6">
@@ -16,7 +15,7 @@ export default function Footer(props) {
         <div className="footnotes px-2">
           <span className="version-v ps-2">v</span>
           <span className="version-number pe-2">{packageJson.version}</span>
-          <a href={repository} target="_blank" rel="noreferrer"><Github /></a>
+          <a href={getConf().repository} target="_blank" rel="noreferrer"><Github /></a>
         </div>
       </div>
     </div>

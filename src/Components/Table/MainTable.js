@@ -5,7 +5,7 @@ import { TableBody } from './TableBody'
 class MainTable extends React.Component {
 
   componentDidMount() {
-    this.props.updateNames(false)
+    this.props.updateNames()
   }
   
   // Hide unregistrable names or not

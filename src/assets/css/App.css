@@ -357,6 +357,11 @@ button.btn-plain[disabled] {
   border-radius: 0.15rem;
   font-size: 0.85rem;
 }
+.wallet-connect {
+  line-height: 0.85;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
 
 .footnotes {
   color: darkgrey;
@@ -404,6 +409,11 @@ button.btn-plain[disabled] {
 }
 
 /* ==== configuration ==== */
+.conf-wrapper {
+  display: inline-block;
+  padding-right: 0.5rem;
+  text-align: left;
+}
 .lookup-display-wrapper {
   background-color: #f5f5f5;
   border-radius: 0.5rem;
@@ -417,6 +427,28 @@ button.btn-plain[disabled] {
   padding: 0;
   width: 2.5rem;
   font-size: 0.75rem;
+}
+.mb-6 {
+  margin-bottom: 3.8rem;
+}
+.conf-btn-box {
+  padding: 0.65rem 1rem;
+  border-top: solid 1px gainsboro;
+  background-color: whitesmoke;
+  display: flex;
+  justify-content: flex-end;
+  width: 399px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1030;
+}
+.conf-btn-save {
+  margin: 0 1rem;
+}
+
+.web3modal-modal-lightbox {
+  z-index: 2000!important;
 }
 
 /* ==== reload bootstrap ==== */

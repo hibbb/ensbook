@@ -1,20 +1,10 @@
 import React from 'react';
 import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { ethers, utils } from 'ethers';
-import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, Gift, CheckCircle } from 'react-bootstrap-icons';
+import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, CheckCircle } from 'react-bootstrap-icons';
+import confFile from '../../conf.json'
 
 class ConfigureForm extends React.Component {
   conf = JSON.parse(window.localStorage.getItem("confInfo"))
-  provider = new ethers.providers.InfuraProvider(this.conf.custom.network, this.conf.custom.infuraID)
-
-  logOperators = async () => {
-    let keys = this.state.operatorPrivateKey.replace(/\s/g, "").split(",")
-    console.log('Operators:')
-    for (let i = 0; i < keys.length; i ++) {
-      const op = (new ethers.Wallet(keys[i])).address
-      console.log('%s...%s : %s', op.slice(0, 7), op.slice(-5), utils.formatEther(await this.provider.getBalance(op)).slice(0,7))
-    }
-  }
 
   state = {
     operatorPrivateKey: this.conf.custom.operatorPrivateKey.join(),
@@ -34,8 +24,7 @@ class ConfigureForm extends React.Component {
     regGasLimit: this.conf.custom.regTxConf.gasLimit,
     regWaitConfirms: this.conf.custom.regTxConf.waitConfirms,
     regRegisterWithConfig: this.conf.custom.regTxConf.registerWithConfig,
-    bookTimeSlot: this.conf.custom.book.timeSlot,
-    donatePercentage: this.conf.custom.donatePercentage
+    bookTimeSlot: this.conf.custom.book.timeSlot
   }
 
   handleChange = (event) => {
@@ -53,6 +42,10 @@ class ConfigureForm extends React.Component {
     const {displayLookup} = this.state
     displayLookup[name] = checked
     this.setState({displayLookup: displayLookup})
+  }
+
+  setAndStoreConfInfo = (newConf) => { 
+    window.localStorage.setItem("confInfo", JSON.stringify(newConf))
   }
 
   submitForm = () => {
@@ -75,14 +68,13 @@ class ConfigureForm extends React.Component {
     confInfo.custom.regTxConf.waitConfirms = Number(this.state.regWaitConfirms)
     confInfo.custom.regTxConf.registerWithConfig = Boolean(this.state.regRegisterWithConfig)
     confInfo.custom.book.timeSlot = Number(this.state.bookTimeSlot)
-    confInfo.custom.donatePercentage = Number(this.state.donatePercentage)
-    this.props.setAndStoreConfInfo(confInfo)
-    this.props.updateNames(false)
+    this.setAndStoreConfInfo(confInfo)
+    this.props.updateNames()
   }
 
   resetConf = () => {
-    this.props.resetAndStoreConfInfo()
-    const initialCustomConf = this.props.confFile.custom
+    this.setAndStoreConfInfo(confFile)
+    const initialCustomConf = confFile.custom
     this.setState({
       operatorPrivateKey: initialCustomConf.operatorPrivateKey.join(),
       network: initialCustomConf.network,
@@ -101,18 +93,9 @@ class ConfigureForm extends React.Component {
       regGasLimit: initialCustomConf.regTxConf.gasLimit,
       regWaitConfirms: initialCustomConf.regTxConf.waitConfirms,
       regRegisterWithConfig: initialCustomConf.regTxConf.registerWithConfig,
-      bookTimeSlot: initialCustomConf.book.timeSlot,
-      donatePercentage: initialCustomConf.donatePercentage
+      bookTimeSlot: initialCustomConf.book.timeSlot
     })
     this.props.updateNames(false)
-  }
-
-  estimateGasPreparation = () => {
-    const gasLimit = "270000"
-    const gasPrice = utils.parseUnits(this.state.regGasPrice.toString(), 'gwei')
-    const preparationWei = gasPrice.mul(gasLimit)
-    const preparation = utils.formatEther(preparationWei)
-    console.log('Gas preparation: ' + preparation + ' ETH')
   }
 
   render() {
@@ -121,35 +104,10 @@ class ConfigureForm extends React.Component {
     }
 
     const lookupList = JSON.parse(window.localStorage.getItem("lookupList"))
-
-    const {t} = this.props
-
-    const configureDivStyle = {
-      display: 'inline-block',
-      paddingRight: '0.5rem',
-      textAlign: 'left'
-    }
-    const buttonBoxStyle = {
-      padding: '0.65rem 1rem',
-      borderTop: 'solid 1px gainsboro',
-      backgroundColor: 'whitesmoke',
-      display: 'flex',
-      justifyContent: 'flex-end',
-      width: '399px',
-      right: 0,
-      bottom: 0,
-      left: 0,
-      zIndex: 1030
-    }
-    const saveButtonStyle = {
-      margin: '0 1rem'
-    }
-    const mb6 = {
-      marginBottom: '3.8rem'
-    }
+    const { t } = this.props
 
     return (
-      <div style={configureDivStyle}>
+      <div className="conf-wrapper">
         <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.title')}</Tooltip>}>
           <button className="btn-plain" type="button" data-bs-toggle="offcanvas" data-bs-target="#configureContainer" aria-controls="configureContainer">
             <Gear />
@@ -164,7 +122,7 @@ class ConfigureForm extends React.Component {
             <form>
               <div className="alert alert-warning" role="alert">
                 <InfoCircle />
-                <a href={this.props.confFile.repository + t('conf.instructionsUrl')} className="alert-link ps-2" target="_blank" rel="noreferrer">
+                <a href={confFile.repository + t('conf.instructionsUrl')} className="alert-link ps-2" target="_blank" rel="noreferrer">
                   {t('conf.instructions')}
                   <BoxArrowUpRight className="external-link-icon" />
                 </a>
@@ -308,9 +266,7 @@ class ConfigureForm extends React.Component {
                 <span className="input-group-text">{t('c.eth')}</span>
               </div>
               <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-reg-gasprice"
-                  onDoubleClick={this.estimateGasPreparation}
-                >{t('conf.register.gasPrice')}</span>
+                <span className="input-group-text" id="conf-key-reg-gasprice">{t('conf.register.gasPrice')}</span>
                 <input type="text" className="form-control" aria-label="regGasPrice" aria-describedby="your-regGasPrice" 
                 name="regGasPrice" 
                 value={this.state.regGasPrice} 
@@ -352,7 +308,7 @@ class ConfigureForm extends React.Component {
                 disabled={true} />
                 <span className="input-group-text">{t('c.hours')}</span>
               </div>
-              <div className="input-group input-group-sm mb-2">
+              <div className="input-group input-group-sm mb-6">
                 <span className="input-group-text" id="conf-key-book-timeslot">{t('conf.book.timeSlot')}</span>
                 <input type="text" className="form-control" aria-label="bookTimeSlot" aria-describedby="your-bookTimeSlot" 
                 name="bookTimeSlot" 
@@ -361,26 +317,15 @@ class ConfigureForm extends React.Component {
                 <span className="input-group-text">{t('c.seconds')}</span>
               </div>
 
-              <h6 className="mt-4 mb-3"><Gift /> {t('conf.donate.title')}</h6>
-              <div className="input-group input-group-sm" style={mb6}>
-                <span className="input-group-text" id="conf-key-donate-percentage">{t('conf.donate.donatePercentage')}</span>
-                <input type="text" className="form-control" aria-label="donatePercentage" aria-describedby="your-donatePercentage" 
-                name="donatePercentage" 
-                value={this.state.donatePercentage} 
-                onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.percent')}</span>
-              </div>
-
-              <div className="fixed-bottom" style={buttonBoxStyle}>
+              <div className="fixed-bottom conf-btn-box">
                 <button 
                   className="btn btn-secondary" 
                   type="button"
                   onClick={this.resetConf}
                 >{t('c.reset')}</button>
                 <button 
-                  className="btn btn-primary" 
                   type="button" 
-                  style={saveButtonStyle}
+                  className="btn btn-primary conf-btn-save" 
                   onClick={this.submitForm}
                 >{t('c.save')} <CheckCircle /></button>
               </div>

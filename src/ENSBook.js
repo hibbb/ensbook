@@ -3,95 +3,88 @@ import { ethers, utils, Contract } from 'ethers'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import lt from 'long-timeout'
-import confFile from './conf.json'
-import { getConf, getProvider, getSignerWithProvider } from './Components/Globals'
+import { getConf } from './Components/Global/globals'
+import { getProviderAndSigner } from './Components/Global/globals'
 import Header from './Components/Header/Header'
-import AddNamesForm from './Components/Form/Form'
-import Table from './Components/Table/MainTable'
+import MainForm from './Components/Form/MainForm'
+import MainTable from './Components/Table/MainTable'
 import Footer from './Components/Footer/Footer'
 import TestBar from './Components/Utils/TestBar'
 import MessageToasts from './Components/Utils/MessageToasts'
 
-let conf = getConf()
-let provider = getProvider(conf)
-let signer = getSignerWithProvider(conf)
+//let conf = getConf()
+const nameInfoStr = window.localStorage.getItem("nameInfo")
+const initialNameInfo = nameInfoStr ? JSON.parse(nameInfoStr) : []
+const initialWalletInfo = { 
+  address: null, 
+  network: null, 
+  balance: null, 
+  ensname: null 
+}
+
 
 class ENSBook extends React.Component {
   t = this.props.t
 
   constructor(props) {
     super(props)
-    // setState: nameInfo
-    const nameInfoStr = window.localStorage.getItem("nameInfo")
-    const nameInfo = nameInfoStr !== null ? JSON.parse(nameInfoStr) : []
+
+    this.state = { 
+      nameInfo: initialNameInfo, 
+      walletInfo: initialWalletInfo,
+      connected: false,
+      interacting: false
+    }
+
+    const conf = getConf()
     // store the newest lookupList to localstorage, keep the list in configform up to date.
-    const lookupList = Object.keys(confFile.custom.display.lookup)
+    const lookupList = Object.keys(conf.custom.display.lookup)
     window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
-    // set: conf
-    //conf = getConf()
-    //setState walletInfo
-    // try {
-    //   this.getProviderAndSigner()
-    // } catch (error) {
-    //   throw error
-    // }
-    const walletInfo = { address: "", balance: "" }
-    this.state = { nameInfo: nameInfo, walletInfo: walletInfo }
   }
 
-  storeContent = (key, value) => {  // store content at localStorage and return a bool
-    return window.localStorage.setItem(key, value)
+  setENSBookState = (key, value) => {
+    this.setState({[key]: value})
+    console.log(key + ": " + value)
   }
 
-  // getProviderAndSigner = () => {
-  //   if (conf.custom.operatorPrivateKey[0].trim().length > 1) {
-  //     provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-  //     signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
-  //   } else {
-  //     provider = new ethers.providers.Web3Provider(window.ethereum)
-  //     signer = provider.getSigner()
+  // getAndStoreWalletInfo = async () => { // update walletInfo in state
+  //   let { walletInfo } = this.state
+  //   const { provider, signer } = await getProviderAndSigner()
+
+  //   if (signer) {
+  //     walletInfo.address = await signer.getAddress()
+  //     walletInfo.network = (await provider.getNetwork()).name
+  //     walletInfo.balance = utils.formatEther(await signer.getBalance())
+  //     walletInfo.ensname = await provider.lookupAddress(walletInfo.address)
+  //     this.setState({ walletInfo: walletInfo })
   //   }
-  // }
 
-  getAndStoreWalletInfo = async () => { // update walletInfo in state
-    const walletAddress = await signer.getAddress()
-    const walletBalance = utils.formatEther(await signer.getBalance())
-    const walletInfo = { "address": walletAddress, "balance": walletBalance }
-    this.setState({ walletInfo: walletInfo })
-    return walletInfo
-  }
+  //   return walletInfo
+  // }
 
   setAndStoreNameInfo = (value, messageShow = true) => { // update nameInfo in state and store it
     this.setState({"nameInfo": value})
-    this.storeContent("nameInfo", JSON.stringify(value))
+    window.localStorage.setItem("nameInfo", JSON.stringify(value))
     if (messageShow) {
       this.MessageToasts.messageShow("setAndStoreNameInfo", this.t('msg.setAndStoreNameInfo'), "msg-default", "true", "5000")  
     }
   }
 
-  setAndStoreConfInfo = (value) => { // update confInfo in variable "conf" and store it
-    conf = value
-    provider = getProvider(conf)
-    signer = getSignerWithProvider(conf, provider)
-    this.storeContent("confInfo", JSON.stringify(conf))
-    this.MessageToasts.messageShow("setAndStoreConfInfo", this.t('msg.setAndStoreConfInfo'))
-  }
-
-  resetAndStoreConfInfo = () => {
-    this.setAndStoreConfInfo(confFile)
-  }
-
   getExpiresTimeStamp = async (label) => {
+    const conf = getConf()
+    //const { provider } = await getProviderAndSigner()
+    const provider = ethers.getDefaultProvider(this.state.walletInfo.network)
     const BaseRegImpCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
       conf.fixed.contract.abi.BaseRegImp, 
-      signer)
+      provider)
     const tokenId = utils.id(label)
     const expiresTimeBignumber = await BaseRegImpCon.nameExpires(tokenId) // return a BigNumber Object
     return expiresTimeBignumber.toNumber() // unix timestamp
   }
 
   getMetadata = async (tokenId) => {
+    const conf = getConf()
     const url = 'https://metadata.ens.domains/mainnet/' + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + '/' + tokenId
     const response = await fetch(url)
     return response.ok ? response.json() : null
@@ -133,17 +126,23 @@ class ENSBook extends React.Component {
     return this.updateName(index, messageShow)
   }
 
-  updateNames = async (messageShowFlag = true) => {
+  updateNames = async (messageShowFlag = true, updateWallet = this.state.connected) => {
     this.state.nameInfo.map(async (row, index) => {
       return await this.updateName(index, messageShowFlag)
     })
-    this.getAndStoreWalletInfo()
+    if (updateWallet) {
+      this.getAndStoreWalletInfo()
+    }
   }
 
   register = async (label) => {
+    const conf = getConf()
+
     let owner = conf.custom.receiverAddress      // address
     let duration = conf.custom.regTxConf.duration    // days
     let ourValue = conf.custom.regTxConf.value  // Ether
+
+    const { provider, signer } = await getProviderAndSigner()
 
     const ETHRegCtrlCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
@@ -160,7 +159,7 @@ class ENSBook extends React.Component {
 
     const secret = ethers.Wallet.createRandom().privateKey
     //secret = ethers.Wallet.createRandom().privateKey.slice(0, 54) + "eb" + moment().format("X")
-    this.storeContent("lastCommit", `{ name: ${label}, owner: ${owner}, secret: ${secret} }`)
+    window.localStorage.setItem("lastCommit", `{ name: ${label}, owner: ${owner}, secret: ${secret} }`)
 
     let resolverAddr = "0x0000000000000000000000000000000000000000"
     let resolveToAddr = "0x0000000000000000000000000000000000000000"
@@ -228,20 +227,19 @@ class ENSBook extends React.Component {
     }
     if (ourValue.length < 1 || ourValue === '0') {
       ourValue = await ETHRegCtrlCon.rentPrice(label, durationSeconds)
-      regOverrides.value = ourValue.mul(100 + conf.custom.donatePercentage).div(100)
+      regOverrides.value = ourValue
     } else {
       regOverrides.value = utils.parseEther(ourValue)
     }
 
     const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, durationSeconds, secret, resolverAddr, resolveToAddr, regOverrides)
     const tx31 = await provider.waitForTransaction(tx30.hash, conf.custom.regTxConf.waitConfirms)
-    const donateEth = tx31.status ? await this.donate(tx30.value, signer) : 0
     const regTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
 
     if (tx31.status) {
       this.MessageToasts.messageShow(
         "register30", 
-        this.t('msg.register30.succeed', { label: label, regTxLink: regTxLink, donationValue: donateEth }),
+        this.t('msg.register30.succeed', { label: label, regTxLink: regTxLink }),
         "msg-success", "false"
       )
     } else {
@@ -255,17 +253,6 @@ class ENSBook extends React.Component {
     // automaticly update the table after a registration
     this.getAndStoreWalletInfo()
     return await this.updateNameByLabel(label)
-  }
-
-  // Donate a few ethers to the author only when the donatePercentage > 0 as well as your register price >= 0.05 eth
-  donate = async (value, wallet) => {
-    let donateETH = 0
-    if (conf.custom.donatePercentage > 0 && value.gte(utils.parseEther('0.05'))) {
-      const donateValue = value.mul(conf.custom.donatePercentage).div(100)
-      await wallet.sendTransaction({to: conf.author, value: donateValue})
-      donateETH = utils.formatEther(donateValue)
-    }
-    return donateETH
   }
 
   getRegistrableNames = () => {
@@ -298,13 +285,18 @@ class ENSBook extends React.Component {
   estimatePrice = async (
     label, 
     messageShow = true, 
-    commitGasPrice = null,
-    regGasPrice = null
+    commitGasPrice,
+    regGasPrice
     ) => {
+    
+    const conf = getConf()
+    // const { provider } = await getProviderAndSigner()
+    const provider = ethers.getDefaultProvider(this.state.walletInfo.network)
+
     const ETHRegCtrlCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
       conf.fixed.contract.abi.ETHRegCtrl, 
-      signer
+      provider
     )
     const duration = (
       conf.custom.regTxConf.duration < conf.fixed.ensConf.MIN_REGISTRATION_DURATION
@@ -342,10 +334,15 @@ class ENSBook extends React.Component {
   }
 
   estimatePriceAll = async () => {
-    let cg = null
-    let rg = null
+    const conf = getConf()
+    //const { provider } = await getProviderAndSigner()
+    const provider = ethers.getDefaultProvider(this.state.walletInfo.network)
+
+    let cg
+    let rg
     const cccg = conf.custom.commitTxConf.gasPrice
     const ccrg = conf.custom.regTxConf.gasPrice
+
 
     if (cccg > 0 && ccrg > 0) {
       cg = utils.parseUnits(cccg.toString(), 'gwei')
@@ -372,7 +369,7 @@ class ENSBook extends React.Component {
   }
 
   removeName = (index) => {
-    const {nameInfo} = this.state
+    const { nameInfo } = this.state
     Promise.all(nameInfo.filter((nameItem, i) => {return i !== index}))
     .then((nameInfo) => {
       this.setAndStoreNameInfo(nameInfo)
@@ -384,27 +381,26 @@ class ENSBook extends React.Component {
   }
 
   render() {
+    const conf = getConf()
     const { nameInfo, walletInfo } = this.state
-    document.title = conf.custom.pageTag.length > 0 ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
+    document.title = conf.custom.pageTag ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
     return (
       <div id="main-wrapper" className="container main-wrapper">
         <Header 
           conf={conf}
+          setENSBookState={this.setENSBookState}
           walletInfo={walletInfo}
-          setAndStoreConfInfo={this.setAndStoreConfInfo} 
-          resetAndStoreConfInfo={this.resetAndStoreConfInfo}
-          confFile={confFile}
           updateNames={this.updateNames} 
           t={this.t}
         />
-        <AddNamesForm 
+        <MainForm 
           nameInfo={nameInfo}
           setAndStoreNameInfo={this.setAndStoreNameInfo}
           updateName={this.updateName}
           t={this.t} 
         />
-        <Table 
+        <MainTable 
           nameInfo={nameInfo} 
           conf={conf}
           updateName={this.updateName}
@@ -420,9 +416,7 @@ class ENSBook extends React.Component {
           setAndStoreNameInfo={this.setAndStoreNameInfo}
           t={this.t}
         />
-        <Footer 
-          repository={conf.repository}
-        />
+        <Footer />
         <TestBar />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
       </div>

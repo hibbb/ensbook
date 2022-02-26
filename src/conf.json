@@ -37,8 +37,7 @@
         "eth.link": false,
         "DNSRelated": false
       }
-    },
-    "donatePercentage": 5
+    }
   },
   "fixed": {
     "ensConf": {
