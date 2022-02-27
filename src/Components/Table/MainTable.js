@@ -18,6 +18,7 @@ class MainTable extends React.Component {
       setAndStoreNameInfo, 
       updateName, 
       updateNames, 
+      updating, 
       estimatePrice, 
       estimatePriceAll, 
       register, 
@@ -48,6 +49,7 @@ class MainTable extends React.Component {
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             updateNames={updateNames}
+            updating={updating}
             isRenewable={isRenewable}
             registerAll={registerAll}
             isRegistrable={isRegistrable}

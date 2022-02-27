@@ -6,7 +6,7 @@ import React from 'react';
 export default function TestBar() {
 
   const testFunc1 = async () => {
-
+    console.log(JSON.parse(window.localStorage.getItem("nameInfo123")))
   }
 
   const testFunc2 = async () => {

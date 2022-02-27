@@ -26,7 +26,7 @@ class OperatorWallet extends React.Component {
   }
 
   render() {
-    const { walletInfo, reconnectApp, disconnectApp, scanConf, t } = this.props
+    const { walletInfo, reconnectApp, disconnectApp, reconnecting, scanConf, t } = this.props
     const { type, address, ensname, network, balance } = walletInfo
     const readableAddress = address ? address.slice(0, 5) + '...' + address.slice(-4) : null
     const walletScanLink = `${scanConf[network]}address/${address}`  
@@ -44,6 +44,14 @@ class OperatorWallet extends React.Component {
       </div>
       )
     } 
+
+    if (reconnecting) {
+      return (
+        <div className="spinner-border text-secondary reconnecting" role="status">
+          <span className="visually-hidden">Connecting...</span>
+        </div>
+      )
+    }
   
     return (
       <div className="d-inline-block">
@@ -61,10 +69,10 @@ class OperatorWallet extends React.Component {
         </OverlayTrigger>
         <OverlayTrigger placement="bottom" overlay={
           <Tooltip>
-            {t('header.balance') + ": " + (balance ? balance.slice(0, 8) : '0.0') + " ETH"}
+            {t('header.balance') + ": " + (balance ?? '').slice(0, 8) + " ETH"}
           </Tooltip>
         }>
-          <span className="wallet-balance ps-2">{ balance ? 'Ξ ' + balance.slice(0, 6) : null }</span>
+          <span className="wallet-balance ps-2">Ξ { (balance ?? '').slice(0, 6) }</span>
         </OverlayTrigger>
         {
           type === 'web3'

@@ -4,7 +4,7 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 import lt from 'long-timeout'
 import Web3Modal from "web3modal";
-import { getConf, clearWeb3Modal, isCustomWallet } from './Components/Global/globals'
+import { getConf, isCustomWallet } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -12,24 +12,24 @@ import Footer from './Components/Footer/Footer'
 import TestBar from './Components/Utils/TestBar'
 import MessageToasts from './Components/Utils/MessageToasts'
 
-//let conf = getConf()
+const conf = getConf()
+const defaultProvider = new ethers.providers.InfuraProvider("homestead", conf.custom.infuraID)
+// store the newest lookupList to localstorage, keep the list in configform up to date.
+const lookupList = Object.keys(conf.custom.display.lookup)
+window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
+
+let web3Modal
 
 const INITIAL_STATE = {
-  fetching: false,
-  provider: ethers.getDefaultProvider(),
+  reconnecting: false,
+  updating: false,
+  provider: defaultProvider,
   signer: null,
   type: "readonly",
   address: null,
   ensname: null,
   network: null,
-  balance: null,
-  nameInfo: (
-    window.localStorage.getItem("nameInfo")
-    ? JSON.parse(window.localStorage.getItem("nameInfo"))
-    : []
-  )
-  //pendingRequest: false,
-  //result: null
+  balance: null
 };
 
 class ENSBook extends React.Component {
@@ -37,18 +37,13 @@ class ENSBook extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = INITIAL_STATE
-
-    const conf = getConf()
-    // store the newest lookupList to localstorage, keep the list in configform up to date.
-    const lookupList = Object.keys(conf.custom.display.lookup)
-    window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
+    const nameInfo = JSON.parse(window.localStorage.getItem("nameInfo")) ?? []
+    this.state = { ...INITIAL_STATE, nameInfo }
   }
 
   reconnectApp = async (updateNamesFlag = true) => {
+    this.setState({ reconnecting: true })
     const { provider, signer, type } = await this.getProviderAndSigner()
-    //await this.subscribeProvider(provider)
-    //await provider.enable()
     this.setState({ provider, signer, type })
 
     const address = signer ? await signer.getAddress() : null
@@ -56,86 +51,29 @@ class ENSBook extends React.Component {
     const balance = address ? utils.formatEther(await provider.getBalance(address)) : null
     const ensname = address ? await provider.lookupAddress(address) : null
     this.setState({ address, network, balance, ensname })
+    this.setState({ reconnecting: false })
 
     if (updateNamesFlag) {
-      this.updateNames()
+      await this.updateNames()
     } 
-  }
-
-  // getProviderAndSigner() return a provider, a signer and a wallet type.
-  // wallet type: 'custom' | 'web3' | 'readonly'
-  getProviderAndSigner = async () => {
-    const conf = getConf()
-    let provider
-    let web3Modal
-    if (isCustomWallet(conf)) {
-      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-      const signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider)
-      return { provider, signer, type: 'custom' }
-    } 
-    //return await getWeb3Modal(fallback)
-    try {
-      web3Modal = new Web3Modal({
-        //network: this.state.network, // optional
-        cacheProvider: true, // optional
-        providerOptions: {
-          walletconnect: {
-            package: () => import('@walletconnect/web3-provider'), // required
-            packageFactory: true,
-            options: {
-              infuraId: conf.custom.infuraID // required
-            }
-          }
-        }
-      })
-      provider = await web3Modal.connect()
-
-      if (provider) {
-        await this.subscribeProvider(provider)
-        await provider.enable()
-        provider = new ethers.providers.Web3Provider(provider);
-        const signer = provider.getSigner();
-        return { provider, signer, type: 'web3' }
-      }
-      else {
-        provider = ethers.getDefaultProvider()
-        return { provider, signer: undefined, type: 'readonly' }
-      }
-    } 
-    catch(e) {
-      console.log(e)
-      return null
-    }
   }
 
   disconnectApp = async () => {
-    await clearWeb3Modal()
-    this.setState(INITIAL_STATE)
+    const { provider } = this.state
+    if (web3Modal) {
+      await web3Modal.clearCachedProvider()
+    }
+    // Disconnect wallet connect provider
+    if (provider && provider.disconnect) {
+      provider.disconnect()
+    }
+    this.setState({ ...INITIAL_STATE })
     this.updateNames()
   }
 
-  subscribeProvider = async (provider) => {
-    if (!provider.on) {
-      return;
-    }
-    //provider.on("close", () => this.resetApp());
-    provider.on("accountsChanged", async (accounts) => {
-      console.log("accountsChanged")
-      this.reconnectApp(false)
-    });
-    // provider.on("chainChanged", async (chainId) => {
-    //   console.log("chainChanged")
-    //   this.reconnectApp()
-    // });
-    provider.on("networkChanged", async (networkId) => {
-      console.log("networkChanged")
-      this.reconnectApp()
-    });
-  };
-
-  setAndStoreNameInfo = (value, messageShow = true) => { // update nameInfo in state and store it
-    this.setState({"nameInfo": value})
-    window.localStorage.setItem("nameInfo", JSON.stringify(value))
+  setAndStoreNameInfo = (nameInfo, messageShow = true) => { // update nameInfo in state and store it
+    this.setState({ nameInfo })
+    window.localStorage.setItem("nameInfo", JSON.stringify(nameInfo))
     if (messageShow) {
       this.MessageToasts.messageShow("setAndStoreNameInfo", this.t('msg.setAndStoreNameInfo'), "msg-default", "true", "5000")  
     }
@@ -144,7 +82,7 @@ class ENSBook extends React.Component {
   getExpiresTimeStamp = async (label) => {
     const conf = getConf()
     //const { provider } = await getProviderAndSigner()
-    const { provider } = this.state  // tobesolved: multi: getDefaultProvider() need the [network]
+    const { provider } = this.state
     const BaseRegImpCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
       conf.fixed.contract.abi.BaseRegImp, 
@@ -194,7 +132,6 @@ class ENSBook extends React.Component {
     this.state.nameInfo.map(async (row, index) => {
       return await this.updateName(index, messageShowFlag)
     })
-    console.log('Updated Names.')
   }
 
   register = async (label) => {
@@ -346,7 +283,6 @@ class ENSBook extends React.Component {
   // }
 
   renewName = async (label, duration) => {
-
   }
 
   estimatePrice = async (
@@ -445,9 +381,68 @@ class ENSBook extends React.Component {
     this.setAndStoreNameInfo([])
   }
 
+  // getProviderAndSigner() return a provider, a signer and a wallet type.
+  // wallet type: 'custom' | 'web3' | 'readonly'
+  getProviderAndSigner = async () => {
+    const conf = getConf()
+    let provider
+    if (isCustomWallet(conf)) {
+      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
+      const signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider)
+      return { provider, signer, type: 'custom' }
+    } 
+    //return await getWeb3Modal(fallback)
+    try {
+      web3Modal = new Web3Modal({
+        //network: this.state.network, // optional
+        cacheProvider: true, // optional
+        providerOptions: {
+          walletconnect: {
+            package: () => import('@walletconnect/web3-provider'), // required
+            packageFactory: true,
+            options: {
+              infuraId: conf.custom.infuraID // required
+            }
+          }
+        }
+      })
+      provider = await web3Modal.connect()
+    } 
+    catch(e) {
+      console.log(e)
+    }
+
+    if (provider) {
+      await this.subscribeProvider(provider)
+      await provider.request({ method: 'eth_requestAccounts' }) 
+      provider = new ethers.providers.Web3Provider(provider);
+      const signer = provider.getSigner();
+      return { provider, signer, type: 'web3' }
+    }
+    else {
+      provider = defaultProvider
+      return { provider, signer: undefined, type: 'readonly' }
+    }
+  }
+
+  subscribeProvider = async (provider) => {
+    if (!provider.on) {
+      return;
+    }
+    //provider.on("close", () => this.resetApp());
+    provider.on("accountsChanged", async (accounts) => {
+      console.log("accountsChanged")
+      this.reconnectApp(false)
+    });
+    provider.on("chainChanged", async (chainId) => {
+      console.log("chainChanged")
+      this.reconnectApp()
+    });
+  };
+
   render() {
     const conf = getConf()
-    const { nameInfo, type, address, ensname, network, balance } = this.state
+    const { reconnecting, updating, nameInfo, type, address, ensname, network, balance } = this.state
     const walletInfo = { type, address, ensname, network, balance }
     document.title = conf.custom.pageTag ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
@@ -458,6 +453,7 @@ class ENSBook extends React.Component {
           walletInfo={walletInfo}
           reconnectApp={this.reconnectApp}
           disconnectApp={this.disconnectApp}
+          reconnecting={reconnecting}
           updateNames={this.updateNames} 
           t={this.t}
         />
@@ -472,6 +468,7 @@ class ENSBook extends React.Component {
           conf={conf}
           updateName={this.updateName}
           updateNames={this.updateNames} 
+          updating={updating}
           register={this.register} 
           registerAll={this.registerAll}
           removeName={this.removeName} 

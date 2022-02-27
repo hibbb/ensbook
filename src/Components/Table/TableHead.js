@@ -17,6 +17,7 @@ export const TableHead = (props) => {
     nameInfo, 
     setAndStoreNameInfo, 
     updateNames, 
+    updating, 
     isRenewable, 
     registerAll, 
     isRegistrable, 
@@ -116,7 +117,7 @@ export const TableHead = (props) => {
             <button type="button" className="btn-plain ms-2" 
               onClick={updateNames}
             >
-              <ArrowRepeat />
+              <ArrowRepeat className={ updating ? "updating" : ""} />
             </button>
           </OverlayTrigger>
         </th>
