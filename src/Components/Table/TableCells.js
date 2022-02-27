@@ -44,7 +44,7 @@ export const LabelCell = (props) => {
 }
 
 export const LookupCell = (props) => {
-  const {conf, label, tokenId, t} = props
+  const {conf, label, tokenId, network, t} = props
 
   // for td-lookup
   const { lookup } = conf.custom.display
@@ -52,9 +52,9 @@ export const LookupCell = (props) => {
   // 1. the custom.display.lookup filed of conf.json
   // 2. the nm.tb.lookup filed of en.json and cn.json
   const lookupLinks = {
-    "Etherscan": "https://" + (conf.custom.network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
-    "Opensea": `https://opensea.io/assets/${conf.fixed.contract.addr[conf.custom.network].BaseRegImp}/${tokenId}`,
-    "Metadata": `https://metadata.ens.domains/${conf.custom.network}/${conf.fixed.contract.addr[conf.custom.network].BaseRegImp}/${tokenId}`,
+    "Etherscan": "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
+    "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
+    "Metadata": `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
     "eth.link": `https://${label}.eth.link/`,
     "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
   }
@@ -163,7 +163,7 @@ export const StatusCell = (props) => {
 }
 
 export const RegisterCell = (props) => {
-  const {status, register, label, estimatePrice, t} = props
+  const {status, register, label, estimateCost, t} = props
   if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
@@ -179,7 +179,7 @@ export const RegisterCell = (props) => {
         </OverlayTrigger>
         <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.est')}</Tooltip>}>
           <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
-            onClick={()=>{estimatePrice(label)}}
+            onClick={()=>{estimateCost(label)}}
           >
             <Calculator />
           </button>

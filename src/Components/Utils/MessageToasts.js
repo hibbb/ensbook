@@ -27,8 +27,8 @@ class MessageToasts extends React.Component {
       'register11', 
       'register20', 
       'register30', 
-      'estimatePrice', 
-      'estimatePriceAll', 
+      // 'estimateCost', 
+      // 'estimateCosts', 
       'setAndStoreNameInfo', 
       'setAndStoreConfInfo'
     ]

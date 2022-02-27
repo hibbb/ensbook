@@ -12,9 +12,16 @@
     "infuraID": "bdd658fb48684fba924654acab554917",
     "pageTag": "",
     "pageTagColor": "#aaaaaa",
+    "commitTxConf": {
+      //"gasPrice": 0,
+      //"gasLimit": 50000,
+      //"waitConfirms": 2
+    },
     "regTxConf": {
       "duration": 5,
+      //"value": "",
       "gasPrice": 0,
+      //"gasLimit": 300000,
       "waitConfirms": 2,
       "registerWithConfig": true
     },

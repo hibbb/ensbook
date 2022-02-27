@@ -4,6 +4,7 @@ import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './Tabl
 export const TableBody = (props) => {
   const { 
     nameInfo, 
+    network, 
     setAndStoreNameInfo, 
     conf, 
     updateName, 
@@ -12,7 +13,7 @@ export const TableBody = (props) => {
     hideNames, 
     isRegistrable, 
     removeName, 
-    estimatePrice,
+    estimateCost,
     t 
   } = props
 
@@ -38,6 +39,7 @@ export const TableBody = (props) => {
             label={row.label}
             tokenId={row.tokenId}
             conf={conf}
+            network={network}
             t={t}
           />
         </td>
@@ -58,7 +60,7 @@ export const TableBody = (props) => {
             label={row.label} 
             index={index}
             status={row.status} 
-            estimatePrice={estimatePrice}
+            estimateCost={estimateCost}
             register={register} 
             t={t}
           />

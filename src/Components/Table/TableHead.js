@@ -24,7 +24,7 @@ export const TableHead = (props) => {
     hideNames, 
     switchHideFlag, 
     removeNames, 
-    estimatePriceAll, 
+    estimateCosts, 
     t 
   } = props
 
@@ -134,7 +134,7 @@ export const TableHead = (props) => {
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.estAll')}</Tooltip>}>
             <button type="button" id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
-              onClick={estimatePriceAll}
+              onClick={estimateCosts}
             >
               <Calculator />
             </button>

@@ -5,7 +5,7 @@ import { TableBody } from './TableBody'
 class MainTable extends React.Component {
 
   componentDidMount() {
-    this.props.updateNames()
+    this.props.reconnectApp()
   }
   
   // Hide unregistrable names or not
@@ -13,14 +13,15 @@ class MainTable extends React.Component {
 
   render() {
     const { 
-      nameInfo, 
       conf, 
+      nameInfo, 
+      network, 
       setAndStoreNameInfo, 
       updateName, 
       updateNames, 
       updating, 
-      estimatePrice, 
-      estimatePriceAll, 
+      estimateCost, 
+      estimateCosts, 
       register, 
       registerAll, 
       removeNames, 
@@ -56,11 +57,12 @@ class MainTable extends React.Component {
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
             removeNames={removeNames}
-            estimatePriceAll={estimatePriceAll}
+            estimateCosts={estimateCosts}
             t={t}
           />
           <TableBody 
             nameInfo={nameInfo} 
+            network={network}
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
             updateName={updateName}
@@ -69,7 +71,7 @@ class MainTable extends React.Component {
             hideNames={this.state.hideNames}
             isRegistrable={isRegistrable}
             removeName={removeName} 
-            estimatePrice={estimatePrice} 
+            estimateCost={estimateCost} 
             t={t}
           />
         </table>

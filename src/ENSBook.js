@@ -82,9 +82,9 @@ class ENSBook extends React.Component {
   getExpiresTimeStamp = async (label) => {
     const conf = getConf()
     //const { provider } = await getProviderAndSigner()
-    const { provider } = this.state
+    const { provider, network } = this.state
     const BaseRegImpCon = new Contract(
-      conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
+      conf.fixed.contract.addr[network].BaseRegImp, 
       conf.fixed.contract.abi.BaseRegImp, 
       provider)
     const tokenId = utils.id(label)
@@ -134,29 +134,23 @@ class ENSBook extends React.Component {
     })
   }
 
-  register = async (label) => {
+  register = async (label, duration = null) => {
     const conf = getConf()
 
-    let owner = conf.custom.receiverAddress      // address
-    let duration = moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds() // years to seconds
-    let ourValue = conf.custom.regTxConf.value  // Ether
-
-    const { provider, signer } = this.state
-    const { nameInfo } = this.state
+    const { provider, signer, nameInfo, address, network } = this.state
 
     const ETHRegCtrlCon = new Contract(
-      conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
+      conf.fixed.contract.addr[network].ETHRegCtrl, 
       conf.fixed.contract.abi.ETHRegCtrl, 
-      signer)
+      signer
+    )
     // set the status of the name to 'Regsitering', but no storing
     nameInfo.find(item => item.label === label).status = 'Registering'
-    this.setState({ nameInfo: nameInfo })
+    this.setState({ nameInfo })
 
-    owner = utils.isAddress(owner) ? owner : await signer.getAddress()
-    duration = Math.max(  // duration is in seconds now
-      duration, 
-      moment.duration(conf.fixed.ensConf.MIN_REGISTRATION_DURATION, 'days').asSeconds()
-    )
+    let owner = utils.isAddress(conf.custom.receiverAddress) ? conf.custom.receiverAddress : address
+    duration = duration ?? moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds()
+    duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
 
     const secret = ethers.Wallet.createRandom().privateKey
     window.localStorage.setItem("lastCommit", `{ name: ${label}, owner: ${owner}, secret: ${secret} }`)
@@ -164,7 +158,7 @@ class ENSBook extends React.Component {
     let resolverAddr = "0x0000000000000000000000000000000000000000"
     let resolveToAddr = "0x0000000000000000000000000000000000000000"
     if (conf.custom.regTxConf.registerWithConfig) {
-      resolverAddr = conf.fixed.contract.addr[conf.custom.network].PubRes
+      resolverAddr = conf.fixed.contract.addr[network].PubRes
       resolveToAddr = owner
     }
 
@@ -181,20 +175,18 @@ class ENSBook extends React.Component {
     )
 
     // Step 1.
-    if (conf.custom.commitTxConf.gasPrice > 0) { // conf.custom.commitTxConf.gasPrice: gwei
-      commitOverrides.gasPrice = utils.parseUnits(conf.custom.commitTxConf.gasPrice.toString(), 'gwei')
+    if (conf.custom.regTxConf.gasPrice > 0) { // conf.custom.regTxConf.gasPrice: gwei
+      commitOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
     }
-    if (conf.custom.commitTxConf.gasLimit > 0) {
-      commitOverrides.gasLimit = conf.custom.commitTxConf.gasLimit
-    }
+    commitOverrides.gasLimit = 70000
     let ourCommitment = await ETHRegCtrlCon.makeCommitmentWithConfig(label, owner, secret, resolverAddr, resolveToAddr)
     let tx10 = await ETHRegCtrlCon.commit(ourCommitment, commitOverrides)
     this.MessageToasts.messageShow(
       "register10", 
       this.t('msg.register10', { label: label })
     )
-    let tx11 = await provider.waitForTransaction(tx10.hash, conf.custom.commitTxConf.waitConfirms)
-    let commitTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx10.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
+    let tx11 = await provider.waitForTransaction(tx10.hash, conf.custom.regTxConf.waitConfirms)
+    let commitTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + tx10.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
     // if step 1 failed, cancel the process.
     if (tx11.status) {
       this.MessageToasts.messageShow(
@@ -226,19 +218,12 @@ class ENSBook extends React.Component {
     if (conf.custom.regTxConf.gasPrice > 0) { // conf.custom.regTxConf.gasPrice: gwei
       regOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
     }
-    if (conf.custom.regTxConf.gasLimit > 0) {
-      regOverrides.gasLimit = conf.custom.regTxConf.gasLimit
-    }
-    if (ourValue.length < 1 || ourValue === '0') {
-      ourValue = await ETHRegCtrlCon.rentPrice(label, duration)
-      regOverrides.value = ourValue
-    } else {
-      regOverrides.value = utils.parseEther(ourValue)
-    }
+    regOverrides.gasLimit = conf.custom.regTxConf.registerWithConfig ? 300000 : 220000
+    regOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(105).div(100)
 
     const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, duration, secret, resolverAddr, resolveToAddr, regOverrides)
     const tx31 = await provider.waitForTransaction(tx30.hash, conf.custom.regTxConf.waitConfirms)
-    const regTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
+    const regTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
 
     if (tx31.status) {
       this.MessageToasts.messageShow(
@@ -285,88 +270,37 @@ class ENSBook extends React.Component {
   renewName = async (label, duration) => {
   }
 
-  estimatePrice = async (
-    label, 
-    messageShow = true, 
-    commitGasPrice,
-    regGasPrice
-    ) => {
-    
+  estimateCost = async (label, duration = null) => {
     const conf = getConf()
-    // const { provider } = await getProviderAndSigner()
-    const { provider } = this.state
+    const { provider, network } = this.state
 
-    const ETHRegCtrlCon = new Contract(
-      conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
-      conf.fixed.contract.abi.ETHRegCtrl, 
-      provider
-    )
-    const duration = Math.max(  // duration is in seconds now
-      moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds(),
-      moment.duration(conf.fixed.ensConf.MIN_REGISTRATION_DURATION, 'days').asSeconds()
-    )
-    const commitGasLimit = "50000"
-    const regGasLimit = "270000"
+    duration = duration ?? moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds()
+    duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
+    const contractAddr = conf.fixed.contract.addr[network].ETHRegCtrl
+    const contractAbi = conf.fixed.contract.abi.ETHRegCtrl
+    const ETHRegCtrlCon = new Contract(contractAddr, contractAbi, provider)
     const rent = await ETHRegCtrlCon.rentPrice(label, duration)
 
-    commitGasPrice = commitGasPrice ?? (
-      conf.custom.commitTxConf.gasPrice > 0 
-      ? utils.parseUnits(conf.custom.commitTxConf.gasPrice.toString(), 'gwei')
-      : await provider.getGasPrice()
-    )
-    regGasPrice = regGasPrice ?? (
-      conf.custom.regTxConf.gasPrice > 0 
+    const gasPrice = (conf.custom.regTxConf.gasPrice > 0 
       ? utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
-      : await provider.getGasPrice()
-    )
+      : await provider.getGasPrice())
+    const gasFee = gasPrice.mul(50000 + 270000)  // commitGasLimit + regGasLimit
+    const costWei = gasFee.add(rent)
 
-    const commitPrice = commitGasPrice.mul(commitGasLimit)
-    const regPrice = regGasPrice.mul(regGasLimit)
-    const priceWei = commitPrice.add(regPrice).add(rent)
-    const priceEther = utils.formatEther(priceWei)
-
-    if (messageShow) {
-      this.MessageToasts.messageShow(
-        "estimatePrice", 
-        this.t('msg.estimatePrice', { label: label, price: priceEther.slice(0, 7) }),
-      )  
-    }
-    return priceWei
+    console.log(utils.formatEther(costWei))  // in Ether
+    return costWei
   }
 
-  estimatePriceAll = async () => {
-    const conf = getConf()
-    //const { provider } = await getProviderAndSigner()
-    const { provider } = this.state
-
-    let cg
-    let rg
-    const cccg = conf.custom.commitTxConf.gasPrice
-    const ccrg = conf.custom.regTxConf.gasPrice
-
-
-    if (cccg > 0 && ccrg > 0) {
-      cg = utils.parseUnits(cccg.toString(), 'gwei')
-      rg = utils.parseUnits(ccrg.toString(), 'gwei')
-    } else {
-      const gasPrice = await provider.getGasPrice()
-      cg = cccg > 0 ? utils.parseUnits(cccg.toString(), 'gwei') : gasPrice
-      rg = ccrg > 0 ? utils.parseUnits(ccrg.toString(), 'gwei') : gasPrice
-    }
-
+  estimateCosts = async () => {
     const registrableNames = this.getRegistrableNames()
-    let priceWei = ethers.BigNumber.from(0)
+    let costWei = ethers.BigNumber.from(0)
+
     for (let i = 0; i < registrableNames.length; i++) {
-      priceWei = priceWei.add(
-        await this.estimatePrice(registrableNames[i].label, false, cg, rg)
-      )
+      costWei = costWei.add(await this.estimateCost(registrableNames[i].label))
     }
-    const priceEther = utils.formatEther(priceWei)
-    this.MessageToasts.messageShow(
-      "estimatePriceAll", 
-      this.t('msg.estimatePriceAll', { price: priceEther.slice(0, 7) }),
-    )
-    return priceWei
+
+    console.log(utils.formatEther(costWei))
+    return costWei
   }
 
   removeName = (index) => {
@@ -464,8 +398,10 @@ class ENSBook extends React.Component {
           t={this.t} 
         />
         <MainTable 
-          nameInfo={nameInfo} 
           conf={conf}
+          nameInfo={nameInfo} 
+          reconnectApp={this.reconnectApp}
+          network={network}
           updateName={this.updateName}
           updateNames={this.updateNames} 
           updating={updating}
@@ -473,8 +409,8 @@ class ENSBook extends React.Component {
           registerAll={this.registerAll}
           removeName={this.removeName} 
           removeNames={this.removeNames}
-          estimatePrice={this.estimatePrice}
-          estimatePriceAll={this.estimatePriceAll}
+          estimateCost={this.estimateCost}
+          estimateCosts={this.estimateCosts}
           book={this.book}
           cancelBook={this.cancelBook}
           setAndStoreNameInfo={this.setAndStoreNameInfo}

@@ -15,13 +15,8 @@ class ConfigureForm extends React.Component {
     pageTagColor: this.conf.custom.pageTagColor,
     displayTime: this.conf.custom.display.time,
     displayLookup: this.conf.custom.display.lookup,
-    commitGasPrice: this.conf.custom.commitTxConf.gasPrice,
-    commitGasLimit: this.conf.custom.commitTxConf.gasLimit,
-    commitWaitConfirms: this.conf.custom.commitTxConf.waitConfirms,
     regDuration: this.conf.custom.regTxConf.duration,
-    regValue: this.conf.custom.regTxConf.value,
     regGasPrice: this.conf.custom.regTxConf.gasPrice,
-    regGasLimit: this.conf.custom.regTxConf.gasLimit,
     regWaitConfirms: this.conf.custom.regTxConf.waitConfirms,
     regRegisterWithConfig: this.conf.custom.regTxConf.registerWithConfig,
     bookTimeSlot: this.conf.custom.book.timeSlot
@@ -58,13 +53,8 @@ class ConfigureForm extends React.Component {
     confInfo.custom.pageTagColor =  this.state.pageTagColor
     confInfo.custom.display.time = this.state.displayTime
     confInfo.custom.display.lookup = this.state.displayLookup
-    confInfo.custom.commitTxConf.gasPrice = Number(this.state.commitGasPrice)
-    confInfo.custom.commitTxConf.gasLimit = Number(this.state.commitGasLimit)
-    confInfo.custom.commitTxConf.waitConfirms = Number(this.state.commitWaitConfirms)
     confInfo.custom.regTxConf.duration = Number(this.state.regDuration)
-    confInfo.custom.regTxConf.value = String(this.state.regValue.trim())
     confInfo.custom.regTxConf.gasPrice = Number(this.state.regGasPrice)
-    confInfo.custom.regTxConf.gasLimit = Number(this.state.regGasLimit)
     confInfo.custom.regTxConf.waitConfirms = Number(this.state.regWaitConfirms)
     confInfo.custom.regTxConf.registerWithConfig = Boolean(this.state.regRegisterWithConfig)
     confInfo.custom.book.timeSlot = Number(this.state.bookTimeSlot)
@@ -84,13 +74,8 @@ class ConfigureForm extends React.Component {
       pageTagColor: initialCustomConf.pageTagColor,
       displayTime: initialCustomConf.display.time,
       displayLookup: initialCustomConf.display.lookup,
-      commitGasPrice: initialCustomConf.commitTxConf.gasPrice,
-      commitGasLimit: initialCustomConf.commitTxConf.gasLimit,
-      commitWaitConfirms: initialCustomConf.commitTxConf.waitConfirms,
       regDuration: initialCustomConf.regTxConf.duration,
-      regValue: initialCustomConf.regTxConf.value,
       regGasPrice: initialCustomConf.regTxConf.gasPrice,
-      regGasLimit: initialCustomConf.regTxConf.gasLimit,
       regWaitConfirms: initialCustomConf.regTxConf.waitConfirms,
       regRegisterWithConfig: initialCustomConf.regTxConf.registerWithConfig,
       bookTimeSlot: initialCustomConf.book.timeSlot
@@ -200,52 +185,28 @@ class ConfigureForm extends React.Component {
                 </select>
               </div>
               <div className="lookup-display-wrapper">
-              <div className="input-group input-group-sm" data-bs-toggle="collapse" data-bs-target="#lookupCheckField" aria-expanded="false" aria-controls="lookupCheckField">
-                <span className="input-group-text">{t('conf.display.lookup')}</span>
-                <span className="form-control text-end"><ChevronDown /></span>
-              </div>
-              <div id="lookupCheckField" className="accordion-collapse collapse" aria-labelledby="headingTwo">
-                <div className="accordion-body">
-                  {
-                    lookupList.map(item => (
-                        <div className="form-check" key={item}>
-                          <input className="form-check-input lookup-check-input" 
-                            type="checkbox" 
-                            name={item} 
-                            checked={this.state.displayLookup[item] ?? false} 
-                            onChange={this.handleDisplayLookupChange}
-                          />
-                          <label className="form-check-label">{t('tb.lookup.' + item)}</label>
-                        </div>
-                      )
-                    )
-                  }
+                <div className="input-group input-group-sm" data-bs-toggle="collapse" data-bs-target="#lookupCheckField" aria-expanded="false" aria-controls="lookupCheckField">
+                  <span className="input-group-text">{t('conf.display.lookup')}</span>
+                  <span className="form-control text-end"><ChevronDown /></span>
                 </div>
-              </div>
-            </div>
-
-            <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.commit.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-commit-gasprice">{t('conf.commit.gasPrice')}</span>
-                <input type="text" className="form-control" aria-label="commitGasPrice" aria-describedby="your-commitGasPrice" 
-                name="commitGasPrice" 
-                value={this.state.commitGasPrice} 
-                onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.gwei')}</span>
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-commit-gaslimit">{t('conf.commit.gasLimit')}</span>
-                <input type="text" className="form-control" aria-label="commitGasLimit" aria-describedby="your-commitGasLimit" 
-                name="commitGasLimit" 
-                value={this.state.commitGasLimit} 
-                onChange={this.handleChange} />
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-commit-waitconfirms">{t('conf.commit.waitConfirms')}</span>
-                <input type="text" className="form-control" aria-label="commitWaitConfirms" aria-describedby="your-commitWaitConfirms" 
-                name="commitWaitConfirms" 
-                value={this.state.commitWaitConfirms} 
-                onChange={this.handleChange} />
+                <div id="lookupCheckField" className="accordion-collapse collapse" aria-labelledby="headingTwo">
+                  <div className="accordion-body">
+                    {
+                      lookupList.map(item => (
+                          <div className="form-check" key={item}>
+                            <input className="form-check-input lookup-check-input" 
+                              type="checkbox" 
+                              name={item} 
+                              checked={this.state.displayLookup[item] ?? false} 
+                              onChange={this.handleDisplayLookupChange}
+                            />
+                            <label className="form-check-label">{t('tb.lookup.' + item)}</label>
+                          </div>
+                        )
+                      )
+                    }
+                  </div>
+                </div>
               </div>
 
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.register.title')}</h6>
@@ -258,27 +219,12 @@ class ConfigureForm extends React.Component {
                 <span className="input-group-text">{t('c.years')}</span>
               </div>
               <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-reg-value">{t('conf.register.value')}</span>
-                <input type="text" className="form-control" aria-label="regValue" aria-describedby="your-Value" 
-                name="regValue" 
-                value={this.state.regValue} 
-                onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.eth')}</span>
-              </div>
-              <div className="input-group input-group-sm mb-2">
                 <span className="input-group-text" id="conf-key-reg-gasprice">{t('conf.register.gasPrice')}</span>
                 <input type="text" className="form-control" aria-label="regGasPrice" aria-describedby="your-regGasPrice" 
                 name="regGasPrice" 
                 value={this.state.regGasPrice} 
                 onChange={this.handleChange} />
                 <span className="input-group-text">{t('c.gwei')}</span>
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-reg-gaslimit">{t('conf.register.gasLimit')}</span>
-                <input type="text" className="form-control" aria-label="regGasLimit" aria-describedby="your-regGasLimit" 
-                name="regGasLimit" 
-                value={this.state.regGasLimit} 
-                onChange={this.handleChange} />
               </div>
               <div className="input-group input-group-sm mb-2">
                 <span className="input-group-text" id="conf-key-reg-waitconfirms">{t('conf.register.waitConfirms')}</span>
