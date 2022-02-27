@@ -5,7 +5,7 @@ import OperatorWallet from './OperatorWallet';
 import ConfigureForm from './ConfigureForm';
 
 export default function Header(props) {
-  const { conf, setENSBookState, walletInfo, updateNames, t } = props
+  const { conf, walletInfo, reconnectApp, disconnectApp, t } = props
 
   return (
     <div className="row mb-3">
@@ -19,15 +19,16 @@ export default function Header(props) {
         <LanguageSwitcher 
           t={t}
         />
-        <OperatorWallet 
-          conf={conf}
-          setENSBookState={setENSBookState}
-          //walletInfo={walletInfo}
-          t={t}
-        />
         <ConfigureForm 
           host={conf.host}
-          updateNames={updateNames} 
+          reconnectApp={reconnectApp}
+          t={t}
+        />
+        <OperatorWallet 
+          walletInfo={walletInfo}
+          reconnectApp={reconnectApp}
+          disconnectApp={disconnectApp}
+          scanConf={conf.fixed.scanConf}
           t={t}
         />
       </div>

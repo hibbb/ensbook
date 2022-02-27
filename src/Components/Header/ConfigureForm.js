@@ -69,7 +69,7 @@ class ConfigureForm extends React.Component {
     confInfo.custom.regTxConf.registerWithConfig = Boolean(this.state.regRegisterWithConfig)
     confInfo.custom.book.timeSlot = Number(this.state.bookTimeSlot)
     this.setAndStoreConfInfo(confInfo)
-    this.props.updateNames()
+    this.props.reconnectApp()
   }
 
   resetConf = () => {
@@ -95,7 +95,7 @@ class ConfigureForm extends React.Component {
       regRegisterWithConfig: initialCustomConf.regTxConf.registerWithConfig,
       bookTimeSlot: initialCustomConf.book.timeSlot
     })
-    this.props.updateNames(false)
+    this.props.reconnectApp()
   }
 
   render() {
@@ -107,7 +107,7 @@ class ConfigureForm extends React.Component {
     const { t } = this.props
 
     return (
-      <div className="conf-wrapper">
+      <div className="px-2 d-inline-block text-start">
         <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.title')}</Tooltip>}>
           <button className="btn-plain" type="button" data-bs-toggle="offcanvas" data-bs-target="#configureContainer" aria-controls="configureContainer">
             <Gear />
@@ -255,7 +255,7 @@ class ConfigureForm extends React.Component {
                 name="regDuration" 
                 value={this.state.regDuration} 
                 onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.days')}</span>
+                <span className="input-group-text">{t('c.years')}</span>
               </div>
               <div className="input-group input-group-sm mb-2">
                 <span className="input-group-text" id="conf-key-reg-value">{t('conf.register.value')}</span>

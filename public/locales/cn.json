@@ -111,7 +111,7 @@
   "msg": {
     "nameNormalizeError": "错误: {{errMsg}}",
     "book": "{{duration}} 之后会再次检查 {{label}}.eth 的注册状态。",
-    "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 天。",
+    "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 年。",
     "register10": "{{label}}.eth 请求已经提交。",
     "register11": {
       "succeed": "步骤 1 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会自动进行一下步。",
@@ -142,6 +142,7 @@
     "confirm": "确认",
     "cancel": "取消",
     "tx": "交易",
+    "currentNetwork": "当前网络",
     "ropsten": "Ropsten",
     "mainnet": "主网",
     "homestead": "主网",
@@ -157,6 +158,7 @@
     "seconds": "秒",
     "hours": "小时",
     "days": "天",
+    "years": "年",
     "percent": "%"
   }
 }

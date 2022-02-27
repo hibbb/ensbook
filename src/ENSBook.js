@@ -3,8 +3,8 @@ import { ethers, utils, Contract } from 'ethers'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import lt from 'long-timeout'
-import { getConf } from './Components/Global/globals'
-import { getProviderAndSigner } from './Components/Global/globals'
+import Web3Modal from "web3modal";
+import { getConf, clearWeb3Modal, isCustomWallet } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -13,28 +13,31 @@ import TestBar from './Components/Utils/TestBar'
 import MessageToasts from './Components/Utils/MessageToasts'
 
 //let conf = getConf()
-const nameInfoStr = window.localStorage.getItem("nameInfo")
-const initialNameInfo = nameInfoStr ? JSON.parse(nameInfoStr) : []
-const initialWalletInfo = { 
-  address: null, 
-  network: null, 
-  balance: null, 
-  ensname: null 
-}
 
+const INITIAL_STATE = {
+  fetching: false,
+  provider: ethers.getDefaultProvider(),
+  signer: null,
+  type: "readonly",
+  address: null,
+  ensname: null,
+  network: null,
+  balance: null,
+  nameInfo: (
+    window.localStorage.getItem("nameInfo")
+    ? JSON.parse(window.localStorage.getItem("nameInfo"))
+    : []
+  )
+  //pendingRequest: false,
+  //result: null
+};
 
 class ENSBook extends React.Component {
   t = this.props.t
 
   constructor(props) {
     super(props)
-
-    this.state = { 
-      nameInfo: initialNameInfo, 
-      walletInfo: initialWalletInfo,
-      connected: false,
-      interacting: false
-    }
+    this.state = INITIAL_STATE
 
     const conf = getConf()
     // store the newest lookupList to localstorage, keep the list in configform up to date.
@@ -42,25 +45,93 @@ class ENSBook extends React.Component {
     window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
   }
 
-  setENSBookState = (key, value) => {
-    this.setState({[key]: value})
-    console.log(key + ": " + value)
+  reconnectApp = async (updateNamesFlag = true) => {
+    const { provider, signer, type } = await this.getProviderAndSigner()
+    //await this.subscribeProvider(provider)
+    //await provider.enable()
+    this.setState({ provider, signer, type })
+
+    const address = signer ? await signer.getAddress() : null
+    const network = (await provider.getNetwork()).name
+    const balance = address ? utils.formatEther(await provider.getBalance(address)) : null
+    const ensname = address ? await provider.lookupAddress(address) : null
+    this.setState({ address, network, balance, ensname })
+
+    if (updateNamesFlag) {
+      this.updateNames()
+    } 
   }
 
-  // getAndStoreWalletInfo = async () => { // update walletInfo in state
-  //   let { walletInfo } = this.state
-  //   const { provider, signer } = await getProviderAndSigner()
+  // getProviderAndSigner() return a provider, a signer and a wallet type.
+  // wallet type: 'custom' | 'web3' | 'readonly'
+  getProviderAndSigner = async () => {
+    const conf = getConf()
+    let provider
+    let web3Modal
+    if (isCustomWallet(conf)) {
+      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
+      const signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider)
+      return { provider, signer, type: 'custom' }
+    } 
+    //return await getWeb3Modal(fallback)
+    try {
+      web3Modal = new Web3Modal({
+        //network: this.state.network, // optional
+        cacheProvider: true, // optional
+        providerOptions: {
+          walletconnect: {
+            package: () => import('@walletconnect/web3-provider'), // required
+            packageFactory: true,
+            options: {
+              infuraId: conf.custom.infuraID // required
+            }
+          }
+        }
+      })
+      provider = await web3Modal.connect()
 
-  //   if (signer) {
-  //     walletInfo.address = await signer.getAddress()
-  //     walletInfo.network = (await provider.getNetwork()).name
-  //     walletInfo.balance = utils.formatEther(await signer.getBalance())
-  //     walletInfo.ensname = await provider.lookupAddress(walletInfo.address)
-  //     this.setState({ walletInfo: walletInfo })
-  //   }
+      if (provider) {
+        await this.subscribeProvider(provider)
+        await provider.enable()
+        provider = new ethers.providers.Web3Provider(provider);
+        const signer = provider.getSigner();
+        return { provider, signer, type: 'web3' }
+      }
+      else {
+        provider = ethers.getDefaultProvider()
+        return { provider, signer: undefined, type: 'readonly' }
+      }
+    } 
+    catch(e) {
+      console.log(e)
+      return null
+    }
+  }
 
-  //   return walletInfo
-  // }
+  disconnectApp = async () => {
+    await clearWeb3Modal()
+    this.setState(INITIAL_STATE)
+    this.updateNames()
+  }
+
+  subscribeProvider = async (provider) => {
+    if (!provider.on) {
+      return;
+    }
+    //provider.on("close", () => this.resetApp());
+    provider.on("accountsChanged", async (accounts) => {
+      console.log("accountsChanged")
+      this.reconnectApp(false)
+    });
+    // provider.on("chainChanged", async (chainId) => {
+    //   console.log("chainChanged")
+    //   this.reconnectApp()
+    // });
+    provider.on("networkChanged", async (networkId) => {
+      console.log("networkChanged")
+      this.reconnectApp()
+    });
+  };
 
   setAndStoreNameInfo = (value, messageShow = true) => { // update nameInfo in state and store it
     this.setState({"nameInfo": value})
@@ -73,7 +144,7 @@ class ENSBook extends React.Component {
   getExpiresTimeStamp = async (label) => {
     const conf = getConf()
     //const { provider } = await getProviderAndSigner()
-    const provider = ethers.getDefaultProvider(this.state.walletInfo.network)
+    const { provider } = this.state  // tobesolved: multi: getDefaultProvider() need the [network]
     const BaseRegImpCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
       conf.fixed.contract.abi.BaseRegImp, 
@@ -81,13 +152,6 @@ class ENSBook extends React.Component {
     const tokenId = utils.id(label)
     const expiresTimeBignumber = await BaseRegImpCon.nameExpires(tokenId) // return a BigNumber Object
     return expiresTimeBignumber.toNumber() // unix timestamp
-  }
-
-  getMetadata = async (tokenId) => {
-    const conf = getConf()
-    const url = 'https://metadata.ens.domains/mainnet/' + conf.fixed.contract.addr[conf.custom.network].BaseRegImp + '/' + tokenId
-    const response = await fetch(url)
-    return response.ok ? response.json() : null
   }
 
   updateName = async (index, messageShowFlag = true) => {
@@ -126,39 +190,38 @@ class ENSBook extends React.Component {
     return this.updateName(index, messageShow)
   }
 
-  updateNames = async (messageShowFlag = true, updateWallet = this.state.connected) => {
+  updateNames = async (messageShowFlag = true) => {
     this.state.nameInfo.map(async (row, index) => {
       return await this.updateName(index, messageShowFlag)
     })
-    if (updateWallet) {
-      this.getAndStoreWalletInfo()
-    }
+    console.log('Updated Names.')
   }
 
   register = async (label) => {
     const conf = getConf()
 
     let owner = conf.custom.receiverAddress      // address
-    let duration = conf.custom.regTxConf.duration    // days
+    let duration = moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds() // years to seconds
     let ourValue = conf.custom.regTxConf.value  // Ether
 
-    const { provider, signer } = await getProviderAndSigner()
+    const { provider, signer } = this.state
+    const { nameInfo } = this.state
 
     const ETHRegCtrlCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
       conf.fixed.contract.abi.ETHRegCtrl, 
       signer)
     // set the status of the name to 'Regsitering', but no storing
-    const nameInfo = this.state.nameInfo
     nameInfo.find(item => item.label === label).status = 'Registering'
     this.setState({ nameInfo: nameInfo })
 
     owner = utils.isAddress(owner) ? owner : await signer.getAddress()
-    duration = Math.max(duration, conf.fixed.ensConf.MIN_REGISTRATION_DURATION)
-    const durationSeconds = moment.duration(duration, 'days').asSeconds()
+    duration = Math.max(  // duration is in seconds now
+      duration, 
+      moment.duration(conf.fixed.ensConf.MIN_REGISTRATION_DURATION, 'days').asSeconds()
+    )
 
     const secret = ethers.Wallet.createRandom().privateKey
-    //secret = ethers.Wallet.createRandom().privateKey.slice(0, 54) + "eb" + moment().format("X")
     window.localStorage.setItem("lastCommit", `{ name: ${label}, owner: ${owner}, secret: ${secret} }`)
 
     let resolverAddr = "0x0000000000000000000000000000000000000000"
@@ -173,7 +236,11 @@ class ENSBook extends React.Component {
 
     this.MessageToasts.messageShow(
       "register00", 
-      this.t('msg.register00', { label: label, owner: owner.substr(0, 7) + '...', duration: duration })
+      this.t('msg.register00', { 
+        label: label, 
+        owner: owner.substr(0, 7) + '...', 
+        duration: moment.duration(duration, 'seconds').asYears()
+      })
     )
 
     // Step 1.
@@ -226,13 +293,13 @@ class ENSBook extends React.Component {
       regOverrides.gasLimit = conf.custom.regTxConf.gasLimit
     }
     if (ourValue.length < 1 || ourValue === '0') {
-      ourValue = await ETHRegCtrlCon.rentPrice(label, durationSeconds)
+      ourValue = await ETHRegCtrlCon.rentPrice(label, duration)
       regOverrides.value = ourValue
     } else {
       regOverrides.value = utils.parseEther(ourValue)
     }
 
-    const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, durationSeconds, secret, resolverAddr, resolveToAddr, regOverrides)
+    const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, duration, secret, resolverAddr, resolveToAddr, regOverrides)
     const tx31 = await provider.waitForTransaction(tx30.hash, conf.custom.regTxConf.waitConfirms)
     const regTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
 
@@ -250,8 +317,8 @@ class ENSBook extends React.Component {
       )      
     }
   
-    // automaticly update the table after a registration
-    this.getAndStoreWalletInfo()
+    // automaticly update the operator's balance and the name infomation after a registration
+    this.setState({ balance: utils.formatEther(await signer.getBalance()) }) 
     return await this.updateNameByLabel(label)
   }
 
@@ -268,15 +335,15 @@ class ENSBook extends React.Component {
     }
   }
 
-  bookFlags = {}
+  // bookFlags = {}
 
-  book = (label) => {
-  }
+  // book = (label) => {
+  // }
 
-  cancelBook = (index) => {
-    this.bookFlags[this.state.nameInfo[index].label] = false
-    this.updateName(index)
-  }
+  // cancelBook = (index) => {
+  //   this.bookFlags[this.state.nameInfo[index].label] = false
+  //   this.updateName(index)
+  // }
 
   renewName = async (label, duration) => {
 
@@ -291,22 +358,20 @@ class ENSBook extends React.Component {
     
     const conf = getConf()
     // const { provider } = await getProviderAndSigner()
-    const provider = ethers.getDefaultProvider(this.state.walletInfo.network)
+    const { provider } = this.state
 
     const ETHRegCtrlCon = new Contract(
       conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
       conf.fixed.contract.abi.ETHRegCtrl, 
       provider
     )
-    const duration = (
-      conf.custom.regTxConf.duration < conf.fixed.ensConf.MIN_REGISTRATION_DURATION
-      ? conf.fixed.ensConf.MIN_REGISTRATION_DURATION
-      : conf.custom.regTxConf.duration
+    const duration = Math.max(  // duration is in seconds now
+      moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds(),
+      moment.duration(conf.fixed.ensConf.MIN_REGISTRATION_DURATION, 'days').asSeconds()
     )
     const commitGasLimit = "50000"
     const regGasLimit = "270000"
-    const durationSec = moment.duration(duration, 'days').asSeconds()
-    const rent = await ETHRegCtrlCon.rentPrice(label, durationSec)
+    const rent = await ETHRegCtrlCon.rentPrice(label, duration)
 
     commitGasPrice = commitGasPrice ?? (
       conf.custom.commitTxConf.gasPrice > 0 
@@ -336,7 +401,7 @@ class ENSBook extends React.Component {
   estimatePriceAll = async () => {
     const conf = getConf()
     //const { provider } = await getProviderAndSigner()
-    const provider = ethers.getDefaultProvider(this.state.walletInfo.network)
+    const { provider } = this.state
 
     let cg
     let rg
@@ -382,15 +447,17 @@ class ENSBook extends React.Component {
 
   render() {
     const conf = getConf()
-    const { nameInfo, walletInfo } = this.state
+    const { nameInfo, type, address, ensname, network, balance } = this.state
+    const walletInfo = { type, address, ensname, network, balance }
     document.title = conf.custom.pageTag ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
     return (
       <div id="main-wrapper" className="container main-wrapper">
         <Header 
           conf={conf}
-          setENSBookState={this.setENSBookState}
           walletInfo={walletInfo}
+          reconnectApp={this.reconnectApp}
+          disconnectApp={this.disconnectApp}
           updateNames={this.updateNames} 
           t={this.t}
         />

@@ -18,7 +18,7 @@
       "waitConfirms": 2
     },
     "regTxConf": {
-      "duration": 365,
+      "duration": 5,
       "value": "",
       "gasPrice": 0,
       "gasLimit": 300000,
@@ -47,6 +47,7 @@
       "maxCommitmentAge": 86400
     },
     "scanConf": {
+      "homestead": "https://etherscan.io/",
       "mainnet": "https://etherscan.io/",
       "ropsten": "https://ropsten.etherscan.io/"
     },

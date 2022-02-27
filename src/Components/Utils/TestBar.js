@@ -1,18 +1,16 @@
 import React from 'react';
 //import moment from 'moment';
 //import { utils } from 'ethers';
-import { clearWeb3Modal, getWeb3Modal, createWeb3Modal } from '../Global/globals'
+//import { clearWeb3Modal, getWeb3Modal, createWeb3Modal } from '../Global/globals'
 
 export default function TestBar() {
 
   const testFunc1 = async () => {
-    clearWeb3Modal()
-    console.log('test1:clear')
+
   }
 
   const testFunc2 = async () => {
-    createWeb3Modal()
-    console.log('test2:connect')
+
   }
 
   return (

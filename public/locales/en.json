@@ -111,7 +111,7 @@
   "msg": {
     "nameNormalizeError": "Error: {{errMsg}}",
     "book": "The status of {{label}}.eth will be rechecked in {{duration}}.",
-    "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} days.",
+    "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
     "register10": "{{label}}.eth commit submitted.",
     "register11": {
       "succeed": "SETP 1 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
@@ -142,6 +142,7 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "tx": "transaction",
+    "currentNetwork": "Current Network",
     "ropsten": "Ropsten",
     "mainnet": "Mainnet",
     "homestead": "Mainnet",
@@ -157,6 +158,7 @@
     "seconds": "Seconds",
     "hours": "Hours",
     "days": "Days",
+    "years": "Years",
     "percent": "%"
   }
 }
