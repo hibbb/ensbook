@@ -69,10 +69,9 @@
     }
   },
   "conf": {
-    "title": "Custom Configuration",
+    "title": "Configuration",
     "instructions": "Custom Instructions",
     "instructionsUrl": "#custom-configuration",
-    "attention": "Attention: If you are not familiar with these configurations, we recommend that you'd better not change the configurations other than the Global and Display items.",
     "global": {
       "title": "Global",
       "operatorPrivateKey": "Operator's Private Key",
@@ -97,15 +96,16 @@
       "waitConfirms": "Confirms",
       "registerWithConfig": "Register With Config"
     },
-    "book": {
-      "title": "Book",
-      "activeDuration": "Active Duration",
-      "timeSlot": "Time Slot"
-    },
     "display": {
       "title": "Display",
-      "time": "Time Display",
       "lookup": "Select Lookups to Display"
+    },
+    "premium": {
+      "title": "Premium",
+      "priceRange": "Price Range of Concern"
+    },
+    "customMode": {
+      "title": "Custom Wallet Mode"
     }
   },
   "msg": {
@@ -163,6 +163,7 @@
     "hours": "Hours",
     "days": "Days",
     "years": "Years",
-    "percent": "%"
+    "percent": "%",
+    "dollars": "Dollars"
   }
 }

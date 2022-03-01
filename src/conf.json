@@ -18,18 +18,17 @@
       "waitConfirms": 2,
       "registerWithConfig": true
     },
-    "book": {
-      "timeSlot": 10
-    },
     "display": {
-      "time": "expiresTime",
       "lookup": {
         "Etherscan": true,
         "Opensea": true,
         "Metadata": true,
         "eth.link": false,
         "DNSRelated": false
-      }
+      } 
+    },
+    "premium": {
+      "priceRange": 1000
     }
   },
   "fixed": {

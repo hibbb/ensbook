@@ -13,13 +13,12 @@ class ConfigureForm extends React.Component {
     infuraID: this.conf.custom.infuraID,
     pageTag: this.conf.custom.pageTag,
     pageTagColor: this.conf.custom.pageTagColor,
-    displayTime: this.conf.custom.display.time,
     displayLookup: this.conf.custom.display.lookup,
     regDuration: this.conf.custom.regTxConf.duration,
     regGasPrice: this.conf.custom.regTxConf.gasPrice,
     regWaitConfirms: this.conf.custom.regTxConf.waitConfirms,
     regRegisterWithConfig: this.conf.custom.regTxConf.registerWithConfig,
-    bookTimeSlot: this.conf.custom.book.timeSlot
+    premiumPriceRange: this.conf.custom.premium.priceRange
   }
 
   handleChange = (event) => {
@@ -51,13 +50,12 @@ class ConfigureForm extends React.Component {
     confInfo.custom.infuraID = this.state.infuraID.trim()
     confInfo.custom.pageTag =  this.state.pageTag.trim()
     confInfo.custom.pageTagColor =  this.state.pageTagColor
-    confInfo.custom.display.time = this.state.displayTime
     confInfo.custom.display.lookup = this.state.displayLookup
     confInfo.custom.regTxConf.duration = Number(this.state.regDuration)
     confInfo.custom.regTxConf.gasPrice = Number(this.state.regGasPrice)
     confInfo.custom.regTxConf.waitConfirms = Number(this.state.regWaitConfirms)
     confInfo.custom.regTxConf.registerWithConfig = Boolean(this.state.regRegisterWithConfig)
-    confInfo.custom.book.timeSlot = Number(this.state.bookTimeSlot)
+    confInfo.custom.premium.priceRange = Number(this.state.premiumPriceRange)
     this.setAndStoreConfInfo(confInfo)
     this.props.reconnectApp()
   }
@@ -72,13 +70,12 @@ class ConfigureForm extends React.Component {
       infuraID: initialCustomConf.infuraID,
       pageTag: initialCustomConf.pageTag,
       pageTagColor: initialCustomConf.pageTagColor,
-      displayTime: initialCustomConf.display.time,
       displayLookup: initialCustomConf.display.lookup,
       regDuration: initialCustomConf.regTxConf.duration,
       regGasPrice: initialCustomConf.regTxConf.gasPrice,
       regWaitConfirms: initialCustomConf.regTxConf.waitConfirms,
       regRegisterWithConfig: initialCustomConf.regTxConf.registerWithConfig,
-      bookTimeSlot: initialCustomConf.book.timeSlot
+      premiumPriceRange: initialCustomConf.premium.priceRange
     })
     this.props.reconnectApp()
   }
@@ -111,8 +108,6 @@ class ConfigureForm extends React.Component {
                   {t('conf.instructions')}
                   <BoxArrowUpRight className="external-link-icon" />
                 </a>
-                <hr />
-                {t('conf.attention')}
               </div>
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.global.title')}</h6>
               <div className="input-group input-group-sm mb-2">
@@ -174,16 +169,6 @@ class ConfigureForm extends React.Component {
               </div>
 
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.display.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-displayTime">{t('conf.display.time')}</span>
-                <select className="form-select form-select-sm" aria-label="displayTime" 
-                name="displayTime"
-                value={this.state.displayTime} 
-                onChange={this.handleChange} >
-                  <option value="expiresTime">{t('c.expiresTime')}</option>
-                  <option value="releaseTime">{t('c.releaseTime')}</option>
-                </select>
-              </div>
               <div className="lookup-display-wrapper">
                 <div className="input-group input-group-sm" data-bs-toggle="collapse" data-bs-target="#lookupCheckField" aria-expanded="false" aria-controls="lookupCheckField">
                   <span className="input-group-text">{t('conf.display.lookup')}</span>
@@ -244,23 +229,14 @@ class ConfigureForm extends React.Component {
                 </select>
               </div>
 
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.book.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-book-activeduration">{t('conf.book.activeDuration')}</span>
-                <input type="text" className="form-control" aria-label="bookActiveDuration" aria-describedby="your-bookActiveDuration" 
-                name="bookActiveDuration" 
-                value="24" 
-                onChange={this.handleChange} 
-                disabled={true} />
-                <span className="input-group-text">{t('c.hours')}</span>
-              </div>
+              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.premium.title')}</h6>
               <div className="input-group input-group-sm mb-6">
-                <span className="input-group-text" id="conf-key-book-timeslot">{t('conf.book.timeSlot')}</span>
-                <input type="text" className="form-control" aria-label="bookTimeSlot" aria-describedby="your-bookTimeSlot" 
-                name="bookTimeSlot" 
-                value={this.state.bookTimeSlot} 
+                <span className="input-group-text" id="conf-key-premium-pricerange">{t('conf.premium.priceRange')}</span>
+                <input type="text" className="form-control" aria-label="premiumPriceRange" aria-describedby="your-premiumPriceRange" 
+                name="premiumPriceRange" 
+                value={this.state.premiumPriceRange} 
                 onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.seconds')}</span>
+                <span className="input-group-text">{t('c.dollars')}</span>
               </div>
 
               <div className="fixed-bottom conf-btn-box">

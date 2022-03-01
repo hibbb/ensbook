@@ -69,10 +69,9 @@
     }
   },
   "conf": {
-    "title": "自定义配置",
+    "title": "配置",
     "instructions": "配置说明",
     "instructionsUrl": "blob/main/README_CN.md#自定义配置",
-    "attention": "注意: 如果您对这些配置项不够了解, 我们建议您只修改 “全局” 和 “显示” 内的条目, 而将其它条目保持默认值。",
     "global": {
       "title": "全局",
       "operatorPrivateKey": "操作员私钥",
@@ -97,15 +96,16 @@
       "waitConfirms": "确认数",
       "registerWithConfig": "注册时进行配置"
     },
-    "book": {
-      "title": "预约注册",
-      "activeDuration": "启动区间",
-      "timeSlot": "时隙"
-    },
     "display": {
       "title": "显示",
-      "time": "时间显示",
       "lookup": "选择要显示的相关信息"
+    },
+    "premium": {
+      "title": "溢价期",
+      "priceRange": "关注的价格区间"
+    },
+    "customMode": {
+      "title": "自定义钱包模式"
     }
   },
   "msg": {
@@ -163,6 +163,7 @@
     "hours": "小时",
     "days": "天",
     "years": "年",
-    "percent": "%"
+    "percent": "%",
+    "dollars": "美元"
   }
 }

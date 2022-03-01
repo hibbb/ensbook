@@ -7,7 +7,9 @@ import React from 'react';
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
-    console.log('555')
+    let a = " 5 6 "
+    //a = a / 7
+    console.log(Number(a))
   }
 
   const testFunc2 = async () => {

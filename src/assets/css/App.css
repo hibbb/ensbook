@@ -50,6 +50,9 @@ a:hover {
 h1 a .title-ens {
   color: #483c32;
 }
+.error-boundary {
+  color: indianred;
+}
 .table {
   --bs-table-bg: transparent;
   --bs-table-accent-bg: transparent;
@@ -163,7 +166,7 @@ h1 a .title-ens {
   color: indianred;
 }
 .td-level-2 {
-  color: indianred;
+  color:limegreen;
 }
 .grace-ending {
   /* animation: grace-ending 3s infinite linear; */
@@ -361,6 +364,9 @@ button.btn-plain[disabled] {
   line-height: 1;
   font-size: 0.85rem;
   font-weight: 400;
+}
+.custom-wallet {
+  color: #483c32;
 }
 .reconnecting, .estimating {
   width: 0.85rem;

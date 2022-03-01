@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
-import { Plug } from 'react-bootstrap-icons';
+import { Plug, WalletFill } from 'react-bootstrap-icons';
 import { isCustomWallet } from '../Global/globals';
 
 const CurrentNetwork = (props) => {
@@ -70,19 +70,25 @@ class OperatorWallet extends React.Component {
             {t('header.balance') + ": " + (balance ?? '').slice(0, 8) + " ETH"}
           </Tooltip>
         }>
-          <span className="wallet-balance ps-2">Ξ { (balance ?? '').slice(0, 6) }</span>
+          <span className="wallet-balance px-2">Ξ { (balance ?? '').slice(0, 6) }</span>
         </OverlayTrigger>
         {
-          type === 'web3'
-          ? (<OverlayTrigger placement="bottom" overlay={<Tooltip>{t('c.disconnect')}</Tooltip>}>
-              <button type="button" 
-                className="btn-plain mx-2 wallet-disconnect"    
-                onClick={disconnectApp}
-              >
-                <Plug />
-              </button>
-            </OverlayTrigger>)
-          : null
+          type === 'custom'
+          ? (
+              <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.customMode.title')}</Tooltip>}>
+                <WalletFill className="btn-light me-2 custom-wallet" />
+              </OverlayTrigger>
+            )
+          : (
+              <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('c.disconnect')}</Tooltip>}>
+                <button type="button" 
+                  className="btn-plain me-2 wallet-disconnect"    
+                  onClick={disconnectApp}
+                >
+                  <Plug />
+                </button>
+              </OverlayTrigger>
+            )
         }
       </div>
     )  
