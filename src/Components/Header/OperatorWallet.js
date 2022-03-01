@@ -47,7 +47,7 @@ class OperatorWallet extends React.Component {
 
     if (reconnecting) {
       return (
-        <div className="spinner-border text-secondary reconnecting" role="status">
+        <div className="spinner-border text-secondary me-2 reconnecting" role="status">
           <span className="visually-hidden">Connecting...</span>
         </div>
       )

@@ -177,7 +177,11 @@ export const RegisterCell = (props) => {
             {t('tb.td.reg')}
           </button>
         </OverlayTrigger>
-        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.est')}</Tooltip>}>
+        <OverlayTrigger placement="top" overlay={
+          <Tooltip>
+            {t('tb.td.tips.est')}
+          </Tooltip>
+        }>
           <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
             onClick={()=>{estimateCost(label)}}
           >

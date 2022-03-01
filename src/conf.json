@@ -40,7 +40,6 @@
       "maxCommitmentAge": 86400
     },
     "scanConf": {
-      "homestead": "https://etherscan.io/",
       "mainnet": "https://etherscan.io/",
       "ropsten": "https://ropsten.etherscan.io/"
     },

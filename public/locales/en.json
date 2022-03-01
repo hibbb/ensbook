@@ -131,7 +131,11 @@
     "title": "Need Confirmation",
     "reg": "Are you sure to register {{label}}.eth? After the registration process has started, do not close this page until the registration is completed.",
     "regAll": "Are you sure to register THESE ENS names?",
-    "removeNames": "Are you sure to CLEAR the table?"
+    "removeNames": "Are you sure to CLEAR the table?",
+    "errorNetwork": {
+      "title": "Unsupported Network",
+      "text": "ENSBook currently supports only ethereum Mainnet and Ropsten network, please switch network in the wallet you are connected to, or disconnect from the wallet."
+    }
   },
   "c": {
     "EMPTY": "",

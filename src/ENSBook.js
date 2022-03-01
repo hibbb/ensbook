@@ -2,15 +2,18 @@ import React from 'react'
 import { ethers, utils, Contract } from 'ethers'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
+import { Modal } from 'bootstrap'
 import lt from 'long-timeout'
 import Web3Modal from "web3modal";
-import { getConf, isCustomWallet } from './Components/Global/globals'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import { getConf, isCustomWallet, isSupportedChain } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
 import Footer from './Components/Footer/Footer'
 import TestBar from './Components/Utils/TestBar'
 import MessageToasts from './Components/Utils/MessageToasts'
+import ErrorNetworkModal from './Components/Utils/ErrorNetworkModal'
 
 const conf = getConf()
 const defaultProvider = new ethers.providers.InfuraProvider("homestead", conf.custom.infuraID)
@@ -19,16 +22,17 @@ const lookupList = Object.keys(conf.custom.display.lookup)
 window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
 
 let web3Modal
+let errorNetworkModal
 
 const INITIAL_STATE = {
   reconnecting: false,
-  updating: false,
+  fetching: false,
   provider: defaultProvider,
   signer: null,
   type: "readonly",
   address: null,
   ensname: null,
-  network: null,
+  network: "mainnet",
   balance: null
 };
 
@@ -46,8 +50,15 @@ class ENSBook extends React.Component {
     const { provider, signer, type } = await this.getProviderAndSigner()
     this.setState({ provider, signer, type })
 
+    const networkname = (await provider.getNetwork()).name
+    if (!isSupportedChain(networkname)) {
+      errorNetworkModal = errorNetworkModal ?? new Modal(document.getElementById('errorNetworkModal'))
+      errorNetworkModal.show()
+      return
+    }
+
+    const network = networkname === "homestead" ? "mainnet" : networkname
     const address = signer ? await signer.getAddress() : null
-    const network = (await provider.getNetwork()).name
     const balance = address ? utils.formatEther(await provider.getBalance(address)) : null
     const ensname = address ? await provider.lookupAddress(address) : null
     this.setState({ address, network, balance, ensname })
@@ -60,13 +71,13 @@ class ENSBook extends React.Component {
 
   disconnectApp = async () => {
     const { provider } = this.state
-    if (web3Modal) {
-      await web3Modal.clearCachedProvider()
-    }
+    await web3Modal?.clearCachedProvider()
     // Disconnect wallet connect provider
     if (provider && provider.disconnect) {
       provider.disconnect()
     }
+    errorNetworkModal?.hide()
+
     this.setState({ ...INITIAL_STATE })
     this.updateNames()
   }
@@ -328,15 +339,12 @@ class ENSBook extends React.Component {
     //return await getWeb3Modal(fallback)
     try {
       web3Modal = new Web3Modal({
-        //network: this.state.network, // optional
         cacheProvider: true, // optional
         providerOptions: {
           walletconnect: {
-            package: () => import('@walletconnect/web3-provider'), // required
-            packageFactory: true,
-            options: {
-              infuraId: conf.custom.infuraID // required
-            }
+            package: WalletConnectProvider, // required
+            //packageFactory: true,
+            options: { infuraId: conf.custom.infuraID }
           }
         }
       })
@@ -348,7 +356,7 @@ class ENSBook extends React.Component {
 
     if (provider) {
       await this.subscribeProvider(provider)
-      await provider.request({ method: 'eth_requestAccounts' }) 
+      await provider.enable()
       provider = new ethers.providers.Web3Provider(provider);
       const signer = provider.getSigner();
       return { provider, signer, type: 'web3' }
@@ -369,14 +377,21 @@ class ENSBook extends React.Component {
       this.reconnectApp(false)
     });
     provider.on("chainChanged", async (chainId) => {
-      console.log("chainChanged")
-      this.reconnectApp()
+      console.log("chain Changed to: " + chainId)
+      if (isSupportedChain(parseInt(chainId, 16))) {
+        errorNetworkModal?.hide()
+        this.reconnectApp()
+      } else {
+        console.log('Unsupported Network')
+        errorNetworkModal = errorNetworkModal ?? new Modal(document.getElementById('errorNetworkModal'))
+        errorNetworkModal.show()
+      }
     });
   };
 
   render() {
     const conf = getConf()
-    const { reconnecting, updating, nameInfo, type, address, ensname, network, balance } = this.state
+    const { reconnecting, nameInfo, type, address, ensname, network, balance } = this.state
     const walletInfo = { type, address, ensname, network, balance }
     document.title = conf.custom.pageTag ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
@@ -404,7 +419,6 @@ class ENSBook extends React.Component {
           network={network}
           updateName={this.updateName}
           updateNames={this.updateNames} 
-          updating={updating}
           register={this.register} 
           registerAll={this.registerAll}
           removeName={this.removeName} 
@@ -417,8 +431,9 @@ class ENSBook extends React.Component {
           t={this.t}
         />
         <Footer />
-        <TestBar />
+        <TestBar disconnectApp={this.disconnectApp} />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
+        <ErrorNetworkModal disconnectApp={this.disconnectApp} t={this.t} />
       </div>
     )
   }

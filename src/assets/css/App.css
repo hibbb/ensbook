@@ -366,9 +366,6 @@ button.btn-plain[disabled] {
   width: 0.85rem;
   height: 0.85rem;
 }
-.updating {
-  animation: spin 2s infinite linear;
-}
 .reg-waiting {
   color: #0dcaf0;
   width: 1rem;
