@@ -75,7 +75,7 @@ class OperatorWallet extends React.Component {
         {
           type === 'custom'
           ? (
-              <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.customMode.title')}</Tooltip>}>
+              <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.customMode.icon')}</Tooltip>}>
                 <WalletFill className="btn-light me-2 custom-wallet" />
               </OverlayTrigger>
             )

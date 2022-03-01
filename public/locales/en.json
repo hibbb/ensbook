@@ -69,7 +69,7 @@
     }
   },
   "conf": {
-    "title": "Configuration",
+    "title": "Custom Configuration",
     "instructions": "Custom Instructions",
     "instructionsUrl": "#custom-configuration",
     "global": {
@@ -105,6 +105,7 @@
       "priceRange": "Price Range of Concern"
     },
     "customMode": {
+      "icon": "This icon indicates that you are currently using Custom Wallet Mode",
       "title": "Custom Wallet Mode"
     }
   },

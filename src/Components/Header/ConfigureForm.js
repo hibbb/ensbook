@@ -89,7 +89,7 @@ class ConfigureForm extends React.Component {
     const { t } = this.props
 
     return (
-      <div className="px-2 d-inline-block text-start">
+      <div className="ps-2 pe-3 d-inline-block text-start">
         <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.title')}</Tooltip>}>
           <button className="btn-plain" type="button" data-bs-toggle="offcanvas" data-bs-target="#configureContainer" aria-controls="configureContainer">
             <Gear />

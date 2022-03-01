@@ -20,7 +20,7 @@ export default function LanguageSwitcher(props) {
   return (
     <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('header.language')}</Tooltip>}>
       <span className="lang-span">
-        <select id="select-lang" className="select-lang" aria-label="language" 
+        <select id="select-lang" className="ms-2 select-lang" aria-label="language" 
           name="language" 
           value={usingLang} 
           onChange={() => selectLang()} >
