@@ -6,20 +6,17 @@ import React from 'react';
 
 export default function TestBar(props) {
 
-  const testFunc1 = async (duration = null) => {
-    props.disconnectApp()
+  const testFunc1 = async () => {
+    console.log('555')
   }
 
   const testFunc2 = async () => {
-    console.log(parseInt('0x3', 16))
-
   }
 
   return (
     <div className="test-bar p-2 mt-3 text-center">
-      <span className="mx-2" onClick={()=>testFunc1()}>Test-1</span>
-      <span className="mx-2" onClick={()=>testFunc2()}>Test-2</span>
-      <div id="myModal"></div>
+      <span className="mx-2" onClick={testFunc1}>Test-1</span>
+      <span className="mx-2" onClick={testFunc2}>Test-2</span>
     </div>
   )
 }

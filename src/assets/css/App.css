@@ -413,6 +413,9 @@ button.btn-plain[disabled] {
 }
 
 /* ==== configuration ==== */
+.offcanvas-header .btn-close {
+  background-color: #aaaaaa;
+}
 .lookup-display-wrapper {
   background-color: #f5f5f5;
   border-radius: 0.5rem;

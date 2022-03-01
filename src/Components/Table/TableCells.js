@@ -33,7 +33,7 @@ export const LabelCell = (props) => {
   return (
     <>
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}>
-        <span className={`td-level td-level-${level}`} onClick={()=>oneClickToLevelUp()}>
+        <span className={`td-level td-level-${level}`} onClick={oneClickToLevelUp}>
           {label}
         </span>
       </OverlayTrigger>

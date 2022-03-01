@@ -1,0 +1,75 @@
+{
+  "projectName": "ENSBook",
+  "author": "liubenben.eth",
+  "host": "remote",
+  "repository": "https://github.com/hibbb/ensbook/",
+  "custom": {
+    "operatorPrivateKey": [
+      "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
+    ],
+    "network": "mainnet",
+    "receiverAddress": "",
+    "infuraID": "bdd658fb48684fba924654acab554917",
+    "pageTag": "",
+    "pageTagColor": "#aaaaaa",
+    "regTxConf": {
+      "duration": 5,
+      "gasPrice": 0,
+      "waitConfirms": 2,
+      "registerWithConfig": true
+    },
+    "book": {
+      "timeSlot": 10
+    },
+    "display": {
+      "time": "expiresTime",
+      "lookup": {
+        "Etherscan": true,
+        "Opensea": true,
+        "Metadata": true,
+        "eth.link": false,
+        "DNSRelated": false
+      }
+    }
+  },
+  "fixed": {
+    "ensConf": {
+      "GRACE_PERIOD": 90,
+      "MIN_REGISTRATION_DURATION": 28,
+      "minCommitmentAge": 60,
+      "maxCommitmentAge": 86400
+    },
+    "scanConf": {
+      "mainnet": "https://etherscan.io/",
+      "ropsten": "https://ropsten.etherscan.io/"
+    },
+    "contract": {
+      "addr": {
+        "mainnet": {
+          "BaseRegImp": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
+          "ETHRegCtrl": "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
+          "PubRes": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
+        },
+        "ropsten": {
+          "BaseRegImp": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
+          "ETHRegCtrl": "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
+          "PubRes": "0x42D63ae25990889E35F215bC95884039Ba354115"
+        }
+      },
+      "abi": {
+        "BaseRegImp": [
+          "function nameExpires(uint256 id) view returns (uint256)"
+        ],
+        "ETHRegCtrl": [
+          "function commit(bytes32 commitment) nonpayable",
+          "function makeCommitment(string name, address owner, bytes32 secret) pure returns (bytes32)",
+          "function register(string name, address owner, uint256 duration, bytes32 secret) payable",
+          "function makeCommitmentWithConfig(string name, address owner, bytes32 secret, address resolver, address addr) pure returns (bytes32)",
+          "function registerWithConfig(string name, address owner, uint256 duration, bytes32 secret, address resolver, address addr) payable",
+          "function renew(string name, uint duration) payable",
+          "function rentPrice(string name, uint duration) view returns (uint)"
+        ]
+      }
+    }
+  }
+}

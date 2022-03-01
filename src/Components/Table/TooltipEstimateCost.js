@@ -13,7 +13,7 @@ class TooltipEstimateCost extends React.Component {
             {t(estimating.title)}
           </p>
           <div>
-            <Spinner animation="border" variant="light" className="ms-2 estimating" />
+            <Spinner animation="border" variant="light" className="estimating" />
           </div>
         </>
       )

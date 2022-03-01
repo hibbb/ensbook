@@ -18,13 +18,11 @@ export function isCustomWallet(conf) {
 }
 
 export function isSupportedChain(key) {
-  switch(typeof(key)) {
-    case 'string':
-      return ["homestead", "mainnet", "ropsten"].findIndex(item => item === key) > -1
-    case 'number':
-      return [1, 3].findIndex(item => item === key) > -1
-    default:
-      return false
+  if (typeof(key) === 'string') {
+    return ["homestead", "mainnet", "ropsten"].findIndex(item => item === key) > -1
+  }
+  if (typeof(key) === 'number') {
+    return [1, 3].findIndex(item => item === key) > -1
   }
 }
 

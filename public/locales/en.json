@@ -105,7 +105,7 @@
     "display": {
       "title": "Display",
       "time": "Time Display",
-      "lookup": "Lookup Display"
+      "lookup": "Select Lookups to Display"
     }
   },
   "msg": {
@@ -139,8 +139,8 @@
   },
   "c": {
     "EMPTY": "",
-    "true": "True",
-    "false": "False",
+    "true": "Yes",
+    "false": "No",
     "reset": "Reset",
     "save": "Save",
     "confirm": "Confirm",

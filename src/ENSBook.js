@@ -2,7 +2,7 @@ import React from 'react'
 import { ethers, utils, Contract } from 'ethers'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
-import { Modal } from 'bootstrap'
+//import { Modal } from 'react-bootstrap'
 import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -13,7 +13,7 @@ import MainTable from './Components/Table/MainTable'
 import Footer from './Components/Footer/Footer'
 import TestBar from './Components/Utils/TestBar'
 import MessageToasts from './Components/Utils/MessageToasts'
-import ErrorNetworkModal from './Components/Utils/ErrorNetworkModal'
+import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal'
 
 const conf = getConf()
 const defaultProvider = new ethers.providers.InfuraProvider("homestead", conf.custom.infuraID)
@@ -22,11 +22,11 @@ const lookupList = Object.keys(conf.custom.display.lookup)
 window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
 
 let web3Modal
-let errorNetworkModal
 
 const INITIAL_STATE = {
   reconnecting: false,
   fetching: false,
+  unsupported: false,
   provider: defaultProvider,
   signer: null,
   type: "readonly",
@@ -52,9 +52,7 @@ class ENSBook extends React.Component {
 
     const networkname = (await provider.getNetwork()).name
     if (!isSupportedChain(networkname)) {
-      errorNetworkModal = errorNetworkModal ?? new Modal(document.getElementById('errorNetworkModal'))
-      errorNetworkModal.show()
-      return
+      return this.setState({ unsupported: true })
     }
 
     const network = networkname === "homestead" ? "mainnet" : networkname
@@ -76,8 +74,6 @@ class ENSBook extends React.Component {
     if (provider && provider.disconnect) {
       provider.disconnect()
     }
-    errorNetworkModal?.hide()
-
     this.setState({ ...INITIAL_STATE })
     this.updateNames()
   }
@@ -92,7 +88,6 @@ class ENSBook extends React.Component {
 
   getExpiresTimeStamp = async (label) => {
     const conf = getConf()
-    //const { provider } = await getProviderAndSigner()
     const { provider, network } = this.state
     const BaseRegImpCon = new Contract(
       conf.fixed.contract.addr[network].BaseRegImp, 
@@ -302,7 +297,6 @@ class ENSBook extends React.Component {
     for (let i = 0; i < registrableNames.length; i++) {
       costWei = costWei.add(await this.estimateCost(registrableNames[i].label))
     }
-
     return costWei
   }
 
@@ -365,25 +359,21 @@ class ENSBook extends React.Component {
     }
     //provider.on("close", () => this.resetApp());
     provider.on("accountsChanged", async (accounts) => {
-      console.log("accountsChanged")
       this.reconnectApp(false)
     });
     provider.on("chainChanged", async (chainId) => {
-      console.log("chain Changed to: " + chainId)
       if (isSupportedChain(parseInt(chainId, 16))) {
-        errorNetworkModal?.hide()
+        this.setState({ unsupported: false })
         this.reconnectApp()
       } else {
-        console.log('Unsupported Network')
-        errorNetworkModal = errorNetworkModal ?? new Modal(document.getElementById('errorNetworkModal'))
-        errorNetworkModal.show()
+        this.setState({ unsupported: true })
       }
     });
   };
 
   render() {
     const conf = getConf()
-    const { reconnecting, nameInfo, type, address, ensname, network, balance } = this.state
+    const { reconnecting, unsupported, nameInfo, type, address, ensname, network, balance } = this.state
     const walletInfo = { type, address, ensname, network, balance }
     document.title = conf.custom.pageTag ? `${conf.custom.pageTag}-${conf.projectName}` : conf.projectName
 
@@ -423,9 +413,9 @@ class ENSBook extends React.Component {
           t={this.t}
         />
         <Footer />
-        <TestBar disconnectApp={this.disconnectApp} />
+        <TestBar />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
-        <ErrorNetworkModal disconnectApp={this.disconnectApp} t={this.t} />
+        <UnsupportedNetworkModal unsupported={unsupported} disconnectApp={this.disconnectApp} t={this.t} />
       </div>
     )
   }

@@ -37,7 +37,7 @@ class OperatorWallet extends React.Component {
         <CurrentNetwork network={network} t={t} />
         <button type="button" 
           className="btn btn-primary me-2 wallet-connect"    
-          onClick={()=>reconnectApp()}
+          onClick={reconnectApp}
         >
           {t('c.connect')}
         </button>
@@ -77,7 +77,7 @@ class OperatorWallet extends React.Component {
           ? (<OverlayTrigger placement="bottom" overlay={<Tooltip>{t('c.disconnect')}</Tooltip>}>
               <button type="button" 
                 className="btn-plain mx-2 wallet-disconnect"    
-                onClick={()=>disconnectApp()}
+                onClick={disconnectApp}
               >
                 <Plug />
               </button>

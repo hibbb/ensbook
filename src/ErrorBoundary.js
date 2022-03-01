@@ -31,7 +31,7 @@ class ErrorBoundary extends React.Component {
       // You can render any custom fallback UI
       return (
         <div className="container">
-          <div className="alert alert-danger mt-5 text-center" role="alert">
+          <div className="alert alert-warning mt-5 text-center" role="alert">
             <ExclamationTriangleFill /> Something went wrong. 
             <br />
             {this.state.errorMessage}
