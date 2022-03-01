@@ -33,15 +33,6 @@ class MainTable extends React.Component {
       setAndStoreNameInfo(nameInfo, false)
     }
   
-    const registrableStatuses = ['Open', 'Reopen', 'Premium']
-    const isRegistrable = (status) => {
-      return registrableStatuses.indexOf(status) >= 0
-    }
-    const renewableStatuses = ['Normal', 'Grace']
-    const isRenewable = (status) => {
-      return renewableStatuses.indexOf(status) >=0
-    }
-  
     return (
       <div className="row table-wrapper">
         <table className="table table-hover ebr-tb">
@@ -49,9 +40,7 @@ class MainTable extends React.Component {
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             updateNames={updateNames}
-            isRenewable={isRenewable}
             registerAll={registerAll}
-            isRegistrable={isRegistrable}
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
             removeNames={removeNames}
@@ -64,10 +53,8 @@ class MainTable extends React.Component {
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
             updateName={updateName}
-            isRenewable={isRenewable}
             register={register} 
             hideNames={this.state.hideNames}
-            isRegistrable={isRegistrable}
             removeName={removeName} 
             estimateCost={estimateCost} 
             t={t}

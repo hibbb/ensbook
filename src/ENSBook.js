@@ -6,7 +6,7 @@ import { Modal } from 'bootstrap'
 import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { getConf, isCustomWallet, isSupportedChain } from './Components/Global/globals'
+import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -255,14 +255,8 @@ class ENSBook extends React.Component {
     return await this.updateNameByLabel(label)
   }
 
-  getRegistrableNames = () => {
-    return this.state.nameInfo.filter((nameItem, i) => {
-      return nameItem.status === 'Open' || nameItem.status === "Reopen" || nameItem.status === "Premium"
-    })
-  }
-
   registerAll = async () => {
-    const registrableNames = this.getRegistrableNames()
+    const registrableNames = getRegistrableNames(this.state.nameInfo)
     for (let i = 0; i < registrableNames.length; i++) {
       await this.register(registrableNames[i].label)
     }
@@ -298,19 +292,17 @@ class ENSBook extends React.Component {
     const gasFee = gasPrice.mul(50000 + 270000)  // commitGasLimit + regGasLimit
     const costWei = gasFee.add(rent)
 
-    console.log(utils.formatEther(costWei))  // in Ether
     return costWei
   }
 
   estimateCosts = async () => {
-    const registrableNames = this.getRegistrableNames()
+    const registrableNames = getRegistrableNames(this.state.nameInfo)
     let costWei = ethers.BigNumber.from(0)
 
     for (let i = 0; i < registrableNames.length; i++) {
       costWei = costWei.add(await this.estimateCost(registrableNames[i].label))
     }
 
-    console.log(utils.formatEther(costWei))
     return costWei
   }
 

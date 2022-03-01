@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
 import RegisterAllConfirmModal from '../Utils/RegisterAllConfirmModal';
 import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
+import TooltipEstimateCost from './TooltipEstimateCost';
+import { haveRenewableNames, haveUnregistrableNames } from '../Global/globals';
 
 let ascFlag = {
   "label": true,
@@ -17,9 +20,7 @@ export const TableHead = (props) => {
     nameInfo, 
     setAndStoreNameInfo, 
     updateNames, 
-    isRenewable, 
     registerAll, 
-    isRegistrable, 
     hideNames, 
     switchHideFlag, 
     removeNames, 
@@ -54,8 +55,7 @@ export const TableHead = (props) => {
   }
 
   const RenewNamesButton = () => {
-    const haveRenewableName = nameInfo.findIndex(row => isRenewable(row.status)) >= 0
-    if (haveRenewableName) return (
+    if (haveRenewableNames(nameInfo)) return (
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
         <button type="button" className="btn-plain btn-sub ms-2"
           onClick={null}
@@ -68,17 +68,31 @@ export const TableHead = (props) => {
   }
 
   const HideShowButton = () => {
-    const haveUnregistrableName = nameInfo.findIndex(row => !isRegistrable(row.status)) >= 0
-    if (haveUnregistrableName) return (
-      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
-        <button type="button" className="btn-plain btn-sub ms-2" 
-          onClick={switchHideFlag}
-        >
-          { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
-        </button>
-      </OverlayTrigger>
-    )
+    if (haveUnregistrableNames(nameInfo)) {
+      return (
+        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
+          <button type="button" className="btn-plain btn-sub ms-2" 
+            onClick={switchHideFlag}
+          >
+            { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
+          </button>
+        </OverlayTrigger>
+      )
+    }
     return null
+  }
+
+  const initialEstimating = { 
+    title: "tb.th.tips.estAll", 
+    status: "before", 
+    cost: "" 
+  }
+  const [estimating, setEstimating] = useState(initialEstimating);
+
+  const estimateThese = async () => {
+    setEstimating({ ...initialEstimating, status: "in" })
+    const costEther = utils.formatEther(await estimateCosts())
+    setEstimating({ ...initialEstimating, status: "after", cost: costEther })
   }
 
   return (
@@ -131,9 +145,13 @@ export const TableHead = (props) => {
               {t('tb.th.reg')}
             </button>
           </OverlayTrigger>
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.estAll')}</Tooltip>}>
+          <OverlayTrigger placement="top" overlay={
+            <Tooltip>
+              <TooltipEstimateCost estimating={estimating} t={t} />
+            </Tooltip>
+          }>
             <button type="button" id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
-              onClick={estimateCosts}
+              onClick={estimateThese}
             >
               <Calculator />
             </button>

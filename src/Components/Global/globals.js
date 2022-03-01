@@ -27,3 +27,23 @@ export function isSupportedChain(key) {
       return false
   }
 }
+
+export function isRegistrable(status) {
+  return status === "Open" || status === "Reopen" || status === "Premium"
+}
+
+export function getRegistrableNames(nameInfo) {
+  return nameInfo.filter(nameItem => isRegistrable(nameItem.status))
+}
+
+export function haveUnregistrableNames(nameInfo) {
+  return nameInfo.findIndex(row => !isRegistrable(row.status)) > -1
+}
+
+export function isRenewable(status) {
+  return status === "Normal" || status === "Grace"
+}
+
+export function haveRenewableNames(nameInfo) {
+  return nameInfo.findIndex(row => isRenewable(row.status)) > -1
+}

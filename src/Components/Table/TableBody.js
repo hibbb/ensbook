@@ -1,4 +1,5 @@
 import React from 'react';
+import { isRegistrable } from '../Global/globals';
 import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './TableCells';
 
 export const TableBody = (props) => {
@@ -8,10 +9,8 @@ export const TableBody = (props) => {
     setAndStoreNameInfo, 
     conf, 
     updateName, 
-    isRenewable, 
     register, 
     hideNames, 
-    isRegistrable, 
     removeName, 
     estimateCost,
     t 
@@ -51,7 +50,6 @@ export const TableBody = (props) => {
             expiresTime={row.expiresTime}
             releaseTime={row.releaseTime}
             updateName={updateName}
-            isRenewable={isRenewable}
             t={t}
           />
         </td>

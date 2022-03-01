@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import RegisterConfirmModal from '../Utils/RegisterConfirmModal';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { BoxArrowUpRight, XCircle, Calculator, Calendar2Plus } from 'react-bootstrap-icons';
 import { t } from 'i18next';
+import TooltipEstimateCost from './TooltipEstimateCost';
+import { isRenewable } from '../Global/globals';
 
 
 export const LabelCell = (props) => {
@@ -73,7 +76,7 @@ export const LookupCell = (props) => {
 }
 
 export const StatusCell = (props) => {
-  const {label, index, status, releaseTime, expiresTime, updateName, isRenewable, t} = props
+  const {label, index, status, releaseTime, expiresTime, updateName, t} = props
 
   const graceEndingFlag = status === 'Grace' && moment().add(18, 'days') > moment.unix(releaseTime)
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
@@ -164,6 +167,21 @@ export const StatusCell = (props) => {
 
 export const RegisterCell = (props) => {
   const {status, register, label, estimateCost, t} = props
+
+  const initialEstimating = { 
+    title: "tb.td.tips.est", 
+    status: "before", 
+    cost: "" 
+  }
+  const [estimating, setEstimating] = useState(initialEstimating);
+
+  const estimateThis = async () => {
+    setEstimating({ ...initialEstimating, status: "in" })
+    const costEther = utils.formatEther(await estimateCost(label))
+    setEstimating({ ...initialEstimating, status: "after", cost: costEther })
+  }
+
+
   if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
     return (
       <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
@@ -179,11 +197,11 @@ export const RegisterCell = (props) => {
         </OverlayTrigger>
         <OverlayTrigger placement="top" overlay={
           <Tooltip>
-            {t('tb.td.tips.est')}
+            <TooltipEstimateCost estimating={estimating} t={t} />
           </Tooltip>
         }>
           <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
-            onClick={()=>{estimateCost(label)}}
+            onClick={estimateThis}
           >
             <Calculator />
           </button>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import { Plug } from 'react-bootstrap-icons';
 import { isCustomWallet } from '../Global/globals';
 
@@ -47,9 +47,7 @@ class OperatorWallet extends React.Component {
 
     if (reconnecting) {
       return (
-        <div className="spinner-border text-secondary me-2 reconnecting" role="status">
-          <span className="visually-hidden">Connecting...</span>
-        </div>
+        <Spinner animation="border" variant="secondary" className="me-2 reconnecting" />
       )
     }
   
