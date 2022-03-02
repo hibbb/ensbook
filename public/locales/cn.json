@@ -72,24 +72,24 @@
     "title": "自定义配置",
     "instructions": "配置说明",
     "instructionsUrl": "blob/main/README_CN.md#自定义配置",
-    "global": {
-      "title": "全局",
-      "operatorPrivateKey": "操作员私钥",
-      "network": "网络",
-      "receiver": "接收者地址",
-      "infuraID": "Infura ID",
+    "general": {
+      "title": "通用",
       "pageTag": "页面标记",
-      "pageTagColorTip": "为标记选择一个背景颜色"
+      "pageTagColorTip": "为标记选择一个背景颜色",
+      "infuraID": "Infura ID"
+    },
+    "display": {
+      "lookup": "选择要显示的相关信息"
     },
     "register": {
       "title": "注册",
-      "duration": "时长",
-      "gasPrice": "Gas 价格",
+      "receiver": "名称接收者",
+      "duration": "默认时长",
       "registerWithConfig": "注册时进行配置"
     },
-    "display": {
-      "title": "显示",
-      "lookup": "选择要显示的相关信息"
+    "renew": {
+      "title": "续期",
+      "duration": "默认时长"
     },
     "premium": {
       "title": "溢价期",
@@ -97,7 +97,11 @@
     },
     "customMode": {
       "icon": "这个图标表示您当前使用的是自定义钱包模式",
-      "title": "自定义钱包模式"
+      "title": "自定义钱包模式",
+      "switch": "开关",
+      "operatorPrivateKey": "操作员私钥",
+      "network": "网络",
+      "gasPrice": "Gas 价格"
     }
   },
   "msg": {

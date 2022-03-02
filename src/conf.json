@@ -16,15 +16,19 @@
         "DNSRelated": false
       } 
     },
-    "regTxConf": {
-      "duration": 5,
+    "register": {
       "receiver": "",
+      "duration": 5,
       "registerWithConfig": true
+    },
+    "renew": {
+      "duration": 5
     },
     "premium": {
       "priceRange": 1000
     },
     "wallet": {
+      "switch": false,
       "operatorPrivateKey": [
         "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
       ],

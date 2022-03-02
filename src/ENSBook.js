@@ -154,8 +154,8 @@ class ENSBook extends React.Component {
     nameInfo.find(item => item.label === label).status = 'Registering'
     this.setState({ nameInfo })
 
-    let owner = utils.isAddress(conf.custom.regTxConf.receiver) ? conf.custom.regTxConf.receiver : address
-    duration = duration ?? moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds()
+    let owner = utils.isAddress(conf.custom.register.receiver) ? conf.custom.register.receiver : address
+    duration = duration ?? moment.duration(conf.custom.register.duration, 'years').asSeconds()
     duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
 
     const secret = ethers.Wallet.createRandom().privateKey
@@ -163,7 +163,7 @@ class ENSBook extends React.Component {
 
     let resolverAddr = "0x0000000000000000000000000000000000000000"
     let resolveToAddr = "0x0000000000000000000000000000000000000000"
-    if (conf.custom.regTxConf.registerWithConfig) {
+    if (conf.custom.register.registerWithConfig) {
       resolverAddr = conf.fixed.contract.addr[network].PubRes
       resolveToAddr = owner
     }
@@ -181,8 +181,8 @@ class ENSBook extends React.Component {
     )
 
     // Step 1.
-    if (conf.custom.regTxConf.gasPrice > 0) { // conf.custom.regTxConf.gasPrice: gwei
-      commitOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
+    if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
+      commitOverrides.gasPrice = utils.parseUnits(conf.custom.wallet.gasPrice.toString(), 'gwei')
     }
     commitOverrides.gasLimit = 70000
     let ourCommitment = await ETHRegCtrlCon.makeCommitmentWithConfig(label, owner, secret, resolverAddr, resolveToAddr)
@@ -221,10 +221,10 @@ class ENSBook extends React.Component {
     )
 
     // Step 3.
-    if (conf.custom.regTxConf.gasPrice > 0) { // conf.custom.regTxConf.gasPrice: gwei
-      regOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
+    if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
+      regOverrides.gasPrice = utils.parseUnits(String(conf.custom.wallet.gasPrice), 'gwei')
     }
-    regOverrides.gasLimit = conf.custom.regTxConf.registerWithConfig ? 300000 : 220000
+    regOverrides.gasLimit = conf.custom.register.registerWithConfig ? 300000 : 220000
     regOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(110).div(100)  // send 105% ETH to avoid failure
 
     const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, duration, secret, resolverAddr, resolveToAddr, regOverrides)
@@ -274,15 +274,15 @@ class ENSBook extends React.Component {
     const conf = getConf()
     const { provider, network } = this.state
 
-    duration = duration ?? moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds()
+    duration = duration ?? moment.duration(conf.custom.register.duration, 'years').asSeconds()
     duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
     const contractAddr = conf.fixed.contract.addr[network].ETHRegCtrl
     const contractAbi = conf.fixed.contract.abi.ETHRegCtrl
     const ETHRegCtrlCon = new Contract(contractAddr, contractAbi, provider)
     const rent = await ETHRegCtrlCon.rentPrice(label, duration)
 
-    const gasPrice = (conf.custom.regTxConf.gasPrice > 0 
-      ? utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
+    const gasPrice = (conf.custom.register.gasPrice > 0 
+      ? utils.parseUnits(conf.custom.register.gasPrice.toString(), 'gwei')
       : await provider.getGasPrice())
     const gasFee = gasPrice.mul(50000 + 270000)  // commitGasLimit + regGasLimit
     const costWei = gasFee.add(rent)

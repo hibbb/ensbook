@@ -72,24 +72,24 @@
     "title": "Custom Configuration",
     "instructions": "Custom Instructions",
     "instructionsUrl": "#custom-configuration",
-    "global": {
-      "title": "Global",
-      "operatorPrivateKey": "Operator's Private Key",
-      "network": "Network",
-      "receiver": "Receiver's Address",
-      "infuraID": "Infura ID",
+    "general": {
+      "title": "General",
       "pageTag": "Page Tag",
-      "pageTagColorTip": "Choose a Background Color for Your Tag"
+      "pageTagColorTip": "Choose a Background Color for Your Tag",
+      "infuraID": "Infura ID"
+    },
+    "display": {
+      "lookup": "Select Lookups to Display"
     },
     "register": {
       "title": "Register",
-      "duration": "Duration",
-      "gasPrice": "Gas Price",
+      "receiver": "Name Receiver",
+      "duration": "Default Duration",
       "registerWithConfig": "Register With Config"
     },
-    "display": {
-      "title": "Display",
-      "lookup": "Select Lookups to Display"
+    "renew": {
+      "title": "Renew",
+      "duration": "Default Duration"
     },
     "premium": {
       "title": "Premium",
@@ -97,7 +97,11 @@
     },
     "customMode": {
       "icon": "This icon indicates that you are currently using Custom Wallet Mode",
-      "title": "Custom Wallet Mode"
+      "title": "Custom Wallet Mode",
+      "switch": "Switch",
+      "operatorPrivateKey": "Operator's Private Key",
+      "network": "网Network络",
+      "gasPrice": "Gas Price"
     }
   },
   "msg": {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, CheckCircle } from 'react-bootstrap-icons';
+import { Form, OverlayTrigger, Tooltip, InputGroup, FormControl, Alert } from 'react-bootstrap'
+import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, CheckCircle, WalletFill } from 'react-bootstrap-icons';
 import confFile from '../../conf.json'
 
 class ConfigureForm extends React.Component {
@@ -12,12 +12,15 @@ class ConfigureForm extends React.Component {
     infuraID: this.conf.custom.infuraID,
     displayLookup: this.conf.custom.display.lookup,
 
-    regDuration: this.conf.custom.regTxConf.duration,
-    regReceiver: this.conf.custom.regTxConf.receiver,
-    regRegisterWithConfig: this.conf.custom.regTxConf.registerWithConfig,
+    regReceiver: this.conf.custom.register.receiver,
+    regDuration: this.conf.custom.register.duration,
+    regRegisterWithConfig: this.conf.custom.register.registerWithConfig,
+
+    renewDuration: this.conf.custom.renew.duration,
 
     premiumPriceRange: this.conf.custom.premium.priceRange,
 
+    walletSwitch: this.conf.custom.wallet.switch,
     walletOperatorPrivateKey: this.conf.custom.wallet.operatorPrivateKey.join(),
     walletNetwork: this.conf.custom.wallet.network,
     walletGasPrice: this.conf.custom.wallet.gasPrice
@@ -26,6 +29,11 @@ class ConfigureForm extends React.Component {
   handleChange = (event) => {
     const {name, value} = event.target
     this.setState({[name]: value})
+  }
+
+  handleSwitchChange = (event) => {
+    const {name, checked} = event.target
+    this.setState({[name]: checked})
   }
 
   handleSelectBooleanChange = (event) => {
@@ -51,14 +59,17 @@ class ConfigureForm extends React.Component {
     confInfo.custom.infuraID = this.state.infuraID.trim()
     confInfo.custom.display.lookup = this.state.displayLookup
 
-    confInfo.custom.regTxConf.duration = Number(this.state.regDuration)
-    confInfo.custom.regTxConf.receiver = this.state.regReceiver.trim()
-    confInfo.custom.regTxConf.registerWithConfig = Boolean(this.state.regRegisterWithConfig)
+    confInfo.custom.register.receiver = this.state.regReceiver.trim()
+    confInfo.custom.register.duration = Number(this.state.regDuration)
+    confInfo.custom.register.registerWithConfig = Boolean(this.state.regRegisterWithConfig)
+
+    confInfo.custom.renew.duration = Number(this.state.renewDuration)
 
     confInfo.custom.premium.priceRange = Number(this.state.premiumPriceRange)
 
+    confInfo.custom.wallet.switch  = this.state.walletSwitch
     confInfo.custom.wallet.operatorPrivateKey = this.state.walletOperatorPrivateKey.replace(/\s/g, "").split(",")
-    confInfo.custom.wallet.network  = this.state.wallet.network
+    confInfo.custom.wallet.network  = this.state.walletNetwork
     confInfo.custom.wallet.gasPrice = Number(this.state.walletGasPrice)
     this.setAndStoreConfInfo(confInfo)
     this.props.reconnectApp()
@@ -73,12 +84,15 @@ class ConfigureForm extends React.Component {
       infuraID: initialCustomConf.infuraID,
       displayLookup: initialCustomConf.display.lookup,
 
-      regDuration: initialCustomConf.regTxConf.duration,
-      regReceiver: initialCustomConf.regTxConf.receiver,
-      regRegisterWithConfig: initialCustomConf.regTxConf.registerWithConfig,
+      regReceiver: initialCustomConf.register.receiver,
+      regDuration: initialCustomConf.register.duration,
+      regRegisterWithConfig: initialCustomConf.register.registerWithConfig,
+
+      renewDuration: initialCustomConf.renew.duration,
 
       premiumPriceRange: initialCustomConf.premium.priceRange,
 
+      walletSwitch: initialCustomConf.wallet.switch,
       walletOperatorPrivateKey: initialCustomConf.wallet.operatorPrivateKey.join(),
       walletNetwork: initialCustomConf.wallet.network,
       walletGasPrice: initialCustomConf.wallet.gasPrice
@@ -108,135 +122,159 @@ class ConfigureForm extends React.Component {
           </div>
           <div className="offcanvas-body">
             <form>
-              <div className="alert alert-warning" role="alert">
+              <Alert variant="warning">
                 <InfoCircle />
                 <a href={confFile.repository + t('conf.instructionsUrl')} className="alert-link ps-2" target="_blank" rel="noreferrer">
                   {t('conf.instructions')}
                   <BoxArrowUpRight className="external-link-icon" />
                 </a>
-              </div>
+              </Alert>
               
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.global.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-pageTag">
-                  {t('conf.global.pageTag')}
-                </span>
-                <input type="text" 
-                  className="form-control" 
-                  aria-label="pageTag" 
-                  aria-describedby="your-pageTag" 
+              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.general.title')}</h6>
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.general.pageTag')}</InputGroup.Text>
+                <FormControl 
                   name="pageTag" 
                   value={this.state.pageTag} 
-                  onChange={this.handleChange} 
-                />
+                  onChange={this.handleChange}  
+                  aria-label="pageTag" />
                 <span className="input-group-text page-tag-color-wrapper">
                   <Form.Control
                     type="color"
                     className="page-tag-color"
                     name="pageTagColor"
                     value={this.state.pageTagColor}
-                    title={t('conf.global.pageTagColorTip')}
+                    title={t('conf.general.pageTagColorTip')}
                     onChange={this.handleChange}
                   />
                 </span>
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-infuraid">{t('conf.global.infuraID')}</span>
-                <input type="text" className="form-control" aria-label="infuraID" aria-describedby="your-infuraID" 
-                name="infuraID" 
-                value={this.state.infuraID} 
-                onChange={this.handleChange} />
-              </div>
-              <div className="lookup-display-wrapper">
-                <div className="input-group input-group-sm" data-bs-toggle="collapse" data-bs-target="#lookupCheckField" aria-expanded="false" aria-controls="lookupCheckField">
-                  <span className="input-group-text">{t('conf.display.lookup')}</span>
-                  <span className="form-control text-end"><ChevronDown /></span>
-                </div>
-                <div id="lookupCheckField" className="accordion-collapse collapse" aria-labelledby="headingTwo">
-                  <div className="accordion-body">
-                    {
-                      lookupList.map(item => (
-                          <div className="form-check" key={item}>
-                            <input className="form-check-input lookup-check-input" 
-                              type="checkbox" 
-                              name={item} 
-                              checked={this.state.displayLookup[item] ?? false} 
-                              onChange={this.handleDisplayLookupChange}
-                            />
-                            <label className="form-check-label">{t('tb.lookup.' + item)}</label>
-                          </div>
-                        )
+              </InputGroup>
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.general.infuraID')}</InputGroup.Text>
+                <FormControl 
+                  name="infuraID" 
+                  value={this.state.infuraID} 
+                  onChange={this.handleChange} 
+                  aria-label="infuraID" />
+              </InputGroup>
+              <InputGroup size="sm" data-bs-toggle="collapse" data-bs-target="#lookupCheckField" aria-expanded="false" aria-controls="lookupCheckField">
+                <InputGroup.Text>{t('conf.display.lookup')}</InputGroup.Text>
+                <span className="form-control text-end"><ChevronDown /></span>
+              </InputGroup>
+              <div id="lookupCheckField" className="accordion-collapse collapse" aria-labelledby="lookupArea">
+                <div className="accordion-body lookup-accordion-body">
+                  {
+                    lookupList.map(item => (
+                        <div className="form-check" key={item}>
+                          <input className="form-check-input lookup-check-input" 
+                            type="checkbox" 
+                            name={item} 
+                            checked={this.state.displayLookup[item] ?? false} 
+                            onChange={this.handleDisplayLookupChange}
+                          />
+                          <label className="form-check-label">{t('tb.lookup.' + item)}</label>
+                        </div>
                       )
-                    }
-                  </div>
+                    )
+                  }
                 </div>
               </div>
 
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.register.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-reg-duration">{t('conf.register.duration')}</span>
-                <input type="text" className="form-control" aria-label="regDuration" aria-describedby="your-Duration" 
-                name="regDuration" 
-                value={this.state.regDuration} 
-                onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.years')}</span>
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-regReceiver">{t('conf.global.regReceiver')}</span>
-                <input type="text" className="form-control" aria-label="regReceiver" aria-describedby="your-regReceiver"
-                name="regReceiver" 
-                value={this.state.regReceiver} 
-                onChange={this.handleChange} />
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-reg-registerwithconfig">{t('conf.register.registerWithConfig')}</span>
-                <select className="form-select form-select-sm" aria-label="regRegisterWihConfig" 
-                name="regRegisterWithConfig" 
-                value={this.state.regRegisterWithConfig} 
-                onChange={this.handleSelectBooleanChange} >
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.register.duration')}</InputGroup.Text>
+                <FormControl 
+                  name="regDuration" 
+                  value={this.state.regDuration}
+                  onChange={this.handleChange} 
+                  aria-label="regDuration" />
+                <InputGroup.Text>{t('c.years')}</InputGroup.Text>
+              </InputGroup>
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.register.receiver')}</InputGroup.Text>
+                <FormControl 
+                  name="regReceiver" 
+                  value={this.state.regReceiver} 
+                  onChange={this.handleChange} 
+                  aria-label="regReceiver" />
+              </InputGroup>
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.register.registerWithConfig')}</InputGroup.Text>
+                <Form.Select 
+                  name="regRegisterWithConfig" 
+                  value={this.state.regRegisterWithConfig} 
+                  onChange={this.handleSelectBooleanChange} 
+                  aria-label="regRegisterWithConfig">
                   <option value="true">{t('c.true')}</option>
                   <option value="false">{t('c.false')}</option>
-                </select>
-              </div>
+                </Form.Select>
+              </InputGroup>
+
+              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.renew.title')}</h6>
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.renew.duration')}</InputGroup.Text>
+                <FormControl 
+                  name="renewDuration" 
+                  value={this.state.renewDuration} 
+                  onChange={this.handleChange} 
+                  aria-label="renewDuration" />
+                <InputGroup.Text>{t('c.years')}</InputGroup.Text>
+              </InputGroup>
 
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.premium.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-premium-pricerange">{t('conf.premium.priceRange')}</span>
-                <input type="text" className="form-control" aria-label="premiumPriceRange" aria-describedby="your-premiumPriceRange" 
-                name="premiumPriceRange" 
-                value={this.state.premiumPriceRange} 
-                onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.dollars')}</span>
-              </div>
+              <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.premium.priceRange')}</InputGroup.Text>
+                <FormControl 
+                  name="premiumPriceRange" 
+                  value={this.state.premiumPriceRange} 
+                  onChange={this.handleChange} 
+                  aria-label="premiumPriceRange" />
+                <InputGroup.Text>{t('c.dollars')}</InputGroup.Text>
+              </InputGroup>
 
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.premium.title')}</h6>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-operatorPrivateKey">
-                  {t('conf.global.operatorPrivateKey')}
-                </span>
-                <input type="password" className="form-control" aria-label="walletOperatorPrivateKey" aria-describedby="your-walletOperatorPrivateKey" 
-                name="walletOperatorPrivateKey" 
-                value={this.state.walletOperatorPrivateKey} 
-                onChange={this.handleChange} />
-              </div>
-              <div className="input-group input-group-sm mb-2">
-                <span className="input-group-text" id="conf-key-walletNetwork">{t('conf.global.network')}</span>
-                <select className="form-select form-select-sm" aria-label="walletNetwork" 
-                name="walletNetwork"
-                value={this.state.walletNetwork} 
-                onChange={this.handleChange} >
+              <h6 className="mt-4 mb-3">
+                <WalletFill className="me-2" />
+                {t('conf.customMode.title')}
+                <Form.Check 
+                  type="switch"
+                  className="ms-3 mt-0 custom-wallet-switch"
+                  inline
+                  name="walletSwitch"
+                  checked={this.state.walletSwitch}
+                  onChange={this.handleSwitchChange}
+                />
+              </h6>
+              <InputGroup className={"mb-2 custom-wallet-" + Boolean(this.state.walletSwitch)} size="sm">
+                <InputGroup.Text>{t('conf.customMode.operatorPrivateKey')}</InputGroup.Text>
+                <Form.Control type="password" 
+                  name="walletOperatorPrivateKey" 
+                  value={this.state.walletOperatorPrivateKey} 
+                  onChange={this.handleChange} 
+                  disabled={!this.state.walletSwitch}
+                  aria-label="walletOperatorPrivateKey" />
+              </InputGroup>
+              <InputGroup className={"mb-2 custom-wallet-" + Boolean(this.state.walletSwitch)} size="sm">
+                <InputGroup.Text>{t('conf.customMode.network')}</InputGroup.Text>
+                <Form.Select 
+                  name="walletNetwork"
+                  value={this.state.walletNetwork} 
+                  onChange={this.handleChange} 
+                  disabled={!this.state.walletSwitch}
+                  aria-label="walletNetwork">
                   <option value="mainnet">{t('c.mainnet')}</option>
                   <option value="ropsten">{t('c.ropsten')}</option>
-                </select>
-              </div>
-              <div className="input-group input-group-sm mb-6">
-                <span className="input-group-text" id="conf-key-wallet-gasprice">{t('conf.register.gasPrice')}</span>
-                <input type="text" className="form-control" aria-label="walletGasPrice" aria-describedby="your-walletGasPrice" 
-                name="walletGasPrice" 
-                value={this.state.walletGasPrice} 
-                onChange={this.handleChange} />
-                <span className="input-group-text">{t('c.gwei')}</span>
-              </div>
+                </Form.Select>
+              </InputGroup>
+              <InputGroup className={"mb-6 custom-wallet-" + Boolean(this.state.walletSwitch)} size="sm">
+                <InputGroup.Text>{t('conf.customMode.gasPrice')}</InputGroup.Text>
+                <FormControl 
+                  name="walletGasPrice" 
+                  value={this.state.walletGasPrice} 
+                  onChange={this.handleChange} 
+                  disabled={!this.state.walletSwitch}
+                  aria-label="walletGasPrice" />
+                <InputGroup.Text>{t('c.gwei')}</InputGroup.Text>
+              </InputGroup>
 
               <div className="fixed-bottom conf-btn-box">
                 <button 

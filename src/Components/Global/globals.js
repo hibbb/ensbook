@@ -14,7 +14,7 @@ export function getConf() {
 
 export function isCustomWallet(conf) {
   conf = conf ?? getConf()
-  return Boolean(conf.custom.wallet.operatorPrivateKey[0])
+  return conf.custom.wallet.switch
 }
 
 export function isSupportedChain(key) {
