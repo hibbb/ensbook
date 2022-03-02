@@ -76,24 +76,15 @@
       "title": "Global",
       "operatorPrivateKey": "Operator's Private Key",
       "network": "Network",
-      "receiverAddress": "Receiver's Address",
+      "receiver": "Receiver's Address",
       "infuraID": "Infura ID",
       "pageTag": "Page Tag",
       "pageTagColorTip": "Choose a Background Color for Your Tag"
     },
-    "commit": {
-      "title": "Commit",
-      "gasPrice": "Gas Price",
-      "gasLimit": "Gas Limit",
-      "waitConfirms": "Confirms"
-    },
     "register": {
       "title": "Register",
       "duration": "Duration",
-      "value": "Value",
       "gasPrice": "Gas Price",
-      "gasLimit": "Gas Limit",
-      "waitConfirms": "Confirms",
       "registerWithConfig": "Register With Config"
     },
     "display": {

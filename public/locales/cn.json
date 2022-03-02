@@ -76,24 +76,15 @@
       "title": "全局",
       "operatorPrivateKey": "操作员私钥",
       "network": "网络",
-      "receiverAddress": "接收者地址",
+      "receiver": "接收者地址",
       "infuraID": "Infura ID",
       "pageTag": "页面标记",
       "pageTagColorTip": "为标记选择一个背景颜色"
     },
-    "commit": {
-      "title": "请求",
-      "gasPrice": "Gas 价格",
-      "gasLimit": "Gas 上限",
-      "waitConfirms": "确认数"
-    },
     "register": {
       "title": "注册",
       "duration": "时长",
-      "value": "ETH 数量",
       "gasPrice": "Gas 价格",
-      "gasLimit": "Gas 上限",
-      "waitConfirms": "确认数",
       "registerWithConfig": "注册时进行配置"
     },
     "display": {

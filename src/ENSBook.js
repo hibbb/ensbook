@@ -154,7 +154,7 @@ class ENSBook extends React.Component {
     nameInfo.find(item => item.label === label).status = 'Registering'
     this.setState({ nameInfo })
 
-    let owner = utils.isAddress(conf.custom.receiverAddress) ? conf.custom.receiverAddress : address
+    let owner = utils.isAddress(conf.custom.regTxConf.receiver) ? conf.custom.regTxConf.receiver : address
     duration = duration ?? moment.duration(conf.custom.regTxConf.duration, 'years').asSeconds()
     duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
 
@@ -191,7 +191,7 @@ class ENSBook extends React.Component {
       "register10", 
       this.t('msg.register10', { label: label })
     )
-    let tx11 = await provider.waitForTransaction(tx10.hash, conf.custom.regTxConf.waitConfirms)
+    let tx11 = await provider.waitForTransaction(tx10.hash, 2) // waitConfirms: 2
     let commitTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + tx10.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
     // if step 1 failed, cancel the process.
     if (tx11.status) {
@@ -225,10 +225,10 @@ class ENSBook extends React.Component {
       regOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
     }
     regOverrides.gasLimit = conf.custom.regTxConf.registerWithConfig ? 300000 : 220000
-    regOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(105).div(100)
+    regOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(110).div(100)  // send 105% ETH to avoid failure
 
     const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, duration, secret, resolverAddr, resolveToAddr, regOverrides)
-    const tx31 = await provider.waitForTransaction(tx30.hash, conf.custom.regTxConf.waitConfirms)
+    const tx31 = await provider.waitForTransaction(tx30.hash, 2) // waitConfirms: 2
     const regTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
 
     if (tx31.status) {
@@ -319,7 +319,7 @@ class ENSBook extends React.Component {
     let provider
     if (isCustomWallet(conf)) {
       provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-      const signer = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider)
+      const signer = new ethers.Wallet(conf.custom.wallet.operatorPrivateKey[0], provider)
       return { provider, signer, type: 'custom' }
     } 
     //return await getWeb3Modal(fallback)

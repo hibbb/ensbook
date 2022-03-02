@@ -11,7 +11,7 @@
       "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
     ],
     "network": "mainnet",
-    "receiverAddress": "",
+    "receiver": "",
     "infuraID": "bdd658fb48684fba924654acab554917",
     "pageTag": "",
     "pageTagColor": "#aaaaaa",

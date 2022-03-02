@@ -4,20 +4,9 @@
   "host": "remote",
   "repository": "https://github.com/hibbb/ensbook/",
   "custom": {
-    "operatorPrivateKey": [
-      "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
-    ],
-    "network": "mainnet",
-    "receiverAddress": "",
-    "infuraID": "bdd658fb48684fba924654acab554917",
     "pageTag": "",
     "pageTagColor": "#aaaaaa",
-    "regTxConf": {
-      "duration": 5,
-      "gasPrice": 0,
-      "waitConfirms": 2,
-      "registerWithConfig": true
-    },
+    "infuraID": "bdd658fb48684fba924654acab554917",
     "display": {
       "lookup": {
         "Etherscan": true,
@@ -27,8 +16,20 @@
         "DNSRelated": false
       } 
     },
+    "regTxConf": {
+      "duration": 5,
+      "receiver": "",
+      "registerWithConfig": true
+    },
     "premium": {
       "priceRange": 1000
+    },
+    "wallet": {
+      "operatorPrivateKey": [
+        "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
+      ],
+      "network": "mainnet",
+      "gasPrice": 0
     }
   },
   "fixed": {
