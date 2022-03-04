@@ -14,17 +14,21 @@ class MainTable extends React.Component {
   render() {
     const { 
       conf, 
-      nameInfo, 
+      nameInfo,
+      type,  
       network, 
       setAndStoreNameInfo, 
       updateName, 
       updateNames, 
+      updateNameByLabel,
+      updateBalance, 
       estimateCost, 
       estimateCosts, 
-      register, 
-      registerAll, 
+      registerName, 
+      registerNames, 
       removeNames, 
       removeName, 
+      messages, 
       t
     } = this.props
 
@@ -37,10 +41,11 @@ class MainTable extends React.Component {
       <div className="row table-wrapper">
         <table className="table table-hover ebr-tb">
           <TableHead
+            type={type}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             updateNames={updateNames}
-            registerAll={registerAll}
+            registerNames={registerNames}
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
             removeNames={removeNames}
@@ -48,15 +53,19 @@ class MainTable extends React.Component {
             t={t}
           />
           <TableBody 
-            nameInfo={nameInfo} 
+            type={type}
             network={network}
+            nameInfo={nameInfo} 
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
             updateName={updateName}
-            register={register} 
+            updateNameByLabel={updateNameByLabel}
+            updateBalance={updateBalance}
+            registerName={registerName} 
             hideNames={this.state.hideNames}
             removeName={removeName} 
             estimateCost={estimateCost} 
+            messages={messages}
             t={t}
           />
         </table>

@@ -5,7 +5,7 @@ import OperatorWallet from './OperatorWallet';
 import ConfigureForm from './ConfigureForm';
 
 export default function Header(props) {
-  const { conf, walletInfo, reconnectApp, disconnectApp, reconnecting, t } = props
+  const { conf, walletInfo, reconnectApp, disconnectApp, reconnecting, setAndStoreConfInfo, t } = props
 
   return (
     <div className="row mb-3">
@@ -22,6 +22,7 @@ export default function Header(props) {
         <ConfigureForm 
           host={conf.host}
           reconnectApp={reconnectApp}
+          setAndStoreConfInfo={setAndStoreConfInfo}
           t={t}
         />
         <OperatorWallet 

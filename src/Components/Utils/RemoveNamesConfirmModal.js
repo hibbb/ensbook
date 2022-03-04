@@ -1,7 +1,7 @@
 import React from 'react';
 
 const RemoveNamesConfirmModal = (props) => {
-  const {t} = props
+  const { removeNames, t } = props
   return (
     <div className="modal fade" id="removeNamesConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="removeNamesConfirmModalLabel" aria-hidden="true">
     <div className="modal-dialog">
@@ -16,7 +16,7 @@ const RemoveNamesConfirmModal = (props) => {
         <div className="modal-footer">
           <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">{ t('c.cancel') }</button>
           <button type="button" className="btn btn-primary"  data-bs-dismiss="modal" 
-          onClick={() => {props.removeNames()}}>{ t('c.confirm') }</button>
+          onClick={()=>removeNames()}>{ t('c.confirm') }</button>
         </div>
       </div>
     </div>

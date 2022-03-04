@@ -118,14 +118,15 @@
       "succeed": "SETP 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
       "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
     },
-    "estimateCost": "{{label}}.eth registration estimated cost ≈ {{price}} ETH.",
-    "estimateCosts": "Registrations estimated TOTAL COST ≈ {{price}} ETH.",
-    "setAndStoreNameInfo": "Name information has been updated and stored.",
-    "setAndStoreConfInfo": "Configurations have been updated and stored."
+    "setAndStoreNameInfo": "Name information has been updated and stored."
   },
   "modal": {
+    "reg": {
+      "title": "注册 {{label}}.eth",
+      "tip1": "你要注册的信息如下: ",
+      "tip2": "点击右下方按钮开始注册"
+    },
     "title": "Need Confirmation",
-    "reg": "Are you sure to register {{label}}.eth? After the registration process has started, do not close this page until the registration is completed.",
     "regAll": "Are you sure to register THESE ENS names?",
     "removeNames": "Are you sure to CLEAR the table?",
     "errorNetwork": {
@@ -141,6 +142,7 @@
     "save": "Save",
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "back": "Back",
     "tx": "transaction",
     "currentNetwork": "Current Network",
     "ropsten": "Ropsten",

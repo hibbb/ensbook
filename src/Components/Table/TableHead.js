@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
-import RegisterAllConfirmModal from '../Utils/RegisterAllConfirmModal';
+import RegisterNamesConfirmModal from '../Utils/RegisterNamesConfirmModal';
 import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
 import { haveRenewableNames, haveUnregistrableNames } from '../Global/globals';
@@ -17,10 +17,11 @@ let ascFlag = {
 
 export const TableHead = (props) => {
   const { 
+    type, 
     nameInfo, 
     setAndStoreNameInfo, 
     updateNames, 
-    registerAll, 
+    registerNames, 
     hideNames, 
     switchHideFlag, 
     removeNames, 
@@ -55,16 +56,24 @@ export const TableHead = (props) => {
   }
 
   const RenewNamesButton = () => {
-    if (haveRenewableNames(nameInfo)) return (
-      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
-        <button type="button" className="btn-plain btn-sub ms-2"
-          onClick={null}
-        >
-          <Calendar2Plus />
-        </button>
-      </OverlayTrigger>
-    )
-    return null 
+    if (haveRenewableNames(nameInfo)) {
+      if (type === 'readonly') {
+        return (
+          <button type="button" disabled className="btn-plain btn-sub ms-2">
+            <Calendar2Plus />
+          </button>
+        )
+      } else {
+        return (
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
+          <button type="button" className="btn-plain btn-sub ms-2" onClick={null}>
+              <Calendar2Plus />
+            </button>
+          </OverlayTrigger>
+        )
+      }
+    } 
+    return null
   }
 
   const HideShowButton = () => {
@@ -72,7 +81,7 @@ export const TableHead = (props) => {
       return (
         <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
           <button type="button" className="btn-plain btn-sub ms-2" 
-            onClick={switchHideFlag}
+            onClick={()=>switchHideFlag()}
           >
             { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
           </button>
@@ -101,7 +110,7 @@ export const TableHead = (props) => {
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.no')}</Tooltip>}>
             <span id="th-level" className="th-sortable" 
-              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "level"))}}
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "level"))}
             >
               {t('tb.th.no')}
             </span>
@@ -110,7 +119,7 @@ export const TableHead = (props) => {
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.lb')}</Tooltip>}>
             <span id="th-label" className="th-sortable" 
-              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "label"))}}
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "label"))}
             >
               {t('tb.th.lb')}
             </span>
@@ -120,7 +129,7 @@ export const TableHead = (props) => {
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}>
             <span id="th-expiresTime" className="th-sortable"
-              onClick={()=>{setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))}}
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))}
             >
               {t('tb.th.sta')}
             </span>
@@ -128,7 +137,7 @@ export const TableHead = (props) => {
           <RenewNamesButton />
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}>
             <button type="button" className="btn-plain ms-2" 
-              onClick={updateNames}
+              onClick={()=>updateNames()}
             >
               <ArrowRepeat />
             </button>
@@ -139,8 +148,9 @@ export const TableHead = (props) => {
             <button
               type="button" 
               className="btn-plain btn-reg" 
+              disabled={type==='readonly'}
               data-bs-toggle="modal" 
-              data-bs-target="#registerAllConfirmModal"
+              data-bs-target="#registerNamesConfirmModal"
               >
               {t('tb.th.reg')}
             </button>
@@ -151,13 +161,13 @@ export const TableHead = (props) => {
             </Tooltip>
           }>
             <button type="button" id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
-              onClick={estimateThese}
+              onClick={()=>estimateThese()}
             >
               <Calculator />
             </button>
           </OverlayTrigger>
           <HideShowButton />
-          <RegisterAllConfirmModal registerAll={registerAll} t={t} />
+          <RegisterNamesConfirmModal registerNames={registerNames} t={t} />
         </th>
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.remAll')}</Tooltip>}>

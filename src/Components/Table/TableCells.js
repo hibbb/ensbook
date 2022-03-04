@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import RegisterConfirmModal from '../Utils/RegisterConfirmModal';
+import RegisterNameConfirmModal from '../Utils/RegisterNameConfirmModal';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { BoxArrowUpRight, XCircle, Calculator, Calendar2Plus } from 'react-bootstrap-icons';
@@ -33,7 +33,7 @@ export const LabelCell = (props) => {
   return (
     <>
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}>
-        <span className={`td-level td-level-${level}`} onClick={oneClickToLevelUp}>
+        <span className={`td-level td-level-${level}`} onClick={()=>oneClickToLevelUp()}>
           {label}
         </span>
       </OverlayTrigger>
@@ -76,7 +76,7 @@ export const LookupCell = (props) => {
 }
 
 export const StatusCell = (props) => {
-  const {label, index, status, releaseTime, expiresTime, updateName, t} = props
+  const {label, index, status, releaseTime, expiresTime, updateName, type, t} = props
 
   const graceEndingFlag = status === 'Grace' && moment().add(18, 'days') > moment.unix(releaseTime)
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
@@ -116,17 +116,32 @@ export const StatusCell = (props) => {
   }  
 
   const RenewNameButton = () => {
-    if (isRenewable(status)) return (
-      <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>}>
-        <button type="button" 
-          id={"status-sub-btn-" + label} 
-          className="btn-plain btn-sub ms-2" 
-          onClick={null}
-        >
-          <Calendar2Plus />
-        </button>
-      </OverlayTrigger>
-    )
+    if (isRenewable(status)) {
+      if (type === 'readonly') {
+        return (
+          <button type="button" disabled className="btn-plain btn-sub ms-2">
+            <Calendar2Plus />
+          </button>
+        )
+      } else {
+        return (
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>}>
+            <button type="button" className="btn-plain btn-sub ms-2" onClick={null}>
+              <Calendar2Plus />
+            </button>
+          </OverlayTrigger>
+        )
+      }
+    } 
+    return null
+  }
+
+  const NameAge = () => {
+    if (status === 'Normal') {
+      return (
+        <span className="name-age">{ moment.unix(expiresTime)?.diff(moment(), 'years') }</span>
+      )
+    }
     return null
   }
 
@@ -156,8 +171,9 @@ export const StatusCell = (props) => {
             }
           </Tooltip>
         }>        
-        <span className={'td-status status-' + status + graceEndingClass + premiumEndingClass} onClick={()=>{updateName(index)}}>
+        <span className={'td-status status-' + status + graceEndingClass + premiumEndingClass} onClick={()=>updateName(index)}>
           {t('nm.sta.' + status)}
+          <NameAge />
         </span>
       </OverlayTrigger>
       <RenewNameButton />
@@ -166,7 +182,7 @@ export const StatusCell = (props) => {
 }
 
 export const RegisterCell = (props) => {
-  const {status, register, label, estimateCost, t} = props
+  const { status, registerName, label, estimateCost, messages, updateNameByLabel, updateBalance, type, t } = props
 
   const initialEstimating = { 
     title: "tb.td.tips.est", 
@@ -181,18 +197,18 @@ export const RegisterCell = (props) => {
     setEstimating({ ...initialEstimating, status: "after", cost: costEther })
   }
 
+  const [modalShow, setModalShow] = useState(false)
 
   if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
     return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
+      <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
         <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.reg', {label: label})}</Tooltip>}>
-          <button
-            type="button" 
-            id={"register-btn-" + label}
+          <button type="button" 
+            disabled={type==='readonly'}
             className="btn-plain btn-reg" 
-            data-bs-toggle="modal" data-bs-target={"#registerConfirmModal-" + label}
-            >
-            {t('tb.td.reg')}
+            onClick={()=>setModalShow(true)} 
+          >
+              {t('tb.td.reg')}
           </button>
         </OverlayTrigger>
         <OverlayTrigger placement="top" overlay={
@@ -200,23 +216,29 @@ export const RegisterCell = (props) => {
             <TooltipEstimateCost estimating={estimating} t={t} />
           </Tooltip>
         }>
-          <button type="button" id={"reg-sub-btn-" + label} className="btn-plain btn-sub ms-2" 
-            onClick={estimateThis}
-          >
+          <button type="button" className="btn-plain btn-sub ms-2" onClick={()=>estimateThis()}>
             <Calculator />
           </button>
         </OverlayTrigger>
-        <RegisterConfirmModal register={register} label={label} t={t} />
+        <RegisterNameConfirmModal 
+          show={modalShow}
+          onHide={()=>setModalShow(false)}
+          label={label} 
+          registerName={registerName} 
+          updateNameByLabel={updateNameByLabel}
+          updateBalance={updateBalance}
+          messages={messages}
+          t={t} 
+        />
       </div>
     )
   }
 
   if (status === 'Registering') {
     return (
-      <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
+      <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
         <button 
           type="button" 
-          id={"register-btn-" + label}
           className="btn-plain"
           disabled={true}
           >
@@ -268,7 +290,7 @@ export const RegisterCell = (props) => {
   }
 
   return (
-    <div id={"trigger-reged-" + label} className="btn-group" role="group" aria-label="Register">
+    <div id={"trigger-reged-" + label} className="btn-group" role="group" aria-label="RegisterName">
       <button type="button" className="btn-plain" disabled={true}>
         {t('tb.td.reged')}
       </button>

@@ -156,6 +156,11 @@ h1 a .title-ens {
 .status-Premium  { background-color: #eede0165; }
 .status-Reopen   { background-color: #a6e9d565; }
 .status-Registering, .status-Booked { background-color: #0dcaf065; }
+.name-age {
+  margin-left: 0.15rem;
+  font-size: smaller;
+  color: #483c3277;
+}
 .td-level {
   cursor: default;
 }
@@ -413,9 +418,16 @@ button.btn-plain[disabled] {
 .toast-container a:hover {
   color: #000000;
 }
-
 .input-group>.form-select {
   width: 2rem;
+}
+
+.modal-message {
+  color: #999
+}
+.modal-message-icon {
+  width: 0.8rem;
+  height: 0.8rem;
 }
 
 /* ==== configuration ==== */

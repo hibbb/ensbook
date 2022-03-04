@@ -1,4 +1,5 @@
 import confFile from '../../conf.json'
+import { Contract } from 'ethers'
 
 export function getConf() {
   if (confFile.host === "remote") {
@@ -10,6 +11,20 @@ export function getConf() {
     return confStored
   }
   return confFile
+}
+
+export function getETHRegCtrlCon(providerOrSigner, network, conf) {
+  conf = conf ?? getConf()
+  const contractAddr = conf.fixed.contract.addr[network].ETHRegCtrl
+  const contractAbi = conf.fixed.contract.abi.ETHRegCtrl
+  return new Contract(contractAddr, contractAbi, providerOrSigner)
+}
+
+export function getBaseRegImpCon(providerOrSigner, network, conf) {
+  conf = conf ?? getConf()
+  const contractAddr = conf.fixed.contract.addr[network].BaseRegImp
+  const contractAbi = conf.fixed.contract.abi.BaseRegImp
+  return new Contract(contractAddr, contractAbi, providerOrSigner)
 }
 
 export function isCustomWallet(conf) {

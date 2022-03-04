@@ -2,10 +2,10 @@ import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
 const UnsupportedNetworkModal = (props) => {
-  const { unsupported, disconnectApp, t } = props
+  const { show, disconnectApp, t } = props
   return (
     <Modal
-      show={unsupported}
+      show={show}
       //onHide={handleClose}
       backdrop="static"
       keyboard={false}
@@ -17,7 +17,7 @@ const UnsupportedNetworkModal = (props) => {
         {t('modal.errorNetwork.text')}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={disconnectApp}>{t('c.disconnect')}</Button>
+        <Button variant="primary" onClick={()=>disconnectApp()}>{t('c.disconnect')}</Button>
       </Modal.Footer>
     </Modal>
   )

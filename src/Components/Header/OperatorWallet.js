@@ -2,7 +2,7 @@
 import React from 'react';
 import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import { Plug, WalletFill } from 'react-bootstrap-icons';
-import { isCustomWallet } from '../Global/globals';
+// import { isCustomWallet } from '../Global/globals';
 
 const CurrentNetwork = (props) => {
   const { network, t } = props
@@ -20,9 +20,9 @@ const CurrentNetwork = (props) => {
 class OperatorWallet extends React.Component {
 
   componentDidMount() {
-    if (isCustomWallet()) {
-      this.props.reconnectApp()
-    }
+    // if (isCustomWallet()) {
+    //   this.props.reconnectApp(true)
+    // }
   }
 
   render() {
@@ -37,7 +37,7 @@ class OperatorWallet extends React.Component {
         <CurrentNetwork network={network} t={t} />
         <button type="button" 
           className="btn btn-primary me-2 wallet-connect"    
-          onClick={reconnectApp}
+          onClick={()=>reconnectApp()}
         >
           {t('c.connect')}
         </button>
@@ -83,7 +83,7 @@ class OperatorWallet extends React.Component {
               <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('c.disconnect')}</Tooltip>}>
                 <button type="button" 
                   className="btn-plain me-2 wallet-disconnect"    
-                  onClick={disconnectApp}
+                  onClick={()=>disconnectApp()}
                 >
                   <Plug />
                 </button>

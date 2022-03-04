@@ -118,14 +118,15 @@
       "succeed": "步骤 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
       "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
     },
-    "estimateCost": "{{label}}.eth 注册费用预估 ≈ {{price}} ETH。",
-    "estimateCosts": "注册这些域名总费用预估 ≈ {{price}} ETH。",
-    "setAndStoreNameInfo": "域名信息完成更新和保存。",
-    "setAndStoreConfInfo": "配置信息完成更新和保存。"
+    "setAndStoreNameInfo": "域名信息完成更新和保存。"
   },
   "modal": {
+    "reg": {
+      "title": "注册 {{label}}.eth",
+      "tip1": "你要注册的信息如下: ",
+      "tip2": "点击右下方按钮开始注册"
+    },
     "title": "需要确认",
-    "reg": "您确定注册 {{label}}.eth ? 该注册进程启动后, 请不要在注册完成前关闭这个页面。",
     "regAll": "您确定注册这些域名?",
     "removeNames": "您确定清空域名列表?",
     "errorNetwork": {
@@ -141,6 +142,7 @@
     "save": "保存",
     "confirm": "确认",
     "cancel": "取消",
+    "back": "返回",
     "tx": "交易",
     "currentNetwork": "当前网络",
     "ropsten": "Ropsten",

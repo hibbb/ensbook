@@ -48,10 +48,6 @@ class ConfigureForm extends React.Component {
     this.setState({displayLookup: displayLookup})
   }
 
-  setAndStoreConfInfo = (newConf) => { 
-    window.localStorage.setItem("confInfo", JSON.stringify(newConf))
-  }
-
   submitForm = () => {
     const confInfo = JSON.parse(window.localStorage.getItem("confInfo"))
     confInfo.custom.pageTag =  this.state.pageTag.trim()
@@ -71,12 +67,11 @@ class ConfigureForm extends React.Component {
     confInfo.custom.wallet.operatorPrivateKey = this.state.walletOperatorPrivateKey.replace(/\s/g, "").split(",")
     confInfo.custom.wallet.network  = this.state.walletNetwork
     confInfo.custom.wallet.gasPrice = Number(this.state.walletGasPrice)
-    this.setAndStoreConfInfo(confInfo)
+    this.props.setAndStoreConfInfo(confInfo)
     this.props.reconnectApp()
   }
 
   resetConf = () => {
-    this.setAndStoreConfInfo(confFile)
     const initialCustomConf = confFile.custom
     this.setState({
       pageTag: initialCustomConf.pageTag,
@@ -97,6 +92,7 @@ class ConfigureForm extends React.Component {
       walletNetwork: initialCustomConf.wallet.network,
       walletGasPrice: initialCustomConf.wallet.gasPrice
     })
+    this.props.setAndStoreConfInfo(confFile)
     this.props.reconnectApp()
   }
 
@@ -129,7 +125,8 @@ class ConfigureForm extends React.Component {
                   <BoxArrowUpRight className="external-link-icon" />
                 </a>
               </Alert>
-              
+
+              {/* General */}
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.general.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.general.pageTag')}</InputGroup.Text>
@@ -180,6 +177,7 @@ class ConfigureForm extends React.Component {
                 </div>
               </div>
 
+              {/* Register */}
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.register.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.register.duration')}</InputGroup.Text>
@@ -210,6 +208,7 @@ class ConfigureForm extends React.Component {
                 </Form.Select>
               </InputGroup>
 
+              {/* Renew */}
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.renew.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.renew.duration')}</InputGroup.Text>
@@ -221,9 +220,11 @@ class ConfigureForm extends React.Component {
                 <InputGroup.Text>{t('c.years')}</InputGroup.Text>
               </InputGroup>
 
+              {/* Premium */}
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.premium.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.premium.priceRange')}</InputGroup.Text>
+                <InputGroup.Text>{"≤"}</InputGroup.Text>
                 <FormControl 
                   name="premiumPriceRange" 
                   value={this.state.premiumPriceRange} 
@@ -232,6 +233,7 @@ class ConfigureForm extends React.Component {
                 <InputGroup.Text>{t('c.dollars')}</InputGroup.Text>
               </InputGroup>
 
+              {/* Custom Wallet Mode */}
               <h6 className="mt-4 mb-3">
                 <WalletFill className="me-2" />
                 {t('conf.customMode.title')}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { utils } from 'ethers';
+import { toast } from 'react-toastify'
 import namehash from '@ensdomains/eth-ens-namehash'
 
 class MainForm extends React.Component {
@@ -9,7 +10,7 @@ class MainForm extends React.Component {
   state = this.initialState
 
   addNames = async (labels) => {
-    const { nameInfo, setAndStoreNameInfo, updateName } = this.props
+    const { nameInfo, setAndStoreNameInfo, updateName, t } = this.props
 
     labels = labels.replace(/[,.'"?!@#$%^&*()/\\\\]/g, ' ').trim()
     if (labels.length < 1) { return false }
@@ -41,9 +42,10 @@ class MainForm extends React.Component {
     setAndStoreNameInfo(nameInfo, false)
 
     // update the status of newly added names
-    for(let i = originNameInfoLen; i < nameInfo.length; i++) {
-      updateName(i)
+    for(let index = originNameInfoLen; index < nameInfo.length; index++) {
+      updateName(index)
     }
+    toast.info(t('msg.setAndStoreNameInfo'))
   }
 
   handleChange = (event) => {

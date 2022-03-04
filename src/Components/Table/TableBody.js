@@ -4,15 +4,19 @@ import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './Tabl
 
 export const TableBody = (props) => {
   const { 
-    nameInfo, 
+    type,
     network, 
+    nameInfo, 
     setAndStoreNameInfo, 
     conf, 
     updateName, 
-    register, 
+    updateNameByLabel, 
+    updateBalance, 
+    registerName, 
     hideNames, 
     removeName, 
     estimateCost,
+    messages, 
     t 
   } = props
 
@@ -50,6 +54,7 @@ export const TableBody = (props) => {
             expiresTime={row.expiresTime}
             releaseTime={row.releaseTime}
             updateName={updateName}
+            type={type}
             t={t}
           />
         </td>
@@ -59,7 +64,11 @@ export const TableBody = (props) => {
             index={index}
             status={row.status} 
             estimateCost={estimateCost}
-            register={register} 
+            registerName={registerName} 
+            updateNameByLabel={updateNameByLabel}
+            updateBalance={updateBalance}
+            messages={messages}
+            type={type}
             t={t}
           />
         </td>

@@ -18,11 +18,11 @@
     },
     "register": {
       "receiver": "",
-      "duration": 5,
+      "duration": 1,
       "registerWithConfig": true
     },
     "renew": {
-      "duration": 5
+      "duration": 1
     },
     "premium": {
       "priceRange": 1000

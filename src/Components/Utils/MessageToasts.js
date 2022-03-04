@@ -6,7 +6,7 @@ class MessageToasts extends React.Component {
     this.props.onRef(this);    // call parent component
   }
 
-  messageShow(id, message, color = "msg-default", autohide = "true", delay = "10000") {
+  messageShow(id, message, color = "msg-default", autohide = "true", delay = "5000") {
     const toastElement = document.getElementById(id)
     toastElement.classList.remove("msg-default")
     toastElement.classList.add(color) 
@@ -21,16 +21,13 @@ class MessageToasts extends React.Component {
     const zIndex = { zIndex: 11 }
     const toastArray = [
       'nameNormalizeError', 
-      'book', 
-      'register00', 
-      'register10', 
-      'register11', 
-      'register20', 
-      'register30', 
-      // 'estimateCost', 
-      // 'estimateCosts', 
-      'setAndStoreNameInfo', 
-      'setAndStoreConfInfo'
+      // 'book', 
+      // 'register00', 
+      // 'register10', 
+      // 'register11', 
+      // 'register20', 
+      // 'register30', 
+      'setAndStoreNameInfo'
     ]
 
     return (

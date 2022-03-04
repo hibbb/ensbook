@@ -5,6 +5,9 @@
 - [ ] remove displaytime and confirms in configureForm
 - [ ] only support mainnet and ropsten
 - [ ] check the offchavs display when leaving the configureform
+- [ ] remove toastify and recover bootstrap-toast as need
+- [ ] registration modal UI: show name info before reg
+- [ ] disable all the consume actions when using default provider
 - [x] WalletConnect test
 - [x] add lookupAddress for operator's address
 - [x] collate account and network display logic
