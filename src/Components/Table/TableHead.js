@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
+import { t } from 'i18next';
 import RegisterNamesConfirmModal from '../Utils/RegisterNamesConfirmModal';
 import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
@@ -26,7 +27,6 @@ export const TableHead = (props) => {
     switchHideFlag, 
     removeNames, 
     estimateCosts, 
-    t 
   } = props
 
   const jsonSort = (array, key) => {
@@ -125,7 +125,6 @@ export const TableHead = (props) => {
             </span>
           </OverlayTrigger>
         </th>
-        <th>{t('tb.th.lu')}</th>
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}>
             <span id="th-expiresTime" className="th-sortable"
@@ -157,7 +156,7 @@ export const TableHead = (props) => {
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={
             <Tooltip>
-              <TooltipEstimateCost estimating={estimating} t={t} />
+              <TooltipEstimateCost estimating={estimating} />
             </Tooltip>
           }>
             <button type="button" id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
@@ -167,8 +166,9 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
           <HideShowButton />
-          <RegisterNamesConfirmModal registerNames={registerNames} t={t} />
+          <RegisterNamesConfirmModal registerNames={registerNames} />
         </th>
+        <th>{t('tb.th.lu')}</th>
         <th>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.remAll')}</Tooltip>}>
             <button type="button" className="btn-plain btn-del-name" 
@@ -178,7 +178,7 @@ export const TableHead = (props) => {
               <XCircle />
             </button>
           </OverlayTrigger>
-          <RemoveNamesConfirmModal removeNames={removeNames}  t={t}/>
+          <RemoveNamesConfirmModal removeNames={removeNames} />
         </th>
       </tr>
     </thead>

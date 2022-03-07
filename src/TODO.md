@@ -8,6 +8,9 @@
 - [ ] remove toastify and recover bootstrap-toast as need
 - [ ] registration modal UI: show name info before reg
 - [ ] disable all the consume actions when using default provider
+- [ ] insert regStep 0.5 and 1.5
+- [ ] seperate reg function into 4 pieces: regPrepare, regStep1, regStep2, regStep3
+- [ ] add reReg button beside Continue
 - [x] WalletConnect test
 - [x] add lookupAddress for operator's address
 - [x] collate account and network display logic

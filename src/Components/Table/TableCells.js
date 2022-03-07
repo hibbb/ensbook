@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import RegisterNameConfirmModal from '../Utils/RegisterNameConfirmModal';
 import moment from 'moment';
 import Clock from 'react-live-clock';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BoxArrowUpRight, XCircle, Calculator, Calendar2Plus } from 'react-bootstrap-icons';
 import { t } from 'i18next';
+import { isRegistrable, isRenewable } from '../Global/globals';
 import TooltipEstimateCost from './TooltipEstimateCost';
-import { isRenewable } from '../Global/globals';
-
+import RegisterNameConfirmModal from '../Utils/RegisterNameConfirmModal';
 
 export const LabelCell = (props) => {
   const { label, level, index, nameInfo, setAndStoreNameInfo } = props
@@ -46,41 +45,12 @@ export const LabelCell = (props) => {
   )
 }
 
-export const LookupCell = (props) => {
-  const {conf, label, tokenId, network, t} = props
-
-  // for td-lookup
-  const { lookup } = conf.custom.display
-  // When you modify lookupLinks, you also need to modify:
-  // 1. the custom.display.lookup filed of conf.json
-  // 2. the nm.tb.lookup filed of en.json and cn.json
-  const lookupLinks = {
-    "Etherscan": "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
-    "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
-    "Metadata": `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
-    "eth.link": `https://${label}.eth.link/`,
-    "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
-  }
-
-  return (
-    Object.keys(lookupLinks).map(item => 
-      lookup[item]
-      ? (
-        <OverlayTrigger key={'lookup-key-' + item} placement="top" overlay={<Tooltip>{t('tb.lookup.' + item, {label: label})}</Tooltip>}>
-          <a href={lookupLinks[item]} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
-        </OverlayTrigger>
-      )
-      : null
-    )
-  )
-}
-
 export const StatusCell = (props) => {
-  const {label, index, status, releaseTime, expiresTime, updateName, type, t} = props
+  const {label, index, status, releaseTime, expiresTime, updateName, type } = props
 
-  const graceEndingFlag = status === 'Grace' && moment().add(18, 'days') > moment.unix(releaseTime)
+  const graceEndingFlag = status === 'Grace' && moment().add(10, 'days').isAfter(moment.unix(releaseTime))
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
-  const premiumEndingFlag = status === 'Premium' && moment() > moment.unix(releaseTime).add(26, 'days')
+  const premiumEndingFlag = status === 'Premium' && moment().isAfter(moment.unix(releaseTime).add(26, 'days'))
   const premiumEndingClass = premiumEndingFlag ? ' premium-ending' : ''
 
   const jsonSortByNumber = (array, key) => {
@@ -182,7 +152,17 @@ export const StatusCell = (props) => {
 }
 
 export const RegisterCell = (props) => {
-  const { status, registerName, label, estimateCost, messages, updateNameByLabel, updateBalance, type, t } = props
+  const { 
+    label, 
+    status, 
+    defaultDuration, 
+    registerName, 
+    regStep, 
+    estimateCost, 
+    registerNameEnd, 
+    messages, 
+    type 
+  } = props
 
   const initialEstimating = { 
     title: "tb.td.tips.est", 
@@ -199,34 +179,56 @@ export const RegisterCell = (props) => {
 
   const [modalShow, setModalShow] = useState(false)
 
-  if (status === 'Open' || status === 'Reopen' || status === 'Premium') {
+  if (isRegistrable(status)) {
     return (
       <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
-        <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.reg', {label: label})}</Tooltip>}>
+        <OverlayTrigger placement="top" overlay={
+          <Tooltip>{
+            regStep > 0
+            ? t('tb.td.tips.continue')
+            : t('tb.td.tips.reg', {label: label})
+          }</Tooltip>
+        }>
           <button type="button" 
             disabled={type==='readonly'}
             className="btn-plain btn-reg" 
             onClick={()=>setModalShow(true)} 
           >
-              {t('tb.td.reg')}
+            {
+              regStep > 0
+              ? t('tb.td.continue')
+              : t('tb.td.reg')
+            }
           </button>
         </OverlayTrigger>
-        <OverlayTrigger placement="top" overlay={
-          <Tooltip>
-            <TooltipEstimateCost estimating={estimating} t={t} />
-          </Tooltip>
-        }>
-          <button type="button" className="btn-plain btn-sub ms-2" onClick={()=>estimateThis()}>
-            <Calculator />
-          </button>
-        </OverlayTrigger>
+        {
+          regStep > 0
+          ? <OverlayTrigger placement="top" overlay={
+              <Tooltip>
+                {t('tb.td.tips.regStep', {regStep: regStep})}
+              </Tooltip>
+            }>
+              <span className="ms-2 td-reg-step">
+                {regStep}/3
+              </span>
+            </OverlayTrigger>
+          : <OverlayTrigger placement="top" overlay={
+              <Tooltip>
+                <TooltipEstimateCost estimating={estimating} t={t} />
+              </Tooltip>
+            }>
+              <button type="button" className="btn-plain btn-sub ms-2" onClick={()=>estimateThis()}>
+                <Calculator />
+              </button>
+            </OverlayTrigger>
+        }
         <RegisterNameConfirmModal 
           show={modalShow}
           onHide={()=>setModalShow(false)}
+          defaultDuration={defaultDuration}
           label={label} 
           registerName={registerName} 
-          updateNameByLabel={updateNameByLabel}
-          updateBalance={updateBalance}
+          registerNameEnd={registerNameEnd}
           messages={messages}
           t={t} 
         />
@@ -234,28 +236,28 @@ export const RegisterCell = (props) => {
     )
   }
 
-  if (status === 'Registering') {
-    return (
-      <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
-        <button 
-          type="button" 
-          className="btn-plain"
-          disabled={true}
-          >
-          {t('tb.td.reg')}
-        </button>
-        <button 
-          type="button" 
-          id={"reg-sub-btn-" + label} 
-          className="btn-plain btn-sub ms-2" 
-          title={t('tb.td.tips.reging')}>
-          <div className="spinner-border reg-waiting" role="status">
-            <span className="visually-hidden">Registering...</span>
-          </div>
-        </button>
-      </div>
-    )
-  }
+  // if (status === 'Registering') {
+  //   return (
+  //     <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
+  //       <button 
+  //         type="button" 
+  //         className="btn-plain"
+  //         disabled={true}
+  //         >
+  //         {t('tb.td.reg')}
+  //       </button>
+  //       <button 
+  //         type="button" 
+  //         id={"reg-sub-btn-" + label} 
+  //         className="btn-plain btn-sub ms-2" 
+  //         title={t('tb.td.tips.reging')}>
+  //         <div className="spinner-border reg-waiting" role="status">
+  //           <span className="visually-hidden">Registering...</span>
+  //         </div>
+  //       </button>
+  //     </div>
+  //   )
+  // }
 
   // if (status === 'Booked') {
   //   return (
@@ -295,6 +297,35 @@ export const RegisterCell = (props) => {
         {t('tb.td.reged')}
       </button>
     </div>
+  )
+}
+
+export const LookupCell = (props) => {
+  const { conf, label, tokenId, network } = props
+
+  // for td-lookup
+  const { lookup } = conf.custom.display
+  // When you modify lookupLinks, you also need to modify:
+  // 1. the custom.display.lookup filed of conf.json
+  // 2. the nm.tb.lookup filed of en.json and cn.json
+  const lookupLinks = {
+    "Etherscan": "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
+    "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
+    "Metadata": `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
+    "eth.link": `https://${label}.eth.link/`,
+    "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
+  }
+
+  return (
+    Object.keys(lookupLinks).map(item => 
+      lookup[item]
+      ? (
+        <OverlayTrigger key={'lookup-key-' + item} placement="top" overlay={<Tooltip>{t('tb.lookup.' + item, {label: label})}</Tooltip>}>
+          <a href={lookupLinks[item]} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
+        </OverlayTrigger>
+      )
+      : null
+    )
   )
 }
 

@@ -1,7 +1,8 @@
 import React from 'react';
+import { t } from 'i18next';
 
 const RegisterNamesConfirmModal = (props) => {
-  const { registerNames, t } = props
+  const { registerNames } = props
   return (
     <div className="modal fade" id="registerNamesConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="registerNamesConfirmModalLabel" aria-hidden="true">
       <div className="modal-dialog">

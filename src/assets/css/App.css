@@ -146,8 +146,29 @@ h1 a .title-ens {
   background-color: #f1aeb5;
   color: #666;
 }
+.td-name-label {
+  font-family: "ebr-semibold";
+}
+.td-time {
+  cursor: default;
+}
 .td-status {
+  cursor: default;
+  border-radius: 0.15rem;
   padding: 0.07rem 0.35rem;
+  text-transform: uppercase;
+  font-size: 0.88rem;
+}
+.td-reg-step {
+  margin-top: 0.15rem;
+  padding: 0 0.3rem;
+  cursor: default;
+  border: 1px solid #0dcaf0;
+  border-radius: 0.6rem;
+  color: #0dcaf0;
+  font-size: 0.75rem;
+  height: 1.2rem;
+  font-family: 'ebr-number-regular';
 }
 .status-Unknown  { background-color: #ffffff; }
 .status-Normal   { background-color: #cccccc65; }
@@ -303,18 +324,6 @@ h1 a .title-ens {
   transform: rotate(135deg);
   -webkit-transform: rotate(135deg);
 }
-.td-name-label {
-  font-family: "ebr-semibold";
-}
-.td-time {
-  cursor: default;
-}
-.td-status {
-  cursor: default;
-  border-radius: 0.15rem;
-  text-transform: uppercase;
-  font-size: 0.88rem;
-}
 .ebr-tb-row:hover > td > .td-status {
   box-shadow: 0 0 0 1px rgba(13, 202, 242, 0.275);
 }
@@ -373,7 +382,7 @@ button.btn-plain[disabled] {
 .custom-wallet {
   color: #483c32;
 }
-.reconnecting, .estimating {
+.spinner-reconnecting, .spinner-estimating, .spinner-registering {
   width: 0.85rem;
   height: 0.85rem;
 }
@@ -423,11 +432,27 @@ button.btn-plain[disabled] {
 }
 
 .modal-message {
-  color: #999
+  margin: 0.5rem auto 0.5rem;
+  font-size: 0.85rem;
+  color: #483c32dd;
+}
+.modal-message-time {
+  font-family: 'ebr-number-light';
+  color: #483c3299;
 }
 .modal-message-icon {
+  margin-right: 0.25rem;
   width: 0.8rem;
   height: 0.8rem;
+}
+.reg-succeeded {
+  color: limegreen;
+}
+.reg-failed {
+  color: crimson;
+}
+.until-time {
+  font-family: 'ebr-number-light';
 }
 
 /* ==== configuration ==== */

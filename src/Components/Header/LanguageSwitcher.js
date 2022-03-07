@@ -3,9 +3,9 @@ import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next'
 import moment from 'moment'
+import { t } from 'i18next';
 
 export default function LanguageSwitcher(props) {
-  const { t } = props
   const usingLang = window.localStorage.getItem('language') ?? 'en'
   const { i18n } = useTranslation()
   moment.locale(usingLang === 'cn' ? 'zh-cn' : usingLang)

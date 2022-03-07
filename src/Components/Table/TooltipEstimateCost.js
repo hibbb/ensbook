@@ -1,10 +1,11 @@
 import React from 'react';
 import { Spinner } from 'react-bootstrap';
+import { t } from 'i18next';
 
 class TooltipEstimateCost extends React.Component {
 
   render() {
-    const { estimating, t } = this.props
+    const { estimating } = this.props
     
     if (estimating.status === "in") {
       return (
@@ -13,7 +14,7 @@ class TooltipEstimateCost extends React.Component {
             {t(estimating.title)}
           </p>
           <div>
-            <Spinner animation="border" variant="light" className="estimating" />
+            <Spinner animation="border" variant="light" className="spinner-estimating" />
           </div>
         </>
       )

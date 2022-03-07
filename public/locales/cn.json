@@ -17,13 +17,13 @@
     "language": "语言"
   },
   "form": {
-    "holder": "输入域名标签 (多个标签用空格分开)",
-    "btn": "添加域名"
+    "holder": "输入名称的标签 (多个标签用空格分开)",
+    "btn": "添加名称"
   },
   "tb": {
     "th": {
       "no": "#",
-      "lb": "域名标签",
+      "lb": "名称标签",
       "lu": "相关信息",
       "sta": "状态",
       "reg": "注册",
@@ -37,15 +37,16 @@
         "update": "更新信息",
         "regAll": "批量注册",
         "estAll": "批量注册费用预估",
-        "remAll": "移除所有域名",
+        "remAll": "移除所有名称",
         "hideNames": {
-          "hide": "隐藏不可注册的域名",
-          "show": "显示不可注册的域名"
+          "hide": "隐藏不可注册的名称",
+          "show": "展开所有名称"
         }
       }
     },
     "td": {
       "reg": "注册",
+      "continue": "继续", 
       "reged": "已被注册", 
       "book": "预约",
       "tips": {
@@ -54,6 +55,8 @@
         "est": "注册费用预估",
         "reg": "注册 {{label}}.eth",
         "reging": "正在注册中",
+        "continue": "继续完成注册流程",
+        "regStep": "注册流程共 3 个步骤, 目前已经完成第 {{regStep}} 个",
         "book": "预约注册 {{label}}.eth",
         "booked": "正在等待该域名重新开放注册",
         "cbook": "取消此次预约",
@@ -110,25 +113,24 @@
     "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 年。",
     "register10": "{{label}}.eth 请求已经提交。",
     "register11": {
-      "succeed": "步骤 1 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会自动进行一下步。",
+      "succeed": "步骤 1 / 3 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会进行一下步。",
       "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
     },
-    "register20": "步骤 2 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
+    "register20": "步骤 2 / 3 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
     "register30": {
-      "succeed": "步骤 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
+      "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
       "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
     },
-    "setAndStoreNameInfo": "域名信息完成更新和保存。"
+    "setAndStoreNameInfo": "名称信息完成更新和保存。"
   },
   "modal": {
     "reg": {
       "title": "注册 {{label}}.eth",
-      "tip1": "你要注册的信息如下: ",
-      "tip2": "点击右下方按钮开始注册"
+      "tip": "您要注册的名称的信息如下: "
     },
     "title": "需要确认",
-    "regAll": "您确定注册这些域名?",
-    "removeNames": "您确定清空域名列表?",
+    "regAll": "您确定注册这些名称?",
+    "removeNames": "您确定清空名称列表?",
     "errorNetwork": {
       "title": "暂不支持该网络",
       "text": "ENSBook 目前仅支持以太坊主网和 Ropsten 测试网, 请在您连接的钱包中切换网络, 或断开与钱包的连接。"
@@ -142,8 +144,10 @@
     "save": "保存",
     "confirm": "确认",
     "cancel": "取消",
-    "back": "返回",
+    "finish": "完成",
     "tx": "交易",
+    "name": "名称",
+    "duration": "时长",
     "currentNetwork": "当前网络",
     "ropsten": "Ropsten",
     "mainnet": "主网",

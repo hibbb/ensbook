@@ -1,8 +1,9 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { t } from 'i18next';
 
 const UnsupportedNetworkModal = (props) => {
-  const { show, disconnectApp, t } = props
+  const { show, disconnectApp } = props
   return (
     <Modal
       show={show}

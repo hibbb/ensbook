@@ -2,10 +2,10 @@
 import React from 'react';
 import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import { Plug, WalletFill } from 'react-bootstrap-icons';
-// import { isCustomWallet } from '../Global/globals';
+import { t } from 'i18next';
 
 const CurrentNetwork = (props) => {
-  const { network, t } = props
+  const { network } = props
   return (
     <OverlayTrigger placement="bottom" overlay={
       <Tooltip>{t('c.currentNetwork')}</Tooltip>
@@ -26,7 +26,7 @@ class OperatorWallet extends React.Component {
   }
 
   render() {
-    const { walletInfo, reconnectApp, disconnectApp, reconnecting, scanConf, t } = this.props
+    const { walletInfo, reconnectApp, disconnectApp, reconnecting, scanConf } = this.props
     const { type, address, ensname, network, balance } = walletInfo
     const readableAddress = address ? address.slice(0, 5) + '...' + address.slice(-4) : null
     const walletScanLink = `${scanConf[network]}address/${address}`  
@@ -34,7 +34,7 @@ class OperatorWallet extends React.Component {
     if (type === 'readonly') {
       return (
       <div className="d-inline-block">
-        <CurrentNetwork network={network} t={t} />
+        <CurrentNetwork network={network} />
         <button type="button" 
           className="btn btn-primary me-2 wallet-connect"    
           onClick={()=>reconnectApp()}
@@ -47,13 +47,13 @@ class OperatorWallet extends React.Component {
 
     if (reconnecting) {
       return (
-        <Spinner animation="border" variant="secondary" className="me-2 reconnecting" />
+        <Spinner animation="border" variant="secondary" className="me-2 spinner-reconnecting" />
       )
     }
   
     return (
       <div className="d-inline-block">
-        <CurrentNetwork network={network} t={t} />
+        <CurrentNetwork network={network} />
         <OverlayTrigger placement="bottom" overlay={
           <Tooltip>
             {t('header.account') + ": " + address}

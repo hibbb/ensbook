@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, OverlayTrigger, Tooltip, InputGroup, FormControl, Alert } from 'react-bootstrap'
 import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, CheckCircle, WalletFill } from 'react-bootstrap-icons';
+import { t } from 'i18next';
 import confFile from '../../conf.json'
 
 class ConfigureForm extends React.Component {
@@ -102,7 +103,6 @@ class ConfigureForm extends React.Component {
     }
 
     const lookupList = JSON.parse(window.localStorage.getItem("lookupList"))
-    const { t } = this.props
 
     return (
       <div className="ps-2 pe-3 d-inline-block text-start">

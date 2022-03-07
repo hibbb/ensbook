@@ -46,6 +46,7 @@
     },
     "td": {
       "reg": "Register",
+      "continue": "Continue", 
       "reged": "Registered", 
       "book": "Book",
       "tips": {
@@ -54,6 +55,8 @@
         "est": "Registration Cost Estimation",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",
+        "continue": "Continue to the Registration Process",
+        "regStep": "{{regStep}} / 3 of the Registration Process has been Completed",
         "book": "Book {{label}}.eth",
         "booked": "Waiting for the Name to Reopen",
         "cbook": "Cancel This Book",
@@ -110,21 +113,20 @@
     "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
     "register10": "{{label}}.eth commit submitted.",
     "register11": {
-      "succeed": "SETP 1 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
+      "succeed": "SETP 1 / 3 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
       "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
     },
-    "register20": "SETP 2 FINISHED: {{label}}.eth is ready for registration.",
+    "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
     "register30": {
-      "succeed": "SETP 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
+      "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
       "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
     },
     "setAndStoreNameInfo": "Name information has been updated and stored."
   },
   "modal": {
     "reg": {
-      "title": "注册 {{label}}.eth",
-      "tip1": "你要注册的信息如下: ",
-      "tip2": "点击右下方按钮开始注册"
+      "title": "Register {{label}}.eth",
+      "tip": "The information for the name you want to register is as follows: "
     },
     "title": "Need Confirmation",
     "regAll": "Are you sure to register THESE ENS names?",
@@ -142,8 +144,10 @@
     "save": "Save",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "back": "Back",
-    "tx": "transaction",
+    "finish": "Finish",
+    "tx": "Transaction",
+    "name": "Name",
+    "duration": "Duration",
     "currentNetwork": "Current Network",
     "ropsten": "Ropsten",
     "mainnet": "Mainnet",
