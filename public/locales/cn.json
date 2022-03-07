@@ -117,7 +117,8 @@
       "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
     },
     "register20": "步骤 2 / 3 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
-    "register30": {
+    "register30": "{{label}}.eth 注册已经提交。",
+    "register31": {
       "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
       "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
     },

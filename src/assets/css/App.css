@@ -451,6 +451,9 @@ button.btn-plain[disabled] {
 .reg-failed {
   color: crimson;
 }
+.reg-suspend {
+  color: orange;
+}
 .until-time {
   font-family: 'ebr-number-light';
 }

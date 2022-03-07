@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
+import moment from 'moment'
 
 export default function TestBar(props) {
-  const [state, setstate] = useState({a: 1, b: 2, c: "ccc"});
 
-  const testFunc1 = async (props) => {
-    console.log(state)
-    state.a = 0
-    setstate(state)
-    console.log(state)
+  let regInfo = { a: "a1", b: "b1", c: "c1"}
+
+  const testFunc1 = async () => {
+    let { b, a, c, d } = regInfo
+    console.log(a)
+    console.log(b)
+    console.log(c)
+    console.log(d)
+    const m = moment.duration(null, 'seconds').asYears().toFixed(1)
+    console.log(m)
   }
 
-  const testFunc2 = async (a, b) => {
+  const testFunc2 = async () => {
   }
 
   return (

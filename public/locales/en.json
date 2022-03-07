@@ -117,7 +117,8 @@
       "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
     },
     "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
-    "register30": {
+    "register30": "{{label}}.eth registration submitted.",
+    "register31": {
       "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
       "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
     },

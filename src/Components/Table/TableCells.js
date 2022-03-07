@@ -228,6 +228,7 @@ export const RegisterCell = (props) => {
           defaultDuration={defaultDuration}
           label={label} 
           registerName={registerName} 
+          regStep={regStep}
           registerNameEnd={registerNameEnd}
           messages={messages}
           t={t} 

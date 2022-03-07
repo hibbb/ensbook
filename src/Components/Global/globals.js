@@ -73,57 +73,51 @@ export function getRegInfo(label) {
 
 export async function updateRegStep(label, regStep, provider) {
   if (regStep >= 3) {
-    console.log(label + ': ' + regStep)
+    removeRegInfo(label)
     return 0
   }
 
   const regInfo = getRegInfo(label)
-  console.log(label + ' regInfo:')
-  console.log(regInfo)
+
+  if (!regInfo) {
+    return 0
+  }
+
   let commitTxReceipt
   let commitTxTime
   let regWindow = {}
 
   if (regInfo.commitTxHash) { 
-    console.log("if (regInfo.commitTxHash)")
     commitTxReceipt = await provider.getTransactionReceipt(regInfo.commitTxHash)
   } else {
-    console.log("! if (regInfo.commitTxHash)")
     return regStep
   }
 
   if (commitTxReceipt) {
-    console.log("if (commitTxReceipt.status)")
     commitTxTime = (await provider.getBlock(commitTxReceipt.blockNumber)).timestamp
-    console.log("commitTxTime: " + commitTxTime)
   } else { 
-    console.log("! if (commitTxReceipt.status)")
     return regStep
   }
 
   if (regStep === 0.5) {
-    console.log("if (regStep === 0.5)")
     regStep = 1
   }
 
   if (regStep > 0.5) {
-    console.log("if (regStep > 0.5)")
     regWindow.start = moment.unix(commitTxTime).add(60, 'seconds')
     regWindow.end = moment.unix(commitTxTime).add(24, 'hours')
-    console.log(regWindow.start.format())
-    console.log(regWindow.end.format())
     regStep = moment().isBefore(regWindow.end) ? regStep : 0
   }
 
   if (regStep === 1) {
-    console.log("if (regStep === 1)")
     regStep = moment().isAfter(regWindow.start) ? 2 : regStep
   }
 
   if (regStep === 2.5) {
-    console.log("if (regStep === 2.5)")
-    const regTxReceipt = await provider.getTransactionReceipt(regStep.regTxHash)
-    regStep = regTxReceipt.status ? 3 : regStep
+    const regTxReceipt = await provider.getTransactionReceipt(regInfo.regTxHash)
+    if (regTxReceipt) { 
+      regStep = regTxReceipt.status ? 3 : 0
+    } // if regTxReceipt is null reStep is still 2.5
   }
 
   return regStep
