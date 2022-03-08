@@ -261,7 +261,6 @@ class ENSBook extends React.Component {
       this.setAndStoreNameInfo(nameInfo, false)
       
       if (regTo <= 0.5) { return nameInfo[index].regStep } 
-      // Steps Left
       return await regFrom05()
     }
 
@@ -308,14 +307,13 @@ class ENSBook extends React.Component {
       }
 
       if (regTo <= 1) { return nameInfo[index].regStep } 
-      // Steps Left
       return await regFrom1()
     }
 
     // *** regStep 1 -> 2
 
     const regFrom1 = async () => {
-      // long-timeout is necessary for >24.8 days
+      // long-timeout is necessary for durations >24.8 days
       const wait = ms => new Promise(resolve => lt.setTimeout(resolve, ms)) 
       await wait(conf.fixed.ensConf.minCommitmentAge * 1000)
       
@@ -323,7 +321,6 @@ class ENSBook extends React.Component {
       this.setAndStoreNameInfo(nameInfo, false)
 
       if (regTo <= 2) { return nameInfo[index].regStep } 
-      // Steps Left
       return await regFrom2()
     }
 
@@ -375,7 +372,6 @@ class ENSBook extends React.Component {
       this.setAndStoreNameInfo(nameInfo, false)
 
       if (regTo <= 2.5) { return nameInfo[index].regStep } 
-      // Steps Left
       return await regFrom25()
     }
 
@@ -407,9 +403,9 @@ class ENSBook extends React.Component {
           text: "regSucceeded" 
         }
         this.setState({ regMsges })
-        console.log(nameInfo[index].regStep)
         return nameInfo[index].regStep
-      } else {
+      } 
+      else {
         nameInfo[index].regStep = 2
         this.setAndStoreNameInfo(nameInfo, false)
 
@@ -424,7 +420,6 @@ class ENSBook extends React.Component {
           text: "regFailed" 
         }
         this.setState({ regMsges })
-        console.log(nameInfo[index].regStep)
         return nameInfo[index].regStep
       }
       // regMsges = INITIAL_STATE.regMsges will be executed in registerNameEnd()
@@ -440,7 +435,6 @@ class ENSBook extends React.Component {
   }
 
   registerNameEnd = (label) => {
-    console.log('registerNameEnd')
     this.setState({ regMsges: INITIAL_STATE.regMsges })
     this.updateNameByLabel(label)
     this.updateBalance()
@@ -459,7 +453,6 @@ class ENSBook extends React.Component {
 
     for (let i = 0; i < registrableNames.length; i++) {
       const regResult = await this.registerName(registrableNames[i].label, duration)
-      console.log('resInRegs: ' + regResult)
       if (regResult === 3) {
         regsMsges.push({
           time: moment(),
@@ -490,7 +483,6 @@ class ENSBook extends React.Component {
     this.setState({ regsMsges })
 
     this.setState({ regMsges: INITIAL_STATE.regMsges })
-    console.log(INITIAL_STATE.regMsges)
   }
 
   registerNamesEnd = async () => {
@@ -499,40 +491,6 @@ class ENSBook extends React.Component {
     this.updateNames()
   }
 
-  // registerNames = async (duration) => {
-  //   const registrableNames = getRegistrableNames(this.state.nameInfo)
-  //   // regStep 0 -> 0.5
-  //   for (let i = 0; i < registrableNames.length; i++) {
-  //     console.log(registrableNames[i].label + '.eth: 0 >')
-  //     await this.registerName(registrableNames[i].label, duration, 0, 0.5)
-  //     console.log(registrableNames[i].label + '.eth: > 0.5')
-  //   }
-  //   // regStep 0.5 -> 1
-  //   for (let i = 0; i < registrableNames.length; i++) {
-  //     console.log(registrableNames[i].label + '.eth: 0.5 >')
-  //     await this.registerName(registrableNames[i].label, duration, 0.5, 1)
-  //     console.log(registrableNames[i].label + '.eth: > 1')
-  //   }
-  //   // regStep 1 -> 2
-  //   for (let i = 0; i < registrableNames.length; i++) {
-  //     console.log(registrableNames[i].label + '.eth: 1 >')
-  //     this.registerName(registrableNames[i].label, duration, 1, 2)
-  //     console.log(registrableNames[i].label + '.eth: > 2')
-  //   }
-  //   // regStep 2 -> 2.5
-  //   for (let i = 0; i < registrableNames.length; i++) {
-  //     console.log(registrableNames[i].label + '.eth: 2 >')
-  //     await this.registerName(registrableNames[i].label, duration, 2, 2.5)
-  //     console.log(registrableNames[i].label + '.eth: > 2.5')
-  //   }
-  //   // regStep 2.5 -> 3 / 2
-  //   for (let i = 0; i < registrableNames.length; i++) {
-  //     console.log(registrableNames[i].label + '.eth: 2 >')
-  //     await this.registerName(registrableNames[i].label, duration, 2, 2.5)
-  //     console.log(registrableNames[i].label + '.eth: > 2.5')
-  //   }
-
-  // }
 
   // bookFlags = {}
 

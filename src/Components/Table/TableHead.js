@@ -6,7 +6,7 @@ import { t } from 'i18next';
 import RegisterNamesConfirmModal from '../Utils/RegisterNamesConfirmModal';
 import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
-import { haveRenewableNames, haveUnregistrableNames } from '../Global/globals';
+import { haveRenewableNames, haveUnregistrableNames, isCustomWallet } from '../Global/globals';
 
 let ascFlag = {
   "label": true,
@@ -154,10 +154,8 @@ export const TableHead = (props) => {
             <button
               type="button" 
               className="btn-plain btn-reg" 
-              disabled={type==='readonly'}
+              disabled={!isCustomWallet()}
               onClick={()=>setRegNamesModalShow(true)} 
-              // data-bs-toggle="modal" 
-              // data-bs-target="#registerNamesConfirmModal"
               >
               {t('tb.th.reg')}
             </button>
