@@ -23,11 +23,13 @@ class MainTable extends React.Component {
       estimateCost, 
       estimateCosts, 
       registerName, 
-      registerNames, 
       registerNameEnd,
+      registerNames, 
+      registerNamesEnd,
       removeNames, 
       removeName, 
-      messages, 
+      regMsges, 
+      regsMsges
     } = this.props
 
     const switchHideFlag = () => {
@@ -44,10 +46,14 @@ class MainTable extends React.Component {
             setAndStoreNameInfo={setAndStoreNameInfo}
             updateNames={updateNames}
             registerNames={registerNames}
+            registerNamesEnd={registerNamesEnd}
+            defaultDuration={conf.custom.register.duration}
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
             removeNames={removeNames}
             estimateCosts={estimateCosts}
+            regMsges={regMsges}
+            regsMsges={regsMsges}
           />
           <TableBody 
             type={type}
@@ -61,7 +67,7 @@ class MainTable extends React.Component {
             hideNames={this.state.hideNames}
             removeName={removeName} 
             estimateCost={estimateCost} 
-            messages={messages}
+            regMsges={regMsges}
           />
         </table>
       </div>

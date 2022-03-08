@@ -15,7 +15,7 @@ export const TableBody = (props) => {
     hideNames, 
     removeName, 
     estimateCost,
-    messages, 
+    regMsges, 
   } = props
 
   const rows = props.nameInfo.map((row, index) => {
@@ -56,7 +56,7 @@ export const TableBody = (props) => {
             registerName={registerName} 
             regStep={row.regStep}
             registerNameEnd={registerNameEnd}
-            messages={messages}
+            regMsges={regMsges}
             type={type}
           />
         </td>

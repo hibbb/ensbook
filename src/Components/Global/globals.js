@@ -72,7 +72,7 @@ export function getRegInfo(label) {
 }
 
 export async function updateRegStep(label, regStep, provider) {
-  if (regStep >= 3) {
+  if (regStep === 0 || regStep === 3) {
     removeRegInfo(label)
     return 0
   }

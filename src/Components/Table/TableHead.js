@@ -23,10 +23,14 @@ export const TableHead = (props) => {
     setAndStoreNameInfo, 
     updateNames, 
     registerNames, 
+    registerNamesEnd,
+    defaultDuration,
     hideNames, 
     switchHideFlag, 
     removeNames, 
     estimateCosts, 
+    regMsges,
+    regsMsges
   } = props
 
   const jsonSort = (array, key) => {
@@ -104,6 +108,9 @@ export const TableHead = (props) => {
     setEstimating({ ...initialEstimating, status: "after", cost: costEther })
   }
 
+  const [regNamesModalShow, setRegNamesModalShow] = useState(false)
+
+
   return (
     <thead>
       <tr className="ebr-tb-row">
@@ -148,8 +155,9 @@ export const TableHead = (props) => {
               type="button" 
               className="btn-plain btn-reg" 
               disabled={type==='readonly'}
-              data-bs-toggle="modal" 
-              data-bs-target="#registerNamesConfirmModal"
+              onClick={()=>setRegNamesModalShow(true)} 
+              // data-bs-toggle="modal" 
+              // data-bs-target="#registerNamesConfirmModal"
               >
               {t('tb.th.reg')}
             </button>
@@ -166,7 +174,15 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
           <HideShowButton />
-          <RegisterNamesConfirmModal registerNames={registerNames} />
+          <RegisterNamesConfirmModal 
+            show={regNamesModalShow}
+            onHide={()=>setRegNamesModalShow(false)}
+            registerNames={registerNames}
+            registerNamesEnd={registerNamesEnd}
+            defaultDuration={defaultDuration}
+            regMsges={regMsges}
+            regsMsges={regsMsges}
+          />
         </th>
         <th>{t('tb.th.lu')}</th>
         <th>

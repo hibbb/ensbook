@@ -15,7 +15,7 @@ const RegisterNameConfirmModal = (props) => {
     regStep, 
     defaultDuration, 
     registerNameEnd, 
-    messages
+    regMsges
   } = props
 
   // support fetching the setted duration from its regInfo
@@ -24,7 +24,7 @@ const RegisterNameConfirmModal = (props) => {
     ? moment.duration(durationFromRegInfo, 'seconds').asYears().toFixed(2)
     : defaultDuration
 
-  const action = messages[0].text  // regBefore, regStarted, regSucceeded, regFailed or regSuspended
+  const regAction = regMsges[0].text  // regBefore, regStarted, regSucceeded, regFailed or regSuspended
 
   const [duration, setDuration] = useState(adjustDuration) // duration: as Years
 
@@ -35,12 +35,12 @@ const RegisterNameConfirmModal = (props) => {
   }
 
   const ActionButton = () => {
-    function regFinished () {
+    function regEnd () {
       onHide()
       registerNameEnd(label)
     }
 
-    if (action === 'regStarted') {
+    if (regAction === 'regStarted') {
       return (
         <Button variant="secondary" disabled>
           {t('nm.sta.Registering')}
@@ -48,13 +48,13 @@ const RegisterNameConfirmModal = (props) => {
         </Button>
       )
     }
-    if (action === 'regFailed' || action === 'regSucceeded') {
-      return <Button variant="primary" onClick={()=>regFinished()}>{t('c.finish')}</Button>
+    if (regAction === 'regFailed' || regAction === 'regSucceeded') {
+      return <Button variant="primary" onClick={()=>regEnd()}>{t('c.end')}</Button>
     }
-    if (action === 'regSuspended') {
+    if (regAction === 'regSuspended') {
       return (
         <>
-          <Button variant="secondary" onClick={()=>regFinished()}>{t('c.cancel')}</Button>
+          <Button variant="secondary" onClick={()=>regEnd()}>{t('c.cancel')}</Button>
           <Button variant="primary" 
             onClick={()=>{registerName(
               label, 
@@ -79,54 +79,60 @@ const RegisterNameConfirmModal = (props) => {
     )
   }
 
-  const ActionMessageIcon = () => {
-    if (action === 'regSucceeded') {
+  const RegActionMsgIcon = () => {
+    if (regAction === 'regSucceeded') {
       return (
         <span className="modal-message-text">
-          <CheckCircleFill className="modal-message-icon reg-succeeded" />
+          <CheckCircleFill className="me-2 modal-message-icon reg-succeeded" />
+          { label + '.eth' }
         </span>
       )
-    } else if (action === 'regFailed') {
+    } else if (regAction === 'regFailed') {
       return (
         <span className="modal-message-text">
-          <XCircleFill className="modal-message-icon reg-failed" />
+          <XCircleFill className="me-2 modal-message-icon reg-failed" /> 
+          { label + '.eth' }
         </span>
       )
-    } else if (action === 'regSuspended') {
+    } else if (regAction === 'regSuspended') {
       return (
         <span className="modal-message-text">
-          <DashCircleFill className="modal-message-icon reg-suspend" />
+          <DashCircleFill className="me-2 modal-message-icon reg-suspend" />
+          { label + '.eth' }
         </span>
       )
     }
     return null
   }
   
-  const ActionMessage = () => {
-    if (action === 'regBefore' || action === 'regStarted') {
+  const RegActionMsg = () => {
+    if (regAction === 'regBefore' || regAction === 'regStarted') {
       return null
     }
     return (
       <p className={"modal-message message-action"}>
-        <span className="modal-message-time" title={messages[0].time.fromNow()}>
-          {messages[0].time.format('HH:mm:ss')}
+        <span className="modal-message-time" title={regMsges[0].time.fromNow()}>
+          {regMsges[0].time.format('HH:mm:ss')}
         </span>
         <ChevronCompactRight className="modal-message-icon" />
-        <ActionMessageIcon />
+        <RegActionMsgIcon />
       </p>
     )
   }
 
-  const InfoMessage = (props) => {
-    const { message } = props
+  const RegInfoMsges = () => {
     return (
-      <p className={"modal-message message-" + message.type}>
-        <span className="modal-message-time" title={message.time.fromNow()}>
-          {message.time.format('HH:mm:ss')}
-        </span>
-        <ChevronCompactRight className="modal-message-icon" />
-        <span className="modal-message-text" dangerouslySetInnerHTML={{ __html: message.text }} />
-      </p>
+      regMsges.slice(1).map((message, index) => { 
+        return (
+          <p key={index} className={"modal-message message-" + message.type}>
+            <span className="modal-message-time" title={message.time.fromNow()}>
+              {message.time.format('HH:mm:ss')}
+            </span>
+            <ChevronCompactRight className="modal-message-icon" />
+            <span className="modal-message-text" dangerouslySetInnerHTML={{ __html: message.text }} />
+          </p>
+        )
+      })
     )
   }
 
@@ -154,7 +160,7 @@ const RegisterNameConfirmModal = (props) => {
                 <InputGroup.Text>{t('c.duration')}: </InputGroup.Text>
                 <FormControl value={duration} 
                   onChange={handleChange} 
-                  disabled={ !(action === "regBefore" || action === "regSuspended") } 
+                  disabled={ !(regAction === "regBefore" || regAction === "regSuspended") } 
                 />
                 <InputGroup.Text>{t('c.years')}</InputGroup.Text>
                 <InputGroup.Text className="ms-2 until-time">
@@ -165,8 +171,8 @@ const RegisterNameConfirmModal = (props) => {
             </Col>
           </Row>
         </div>
-        { messages.slice(1).map((item, index) => { return <InfoMessage key={index} message={item} /> }) }
-        <ActionMessage />
+        <RegInfoMsges />
+        <RegActionMsg />
       </Modal.Body>
       <Modal.Footer>
         <ActionButton />    

@@ -108,26 +108,29 @@
     }
   },
   "msg": {
-    "nameNormalizeError": "Error: {{errMsg}}",
-    "book": "The status of {{label}}.eth will be rechecked in {{duration}}.",
-    "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
-    "register10": "{{label}}.eth commit submitted.",
-    "register11": {
-      "succeed": "SETP 1 / 3 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
-      "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
-    },
-    "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
-    "register30": "{{label}}.eth registration submitted.",
-    "register31": {
-      "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
-      "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
-    },
     "setAndStoreNameInfo": "Name information has been updated and stored."
   },
   "modal": {
     "reg": {
       "title": "Register {{label}}.eth",
-      "tip": "The information for the name you want to register is as follows: "
+      "tip": "The information for the name you want to register is as follows: ",
+      "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
+      "register10": "{{label}}.eth commit submitted.",
+      "register11": {
+        "succeed": "SETP 1 / 3 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
+        "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
+      },
+      "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
+      "register30": "{{label}}.eth registration submitted.",
+      "register31": {
+        "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
+        "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
+      }
+    },
+    "regs": {
+      "title": "Batch Registration",
+      "tip": "The information for the names you want to register is as follows: ",
+      "regsEnded": "The batch registration has been ended."
     },
     "title": "Need Confirmation",
     "regAll": "Are you sure to register THESE ENS names?",
@@ -145,7 +148,7 @@
     "save": "Save",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "finish": "Finish",
+    "end": "End",
     "tx": "Transaction",
     "name": "Name",
     "duration": "Duration",

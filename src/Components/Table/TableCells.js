@@ -160,7 +160,7 @@ export const RegisterCell = (props) => {
     regStep, 
     estimateCost, 
     registerNameEnd, 
-    messages, 
+    regMsges, 
     type 
   } = props
 
@@ -230,7 +230,7 @@ export const RegisterCell = (props) => {
           registerName={registerName} 
           regStep={regStep}
           registerNameEnd={registerNameEnd}
-          messages={messages}
+          regMsges={regMsges}
           t={t} 
         />
       </div>

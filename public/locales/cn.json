@@ -108,26 +108,29 @@
     }
   },
   "msg": {
-    "nameNormalizeError": "错误: {{errMsg}}",
-    "book": "{{duration}} 之后会再次检查 {{label}}.eth 的注册状态。",
-    "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 年。",
-    "register10": "{{label}}.eth 请求已经提交。",
-    "register11": {
-      "succeed": "步骤 1 / 3 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会进行一下步。",
-      "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
-    },
-    "register20": "步骤 2 / 3 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
-    "register30": "{{label}}.eth 注册已经提交。",
-    "register31": {
-      "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
-      "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
-    },
     "setAndStoreNameInfo": "名称信息完成更新和保存。"
   },
   "modal": {
     "reg": {
       "title": "注册 {{label}}.eth",
-      "tip": "您要注册的名称的信息如下: "
+      "tip": "您要注册的名称的信息如下: ",
+      "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 年。",
+      "register10": "{{label}}.eth 请求已经提交。",
+      "register11": {
+        "succeed": "步骤 1 / 3 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会进行一下步。",
+        "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
+      },
+      "register20": "步骤 2 / 3 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
+      "register30": "{{label}}.eth 注册已经提交。",
+      "register31": {
+        "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
+        "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
+      }
+    },
+    "regs": {
+      "title": "批量注册",
+      "tip": "您要注册的名称的信息如下: ",
+      "regsEnded": "批量注册进程已经结束。"
     },
     "title": "需要确认",
     "regAll": "您确定注册这些名称?",
@@ -145,7 +148,7 @@
     "save": "保存",
     "confirm": "确认",
     "cancel": "取消",
-    "finish": "完成",
+    "end": "结束",
     "tx": "交易",
     "name": "名称",
     "duration": "时长",
