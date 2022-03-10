@@ -1,5 +1,5 @@
 import React from 'react';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { toast } from 'react-toastify'
 import namehash from '@ensdomains/eth-ens-namehash'
 import { t } from 'i18next';
