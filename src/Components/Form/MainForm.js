@@ -37,7 +37,7 @@ class MainForm extends React.Component {
         "label": label,
         "level": 0,
         "status": "Unknown",
-        "tokenId": BigNumber.from(utils.id(label)).toString()
+        "tokenId": utils.id(label)
       })
     )
     setAndStoreNameInfo(nameInfo, false)

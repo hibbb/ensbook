@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -294,7 +294,7 @@ export const RegisterCell = (props) => {
 
 export const LookupCell = (props) => {
   const { conf, label, tokenId, network } = props
-
+  const tokenIdDec = BigNumber.from(tokenId).toString()
   // for td-lookup
   const { lookup } = conf.custom.display
   // When you modify lookupLinks, you also need to modify:
@@ -302,7 +302,7 @@ export const LookupCell = (props) => {
   // 2. the nm.tb.lookup filed of en.json and cn.json
   const lookupLinks = {
     "Etherscan": "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
-    "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
+    "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenIdDec}`,
     "Metadata": `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
     "eth.link": `https://${label}.eth.link/`,
     "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
