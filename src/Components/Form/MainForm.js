@@ -1,5 +1,5 @@
 import React from 'react';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { toast } from 'react-toastify'
 import namehash from '@ensdomains/eth-ens-namehash'
 import { t } from 'i18next';
@@ -37,7 +37,7 @@ class MainForm extends React.Component {
         "label": label,
         "level": 0,
         "status": "Unknown",
-        "tokenId": utils.id(label)
+        "tokenId": BigNumber.from(utils.id(label)).toString()
       })
     )
     setAndStoreNameInfo(nameInfo, false)

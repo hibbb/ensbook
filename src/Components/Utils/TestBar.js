@@ -1,18 +1,14 @@
 import React from 'react';
-import moment from 'moment'
+//import moment from 'moment'
+import { BigNumber, utils } from 'ethers';
 
 export default function TestBar(props) {
 
-  let regInfo = { a: "a1", b: "b1", c: "c1"}
-
   const testFunc1 = async () => {
-    let { b, a, c, d } = regInfo
-    console.log(a)
-    console.log(b)
-    console.log(c)
-    console.log(d)
-    const m = moment.duration(null, 'seconds').asYears().toFixed(1)
-    console.log(m)
+    const tid = utils.id('123')
+    console.log(tid)
+    const de = BigNumber.from(tid).toString()
+    console.log(de)
   }
 
   const testFunc2 = async () => {
