@@ -4,41 +4,37 @@
   "host": "remote",
   "repository": "https://github.com/hibbb/ensbook/",
   "custom": {
-    "operatorPrivateKey": [
-      "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
-    ],
-    "network": "mainnet",
-    "receiverAddress": "",
-    "infuraID": "bdd658fb48684fba924654acab554917",
     "pageTag": "",
     "pageTagColor": "#aaaaaa",
-    "commitTxConf": {
-      "gasPrice": 0,
-      "gasLimit": 50000,
-      "waitConfirms": 2
-    },
-    "regTxConf": {
-      "duration": 365,
-      "value": "",
-      "gasPrice": 0,
-      "gasLimit": 300000,
-      "waitConfirms": 2,
-      "registerWithConfig": true
-    },
-    "book": {
-      "timeSlot": 10
-    },
+    "infuraID": "bdd658fb48684fba924654acab554917",
     "display": {
-      "time": "expiresTime",
       "lookup": {
         "Etherscan": true,
         "Opensea": true,
         "Metadata": true,
         "eth.link": false,
         "DNSRelated": false
-      }
+      } 
     },
-    "donatePercentage": 5
+    "register": {
+      "receiver": "",
+      "duration": 1,
+      "registerWithConfig": true
+    },
+    "renew": {
+      "duration": 1
+    },
+    "premium": {
+      "priceRange": 1000
+    },
+    "wallet": {
+      "switch": false,
+      "operatorPrivateKey": [
+        "1f14e3f4ce6b83342c90e5602bf7f03ddb79cd2f78560e1ccab27181b228e2e5"   
+      ],
+      "network": "mainnet",
+      "gasPrice": 0
+    }
   },
   "fixed": {
     "ensConf": {
@@ -74,7 +70,8 @@
           "function register(string name, address owner, uint256 duration, bytes32 secret) payable",
           "function makeCommitmentWithConfig(string name, address owner, bytes32 secret, address resolver, address addr) pure returns (bytes32)",
           "function registerWithConfig(string name, address owner, uint256 duration, bytes32 secret, address resolver, address addr) payable",
-          "function rentPrice(string name, uint256 duration) view returns (uint256)"
+          "function renew(string name, uint duration) payable",
+          "function rentPrice(string name, uint duration) view returns (uint)"
         ]
       }
     }

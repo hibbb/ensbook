@@ -2,51 +2,62 @@
   "nm": {
     "sta": {
       "Open": "开放注册",
-      "Registering": "正在注册",
       "Normal": "正常使用",
       "Grace": "宽限期",
       "Booked": "已预约",
       "Premium": "溢价期",
       "Reopen": "重新开放",
-      "Unknown": "未知"
+      "Unknown": "未知",
+      "Registering": "正在注册",
+      "Renewing": "正在续费"
     }
   },
+  "header": {
+    "account": "操作员账户",
+    "balance": "操作员余额",
+    "language": "语言"
+  },
   "form": {
-    "holder": "输入域名标签 (多个标签用空格分开)",
-    "btn": "添加域名"
+    "holder": "输入名称的标签 (多个标签用空格分开)",
+    "btn": "添加名称"
   },
   "tb": {
     "th": {
       "no": "#",
-      "lb": "域名标签",
+      "lb": "名称标签",
       "lu": "相关信息",
       "sta": "状态",
       "reg": "注册",
       "del": "删除",
       "tips": {
-        "no": "按关注度排序",
+        "no": "按标签颜色排序",
         "lb": "按标签排序",
         "ti": "按时间排序",
         "sta": "按状态排序",
-        "update": "更新全部域名信息",
-        "regAll": "注册全部可注册域名",
-        "estAll": "估算可注册域名的总注册费用",
-        "remAll": "移除所有域名",
+        "renew": "批量续费",
+        "update": "更新信息",
+        "regAll": "批量注册",
+        "estAll": "批量注册费用预估",
+        "remAll": "移除所有名称",
         "hideNames": {
-          "hide": "隐藏不可注册的域名",
-          "show": "显示不可注册的域名"
+          "hide": "隐藏不可注册的名称",
+          "show": "展开所有名称"
         }
       }
     },
     "td": {
       "reg": "注册",
+      "continue": "继续", 
+      "reged": "已被注册", 
       "book": "预约",
       "tips": {
-        "lb": "点击标记此域名",
-        "sta": "点击更新此域名信息",
-        "est": "估算注册费用",
+        "lb": "点击改变标签颜色",
+        "renew": "给 {{label}}.eth 续费",
+        "est": "注册费用预估",
         "reg": "注册 {{label}}.eth",
         "reging": "正在注册中",
+        "continue": "继续完成注册流程",
+        "regStep": "注册流程共 3 个步骤, 目前已经完成第 {{regStep}} 个",
         "book": "预约注册 {{label}}.eth",
         "booked": "正在等待该域名重新开放注册",
         "cbook": "取消此次预约",
@@ -65,87 +76,98 @@
     "title": "自定义配置",
     "instructions": "配置说明",
     "instructionsUrl": "blob/main/README_CN.md#自定义配置",
-    "attention": "注意: 如果您对这些配置项不够了解, 我们建议您只修改 “全局” 和 “显示” 内的条目, 而将其它条目保持默认值。",
-    "global": {
-      "title": "全局",
-      "operatorPrivateKey": "操作员私钥",
-      "network": "网络",
-      "receiverAddress": "接收者地址",
-      "infuraID": "Infura ID",
+    "general": {
+      "title": "通用",
       "pageTag": "页面标记",
-      "pageTagColorTip": "为标记选择一个背景颜色"
+      "pageTagColorTip": "为标记选择一个背景颜色",
+      "infuraID": "Infura ID"
     },
-    "commit": {
-      "title": "请求",
-      "gasPrice": "Gas 价格",
-      "gasLimit": "Gas 上限",
-      "waitConfirms": "确认数"
+    "display": {
+      "lookup": "选择要显示的相关信息"
     },
     "register": {
       "title": "注册",
-      "duration": "时长",
-      "value": "ETH 数量",
-      "gasPrice": "Gas 价格",
-      "gasLimit": "Gas 上限",
-      "waitConfirms": "确认数",
+      "receiver": "名称接收者",
+      "duration": "默认时长",
       "registerWithConfig": "注册时进行配置"
     },
-    "book": {
-      "title": "预约注册",
-      "activeDuration": "启动区间",
-      "timeSlot": "时隙"
+    "renew": {
+      "title": "续期",
+      "duration": "默认时长"
     },
-    "display": {
-      "title": "显示",
-      "time": "时间显示",
-      "lookup": "信息查询显示"
+    "premium": {
+      "title": "溢价期",
+      "priceRange": "关注的价格区间"
     },
-    "donate": {
-      "title": "捐赠",
-      "donatePercentage": "百分比"
+    "customMode": {
+      "icon": "这个图标表示您当前使用的是自定义钱包模式",
+      "title": "自定义钱包模式",
+      "switch": "开关",
+      "operatorPrivateKey": "操作员私钥",
+      "network": "网络",
+      "gasPrice": "Gas 价格"
     }
   },
   "msg": {
-    "nameNormalizeError": "错误: {{errMsg}}",
-    "book": "{{duration}} 之后会再次检查 {{label}}.eth 的注册状态。",
-    "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 天。",
-    "register10": "{{label}}.eth 请求已经提交。",
-    "register11": {
-      "succeed": "步骤 1 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会自动进行一下步。",
-      "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
-    },
-    "register20": "步骤 2 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
-    "register30": {
-      "succeed": "步骤 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功, 并捐赠了 {{donationValue}} ETH。",
-      "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
-    },
-    "estimatePrice": "{{label}}.eth 注册费用预估 ≈ {{price}} ETH。",
-    "estimatePriceAll": "注册这些域名总费用预估 ≈ {{price}} ETH。",
-    "setAndStoreNameInfo": {
-      "succeed": "域名信息完成更新和保存。",
-      "fail": "域名信息保存失败。"
-    },
-    "setAndStoreConfInfo": {
-      "succeed": "配置信息完成更新和保存。",
-      "fail": "配置信息保存失败。"
-    }
+    "setAndStoreNameInfo": "名称信息完成更新和保存。"
   },
   "modal": {
+    "reg": {
+      "title": "注册 {{label}}.eth",
+      "tip": "您要注册的名称及信息如下: ",
+      "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 年。",
+      "register10": "{{label}}.eth 请求交易已经提交。",
+      "register11": {
+        "succeed": "步骤 1 / 3 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会进行一下步。",
+        "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
+      },
+      "register20": "步骤 2 / 3 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
+      "register30": "{{label}}.eth 注册交易已经提交。",
+      "register31": {
+        "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
+        "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
+      }
+    },
+    "regs": {
+      "title": "批量注册",
+      "tip": "您要注册的名称及信息如下: ",
+      "regsEnded": "批量注册进程已经结束。"
+    },
+    "renew": {
+      "title": "续费",
+      "tips": "您要续费的名称及信息如下",
+      "renew00": "即将为 {{label}}.eth 续费 {{duration}} 年。",
+      "renew10": "{{label}}.eth 续费交易已经提交。",
+      "renew11": {
+        "succeed": "{{label}}.eth 续费 {{txLink}} 已经完成。",
+        "fail": "{{label}}.eth 续费失败。你可以检查这笔 {{txLink}}。"
+      }
+    },
     "title": "需要确认",
-    "reg": "您确定注册 {{label}}.eth ? 该注册进程启动后, 请不要在注册完成前关闭这个页面。",
-    "regAll": "您确定注册这些域名?",
-    "removeNames": "您确定清空域名列表?"
+    "removeNames": "您确定清空名称列表?",
+    "errorNetwork": {
+      "title": "暂不支持该网络",
+      "text": "ENSBook 目前仅支持以太坊主网和 Ropsten 测试网, 请在您连接的钱包中切换网络, 或断开与钱包的连接。"
+    }
   },
   "c": {
+    "EMPTY": "",
     "true": "是",
     "false": "否",
     "reset": "重置",
     "save": "保存",
     "confirm": "确认",
     "cancel": "取消",
+    "end": "结束",
     "tx": "交易",
+    "name": "名称",
+    "duration": "时长",
+    "currentNetwork": "当前网络",
     "ropsten": "Ropsten",
     "mainnet": "主网",
+    "homestead": "主网",
+    "connect": "连接",
+    "disconnect": "断开连接",
     "relatedTime": "相关时间",
     "currentTime": "当前时间",
     "expiresTime": "到期时间",
@@ -156,6 +178,8 @@
     "seconds": "秒",
     "hours": "小时",
     "days": "天",
-    "percent": "%"
+    "years": "年",
+    "percent": "%",
+    "dollars": "美元"
   }
 }

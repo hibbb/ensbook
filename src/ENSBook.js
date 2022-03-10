@@ -1,140 +1,108 @@
-import React, {Component} from 'react'
-import { ethers, utils, Contract } from 'ethers'
-import confFile from './conf.json'
+import React from 'react'
+import { ethers, utils } from 'ethers'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import lt from 'long-timeout'
-import NamesDisplayTable from './NamesDisplayTable'
-import AddNamesForm from './AddNamesForm'
-import namehash from '@ensdomains/eth-ens-namehash'
-import ConfigureForm from './Utils/ConfigureForm'
-import MessageToasts from './Utils/MessageToasts'
-import LanguageSwitcher from './Utils/LanguageSwitcher'
-import AppTitle from './Utils/AppTitle'
-import packageJson from '../package.json'
-import { Github, Twitter } from 'react-bootstrap-icons';
+import Web3Modal from "web3modal";
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import { t } from 'i18next';
+import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo } from './Components/Global/globals'
+import Header from './Components/Header/Header'
+import MainForm from './Components/Form/MainForm'
+import MainTable from './Components/Table/MainTable'
+import Footer from './Components/Footer/Footer'
+import MessageToasts from './Components/Utils/MessageToasts'
+import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal'
 
-let provider
-let walletWithProvider
-let conf
+let conf = getConf()
+const defaultProvider = new ethers.providers.InfuraProvider("mainnet", conf.custom.infuraID)
+// store the newest lookupList to localstorage, keep the list in configform up to date.
+const lookupList = Object.keys(conf.custom.display.lookup)
+window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
 
-class ENSBook extends Component {
-  t = this.props.t
+let web3Modal
+
+const INITIAL_STATE = {
+  regMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerName process
+  regsMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerNames process
+  renewMsges: [{ time: moment(), type: "action", text: "renewBefore" }], // for renewName process
+  reconnecting: false,
+  fetching: false,
+  unsupported: false,
+  provider: defaultProvider,
+  signer: undefined,
+  type: "readonly",
+  address: undefined,
+  ensname: undefined,
+  network: "mainnet",
+  balance: undefined
+};
+
+class ENSBook extends React.Component {
 
   constructor(props) {
     super(props)
+    const nameInfo = JSON.parse(window.localStorage.getItem("nameInfo")) ?? []
+    this.state = { ...INITIAL_STATE, nameInfo }
+  }
 
-    try {
-      if (!window.localStorage) {
-        throw new Error("Your browser must support LocalStorage to use this APP.")
-      }
-    } catch (error) {
-      throw error
+  reconnectApp = async (updateNamesFlag = true) => {
+    this.setState({ reconnecting: true })
+    const { provider, signer, type } = await this.getProviderAndSigner()
+    this.setState({ provider, signer, type })
+
+    const networkname = (await provider.getNetwork()).name
+    if (!isSupportedChain(networkname)) {
+      return this.setState({ unsupported: true })
     }
 
-    // setState: nameInfo
-    const nameInfoStr = window.localStorage.getItem("nameInfo")
-    const nameInfo = nameInfoStr !== null ? JSON.parse(nameInfoStr) : []
-    // store the newest lookupList to localstorage, keep the list in configform up to date.
-    const lookupList = Object.keys(confFile.custom.display.lookup)
-    window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
-    // setState: conf
-    if (confFile.host === "remote") {
-      conf = JSON.parse(window.localStorage.getItem("confInfo"))
-      if (!conf) {
-        conf = confFile
-        this.storeContent("confInfo", JSON.stringify(conf))
-      }      
-    } else {
-      conf = confFile
+    const network = networkname === "homestead" ? "mainnet" : networkname
+    const address = signer ? await signer.getAddress() : null
+    const balance = address ? utils.formatEther(await provider.getBalance(address)) : null
+    const ensname = address ? await provider.lookupAddress(address) : null
+    this.setState({ address, network, balance, ensname })
+    this.setState({ reconnecting: false })
+
+    if (updateNamesFlag) {
+      await this.updateNames()
+    } 
+  }
+
+  disconnectApp = async () => {
+    const { provider } = this.state
+    await web3Modal?.clearCachedProvider()
+    // Disconnect wallet connect provider
+    if (provider && provider.disconnect) {
+      provider.disconnect()
     }
-    //setState walletInfo
-    try {
-      if (conf.custom.infuraID.trim().length >= 1) {
-        provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-        walletWithProvider = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
-      } else {
-        throw new Error("You must correctly configure the conf.json file at first.")
-      }
-    } catch (error) {
-      throw error
+    this.setState({ ...INITIAL_STATE })
+    this.updateNames()
+  }
+
+  setAndStoreConfInfo = (newConf) => { 
+    conf = newConf  // renew the global variable: conf
+    window.localStorage.setItem("confInfo", JSON.stringify(conf))
+  }
+
+  setAndStoreNameInfo = (nameInfo, messageShowFlag = true) => { // update nameInfo in state and store it
+    this.setState({ nameInfo })
+    window.localStorage.setItem("nameInfo", JSON.stringify(nameInfo))
+    if (messageShowFlag) {
+      this.MessageToasts.messageShow("setAndStoreNameInfo", t('msg.setAndStoreNameInfo'))  
     }
-    const walletInfo = { address: walletWithProvider.address, balance: "" }
-    this.state = {nameInfo: nameInfo, walletInfo: walletInfo}
-  }
-
-  storeContent = (key, value) => {  // store content at localStorage and return a bool
-    window.localStorage.setItem(key, value)
-    return true  
-  }
-
-  getAndStoreWalletInfo = async () => { // update walletInfo in state
-    const walletAddress = walletWithProvider.address
-    const walletBalance = utils.formatEther(await walletWithProvider.getBalance())
-    const walletInfo = { "address": walletAddress, "balance": walletBalance }
-    this.setState({walletInfo: walletInfo})
-    return walletInfo
-  }
-
-  setAndStoreNameInfo = (value, messageShow = true) => { // update nameInfo in state and store it
-    this.setState({"nameInfo": value})
-    const isStored = this.storeContent("nameInfo", JSON.stringify(value))
-    if (messageShow) {
-      this.MessageToasts.messageShow(
-        "setAndStoreNameInfo", 
-        isStored ? this.t('msg.setAndStoreNameInfo.succeed') : this.t('msg.setAndStoreNameInfo.fail'),
-        isStored ? "msg-default" : "msg-warning",
-        "true",
-        "5000"
-      )  
-    }
-  }
-
-  setAndStoreConfInfo = (value) => { // update confInfo in variable "conf" and store it
-    const isStored = this.storeContent("confInfo", JSON.stringify(value))
-    if (isStored) {
-      conf = value
-      provider = new ethers.providers.InfuraProvider(conf.custom.network, conf.custom.infuraID)
-      walletWithProvider = new ethers.Wallet(conf.custom.operatorPrivateKey[0], provider);
-    }
-    this.MessageToasts.messageShow(
-      "setAndStoreConfInfo", 
-      isStored ? this.t('msg.setAndStoreConfInfo.succeed') : this.t('msg.setAndStoreConfInfo.fail'),
-      isStored ? "msg-default" : "msg-warning"
-    )
-  }
-
-  resetAndStoreConfInfo = () => {
-    this.setAndStoreConfInfo(confFile)
-  }
-
-  getLabels = () => {
-    return this.state.nameInfo.map(item => item.label).join(' ')
   }
 
   getExpiresTimeStamp = async (label) => {
-    const BaseRegImpCon = new Contract(
-      conf.fixed.contract.addr[conf.custom.network].BaseRegImp, 
-      conf.fixed.contract.abi.BaseRegImp, 
-      walletWithProvider)
+    const { provider, network } = this.state
+    const BaseRegImpCon = getBaseRegImpCon(provider, network, conf)
     const tokenId = utils.id(label)
     const expiresTimeBignumber = await BaseRegImpCon.nameExpires(tokenId) // return a BigNumber Object
     return expiresTimeBignumber.toNumber() // unix timestamp
   }
 
-  logOperators = async () => {
-    let keys = conf.custom.operatorPrivateKey
-    console.log('Operators:')
-    for (let i = 0; i < keys.length; i ++) {
-      const op = (new ethers.Wallet(keys[i])).address
-      console.log('%s...%s : %s', op.slice(0, 7), op.slice(-5), utils.formatEther(await provider.getBalance(op)).slice(0,7))
-    }
-  }
-
-  updateName = async (index, messageShow = true) => {
-    const {nameInfo} = this.state
+  updateName = async (index, messageShowFlag = true) => {
+    const { nameInfo } = this.state
     const expiresTimeStamp = await this.getExpiresTimeStamp(nameInfo[index].label) // unix timestamp
-    const nowT = moment()
     const expiresTime = moment.unix(expiresTimeStamp)
     const releaseTime = moment.unix(expiresTimeStamp).add(90, 'days')
 
@@ -146,351 +114,507 @@ class ENSBook extends Component {
       nameInfo[index].expiresTime = expiresTime.unix()
       nameInfo[index].releaseTime = releaseTime.unix()
       
-      if (nowT <= expiresTime) {
+      if (moment().isSameOrBefore(expiresTime)) {
         nameInfo[index].status = 'Normal'
-      } else if (nowT <= releaseTime) {
+      } else if (moment().isSameOrBefore(releaseTime)) {
         nameInfo[index].status = 'Grace'
-      } else if (nowT <= releaseTime.add(28, 'days')) { // here releaseTime itself add 28 days
+      } else if (moment().subtract(28, 'days').isSameOrBefore(releaseTime)) { 
         nameInfo[index].status = 'Premium'
-      } else if (nowT > releaseTime) {
+      } else if (moment().subtract(28, 'days').isAfter(releaseTime)) {
         nameInfo[index].status = 'Reopen'
       } else {
         nameInfo[index].status = 'Unknown'
       }
     }
-    this.setAndStoreNameInfo(nameInfo, messageShow)
+
+    if (nameInfo[index].regStep > 0) {
+      nameInfo[index].regStep = await updateRegStep(nameInfo[index].label, nameInfo[index].regStep, this.state.provider)
+    }
+
+    this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     return expiresTimeStamp
   }
 
-  updateNameByLabel = async (label, messageShow = true) => {
+  updateNameByLabel = async (label) => {
     const index = this.state.nameInfo.findIndex(item => item.label === label)
-    return this.updateName(index, messageShow)
+    return this.updateName(index)
   }
 
-  updateNames = async (messageShow = true) => {
+  updateBalance = async () => {
+    this.setState({ balance: utils.formatEther(await this.state.signer.getBalance()) }) 
+  }
+
+  updateNames = async (messageShowFlag = true) => {
     this.state.nameInfo.map(async (row, index) => {
-      return await this.updateName(index, messageShow)
+      return await this.updateName(index, messageShowFlag)
     })
-    this.getAndStoreWalletInfo()
   }
 
-  addNames = async (labels) => {
-    const {nameInfo} = this.state
-    labels = labels.replace(/[,.'"?!@#$%^&*()]/g, ' ').trim()
-    if (labels.length < 1) {
-      return false
-    }
-    // create an Array(originLabelsSet) including the original labels
-    const originLabelsSet = new Set()
-    nameInfo.map(row => originLabelsSet.add(row.label))
-    // split the string by spaces to labels and remove duplicates
-    const newLabelsSet = new Set(labels.split(/\s+/));
-    // only retain the labels whose length >= 3
-    let newLabelsArr = [...newLabelsSet].filter(label => label.length >= 3)
-    try {
-      newLabelsArr.map((label, index) => newLabelsArr[index] = namehash.normalize(label))
-    } catch (err) {
-      this.MessageToasts.messageShow(
-        "nameNormalizeError", 
-        this.t('msg.nameNormalizeError', {errMsg: err.message}),
-        "msg-warning"
-      )
-    }
-    // caculate the differences between the new and original labels, to avoid duplicates 
-    let diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]; 
-
-    const originNameInfoLen = nameInfo.length
-
-    diffLabelsArr.map(label => 
-      nameInfo.push({
-        "label": label,
-        "level": 0,
-        "status": "Unknown",
-        "tokenId": utils.id(label)
-      })
-    )
-    this.setState({nameInfo: nameInfo})
-
-    // update the status of newly added names
-    for(let i = originNameInfoLen; i < nameInfo.length; i++) {
-      this.updateName(i)
-    }
-  }
-
-  levelUp = (index) => {
-    const {nameInfo} = this.state
-    nameInfo[index].level = (nameInfo[index].level + 1) % 2
-    this.setAndStoreNameInfo(nameInfo, false)
-  } 
-
-  register = async (label, booked = false) => {
-    let owner = conf.custom.receiverAddress      // address
-    let duration = conf.custom.regTxConf.duration    // days
-    let ourValue = conf.custom.regTxConf.value  // Ether
-
-    const ETHRegCtrlCon = new Contract(
-      conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
-      conf.fixed.contract.abi.ETHRegCtrl, 
-      walletWithProvider)
-    // set the status of the name to 'Regsitering', but no storing
-    const nameInfo = this.state.nameInfo
-    nameInfo.find(item => item.label === label).status = booked ? 'Booked' : 'Registering'
-    this.setState({nameInfo: nameInfo})
-
-    owner = owner.trim().length < 1 ? walletWithProvider.address : owner
-    duration = Math.max(duration, conf.fixed.ensConf.MIN_REGISTRATION_DURATION)
-    const durationSeconds = moment.duration(duration, 'days').asSeconds()
-
-    const secret = ethers.Wallet.createRandom().privateKey
-    //secret = ethers.Wallet.createRandom().privateKey.slice(0, 54) + "eb" + moment().format("X")
-    this.storeContent("lastCommitSecret", secret)
-
-    let resolverAddr = "0x0000000000000000000000000000000000000000"
-    let resolveToAddr = "0x0000000000000000000000000000000000000000"
-    if (conf.custom.regTxConf.registerWithConfig) {
-      resolverAddr = conf.fixed.contract.addr[conf.custom.network].PubRes
-      resolveToAddr = owner
+  registerName = async (label, duration, regFrom = 0, regTo = 3) => {
+    if (regFrom >= regTo) {
+      return console.log("Warning: regFrom must < regTo.")
     }
 
-    let commitOverrides = {} // config overrides 
-    let regOverrides = {}
+    const { provider, signer, address, network, nameInfo } = this.state
+    const index = nameInfo.findIndex(item => item.label === label)
 
-    this.MessageToasts.messageShow(
-      "register00", 
-      this.t('msg.register00', { label: label, owner: owner.substr(0, 7) + '...', duration: duration })
-    )
+    let regMsges = [{ 
+      time: moment(), 
+      type: "action", 
+      text: "regStarted" 
+    }]
+    this.setState({ regMsges })
 
-    // Step 1.
-    if (conf.custom.commitTxConf.gasPrice > 0) { // conf.custom.commitTxConf.gasPrice: gwei
-      commitOverrides.gasPrice = utils.parseUnits(conf.custom.commitTxConf.gasPrice.toString(), 'gwei')
-    }
-    if (conf.custom.commitTxConf.gasLimit > 0) {
-      commitOverrides.gasLimit = conf.custom.commitTxConf.gasLimit
-    }
-    let ourCommitment = await ETHRegCtrlCon.makeCommitmentWithConfig(label, owner, secret, resolverAddr, resolveToAddr)
-    let tx10 = await ETHRegCtrlCon.commit(ourCommitment, commitOverrides)
-    this.MessageToasts.messageShow(
-      "register10", 
-      this.t('msg.register10', { label: label })
-    )
-    let tx11 = await provider.waitForTransaction(tx10.hash, conf.custom.commitTxConf.waitConfirms)
-    let commitTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx10.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
-    // if step 1 failed, cancel the process.
-    if (tx11.status) {
-      this.MessageToasts.messageShow(
-        "register11", 
-        this.t('msg.register11.succeed', { label: label, txLink: commitTxLink}),
-        "msg-default",
-        "true",
-        "60000"
-      )
-    } else {
-      this.MessageToasts.messageShow(
-        "register11", 
-        this.t('msg.register11.fail', { label: label, txLink: commitTxLink }),
-        "msg-fail",
-        "false"
-      )  
-      return await this.updateNameByLabel(label) 
-    }
+    const ETHRegCtrlCon = getETHRegCtrlCon(signer, network, conf)
 
-    // Step 2.
-    const wait = ms => new Promise(resolve => lt.setTimeout(resolve, ms)) 
-    // long-timeout is necessary for >24.8 days
-    if (booked) {
-      let expiresTimeStamp = await this.getExpiresTimeStamp(label)   // unix timestamp
-      let diffT = moment.unix(expiresTimeStamp).add(90, 'days').diff(moment())
-      let refreshT = parseInt(diffT / 2)   // as milisecs
-      const activeDuration = moment.duration(24, 'hours')   // as milisecs
-  
-      this.bookFlags[label] = true
-      // Cycle to get the latest status and prepare for registration
-      while (diffT < activeDuration && diffT > 30000 && this.bookFlags[label]) {
-        this.MessageToasts.messageShow(
-          "book", 
-          this.t('msg.book', { label: label, duration: moment.duration(refreshT).toISOString() })
+    duration = duration ?? moment.duration(conf.custom.register.duration, 'years').asSeconds()
+    duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
+
+    let regInfo = {
+      owner: undefined,
+      duration: duration,
+      secret: undefined,
+      resolver: "0x0000000000000000000000000000000000000000",
+      addr: "0x0000000000000000000000000000000000000000",
+      commitment: undefined
+    }    
+
+    // prepare of regNew or regFrom*
+
+    const regPrepare = async (regFrom) => {
+      if (regFrom <= 0) {
+        regInfo.owner = utils.isAddress(conf.custom.register.receiver) ? conf.custom.register.receiver : address
+
+        regInfo.secret = ethers.Wallet.createRandom().privateKey
+        window.localStorage.setItem("lastCommit", `{ name: ${label}, owner: ${regInfo.owner}, secret: ${regInfo.secret} }`)
+
+        if (conf.custom.register.registerWithConfig) {
+          regInfo.resolver = conf.fixed.contract.addr[network].PubRes
+          regInfo.addr = regInfo.owner
+        }
+
+        regMsges.push({ time: moment(), type: "info", text: t('modal.reg.register00', { 
+          label: label, 
+          owner: regInfo.owner.substr(0, 7) + '...', 
+          duration: moment.duration(duration, 'seconds').asYears().toFixed(2)
+          }) })
+        this.setState({ regMsges })
+
+        // makeCommitmentWithConfig
+        regInfo.commitment = await ETHRegCtrlCon.makeCommitmentWithConfig(
+          label, 
+          regInfo.owner, 
+          regInfo.secret, 
+          regInfo.resolver, 
+          regInfo.addr
         )
-        await wait(refreshT)
-        expiresTimeStamp = await this.getExpiresTimeStamp(label)
-        nameInfo.find(item => item.label === label).expiresTime = expiresTimeStamp
-        this.setState({nameInfo: nameInfo})    
-        diffT = moment.unix(expiresTimeStamp).add(90, 'days').diff(moment())
-        refreshT = parseInt(diffT / 2)
-      }
-      this.bookFlags[label] = false
 
-      if (diffT < 30001 && diffT > 0) {
-        await wait(diffT + conf.custom.book.timeSlot * 1000)
+        // init regInfo
+        storeRegInfo(label, regInfo)
+        return regFrom
+      }
+      else {
+        regInfo = { ...getRegInfo(label), duration: duration }  // support inputing a new duration
+        storeRegInfo(label, regInfo)
+
+        regMsges.push({ time: moment(), type: "info", text: t('modal.reg.register00', { 
+          label: label, 
+          owner: regInfo.owner.substr(0, 7) + '...', 
+          duration: moment.duration(regInfo.duration, 'seconds').asYears().toFixed(2)
+          }) 
+        })
+        this.setState({ regMsges })
+
+        return await updateRegStep(label, regFrom, provider)
+      }
+    }   
+
+    // *** regStep 0 -> 0.5
+
+    const regFrom0 = async () => {    
+      let commitOverrides = {} // config overrides 
+      if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
+        commitOverrides.gasPrice = utils.parseUnits(conf.custom.wallet.gasPrice.toString(), 'gwei')
+      }
+      commitOverrides.gasLimit = 70000
+
+      try { // submit the 1st transaction
+        const commitTx = await ETHRegCtrlCon.commit(regInfo.commitment, commitOverrides)
+        regInfo.commitTxHash = commitTx.hash
+      } catch(e) {
+        console.log(e)
+        nameInfo[index].regStep = 0
+        this.setState({ nameInfo })
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regSuspended" 
+        }
+        this.setState({ regMsges })
+        return nameInfo[index].regStep
+      }
+
+      //regInfo = { ...regInfo, commitTxHash: tx10.hash }
+      storeRegInfo(label, regInfo)
+
+      nameInfo[index].regStep = 0.5
+      this.setAndStoreNameInfo(nameInfo, false)
+      
+      if (regTo <= 0.5) { return nameInfo[index].regStep } 
+      return await regFrom05()
+    }
+
+    // *** regStep 0.5 -> 1 / 0
+
+    const regFrom05 = async () => {
+      regMsges.push({ 
+        time: moment(), 
+        type: "info", 
+        text: t('modal.reg.register10', { label: label }) 
+      })
+      this.setState({ regMsges })
+
+      const commitTxReceipt = await provider.waitForTransaction(regInfo.commitTxHash, 2) // waitConfirms: 2
+      const commitTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + regInfo.commitTxHash + '" target="_blank" rel="noreferrer">' + t('c.tx') + '</a>'
+      
+      if (commitTxReceipt.status) {
+        nameInfo[index].regStep = 1
+        this.setAndStoreNameInfo(nameInfo, false)
+
+        regMsges.push({ 
+          time: moment(), 
+          type: "info", 
+          text: t('modal.reg.register11.succeed', { label: label, txLink: commitTxLink }) 
+        })
+        this.setState({ regMsges })
+      } 
+      else { // if step 1 failed, cancel the process.
+        nameInfo[index].regStep = 0
+        this.setAndStoreNameInfo(nameInfo, false)
+
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regFailed" 
+        }
+        regMsges.push({ 
+          time: moment(), 
+          type: "fail", 
+          text: t('modal.reg.register11.fail', { label: label, txLink: commitTxLink }) 
+        })
+        this.setState({ regMsges })
+        return nameInfo[index].regStep
+      }
+
+      if (regTo <= 1) { return nameInfo[index].regStep } 
+      return await regFrom1()
+    }
+
+    // *** regStep 1 -> 2
+
+    const regFrom1 = async () => {
+      // long-timeout is necessary for durations >24.8 days
+      const wait = ms => new Promise(resolve => lt.setTimeout(resolve, ms)) 
+      await wait(conf.fixed.ensConf.minCommitmentAge * 1000)
+      
+      nameInfo[index].regStep = 2
+      this.setAndStoreNameInfo(nameInfo, false)
+
+      if (regTo <= 2) { return nameInfo[index].regStep } 
+      return await regFrom2()
+    }
+
+    // *** regStep 2 -> 2.5
+
+    const regFrom2 = async () => {
+      regMsges.push({ 
+        time: moment(), 
+        type: "info", 
+        text: t('modal.reg.register20', { label: label }) 
+      })
+      this.setState({ regMsges })
+
+      let regOverrides = {}
+      if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
+        regOverrides.gasPrice = utils.parseUnits(String(conf.custom.wallet.gasPrice), 'gwei')
+      }
+      regOverrides.gasLimit = conf.custom.register.registerWithConfig ? 300000 : 220000
+      regOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(105).div(100)
+
+      try { // submit the 2nd transaction
+        const regTx = await ETHRegCtrlCon.registerWithConfig(
+          label, 
+          regInfo.owner, 
+          regInfo.duration, 
+          regInfo.secret, 
+          regInfo.resolver, 
+          regInfo.addr, 
+          regOverrides
+        )
+        regInfo.regTxHash = regTx.hash
+      } catch(e) {
+        console.log(e)
+        nameInfo[index].regStep = 2
+        this.setState({ nameInfo })
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regSuspended" 
+        }
+        this.setState({ regMsges })
+        return nameInfo[index].regStep
+      }
+
+      //regInfo = { ...regInfo, regTxHash: tx30.hash }
+      storeRegInfo(label, regInfo)
+      nameInfo[index].regStep = 2.5
+      this.setAndStoreNameInfo(nameInfo, false)
+
+      if (regTo <= 2.5) { return nameInfo[index].regStep } 
+      return await regFrom25()
+    }
+
+    // *** regStep 2.5 -> 3 / 2
+
+    const regFrom25 = async () => {
+      regMsges.push({ 
+        time: moment(), 
+        type: "info", 
+        text: t('modal.reg.register30', { label: label }) 
+      })
+      this.setState({ regMsges })
+
+      const regTxReceipt = await provider.waitForTransaction(regInfo.regTxHash, 1) // waitConfirms: 2
+      const regTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + regInfo.regTxHash + '" target="_blank" rel="noreferrer">' + t('c.tx') + '</a>'
+      // insert regInfo: regTx
+      if (regTxReceipt.status) {
+        nameInfo[index].regStep = 3
+        this.setAndStoreNameInfo(nameInfo, false)
+
+        regMsges.push({ 
+          time: moment(), 
+          type: "info", 
+          text: t('modal.reg.register31.succeed', { label: label, regTxLink: regTxLink }) 
+        })
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regSucceeded" 
+        }
+        this.setState({ regMsges })
+        return nameInfo[index].regStep
+      } 
+      else {
+        nameInfo[index].regStep = 2
+        this.setAndStoreNameInfo(nameInfo, false)
+
+        regMsges.push({ 
+          time: moment(),
+          type: "info", 
+          text: t('modal.reg.register31.fail', { label: label, regTxLink: regTxLink }) 
+        })
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regFailed" 
+        }
+        this.setState({ regMsges })
+        return nameInfo[index].regStep
+      }
+      // regMsges = INITIAL_STATE.regMsges will be executed in registerNameEnd()
+    }
+
+    const updatedRegFrom = await regPrepare(regFrom)
+
+    if (updatedRegFrom === 2.5) return await regFrom25()
+    if (updatedRegFrom === 2) return await regFrom2()
+    if (updatedRegFrom === 1) return await regFrom1()
+    if (updatedRegFrom === 0.5) return await regFrom05()
+    return await regFrom0()
+  }
+
+  registerNameEnd = (label) => {
+    this.setState({ regMsges: INITIAL_STATE.regMsges })
+    this.updateNameByLabel(label)
+    this.updateBalance()
+  }
+
+  registerNames = async (duration) => {
+    const registrableNames = getRegistrableNames(this.state.nameInfo)
+
+    let regsMsges = [{ 
+      time: moment(), 
+      type: "action", 
+      text: "regsStarted" 
+    }]
+    this.setState({ regsMsges })
+
+    for (let i = 0; i < registrableNames.length; i++) {
+      const regResult = await this.registerName(registrableNames[i].label, duration)
+      if (regResult === 3) {
+        regsMsges.push({
+          time: moment(),
+          type: "succeeded",
+          text: registrableNames[i].label + '.eth'
+        })
+        this.setState({ regsMsges })
       } else {
-        return await this.updateNameByLabel(label)
+        regsMsges.push({
+          time: moment(),
+          type: "failed",
+          text: registrableNames[i].label + '.eth'
+        })
+        this.setState({ regsMsges })
       }
-    } else {
-      // wait for 2nd pharse of registration
-      await wait(conf.fixed.ensConf.minCommitmentAge * 1000) 
-    }
-    this.MessageToasts.messageShow(
-      "register20", 
-      this.t('msg.register20', { label: label }),
-    )
-
-    // Step 3.
-    if (booked) {
-      nameInfo.find(item => item.label === label).status = 'Registering'
-      this.setState({nameInfo: nameInfo})  
-    }
-    if (conf.custom.regTxConf.gasPrice > 0) { // conf.custom.regTxConf.gasPrice: gwei
-      regOverrides.gasPrice = utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
-    }
-    if (conf.custom.regTxConf.gasLimit > 0) {
-      regOverrides.gasLimit = conf.custom.regTxConf.gasLimit
-    }
-    if (ourValue.length < 1 || ourValue === '0') {
-      ourValue = await ETHRegCtrlCon.rentPrice(label, durationSeconds)
-      regOverrides.value = ourValue.mul(100 + conf.custom.donatePercentage).div(100)
-    } else {
-      regOverrides.value = utils.parseEther(ourValue)
     }
 
-    const tx30 = await ETHRegCtrlCon.registerWithConfig(label, owner, durationSeconds, secret, resolverAddr, resolveToAddr, regOverrides)
-    const tx31 = await provider.waitForTransaction(tx30.hash, conf.custom.regTxConf.waitConfirms)
-    const donateEth = tx31.status ? await this.donate(tx30.value, walletWithProvider) : 0
-    const regTxLink = '<a href="' + conf.fixed.scanConf[conf.custom.network] + 'tx/' + tx30.hash + '" target="_blank" rel="noreferrer">' + this.t('c.tx') + '</a>'
-
-    if (tx31.status) {
-      this.MessageToasts.messageShow(
-        "register30", 
-        this.t('msg.register30.succeed', { label: label, regTxLink: regTxLink, donationValue: donateEth }),
-        "msg-success",
-        "false"
-      )
-    } else {
-      this.MessageToasts.messageShow(
-        "register30", 
-        this.t('msg.register30.fail', { label: label, regTxLink: regTxLink }),
-        "msg-fail",
-        "false"
-      )      
-    }
-  
-    // automaticly update the table after a registration
-    this.getAndStoreWalletInfo()
-    return await this.updateNameByLabel(label)
-  }
-
-  // Donate a few ethers to the author only when the donatePercentage > 0 as well as your register price >= 0.05 eth
-  donate = async (value, wallet) => {
-    let donateETH = 0
-    if (conf.custom.donatePercentage > 0 && value.gte(utils.parseEther('0.05'))) {
-      const donateValue = value.mul(conf.custom.donatePercentage).div(100)
-      await wallet.sendTransaction({to: conf.author, value: donateValue})
-      donateETH = utils.formatEther(donateValue)
-    }
-    return donateETH
-  }
-
-  getRegistrableNames = () => {
-    return this.state.nameInfo.filter((nameItem, i) => {
-      return nameItem.status === 'Open' || nameItem.status === "Reopen" || nameItem.status === "Premium"
+    regsMsges.push({
+      time: moment(),
+      type: "ended",
+      text: t('modal.regs.regsEnded')
     })
-  }
-
-  registerAll = async () => {
-    const registrableNames = this.getRegistrableNames()
-    for (let i = 0; i < registrableNames.length; i++) {
-      await this.register(registrableNames[i].label)
+    regsMsges[0] = { 
+      time: moment(), 
+      type: "action", 
+      text: "regsEnded" 
     }
+    this.setState({ regsMsges })
+
+    this.setState({ regMsges: INITIAL_STATE.regMsges })
   }
 
-  bookFlags = {}
-
-  book = (label) => {
-    this.register(label, true)
+  registerNamesEnd = async () => {
+    this.setState({ regsMsges: INITIAL_STATE.regsMsges })
+    this.updateBalance()
+    this.updateNames()
   }
 
-  cancelBook = (index) => {
-    this.bookFlags[this.state.nameInfo[index].label] = false
-    this.updateName(index)
-  }
 
-  estimatePrice = async (
-    label, 
-    messageShow = true, 
-    commitGasPrice = null,
-    regGasPrice = null
-    ) => {
-    const ETHRegCtrlCon = new Contract(
-      conf.fixed.contract.addr[conf.custom.network].ETHRegCtrl, 
-      conf.fixed.contract.abi.ETHRegCtrl, 
-      walletWithProvider
-    )
-    const duration = (
-      conf.custom.regTxConf.duration < conf.fixed.ensConf.MIN_REGISTRATION_DURATION
-      ? conf.fixed.ensConf.MIN_REGISTRATION_DURATION
-      : conf.custom.regTxConf.duration
-    )
-    const commitGasLimit = "50000"
-    const regGasLimit = "270000"
-    const durationSec = moment.duration(duration, 'days').asSeconds()
-    const rent = await ETHRegCtrlCon.rentPrice(label, durationSec)
+  // bookFlags = {}
 
-    commitGasPrice = commitGasPrice ?? (
-      conf.custom.commitTxConf.gasPrice > 0 
-      ? utils.parseUnits(conf.custom.commitTxConf.gasPrice.toString(), 'gwei')
-      : await provider.getGasPrice()
-    )
-    regGasPrice = regGasPrice ?? (
-      conf.custom.regTxConf.gasPrice > 0 
-      ? utils.parseUnits(conf.custom.regTxConf.gasPrice.toString(), 'gwei')
-      : await provider.getGasPrice()
-    )
+  // book = (label) => {
+  // }
 
-    const commitPrice = commitGasPrice.mul(commitGasLimit)
-    const regPrice = regGasPrice.mul(regGasLimit)
-    const priceWei = commitPrice.add(regPrice).add(rent)
-    const priceEther = utils.formatEther(priceWei)
+  // cancelBook = (index) => {
+  //   this.bookFlags[this.state.nameInfo[index].label] = false
+  //   this.updateName(index)
+  // }
 
-    if (messageShow) {
-      this.MessageToasts.messageShow(
-        "estimatePrice", 
-        this.t('msg.estimatePrice', { label: label, price: priceEther.slice(0, 7) }),
-      )  
+  renewName = async (label, duration) => {
+    const { provider, signer, network } = this.state
+
+    duration = duration ?? moment.duration(conf.custom.renew.duration, 'years').asSeconds()
+    const ETHRegCtrlCon = getETHRegCtrlCon(signer, network, conf)
+
+    let renewMsges = [{ 
+      time: moment(), 
+      type: "action", 
+      text: "renewStarted" 
+    }]
+    renewMsges.push({ 
+      time: moment(), 
+      type: "info", 
+      text: t('modal.renew.renew00', { 
+        label: label, 
+        duration: moment.duration(duration, 'seconds').asYears().toFixed(2)
+      }) 
+    })
+    this.setState({ renewMsges })
+
+    let renewTx
+    let renewOverrides = {}
+    if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
+      renewOverrides.gasPrice = utils.parseUnits(String(conf.custom.wallet.gasPrice), 'gwei')
     }
-    return priceWei
-  }
+    renewOverrides.gasLimit = 120000   // !!!!!
+    renewOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(105).div(100)
 
-  estimatePriceAll = async () => {
-    let cg = null
-    let rg = null
-    const cccg = conf.custom.commitTxConf.gasPrice
-    const ccrg = conf.custom.regTxConf.gasPrice
+    try { // submit the 2nd transaction
+      renewTx = await ETHRegCtrlCon.renew(label, duration, renewOverrides)
+      renewMsges.push({
+        time: moment(), 
+        type: "info", 
+        text: t('modal.renew.renew10', { label: label})
+      }) 
+      this.setState({ renewMsges })
+    } catch(e) {
+      console.log(e)
+      renewMsges[0] = {
+        time: moment(), 
+        type: "action", 
+        text: "renewSuspended" 
+      }
+      this.setState({ renewMsges })
+      return
+    }
+    
+    const renewTxReceipt = await provider.waitForTransaction(renewTx.hash, 1)
+    const renewTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + renewTx.hash + '" target="_blank" rel="noreferrer">' + t('c.tx') + '</a>'
 
-    if (cccg > 0 && ccrg > 0) {
-      cg = utils.parseUnits(cccg.toString(), 'gwei')
-      rg = utils.parseUnits(ccrg.toString(), 'gwei')
+    if (renewTxReceipt.status) {
+      renewMsges.push({
+        time: moment(), 
+        type: "info", 
+        text: t('modal.renew.renew11.succeed', { label: label, txLink: renewTxLink })
+      }) 
+      renewMsges[0] = { 
+        time: moment(), 
+        type: "action", 
+        text: "renewSucceeded" 
+      }
+      this.setState({ renewMsges })
     } else {
-      const gasPrice = await provider.getGasPrice()
-      cg = cccg > 0 ? utils.parseUnits(cccg.toString(), 'gwei') : gasPrice
-      rg = ccrg > 0 ? utils.parseUnits(ccrg.toString(), 'gwei') : gasPrice
+      renewMsges.push({
+        time: moment(), 
+        type: "info", 
+        text: t('modal.renew.renew11.fail', { label: label, txLink: renewTxLink })  
+      }) 
+      renewMsges[0] = { 
+        time: moment(), 
+        type: "action", 
+        text: "renewFailed" 
+      }
+      this.setState({ renewMsges })
     }
+  }
 
-    const registrableNames = this.getRegistrableNames()
-    let priceWei = ethers.BigNumber.from(0)
+  renewNameEnd = (label) => {
+    this.setState({ renewMsges: INITIAL_STATE.renewMsges })
+    this.updateNameByLabel(label)
+    this.updateBalance()
+  }
+
+  estimateCost = async (label, duration) => {
+    const { provider, network } = this.state
+
+    duration = duration ?? moment.duration(conf.custom.register.duration, 'years').asSeconds()
+    duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
+    const ETHRegCtrlCon = getETHRegCtrlCon(provider, network)
+    const rent = await ETHRegCtrlCon.rentPrice(label, duration)
+
+    const gasPrice = (conf.custom.register.gasPrice > 0 
+      ? utils.parseUnits(conf.custom.register.gasPrice.toString(), 'gwei')
+      : await provider.getGasPrice())
+    const gasFee = gasPrice.mul(50000 + 270000)  // commitGasLimit + regGasLimit
+    const costWei = gasFee.add(rent)
+
+    return costWei
+  }
+
+  estimateCosts = async () => {
+    const registrableNames = getRegistrableNames(this.state.nameInfo)
+    let costWei = ethers.BigNumber.from(0)
+
     for (let i = 0; i < registrableNames.length; i++) {
-      priceWei = priceWei.add(
-        await this.estimatePrice(registrableNames[i].label, false, cg, rg)
-      )
+      costWei = costWei.add(await this.estimateCost(registrableNames[i].label))
     }
-    const priceEther = utils.formatEther(priceWei)
-    this.MessageToasts.messageShow(
-      "estimatePriceAll", 
-      this.t('msg.estimatePriceAll', { price: priceEther.slice(0, 7) }),
-    )
-    return priceWei
+    return costWei
   }
 
   removeName = (index) => {
-    const {nameInfo} = this.state
-    Promise.all(nameInfo.filter((nameItem, i) => {return i !== index}))
+    const { nameInfo } = this.state
+    //removeRegInfo(nameInfo[index].label)
+    Promise.all(nameInfo.filter((item, i) => {return i !== index}))
     .then((nameInfo) => {
       this.setAndStoreNameInfo(nameInfo)
     })
@@ -500,76 +624,120 @@ class ENSBook extends Component {
     this.setAndStoreNameInfo([])
   }
 
+  // getProviderAndSigner() return a provider, a signer and a wallet type.
+  // wallet type: 'custom' | 'web3' | 'readonly'
+  getProviderAndSigner = async () => {
+    let provider
+    if (isCustomWallet(conf)) {
+      provider = new ethers.providers.InfuraProvider(conf.custom.wallet.network, conf.custom.infuraID)
+      const signer = new ethers.Wallet(conf.custom.wallet.operatorPrivateKey[0], provider)
+      return { provider, signer, type: 'custom' }
+    } 
+    //return await getWeb3Modal(fallback)
+    try {
+      web3Modal = new Web3Modal({
+        cacheProvider: true, // optional
+        providerOptions: {
+          walletconnect: {
+            package: WalletConnectProvider, // required
+            //packageFactory: true,
+            options: { infuraId: conf.custom.infuraID }
+          }
+        }
+      })
+      provider = await web3Modal.connect()
+    } 
+    catch(e) {
+      console.log(e)
+    }
+
+    if (provider) {
+      await this.subscribeProvider(provider)
+      await provider.enable()
+      provider = new ethers.providers.Web3Provider(provider);
+      const signer = provider.getSigner();
+      return { provider, signer, type: 'web3' }
+    }
+    else {
+      provider = defaultProvider
+      return { provider, signer: undefined, type: 'readonly' }
+    }
+  }
+
+  subscribeProvider = async (provider) => {
+    if (!provider.on) {
+      return;
+    }
+    //provider.on("close", () => this.resetApp());
+    provider.on("accountsChanged", async (accounts) => {
+      this.reconnectApp(false)
+    });
+    provider.on("chainChanged", async (chainId) => {
+      if (isSupportedChain(parseInt(chainId, 16))) {
+        this.setState({ unsupported: false })
+        this.reconnectApp()
+      } else {
+        this.setState({ unsupported: true })
+      }
+    });
+  };
+
   render() {
-    const {nameInfo, walletInfo} = this.state
-    const walletAddr = walletInfo.address
-    const walletScanLink = conf.fixed.scanConf[conf.custom.network] + "address/" + walletAddr
-    document.title = conf.custom.pageTag.length > 0 ? conf.custom.pageTag + ' - ' + conf.projectName : conf.projectName
+    const { 
+      reconnecting, 
+      unsupported, 
+      nameInfo, 
+      type, 
+      regMsges, regsMsges, renewMsges, 
+      address, ensname, network, balance 
+    } = this.state
+
+    const walletInfo = { type, address, ensname, network, balance }
+    document.title = conf.custom.pageTag ? `${conf.custom.pageTag} - ${conf.projectName}` : conf.projectName
 
     return (
       <div id="main-wrapper" className="container main-wrapper">
-        <div className="row mb-3">
-          <div className="header-left col-md-6">
-            <AppTitle pageTag={conf.custom.pageTag} pageTagColor={conf.custom.pageTagColor} />
-          </div>
-          <div className="header-right col-md-6 align-self-center">
-            <LanguageSwitcher />
-            <span className={"network px-2 network-"+ conf.custom.network}>{this.t('c.' + conf.custom.network)}</span>
-            <span className="wallet-address">
-              <a href={walletScanLink} target="_blank" rel="noreferrer" title={walletAddr}>
-                {walletAddr.slice(0, 5) + '...' + walletAddr.slice(-4)}
-              </a>
-            </span>
-            <span className="wallet-balance px-2">Ξ { walletInfo.balance.slice(0, 6) }</span>
-            <ConfigureForm 
-              host={conf.host}
-              setAndStoreConfInfo={this.setAndStoreConfInfo} 
-              resetAndStoreConfInfo={this.resetAndStoreConfInfo}
-              confFile={confFile}
-              updateNames={this.updateNames} 
-              logOperators={this.logOperators}
-              t={this.t}
-            />
-          </div>
-        </div>
-        <AddNamesForm 
-          addNames={this.addNames} 
-          t={this.t} 
-          getLabels={this.getLabels}
+        <Header 
+          conf={conf}
+          walletInfo={walletInfo}
+          reconnectApp={this.reconnectApp}
+          disconnectApp={this.disconnectApp}
+          reconnecting={reconnecting}
+          setAndStoreConfInfo={this.setAndStoreConfInfo}
         />
-        <div className="row table-wrapper">
-          <NamesDisplayTable 
-            nameInfo={nameInfo} 
-            conf={conf}
-            levelUp={this.levelUp}
-            updateName={this.updateName}
-            updateNames={this.updateNames} 
-            register={this.register} 
-            registerAll={this.registerAll}
-            removeName={this.removeName} 
-            removeNames={this.removeNames}
-            estimatePrice={this.estimatePrice}
-            estimatePriceAll={this.estimatePriceAll}
-            book={this.book}
-            cancelBook={this.cancelBook}
-            setAndStoreNameInfo={this.setAndStoreNameInfo}
-            t={this.t}
-          />
-        </div>
-        <div className="row">
-          <div className="footnode-left align-self-center col-6">
-            <div className="footnotes px-2">
-              <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer"><Twitter /></a>
-            </div>
-          </div>
-          <div className="footnode-right align-self-center col-6">
-            <div className="footnotes px-2">
-              <span className="current-version px-2">v{packageJson.version}</span>
-              <a href={conf.repository} target="_blank" rel="noreferrer"><Github /></a>
-            </div>
-          </div>
-        </div>
+        <MainForm 
+          nameInfo={nameInfo}
+          setAndStoreNameInfo={this.setAndStoreNameInfo}
+          updateName={this.updateName}
+        />
+        <MainTable 
+          conf={conf}
+          nameInfo={nameInfo} 
+          reconnectApp={this.reconnectApp}
+          type={type}
+          network={network}
+          updateName={this.updateName}
+          updateNames={this.updateNames} 
+          registerName={this.registerName} 
+          registerNames={this.registerNames}
+          registerNameEnd={this.registerNameEnd}
+          registerNamesEnd={this.registerNamesEnd}
+          renewName={this.renewName}
+          renewNameEnd={this.renewNameEnd}
+          removeName={this.removeName} 
+          removeNames={this.removeNames}
+          estimateCost={this.estimateCost}
+          estimateCosts={this.estimateCosts}
+          regMsges={regMsges}
+          regsMsges={regsMsges}
+          renewMsges={renewMsges}
+          // book={this.book}
+          // cancelBook={this.cancelBook}
+          setAndStoreNameInfo={this.setAndStoreNameInfo}
+        />
+        <Footer />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
+        <UnsupportedNetworkModal show={unsupported} disconnectApp={this.disconnectApp} />
       </div>
     )
   }

@@ -6,10 +6,8 @@ class MessageToasts extends React.Component {
     this.props.onRef(this);    // call parent component
   }
 
-  messageShow(id, message, color = "msg-default", autohide = "true", delay = "10000") {
+  messageShow(id, message, autohide = "true", delay = "5000") {
     const toastElement = document.getElementById(id)
-    toastElement.classList.remove("msg-default")
-    toastElement.classList.add(color) 
     toastElement.setAttribute('data-bs-autohide', autohide)
     toastElement.setAttribute('data-bs-delay', delay)
     toastElement.firstElementChild.firstElementChild.innerHTML = message
@@ -20,17 +18,14 @@ class MessageToasts extends React.Component {
   render() {
     const zIndex = { zIndex: 11 }
     const toastArray = [
-      'nameNormalizeError', 
-      'book', 
-      'register00', 
-      'register10', 
-      'register11', 
-      'register20', 
-      'register30', 
-      'estimatePrice', 
-      'estimatePriceAll', 
-      'setAndStoreNameInfo', 
-      'setAndStoreConfInfo'
+      // 'nameNormalizeError', 
+      // 'book', 
+      // 'register00', 
+      // 'register10', 
+      // 'register11', 
+      // 'register20', 
+      // 'register31', 
+      'setAndStoreNameInfo'
     ]
 
     return (

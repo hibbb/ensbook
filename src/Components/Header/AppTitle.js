@@ -12,11 +12,11 @@ function getPageTag(props) {
 
 export default function AppTitle(props) {
   return (
-    <h1>
-      <a href="/">
-        <span className="title-ens">ENS</span><span className="title-book">Book</span>
-      </a>
-      {getPageTag(props)}
-    </h1>
+      <h1>
+        <a href="/">
+          <span className="title-ens">ENS</span><span className="title-book">Book</span>
+        </a>
+        {getPageTag(props)}
+      </h1>
   )
 }

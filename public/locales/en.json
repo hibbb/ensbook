@@ -2,14 +2,20 @@
   "nm": {
     "sta": {
       "Open": "Open",
-      "Registering": "Registering",
       "Normal": "Normal",
       "Grace": "Grace",
       "Booked": "Booked",
       "Premium": "Premium",
       "Reopen": "Reopen",
-      "Unknown": "Unknown"
+      "Unknown": "Unknown",
+      "Registering": "Registering",
+      "Renewing": "Renewing"
     }
+  },
+  "header": {
+    "account": "Operator's Account",
+    "balance": "Operator's Balance",
+    "language": "Language"
   },
   "form": {
     "holder": "Enter name labels separated by spaces",
@@ -24,13 +30,14 @@
       "reg": "Reg",
       "del": "Del",
       "tips": {
-        "no": "Sort by Special",
+        "no": "Sort by Label Color",
         "lb": "Sort by Label",
         "ti": "Sort by Time",
         "sta": "Sort by Status",
-        "update": "Update Name Informations",
-        "regAll": "Register All Available Names",
-        "estAll": "Estimate the Cost of All Available Registrations",
+        "renew": "Batch Renewal",
+        "update": "Update Information",
+        "regAll": "Batch Registration",
+        "estAll": "Batch Registration Cost Estimation",
         "remAll": "Remove All Names",
         "hideNames": {
           "hide": "Hide Unregistrable Names",
@@ -39,16 +46,20 @@
       }
     },
     "td": {
-      "reg": "Reg",
+      "reg": "Register",
+      "continue": "Continue", 
+      "reged": "Registered", 
       "book": "Book",
       "tips": {
-        "lb": "Click to Highlight This Name",
-        "sta": "Click to Update This Name",
-        "est": "Estimate the Registration Cost",
+        "lb": "Click to Change the Label Color",
+        "renew": "Renew {{label}}.eth",
+        "est": "Registration Cost Estimation",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",
+        "continue": "Continue to the Registration Process",
+        "regStep": "{{regStep}} / 3 of the Registration Process has been Completed",
         "book": "Book {{label}}.eth",
-        "booked": "Waiting for the name reopening",
+        "booked": "Waiting for the Name to Reopen",
         "cbook": "Cancel This Book",
         "del": "Remove {{label}}.eth"
       }
@@ -65,87 +76,98 @@
     "title": "Custom Configuration",
     "instructions": "Custom Instructions",
     "instructionsUrl": "#custom-configuration",
-    "attention": "Attention: If you are not familiar with these configurations, we recommend that you'd better not change the configurations other than the Global and Display items.",
-    "global": {
-      "title": "Global",
-      "operatorPrivateKey": "Operator's Private Key",
-      "network": "Network",
-      "receiverAddress": "Receiver's Address",
-      "infuraID": "Infura ID",
+    "general": {
+      "title": "General",
       "pageTag": "Page Tag",
-      "pageTagColorTip": "Choose a Background Color for Your Tag"
+      "pageTagColorTip": "Choose a Background Color for Your Tag",
+      "infuraID": "Infura ID"
     },
-    "commit": {
-      "title": "Commit",
-      "gasPrice": "Gas Price",
-      "gasLimit": "Gas Limit",
-      "waitConfirms": "Confirms"
+    "display": {
+      "lookup": "Select Lookups to Display"
     },
     "register": {
       "title": "Register",
-      "duration": "Duration",
-      "value": "Value",
-      "gasPrice": "Gas Price",
-      "gasLimit": "Gas Limit",
-      "waitConfirms": "Confirms",
+      "receiver": "Name Receiver",
+      "duration": "Default Duration",
       "registerWithConfig": "Register With Config"
     },
-    "book": {
-      "title": "Book",
-      "activeDuration": "Active Duration",
-      "timeSlot": "Time Slot"
+    "renew": {
+      "title": "Renew",
+      "duration": "Default Duration"
     },
-    "display": {
-      "title": "Display",
-      "time": "Time Display",
-      "lookup": "Lookup Display"
+    "premium": {
+      "title": "Premium",
+      "priceRange": "Price Range of Concern"
     },
-    "donate": {
-      "title": "Donate",
-      "donatePercentage": "Percentage"
+    "customMode": {
+      "icon": "This icon indicates that you are currently using Custom Wallet Mode",
+      "title": "Custom Wallet Mode",
+      "switch": "Switch",
+      "operatorPrivateKey": "Operator's Private Key",
+      "network": "网Network络",
+      "gasPrice": "Gas Price"
     }
   },
   "msg": {
-    "nameNormalizeError": "Error: {{errMsg}}",
-    "book": "The status of {{label}}.eth will be rechecked in {{duration}}.",
-    "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} days.",
-    "register10": "{{label}}.eth commit submitted.",
-    "register11": {
-      "succeed": "SETP 1 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
-      "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
-    },
-    "register20": "SETP 2 FINISHED: {{label}}.eth is ready for registration.",
-    "register30": {
-      "succeed": "SETP 3 FINISHED: {{label}}.eth register {{regTxLink}} COMPLETED with a {{donationValue}} ETH donation.",
-      "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
-    },
-    "estimatePrice": "{{label}}.eth registration estimated cost ≈ {{price}} ETH.",
-    "estimatePriceAll": "Registrations estimated TOTAL COST ≈ {{price}} ETH.",
-    "setAndStoreNameInfo": {
-      "succeed": "Name information has been updated and stored.",
-      "fail": "Failed to store the name information."
-    },
-    "setAndStoreConfInfo": {
-      "succeed": "Configurations have been updated and stored.",
-      "fail": "Failed to store the configurations."
-    }
+    "setAndStoreNameInfo": "Name information has been updated and stored."
   },
   "modal": {
+    "reg": {
+      "title": "Register {{label}}.eth",
+      "tip": "The information for the name you want to register is as follows: ",
+      "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
+      "register10": "{{label}}.eth commit transaction submitted.",
+      "register11": {
+        "succeed": "SETP 1 / 3 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
+        "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
+      },
+      "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
+      "register30": "{{label}}.eth registration transaction submitted.",
+      "register31": {
+        "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
+        "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
+      }
+    },
+    "regs": {
+      "title": "Batch Registration",
+      "tip": "The information for the names you want to register is as follows: ",
+      "regsEnded": "The batch registration has been ended."
+    },
+    "renew": {
+      "title": "Renew",
+      "tips": "The information for the name you want to renew is as follows:",
+      "renew00": "{{label}}.eth will be renewed for {{duration}} years.",
+      "renew10": "{{label}}.eth renewal transaction submitted.",
+      "renew11": {
+        "succeed": "{{label}}.eth renewal {{txLink}} COMPLETED.",
+        "fail": "{{label}}.eth RENEWAL FAILED. You can check the renewal {{txLink}}。"
+      }
+    },
     "title": "Need Confirmation",
-    "reg": "Are you sure to register {{label}}.eth? After the registration process has started, do not close this page until the registration is completed.",
-    "regAll": "Are you sure to register THESE ENS names?",
-    "removeNames": "Are you sure to CLEAR the table?"
+    "removeNames": "Are you sure to CLEAR the table?",
+    "errorNetwork": {
+      "title": "Unsupported Network",
+      "text": "ENSBook currently supports only ethereum Mainnet and Ropsten network, please switch network in the wallet you are connected to, or disconnect from the wallet."
+    }
   },
   "c": {
-    "true": "True",
-    "false": "False",
+    "EMPTY": "",
+    "true": "Yes",
+    "false": "No",
     "reset": "Reset",
     "save": "Save",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "tx": "transaction",
+    "end": "End",
+    "tx": "Transaction",
+    "name": "Name",
+    "duration": "Duration",
+    "currentNetwork": "Current Network",
     "ropsten": "Ropsten",
     "mainnet": "Mainnet",
+    "homestead": "Mainnet",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
     "relatedTime": "Related Times",
     "currentTime": "Current",
     "expiresTime": "Expires",
@@ -156,6 +178,8 @@
     "seconds": "Seconds",
     "hours": "Hours",
     "days": "Days",
-    "percent": "%"
+    "years": "Years",
+    "percent": "%",
+    "dollars": "Dollars"
   }
 }
