@@ -1,7 +1,7 @@
 import React from 'react';
 import { t } from 'i18next';
 
-const RemoveNamesConfirmModal = (props) => {
+const RemovalsModal = (props) => {
   const { removeNames } = props
   return (
     <div className="modal fade" id="removeNamesConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="removeNamesConfirmModalLabel" aria-hidden="true">
@@ -25,4 +25,4 @@ const RemoveNamesConfirmModal = (props) => {
   )
 }
 
-export default RemoveNamesConfirmModal
+export default RemovalsModal

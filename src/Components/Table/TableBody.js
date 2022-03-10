@@ -12,10 +12,13 @@ export const TableBody = (props) => {
     updateName, 
     registerName, 
     registerNameEnd, 
+    renewName,
+    renewNameEnd,
     hideNames, 
     removeName, 
     estimateCost,
     regMsges, 
+    renewMsges
   } = props
 
   const rows = props.nameInfo.map((row, index) => {
@@ -43,6 +46,10 @@ export const TableBody = (props) => {
             expiresTime={row.expiresTime}
             releaseTime={row.releaseTime}
             updateName={updateName}
+            defaultDuration={conf.custom.register.duration}
+            renewName={renewName}
+            renewNameEnd={renewNameEnd}
+            renewMsges={renewMsges}
             type={type}
           />
         </td>

@@ -47,7 +47,7 @@ class OperatorWallet extends React.Component {
 
     if (reconnecting) {
       return (
-        <Spinner animation="border" variant="secondary" className="me-2 spinner-reconnecting" />
+        <Spinner animation="border" variant="secondary" className="me-2 spinner-acting" />
       )
     }
   

@@ -26,10 +26,13 @@ class MainTable extends React.Component {
       registerNameEnd,
       registerNames, 
       registerNamesEnd,
+      renewName,
+      renewNameEnd,
       removeNames, 
       removeName, 
       regMsges, 
-      regsMsges
+      regsMsges,
+      renewMsges
     } = this.props
 
     const switchHideFlag = () => {
@@ -64,10 +67,13 @@ class MainTable extends React.Component {
             updateName={updateName}
             registerName={registerName} 
             registerNameEnd={registerNameEnd}
+            renewName={renewName}
+            renewNameEnd={renewNameEnd}
             hideNames={this.state.hideNames}
             removeName={removeName} 
             estimateCost={estimateCost} 
             regMsges={regMsges}
+            renewMsges={renewMsges}
           />
         </table>
       </div>

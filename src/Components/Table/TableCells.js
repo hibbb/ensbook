@@ -7,7 +7,8 @@ import { BoxArrowUpRight, XCircle, Calculator, Calendar2Plus } from 'react-boots
 import { t } from 'i18next';
 import { isRegistrable, isRenewable } from '../Global/globals';
 import TooltipEstimateCost from './TooltipEstimateCost';
-import RegisterNameConfirmModal from '../Utils/RegisterNameConfirmModal';
+import RegistrationModal from '../Utils/RegistrationModal';
+import RenewalModal from '../Utils/RenewalModal';
 
 export const LabelCell = (props) => {
   const { label, level, index, nameInfo, setAndStoreNameInfo } = props
@@ -46,7 +47,8 @@ export const LabelCell = (props) => {
 }
 
 export const StatusCell = (props) => {
-  const {label, index, status, releaseTime, expiresTime, updateName, type } = props
+  const { label, index, status, releaseTime, expiresTime, updateName, type, renewName, renewNameEnd, defaultDuration, renewMsges } = props
+  const [modalShow, setModalShow] = useState(false)
 
   const graceEndingFlag = status === 'Grace' && moment().add(10, 'days').isAfter(moment.unix(releaseTime))
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
@@ -95,11 +97,13 @@ export const StatusCell = (props) => {
         )
       } else {
         return (
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>}>
-            <button type="button" className="btn-plain btn-sub ms-2" onClick={null}>
+          <OverlayTrigger placement="top" overlay={
+            <Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>
+          }>
+            <button type="button" className="btn-plain btn-sub ms-2" onClick={()=>setModalShow(true)}>
               <Calendar2Plus />
             </button>
-          </OverlayTrigger>
+          </OverlayTrigger>          
         )
       }
     } 
@@ -147,6 +151,16 @@ export const StatusCell = (props) => {
         </span>
       </OverlayTrigger>
       <RenewNameButton />
+      <RenewalModal 
+        show={modalShow} 
+        onHide={()=>setModalShow(false)}
+        label={label}
+        expiresTime={expiresTime}
+        renewName={renewName}
+        renewNameEnd={renewNameEnd}
+        defaultDuration={defaultDuration}
+        renewMsges={renewMsges}
+      />
     </>
   )
 }
@@ -222,7 +236,7 @@ export const RegisterCell = (props) => {
               </button>
             </OverlayTrigger>
         }
-        <RegisterNameConfirmModal 
+        <RegistrationModal 
           show={modalShow}
           onHide={()=>setModalShow(false)}
           defaultDuration={defaultDuration}
@@ -236,29 +250,6 @@ export const RegisterCell = (props) => {
       </div>
     )
   }
-
-  // if (status === 'Registering') {
-  //   return (
-  //     <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
-  //       <button 
-  //         type="button" 
-  //         className="btn-plain"
-  //         disabled={true}
-  //         >
-  //         {t('tb.td.reg')}
-  //       </button>
-  //       <button 
-  //         type="button" 
-  //         id={"reg-sub-btn-" + label} 
-  //         className="btn-plain btn-sub ms-2" 
-  //         title={t('tb.td.tips.reging')}>
-  //         <div className="spinner-border reg-waiting" role="status">
-  //           <span className="visually-hidden">Registering...</span>
-  //         </div>
-  //       </button>
-  //     </div>
-  //   )
-  // }
 
   // if (status === 'Booked') {
   //   return (

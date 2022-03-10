@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo } from './Components/Global/globals'
+import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -26,6 +26,7 @@ let web3Modal
 const INITIAL_STATE = {
   regMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerName process
   regsMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerNames process
+  renewMsges: [{ time: moment(), type: "action", text: "renewBefore" }], // for renewName process
   reconnecting: false,
   fetching: false,
   unsupported: false,
@@ -274,10 +275,10 @@ class ENSBook extends React.Component {
       })
       this.setState({ regMsges })
 
-      const tx11 = await provider.waitForTransaction(regInfo.commitTxHash, 2) // waitConfirms: 2
+      const commitTxReceipt = await provider.waitForTransaction(regInfo.commitTxHash, 2) // waitConfirms: 2
       const commitTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + regInfo.commitTxHash + '" target="_blank" rel="noreferrer">' + t('c.tx') + '</a>'
       
-      if (tx11.status) {
+      if (commitTxReceipt.status) {
         nameInfo[index].regStep = 1
         this.setAndStoreNameInfo(nameInfo, false)
 
@@ -364,7 +365,6 @@ class ENSBook extends React.Component {
         this.setState({ regMsges })
         return nameInfo[index].regStep
       }
-      //const tx30 = await ETHRegCtrlCon.registerWithConfig(label, regInfo.owner, regInfo.duration, regInfo.secret, regInfo.resolver, regInfo.addr, regOverrides)
 
       //regInfo = { ...regInfo, regTxHash: tx30.hash }
       storeRegInfo(label, regInfo)
@@ -385,10 +385,10 @@ class ENSBook extends React.Component {
       })
       this.setState({ regMsges })
 
-      const tx31 = await provider.waitForTransaction(regInfo.regTxHash, 1) // waitConfirms: 2
+      const regTxReceipt = await provider.waitForTransaction(regInfo.regTxHash, 1) // waitConfirms: 2
       const regTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + regInfo.regTxHash + '" target="_blank" rel="noreferrer">' + t('c.tx') + '</a>'
       // insert regInfo: regTx
-      if (tx31.status) {
+      if (regTxReceipt.status) {
         nameInfo[index].regStep = 3
         this.setAndStoreNameInfo(nameInfo, false)
 
@@ -439,7 +439,6 @@ class ENSBook extends React.Component {
     this.updateNameByLabel(label)
     this.updateBalance()
   }
-
 
   registerNames = async (duration) => {
     const registrableNames = getRegistrableNames(this.state.nameInfo)
@@ -503,6 +502,87 @@ class ENSBook extends React.Component {
   // }
 
   renewName = async (label, duration) => {
+    const { provider, signer, network } = this.state
+
+    duration = duration ?? moment.duration(conf.custom.renew.duration, 'years').asSeconds()
+    const ETHRegCtrlCon = getETHRegCtrlCon(signer, network, conf)
+
+    let renewMsges = [{ 
+      time: moment(), 
+      type: "action", 
+      text: "renewStarted" 
+    }]
+    renewMsges.push({ 
+      time: moment(), 
+      type: "info", 
+      text: t('modal.renew.renew00', { 
+        label: label, 
+        duration: moment.duration(duration, 'seconds').asYears().toFixed(2)
+      }) 
+    })
+    this.setState({ renewMsges })
+
+    let renewTx
+    let renewOverrides = {}
+    if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
+      renewOverrides.gasPrice = utils.parseUnits(String(conf.custom.wallet.gasPrice), 'gwei')
+    }
+    renewOverrides.gasLimit = 120000   // !!!!!
+    renewOverrides.value = (await ETHRegCtrlCon.rentPrice(label, duration)).mul(105).div(100)
+
+    try { // submit the 2nd transaction
+      renewTx = await ETHRegCtrlCon.renew(label, duration, renewOverrides)
+      renewMsges.push({
+        time: moment(), 
+        type: "info", 
+        text: t('modal.renew.renew10', { label: label})
+      }) 
+      this.setState({ renewMsges })
+    } catch(e) {
+      console.log(e)
+      renewMsges[0] = {
+        time: moment(), 
+        type: "action", 
+        text: "renewSuspended" 
+      }
+      this.setState({ renewMsges })
+      return
+    }
+    
+    const renewTxReceipt = await provider.waitForTransaction(renewTx.hash, 1)
+    const renewTxLink = '<a href="' + conf.fixed.scanConf[network] + 'tx/' + renewTx.hash + '" target="_blank" rel="noreferrer">' + t('c.tx') + '</a>'
+
+    if (renewTxReceipt.status) {
+      renewMsges.push({
+        time: moment(), 
+        type: "info", 
+        text: t('modal.renew.renew11.succeed', { label: label, txLink: renewTxLink })
+      }) 
+      renewMsges[0] = { 
+        time: moment(), 
+        type: "action", 
+        text: "renewSucceeded" 
+      }
+      this.setState({ renewMsges })
+    } else {
+      renewMsges.push({
+        time: moment(), 
+        type: "info", 
+        text: t('modal.renew.renew11.fail', { label: label, txLink: renewTxLink })  
+      }) 
+      renewMsges[0] = { 
+        time: moment(), 
+        type: "action", 
+        text: "renewFailed" 
+      }
+      this.setState({ renewMsges })
+    }
+  }
+
+  renewNameEnd = (label) => {
+    this.setState({ renewMsges: INITIAL_STATE.renewMsges })
+    this.updateNameByLabel(label)
+    this.updateBalance()
   }
 
   estimateCost = async (label, duration) => {
@@ -609,8 +689,7 @@ class ENSBook extends React.Component {
       unsupported, 
       nameInfo, 
       type, 
-      regMsges, 
-      regsMsges,
+      regMsges, regsMsges, renewMsges, 
       address, ensname, network, balance 
     } = this.state
 
@@ -644,12 +723,15 @@ class ENSBook extends React.Component {
           registerNames={this.registerNames}
           registerNameEnd={this.registerNameEnd}
           registerNamesEnd={this.registerNamesEnd}
+          renewName={this.renewName}
+          renewNameEnd={this.renewNameEnd}
           removeName={this.removeName} 
           removeNames={this.removeNames}
           estimateCost={this.estimateCost}
           estimateCosts={this.estimateCosts}
           regMsges={regMsges}
           regsMsges={regsMsges}
+          renewMsges={renewMsges}
           // book={this.book}
           // cancelBook={this.cancelBook}
           setAndStoreNameInfo={this.setAndStoreNameInfo}

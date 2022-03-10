@@ -3,30 +3,24 @@ import { Modal, Button, InputGroup, FormControl, Col, Row, Spinner } from 'react
 import { ChevronCompactRight, CheckCircleFill, XCircleFill, CalendarWeek, DashCircleFill } from 'react-bootstrap-icons';
 import moment from 'moment';
 import { t } from 'i18next';
-import { getRegInfo } from '../Global/globals';
 
 
-const RegisterNameConfirmModal = (props) => {
+const RegistrationsModal = (props) => {
   const { 
     show, 
     onHide, 
-    label, 
-    registerName, 
-    regStep, 
+    registerNames, 
+    registerNamesEnd,
     defaultDuration, 
-    registerNameEnd, 
-    regMsges
+    regMsges,
+    regsMsges
   } = props
 
-  // support fetching the setted duration from its regInfo
-  const durationFromRegInfo = getRegInfo(label)?.duration
-  const adjustDuration = durationFromRegInfo
-    ? moment.duration(durationFromRegInfo, 'seconds').asYears().toFixed(2)
-    : defaultDuration
+  
+  const regAction = regMsges[0].text  // regBefore, regStarted, regSucceeded, regFailed, regSuspended
+  const regsAction = regsMsges[0].text   // regsBefore, regsStarted, regsEnded
 
-  const regAction = regMsges[0].text  // regBefore, regStarted, regSucceeded, regFailed or regSuspended
-
-  const [duration, setDuration] = useState(adjustDuration) // duration: as Years
+  const [duration, setDuration] = useState(defaultDuration) // duration: as Years
 
   const handleChange = (event) => {
     const { value } = event.target
@@ -35,45 +29,30 @@ const RegisterNameConfirmModal = (props) => {
   }
 
   const ActionButton = () => {
-    function regEnd () {
+    function regsEnd() {
       onHide()
-      registerNameEnd(label)
+      registerNamesEnd()
     }
 
-    if (regAction === 'regStarted') {
+    if (regsAction === 'regsStarted') {
       return (
         <Button variant="secondary" disabled>
           {t('nm.sta.Registering')}
-          <Spinner animation="border" variant="light" className="ms-2 spinner-registering" />
+          <Spinner animation="border" variant="light" className="ms-2 spinner-acting" />
         </Button>
       )
     }
-    if (regAction === 'regFailed' || regAction === 'regSucceeded') {
-      return <Button variant="primary" onClick={()=>regEnd()}>{t('c.end')}</Button>
+
+    if (regsAction === 'regsEnded') {
+      return <Button variant="primary" onClick={()=>regsEnd()}>{t('c.end')}</Button>
     }
-    if (regAction === 'regSuspended') {
-      return (
-        <>
-          <Button variant="secondary" onClick={()=>regEnd()}>{t('c.cancel')}</Button>
-          <Button variant="primary" 
-            onClick={()=>{registerName(
-              label, 
-              moment.duration(duration, 'years').asSeconds(),
-              regStep
-            )}
-          }>{t('tb.td.continue')}</Button>
-        </>
-      )     
-    }
+
     return (
       <>
         <Button variant="secondary" onClick={onHide}>{t('c.cancel')}</Button>
         <Button variant="primary" onClick={()=>{
-          registerName(
-            label, 
-            moment.duration(duration, 'years').asSeconds(),
-            regStep
-          )}
+            registerNames(moment.duration(duration, 'years').asSeconds())
+          }
         }>{t('c.confirm')}</Button>
       </>
     )
@@ -83,26 +62,24 @@ const RegisterNameConfirmModal = (props) => {
     if (regAction === 'regSucceeded') {
       return (
         <span className="modal-message-text">
-          <CheckCircleFill className="me-2 modal-message-icon reg-succeeded" />
-          { label + '.eth' }
+          <CheckCircleFill className="modal-message-icon action-succeeded" />
         </span>
       )
     } else if (regAction === 'regFailed') {
       return (
         <span className="modal-message-text">
-          <XCircleFill className="me-2 modal-message-icon reg-failed" /> 
-          { label + '.eth' }
+          <XCircleFill className="modal-message-icon action-failed" />
         </span>
       )
     } else if (regAction === 'regSuspended') {
       return (
         <span className="modal-message-text">
-          <DashCircleFill className="me-2 modal-message-icon reg-suspend" />
-          { label + '.eth' }
+          <DashCircleFill className="modal-message-icon action-suspend" />
         </span>
       )
+    } else {
+      return null
     }
-    return null
   }
   
   const RegActionMsg = () => {
@@ -136,21 +113,47 @@ const RegisterNameConfirmModal = (props) => {
     )
   }
 
+  const RegsInfoMsges = () => {
+    return (
+      regsMsges.slice(1).map((message, index) => { 
+        return (
+          <p key={index} className={"modal-message message-" + message.type}>
+            <span className="modal-message-time" title={message.time.fromNow()}>
+              {message.time.format('HH:mm:ss')}
+            </span>
+            <ChevronCompactRight className="modal-message-icon" />
+            {
+              message.type === 'succeeded'
+                ? <CheckCircleFill className="me-2 modal-message-icon action-succeeded" />
+                : null
+            }
+            {
+              message.type === 'failed'
+                ? <XCircleFill className="me-2 modal-message-icon action-failed" /> 
+                : null
+            }
+            { message.text }
+          </p>
+        )
+      })
+    )
+  }
+
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
       <Modal.Header>
-        <Modal.Title>{ t('modal.reg.title', { label: label}) }</Modal.Title>
+        <Modal.Title>{ t('modal.regs.title') }</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p className="modal-tip">
-          {t('modal.reg.tip')}
+          {t('modal.regs.tip')}
         </p>
         <div className="mb-3 duration-input">
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
                 <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
-                <FormControl className="modal-name-label" value={label + '.eth'} disabled />
+                <FormControl className="modal-name-label" value="Bunch of Names" disabled />
               </InputGroup>
             </Col>
           </Row>
@@ -171,6 +174,7 @@ const RegisterNameConfirmModal = (props) => {
             </Col>
           </Row>
         </div>
+        <RegsInfoMsges />
         <RegInfoMsges />
         <RegActionMsg />
       </Modal.Body>
@@ -181,4 +185,4 @@ const RegisterNameConfirmModal = (props) => {
   )
 }
 
-export default RegisterNameConfirmModal
+export default RegistrationsModal

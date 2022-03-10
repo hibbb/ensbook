@@ -3,8 +3,8 @@ import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
 import { t } from 'i18next';
-import RegisterNamesConfirmModal from '../Utils/RegisterNamesConfirmModal';
-import RemoveNamesConfirmModal from '../Utils/RemoveNamesConfirmModal';
+import RegistrationsModal from '../Utils/RegistrationsModal';
+import RemovalsModal from '../Utils/RemovalsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
 import { haveRenewableNames, haveUnregistrableNames, isCustomWallet } from '../Global/globals';
 
@@ -70,7 +70,7 @@ export const TableHead = (props) => {
       } else {
         return (
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
-          <button type="button" className="btn-plain btn-sub ms-2" onClick={null}>
+          <button type="button" className="btn-plain btn-sub ms-2" onClick={null} disabled>
               <Calendar2Plus />
             </button>
           </OverlayTrigger>
@@ -172,7 +172,7 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
           <HideShowButton />
-          <RegisterNamesConfirmModal 
+          <RegistrationsModal 
             show={regNamesModalShow}
             onHide={()=>setRegNamesModalShow(false)}
             registerNames={registerNames}
@@ -192,7 +192,7 @@ export const TableHead = (props) => {
               <XCircle />
             </button>
           </OverlayTrigger>
-          <RemoveNamesConfirmModal removeNames={removeNames} />
+          <RemovalsModal removeNames={removeNames} />
         </th>
       </tr>
     </thead>

@@ -2,13 +2,14 @@
   "nm": {
     "sta": {
       "Open": "Open",
-      "Registering": "Registering",
       "Normal": "Normal",
       "Grace": "Grace",
       "Booked": "Booked",
       "Premium": "Premium",
       "Reopen": "Reopen",
-      "Unknown": "Unknown"
+      "Unknown": "Unknown",
+      "Registering": "Registering",
+      "Renewing": "Renewing"
     }
   },
   "header": {
@@ -115,13 +116,13 @@
       "title": "Register {{label}}.eth",
       "tip": "The information for the name you want to register is as follows: ",
       "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
-      "register10": "{{label}}.eth commit submitted.",
+      "register10": "{{label}}.eth commit transaction submitted.",
       "register11": {
         "succeed": "SETP 1 / 3 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
         "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
       },
       "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
-      "register30": "{{label}}.eth registration submitted.",
+      "register30": "{{label}}.eth registration transaction submitted.",
       "register31": {
         "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
         "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
@@ -132,8 +133,17 @@
       "tip": "The information for the names you want to register is as follows: ",
       "regsEnded": "The batch registration has been ended."
     },
+    "renew": {
+      "title": "Renew",
+      "tips": "The information for the name you want to renew is as follows:",
+      "renew00": "{{label}}.eth will be renewed for {{duration}} years.",
+      "renew10": "{{label}}.eth renewal transaction submitted.",
+      "renew11": {
+        "succeed": "{{label}}.eth renewal {{txLink}} COMPLETED.",
+        "fail": "{{label}}.eth RENEWAL FAILED. You can check the renewal {{txLink}}。"
+      }
+    },
     "title": "Need Confirmation",
-    "regAll": "Are you sure to register THESE ENS names?",
     "removeNames": "Are you sure to CLEAR the table?",
     "errorNetwork": {
       "title": "Unsupported Network",

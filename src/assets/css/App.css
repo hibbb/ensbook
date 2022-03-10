@@ -382,14 +382,9 @@ button.btn-plain[disabled] {
 .custom-wallet {
   color: #483c32;
 }
-.spinner-reconnecting, .spinner-estimating, .spinner-registering {
+.spinner-acting {
   width: 0.85rem;
   height: 0.85rem;
-}
-.reg-waiting {
-  color: #0dcaf0;
-  width: 1rem;
-  height: 1rem;
 }
 .book-waiting {
   animation: shake 3s infinite linear;
@@ -445,13 +440,13 @@ button.btn-plain[disabled] {
   width: 0.8rem;
   height: 0.8rem;
 }
-.reg-succeeded {
+.action-succeeded {
   color: limegreen;
 }
-.reg-failed {
+.action-failed {
   color: crimson;
 }
-.reg-suspend {
+.action-suspend {
   color: orange;
 }
 .until-time {
