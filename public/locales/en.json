@@ -104,7 +104,7 @@
       "title": "Custom Wallet Mode",
       "switch": "Switch",
       "operatorPrivateKey": "Operator's Private Key",
-      "network": "网Network络",
+      "network": "Network",
       "gasPrice": "Gas Price"
     }
   },
