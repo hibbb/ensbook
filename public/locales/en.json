@@ -97,7 +97,9 @@
     },
     "premium": {
       "title": "Premium",
-      "priceRange": "Price Range of Concern"
+      "priceRange": "Price Range of Concern",
+      "million": "Million",
+      "thousand": "Thousand"
     },
     "customMode": {
       "icon": "This icon indicates that you are currently using Custom Wallet Mode",

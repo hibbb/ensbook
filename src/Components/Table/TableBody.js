@@ -50,6 +50,7 @@ export const TableBody = (props) => {
             renewName={renewName}
             renewNameEnd={renewNameEnd}
             renewMsges={renewMsges}
+            priceRange={conf.custom.premium.priceRange}
             type={type}
           />
         </td>
