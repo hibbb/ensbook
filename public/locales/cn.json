@@ -97,7 +97,9 @@
     },
     "premium": {
       "title": "溢价期",
-      "priceRange": "关注的价格区间"
+      "priceRange": "关注的价格区间",
+      "million": "百万",
+      "thousand": "千"
     },
     "customMode": {
       "icon": "这个图标表示您当前使用的是自定义钱包模式",

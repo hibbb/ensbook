@@ -35,12 +35,19 @@ class ConfigureForm extends React.Component {
     renewDuration: this.conf.custom.renew.duration,
 
     premiumPriceRange: this.conf.custom.premium.priceRange,
+    // Prepared for EP9
+    // premiumPriceRange: this.conf.custom.premium.priceRange > 21 ? 21 : this.conf.custom.premium.priceRange,
 
     walletSwitch: this.conf.custom.wallet.switch,
     walletOperatorPrivateKey: this.conf.custom.wallet.operatorPrivateKey.join(),
     walletNetwork: this.conf.custom.wallet.network,
     walletGasPrice: this.conf.custom.wallet.gasPrice
   }
+
+  premiumPriceArray = [
+    99999952, 49999952, 24999952, 12499952, 6249952, 3124952, 1562452, 781202,  
+    390577, 195264, 97608, 48780, 24366, 12159, 6055, 3004, 1478, 715, 333, 143, 47, 0
+  ]
 
   handleChange = (event) => {
     const {name, value} = event.target
@@ -245,6 +252,21 @@ class ConfigureForm extends React.Component {
                   value={this.state.premiumPriceRange} 
                   onChange={this.handleChange} 
                   aria-label="premiumPriceRange" />
+
+                {/* Prepared for EP9
+                <Form.Select 
+                  name="premiumPriceRange" 
+                  value={this.state.premiumPriceRange} 
+                  onChange={this.handleChange} 
+                  aria-label="premiumPriceRange">
+                  {
+                    this.premiumPriceArray.map(
+                      (item, index) => index > 8
+                        ? <option key={index} value={index}>{item}</option>
+                        : null
+                    )
+                  }
+                </Form.Select> */}
                 <InputGroup.Text>{t('c.dollars')}</InputGroup.Text>
               </InputGroup>
 
