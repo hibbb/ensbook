@@ -50,9 +50,9 @@ export const StatusCell = (props) => {
   const { label, index, status, releaseTime, expiresTime, updateName, type, renewName, renewNameEnd, defaultDuration, renewMsges } = props
   const [modalShow, setModalShow] = useState(false)
 
-  const graceEndingFlag = status === 'Grace' && moment().add(10, 'days').isAfter(moment.unix(releaseTime))
+  const graceEndingFlag = status === 'Grace' && moment().add(7, 'days').isAfter(moment.unix(releaseTime))
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
-  const premiumEndingFlag = status === 'Premium' && moment().isAfter(moment.unix(releaseTime).add(26, 'days'))
+  const premiumEndingFlag = status === 'Premium' && moment().isAfter(moment.unix(releaseTime).add(25, 'days'))
   const premiumEndingClass = premiumEndingFlag ? ' premium-ending' : ''
 
   const jsonSortByNumber = (array, key) => {

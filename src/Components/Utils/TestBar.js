@@ -1,14 +1,18 @@
 import React from 'react';
 //import moment from 'moment'
-import { BigNumber, utils } from 'ethers';
+// import { BigNumber, utils } from 'ethers';
+import { hexlify } from 'ethers/lib/utils';
 
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
-    const tid = utils.id('123')
-    console.log(tid)
-    const de = BigNumber.from(tid).toString()
-    console.log(de)
+    console.log(0.5 ^ 0.25)
+    
+    // console.log(0.5 ^ 2/65536 * (10 ** 18))
+    // console.log(0.5 ^ 3/65536 * (10 ** 18))
+    // console.log(0.5 ^ 4/65536 * (10 ** 18))
+    // console.log(0.5 ^ 5/65536 * (10 ** 18))
+    // console.log(BigNumber.from())
   }
 
   const testFunc2 = async () => {

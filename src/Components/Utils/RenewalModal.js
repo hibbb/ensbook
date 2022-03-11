@@ -115,7 +115,7 @@ const RenewalModal = (props) => {
 
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>{ t('modal.renew.title') }</Modal.Title>
       </Modal.Header>
       <Modal.Body>

@@ -6,6 +6,7 @@
 - [ ] learn the new rentPrice function in EP9
 - [ ] display the names before regNames
 - [ ] replace Bignumber .mul(105).div(100) with a better method
+- [ ] Price Range of Concern
 
 ## Priority 2
 

@@ -138,7 +138,7 @@ const RegistrationModal = (props) => {
 
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>{ t('modal.reg.title', { label: label}) }</Modal.Title>
       </Modal.Header>
       <Modal.Body>

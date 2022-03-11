@@ -1,6 +1,21 @@
 import React from 'react';
-import { Form, OverlayTrigger, Tooltip, InputGroup, FormControl, Alert } from 'react-bootstrap'
-import { Gear, InfoCircle, BoxArrowUpRight, CaretRightFill, ChevronDown, CheckCircle, WalletFill } from 'react-bootstrap-icons';
+import { 
+  // Alert,
+  Form, 
+  OverlayTrigger, 
+  Tooltip, 
+  InputGroup, 
+  FormControl
+} from 'react-bootstrap'
+import { 
+  Gear, 
+  // InfoCircle, 
+  // BoxArrowUpRight, 
+  CaretRightFill, 
+  ChevronDown, 
+  CheckCircle, 
+  WalletFill 
+} from 'react-bootstrap-icons';
 import { t } from 'i18next';
 import confFile from '../../conf.json'
 
@@ -118,13 +133,13 @@ class ConfigureForm extends React.Component {
           </div>
           <div className="offcanvas-body">
             <form>
-              <Alert variant="warning">
+              {/* <Alert variant="warning">
                 <InfoCircle />
                 <a href={confFile.repository + t('conf.instructionsUrl')} className="alert-link ps-2" target="_blank" rel="noreferrer">
                   {t('conf.instructions')}
                   <BoxArrowUpRight className="external-link-icon" />
                 </a>
-              </Alert>
+              </Alert> */}
 
               {/* General */}
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.general.title')}</h6>
