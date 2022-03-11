@@ -141,7 +141,7 @@ const RegistrationsModal = (props) => {
 
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>{ t('modal.regs.title') }</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -153,7 +153,7 @@ const RegistrationsModal = (props) => {
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
                 <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
-                <FormControl className="modal-name-label" value="Bunch of Names" disabled />
+                <FormControl className="modal-name-label" value={t('modal.regs.names')} disabled />
               </InputGroup>
             </Col>
           </Row>

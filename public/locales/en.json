@@ -131,6 +131,7 @@
     "regs": {
       "title": "Batch Registration",
       "tip": "The information for the names you want to register is as follows: ",
+      "names": "All Registrable Names in the Table",
       "regsEnded": "The batch registration has been ended."
     },
     "renew": {
