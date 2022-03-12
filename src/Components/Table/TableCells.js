@@ -58,7 +58,7 @@ export const StatusCell = (props) => {
   
   const premiumEndingFlag = (
     status === 'Premium' 
-    && moment().isAfter(moment.unix(releaseTime).add(28 - (priceRange / 100000 * 28).toFixed(2), 'days'))
+    && moment().unix() > releaseTime + (1 - priceRange / 100000) * 28 * 86400
     // Prepared for EP9
     // && priceRange < 21 
     // && moment().isAfter(moment.unix(releaseTime).add(priceRange, 'days'))
