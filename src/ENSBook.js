@@ -101,7 +101,10 @@ class ENSBook extends React.Component {
   }
 
   getDefaultNameReceiver = async () => {
-    return conf.custom.register.receiver ? conf.custom.register.receiver : await this.state.address
+    const defaultReceiver = conf.custom.register.receiver 
+      ? conf.custom.register.receiver 
+      : (this.state.ensname ?? this.state.address)
+    return defaultReceiver
   }
 
   updateName = async (index, messageShowFlag = true) => {
