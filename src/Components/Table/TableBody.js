@@ -6,6 +6,7 @@ export const TableBody = (props) => {
   const { 
     type,
     network, 
+    reconnecting,
     nameInfo, 
     setAndStoreNameInfo, 
     conf, 
@@ -18,7 +19,8 @@ export const TableBody = (props) => {
     removeName, 
     estimateCost,
     regMsges, 
-    renewMsges
+    renewMsges,
+    getDefaultNameReceiver
   } = props
 
   const rows = props.nameInfo.map((row, index) => {
@@ -40,9 +42,11 @@ export const TableBody = (props) => {
         </td>
         <td>
           <StatusCell
+            type={type}
             label={row.label} 
             index={index}
             status={row.status} 
+            reconnecting={reconnecting}
             expiresTime={row.expiresTime}
             releaseTime={row.releaseTime}
             updateName={updateName}
@@ -51,21 +55,22 @@ export const TableBody = (props) => {
             renewNameEnd={renewNameEnd}
             renewMsges={renewMsges}
             priceRange={conf.custom.premium.priceRange}
-            type={type}
           />
         </td>
         <td>
           <RegisterCell 
+            type={type}
             label={row.label} 
             index={index}
             defaultDuration={conf.custom.register.duration}
             status={row.status} 
+            reconnecting={reconnecting}
             estimateCost={estimateCost}
             registerName={registerName} 
             regStep={row.regStep}
             registerNameEnd={registerNameEnd}
             regMsges={regMsges}
-            type={type}
+            getDefaultNameReceiver={getDefaultNameReceiver}
           />
         </td>
         <td className='td-lookup'>

@@ -47,7 +47,7 @@ export const LabelCell = (props) => {
 }
 
 export const StatusCell = (props) => {
-  const { label, index, status, releaseTime, expiresTime, updateName, type, renewName, renewNameEnd, defaultDuration, priceRange, renewMsges } = props
+  const { label, index, status, reconnecting, releaseTime, expiresTime, updateName, type, renewName, renewNameEnd, defaultDuration, priceRange, renewMsges } = props
   const [modalShow, setModalShow] = useState(false)
 
   const graceEndingFlag = (
@@ -99,7 +99,7 @@ export const StatusCell = (props) => {
 
   const RenewNameButton = () => {
     if (isRenewable(status)) {
-      if (type === 'readonly') {
+      if (type === 'readonly' || reconnecting) {
         return (
           <button type="button" disabled className="btn-plain btn-sub ms-2">
             <Calendar2Plus />
@@ -110,7 +110,10 @@ export const StatusCell = (props) => {
           <OverlayTrigger placement="top" overlay={
             <Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>
           }>
-            <button type="button" className="btn-plain btn-sub ms-2" onClick={()=>setModalShow(true)}>
+            <button type="button" 
+              className="btn-plain btn-sub ms-2" 
+              onClick={()=>setModalShow(true)}
+            >
               <Calendar2Plus />
             </button>
           </OverlayTrigger>          
@@ -179,12 +182,14 @@ export const RegisterCell = (props) => {
   const { 
     label, 
     status, 
+    reconnecting, 
     defaultDuration, 
     registerName, 
     regStep, 
     estimateCost, 
     registerNameEnd, 
     regMsges, 
+    getDefaultNameReceiver,
     type 
   } = props
 
@@ -214,7 +219,7 @@ export const RegisterCell = (props) => {
           }</Tooltip>
         }>
           <button type="button" 
-            disabled={type==='readonly'}
+            disabled={type==='readonly' || reconnecting}
             className="btn-plain btn-reg" 
             onClick={()=>setModalShow(true)} 
           >
@@ -255,38 +260,17 @@ export const RegisterCell = (props) => {
           regStep={regStep}
           registerNameEnd={registerNameEnd}
           regMsges={regMsges}
+          getDefaultNameReceiver={getDefaultNameReceiver}
           t={t} 
         />
       </div>
     )
   }
 
-  // if (status === 'Booked') {
-  //   return (
-  //     <div id={"register-" + label} className="btn-group" role="group" aria-label="Register or Estimate Price">
-  //       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.cbook')}</Tooltip>}>
-  //         <button type="button" id={"register-btn-" + label} className="btn-plain"
-  //           disabled={false}
-  //           onClick={()=>{cancelBook(index)}}
-  //         >
-  //           {t('c.cancel')}
-  //         </button>
-  //       </OverlayTrigger>
-  //       <button 
-  //         type="button" 
-  //         id={"reg-sub-btn-" + label} 
-  //         className="btn-plain btn-sub book-waiting ms-2" 
-  //         title={t('tb.td.tips.booked')}>
-  //         <Robot />
-  //       </button>
-  //     </div>
-  //   )
-  // }
-
   if (status === 'Unknown') {
     return (
       <div id={"trigger-unknown-" + label} className="btn-group" role="group" aria-label="Unknown">
-        <button type="button" className="btn-plain" disabled={true}>
+        <button type="button" className="btn-plain" disabled>
           {t('nm.sta.Unknown')}
         </button>
       </div>
@@ -295,7 +279,7 @@ export const RegisterCell = (props) => {
 
   return (
     <div id={"trigger-reged-" + label} className="btn-group" role="group" aria-label="RegisterName">
-      <button type="button" className="btn-plain" disabled={true}>
+      <button type="button" className="btn-plain" disabled>
         {t('tb.td.reged')}
       </button>
     </div>

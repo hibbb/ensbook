@@ -3,16 +3,12 @@
 ## Priority 1
 
 - [ ] add reReg button beside Continue
-- [ ] learn the new rentPrice function in EP9
 - [ ] display the names before regNames
 - [ ] replace Bignumber .mul(105).div(100) with a better method
-- [ ] Price Range of Concern
 
 ## Priority 2
 
 - [ ] support inputing an address to get all name owned by the address
-- [ ] switch book function for premium names
-- [ ] add renew feature
 
 ## Priority 3
 
@@ -20,6 +16,11 @@
 
 ## Completed From v1.4.0
 
+- [x] add custom receiver input on reg Modal
+- [x] learn the new rentPrice function in EP9
+- [x] Price Range of Concern
+- [x] add renew feature
+- [x] support ENS for registration receiver
 - [x] rebuild configure UI and features
 - [x] remove displaytime and confirms in configureForm
 - [x] only support mainnet and ropsten

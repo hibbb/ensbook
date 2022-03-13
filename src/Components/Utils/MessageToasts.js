@@ -19,7 +19,6 @@ class MessageToasts extends React.Component {
     const zIndex = { zIndex: 11 }
     const toastArray = [
       // 'nameNormalizeError', 
-      // 'book', 
       // 'register00', 
       // 'register10', 
       // 'register11', 

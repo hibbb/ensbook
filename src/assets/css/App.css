@@ -386,10 +386,6 @@ button.btn-plain[disabled] {
   width: 0.85rem;
   height: 0.85rem;
 }
-.book-waiting {
-  animation: shake 3s infinite linear;
-}
-
 .footnotes {
   color: darkgrey;
 }
@@ -440,10 +436,10 @@ button.btn-plain[disabled] {
   width: 0.8rem;
   height: 0.8rem;
 }
-.action-succeeded {
+.action-succeeded, .message-succeed {
   color: limegreen;
 }
-.action-failed {
+.action-failed, .message-failed {
   color: crimson;
 }
 .action-suspend {

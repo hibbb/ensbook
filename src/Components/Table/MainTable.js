@@ -14,25 +14,27 @@ class MainTable extends React.Component {
   render() {
     const { 
       conf, 
-      nameInfo,
-      type,  
-      network, 
-      setAndStoreNameInfo, 
-      updateName, 
-      updateNames, 
       estimateCost, 
       estimateCosts, 
+      getDefaultNameReceiver, 
+      nameInfo,
+      network, 
+      reconnecting, 
       registerName, 
       registerNameEnd,
       registerNames, 
       registerNamesEnd,
-      renewName,
-      renewNameEnd,
-      removeNames, 
-      removeName, 
       regMsges, 
       regsMsges,
-      renewMsges
+      removeNames, 
+      removeName, 
+      renewMsges,
+      renewName,
+      renewNameEnd,
+      setAndStoreNameInfo, 
+      type,  
+      updateName, 
+      updateNames
     } = this.props
 
     const switchHideFlag = () => {
@@ -45,6 +47,7 @@ class MainTable extends React.Component {
         <table className="table table-hover ebr-tb">
           <TableHead
             type={type}
+            reconnecting={reconnecting}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             updateNames={updateNames}
@@ -60,6 +63,7 @@ class MainTable extends React.Component {
           />
           <TableBody 
             type={type}
+            reconnecting={reconnecting}
             network={network}
             nameInfo={nameInfo} 
             setAndStoreNameInfo={setAndStoreNameInfo}
@@ -74,6 +78,7 @@ class MainTable extends React.Component {
             estimateCost={estimateCost} 
             regMsges={regMsges}
             renewMsges={renewMsges}
+            getDefaultNameReceiver={getDefaultNameReceiver}
           />
         </table>
       </div>

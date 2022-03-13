@@ -19,6 +19,7 @@ let ascFlag = {
 export const TableHead = (props) => {
   const { 
     type, 
+    reconnecting, 
     nameInfo, 
     setAndStoreNameInfo, 
     updateNames, 
@@ -61,7 +62,7 @@ export const TableHead = (props) => {
 
   const RenewNamesButton = () => {
     if (haveRenewableNames(nameInfo)) {
-      if (type === 'readonly') {
+      if (type === 'readonly' || reconnecting) {
         return (
           <button type="button" disabled className="btn-plain btn-sub ms-2">
             <Calendar2Plus />
@@ -154,7 +155,7 @@ export const TableHead = (props) => {
             <button
               type="button" 
               className="btn-plain btn-reg" 
-              disabled={!isCustomWallet()}
+              disabled={!isCustomWallet() || reconnecting}
               onClick={()=>setRegNamesModalShow(true)} 
               >
               {t('tb.th.reg')}
