@@ -5,7 +5,6 @@ import moment from 'moment';
 import { t } from 'i18next';
 import { getRegInfo } from '../Global/globals';
 
-
 const RegistrationModal = (props) => {
   const { 
     show, 
@@ -15,23 +14,39 @@ const RegistrationModal = (props) => {
     regStep, 
     defaultDuration, 
     registerNameEnd, 
-    regMsges
+    regMsges,
+    getDefaultNameReceiver
   } = props
-
-  // support fetching the setted duration from its regInfo
-  const durationFromRegInfo = getRegInfo(label)?.duration
-  const adjustDuration = durationFromRegInfo
-    ? moment.duration(durationFromRegInfo, 'seconds').asYears().toFixed(2)
-    : defaultDuration
 
   const regAction = regMsges[0].text  // regBefore, regStarted, regSucceeded, regFailed or regSuspended
 
-  const [duration, setDuration] = useState(adjustDuration) // duration: as Years
+  // support fetching the setted duration from its regInfo
+  const durationFromRegInfo = getRegInfo(label)?.duration
+  const usingDuration = durationFromRegInfo
+    ? moment.duration(durationFromRegInfo, 'seconds').asYears().toFixed(2)
+    : defaultDuration
+  const [duration, setDuration] = useState(usingDuration) // duration: as Years
 
-  const handleChange = (event) => {
+  const handleDurationChange = (event) => {
     const { value } = event.target
     const newDuration = value
     setDuration(newDuration)
+  }
+
+  // support changing the receiver for temp before registering
+  const [receiver, setReceiver] = useState('')
+  const [isReceiverSpecified, setIsReceiverSpecified] = useState(false)
+
+  const onShow = async () => {
+    const receiverFromRegInfo = getRegInfo(label)?.receiver
+    setIsReceiverSpecified(Boolean(receiverFromRegInfo))  // disable receiver input if true
+    setReceiver(receiverFromRegInfo ?? await getDefaultNameReceiver())
+  }
+
+  const handleReceiverChange = (event) => {
+    const { value } = event.target
+    const newReceiver = value
+    setReceiver(newReceiver)
   }
 
   const ActionButton = () => {
@@ -59,6 +74,7 @@ const RegistrationModal = (props) => {
             onClick={()=>{registerName(
               label, 
               moment.duration(duration, 'years').asSeconds(),
+              receiver,
               regStep
             )}
           }>{t('tb.td.continue')}</Button>
@@ -72,6 +88,7 @@ const RegistrationModal = (props) => {
           registerName(
             label, 
             moment.duration(duration, 'years').asSeconds(),
+            receiver,
             regStep
           )}
         }>{t('c.confirm')}</Button>
@@ -137,8 +154,8 @@ const RegistrationModal = (props) => {
   }
 
   return (
-    <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
-      <Modal.Header closeButton>
+    <Modal show={show} onHide={onHide} onShow={onShow} backdrop="static" keyboard={false}>
+      <Modal.Header>
         <Modal.Title>{ t('modal.reg.title', { label: label}) }</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -150,7 +167,7 @@ const RegistrationModal = (props) => {
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
                 <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
-                <FormControl className="modal-name-label" value={label + '.eth'} disabled />
+                <FormControl value={label + '.eth'} disabled />
               </InputGroup>
             </Col>
           </Row>
@@ -158,8 +175,9 @@ const RegistrationModal = (props) => {
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
                 <InputGroup.Text>{t('c.duration')}: </InputGroup.Text>
-                <FormControl value={duration} 
-                  onChange={handleChange} 
+                <FormControl 
+                  value={duration} 
+                  onChange={handleDurationChange} 
                   disabled={ !(regAction === "regBefore" || regAction === "regSuspended") } 
                 />
                 <InputGroup.Text>{t('c.years')}</InputGroup.Text>
@@ -167,6 +185,18 @@ const RegistrationModal = (props) => {
                   <CalendarWeek className="me-2" />
                   { moment().add(moment.duration(duration, 'years').asSeconds(), 'seconds').format('L') } 
                 </InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm="9">
+              <InputGroup size="sm" className="mb-2">
+                <InputGroup.Text>{t('modal.reg.receiver')}: </InputGroup.Text>
+                <FormControl 
+                  value={receiver} 
+                  onChange={handleReceiverChange}
+                  disabled={ regAction !== "regBefore" || isReceiverSpecified } 
+                />
               </InputGroup>
             </Col>
           </Row>

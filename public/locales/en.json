@@ -49,7 +49,6 @@
       "reg": "Register",
       "continue": "Continue", 
       "reged": "Registered", 
-      "book": "Book",
       "tips": {
         "lb": "Click to Change the Label Color",
         "renew": "Renew {{label}}.eth",
@@ -58,9 +57,6 @@
         "reging": "Registering",
         "continue": "Continue to the Registration Process",
         "regStep": "{{regStep}} / 3 of the Registration Process has been Completed",
-        "book": "Book {{label}}.eth",
-        "booked": "Waiting for the Name to Reopen",
-        "cbook": "Cancel This Book",
         "del": "Remove {{label}}.eth"
       }
     },
@@ -117,14 +113,16 @@
     "reg": {
       "title": "Register {{label}}.eth",
       "tip": "The information for the name you want to register is as follows: ",
+      "receiver": "Receiver",
+      "wrongReceiver": "The Receiver you specified is invalid, please re-enter the Receiver and continue.",
       "register00": "{{label}}.eth will be registered to {{owner}} for {{duration}} years.",
-      "register10": "{{label}}.eth commit transaction submitted.",
+      "register10": "{{label}}.eth commit transaction submitted, awaiting confirmation.",
       "register11": {
         "succeed": "SETP 1 / 3 FINISHED: {{label}}.eth commit {{txLink}} confirmed, wait a short time before the next step.",
         "fail": "{{label}}.eth COMMIT FAILED. You can check the commit {{txLink}}."
       },
       "register20": "SETP 2 / 3 FINISHED: {{label}}.eth is ready for registration.",
-      "register30": "{{label}}.eth registration transaction submitted.",
+      "register30": "{{label}}.eth registration transaction submitted, awaiting confirmation.",
       "register31": {
         "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
         "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."

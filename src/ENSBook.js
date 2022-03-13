@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo } from './Components/Global/globals'
+import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -24,7 +24,7 @@ let web3Modal
 
 const INITIAL_STATE = {
   regMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerName process
-  regsMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerNames process
+  regsMsges: [{ time: moment(), type: "action", text: "regsBefore" }], // for registerNames process
   renewMsges: [{ time: moment(), type: "action", text: "renewBefore" }], // for renewName process
   reconnecting: false,
   fetching: false,
@@ -100,6 +100,10 @@ class ENSBook extends React.Component {
     return expiresTimeBignumber.toNumber() // unix timestamp
   }
 
+  getDefaultNameReceiver = async () => {
+    return conf.custom.register.receiver ? conf.custom.register.receiver : await this.state.address
+  }
+
   updateName = async (index, messageShowFlag = true) => {
     const { nameInfo } = this.state
     const expiresTimeStamp = await this.getExpiresTimeStamp(nameInfo[index].label) // unix timestamp
@@ -150,12 +154,14 @@ class ENSBook extends React.Component {
     })
   }
 
-  registerName = async (label, duration, regFrom = 0, regTo = 3) => {
+  // registerName actions: regBefore, regStarted, regSupended, regSucceeded, regFailed
+
+  registerName = async (label, duration, receiver, regFrom = 0, regTo = 3) => {
     if (regFrom >= regTo) {
       return console.log("Warning: regFrom must < regTo.")
     }
 
-    const { provider, signer, address, network, nameInfo } = this.state
+    const { provider, signer, network, nameInfo } = this.state
     const index = nameInfo.findIndex(item => item.label === label)
 
     let regMsges = [{ 
@@ -171,7 +177,8 @@ class ENSBook extends React.Component {
     duration = Math.max(duration, 2419200)  // 2419200 seconds = 28 days
 
     let regInfo = {
-      owner: undefined,
+      receiver: undefined,  // receiver can be address or ENS name
+      owner: undefined,     // owner can only be a standard ETH address
       duration: duration,
       secret: undefined,
       resolver: "0x0000000000000000000000000000000000000000",
@@ -183,10 +190,31 @@ class ENSBook extends React.Component {
 
     const regPrepare = async (regFrom) => {
       if (regFrom <= 0) {
-        regInfo.owner = utils.isAddress(conf.custom.register.receiver) ? conf.custom.register.receiver : address
+        // Verify that the user entered a valid receiver (ETH address or ENS name)
+        try { 
+          const owner = await provider.resolveName(receiver)
+          if (!owner) {
+            throw new Error('This ENS does not have an address configured.')
+          }
+          regInfo.receiver = receiver
+          regInfo.owner = receiver
+        } catch(e) {
+          console.log(e)
+          regMsges[0] = { 
+            time: moment(), 
+            type: "action", 
+            text: "regBefore" 
+          }
+          regMsges.push({ 
+            time: moment(), 
+            type: "failed", 
+            text: t('modal.reg.wrongReceiver') 
+          })
+          this.setState({ regMsges })
+          return -1
+        }
 
         regInfo.secret = ethers.Wallet.createRandom().privateKey
-        window.localStorage.setItem("lastCommit", `{ name: ${label}, owner: ${regInfo.owner}, secret: ${regInfo.secret} }`)
 
         if (conf.custom.register.registerWithConfig) {
           regInfo.resolver = conf.fixed.contract.addr[network].PubRes
@@ -299,7 +327,7 @@ class ENSBook extends React.Component {
         }
         regMsges.push({ 
           time: moment(), 
-          type: "fail", 
+          type: "failed", 
           text: t('modal.reg.register11.fail', { label: label, txLink: commitTxLink }) 
         })
         this.setState({ regMsges })
@@ -426,6 +454,7 @@ class ENSBook extends React.Component {
 
     const updatedRegFrom = await regPrepare(regFrom)
 
+    if (updatedRegFrom < 0) return 0  // execute this line if prepare failed
     if (updatedRegFrom === 2.5) return await regFrom25()
     if (updatedRegFrom === 2) return await regFrom2()
     if (updatedRegFrom === 1) return await regFrom1()
@@ -439,7 +468,9 @@ class ENSBook extends React.Component {
     this.updateBalance()
   }
 
-  registerNames = async (duration) => {
+  // registerNames actions: regsBefore, regsStarted, regsEnded
+
+  registerNames = async (duration, receiver) => {
     const registrableNames = getRegistrableNames(this.state.nameInfo)
 
     let regsMsges = [{ 
@@ -450,7 +481,7 @@ class ENSBook extends React.Component {
     this.setState({ regsMsges })
 
     for (let i = 0; i < registrableNames.length; i++) {
-      const regResult = await this.registerName(registrableNames[i].label, duration)
+      const regResult = await this.registerName(registrableNames[i].label, duration, receiver)
       if (regResult === 3) {
         regsMsges.push({
           time: moment(),
@@ -488,17 +519,6 @@ class ENSBook extends React.Component {
     this.updateBalance()
     this.updateNames()
   }
-
-
-  // bookFlags = {}
-
-  // book = (label) => {
-  // }
-
-  // cancelBook = (index) => {
-  //   this.bookFlags[this.state.nameInfo[index].label] = false
-  //   this.updateName(index)
-  // }
 
   renewName = async (label, duration) => {
     const { provider, signer, network } = this.state
@@ -613,7 +633,7 @@ class ENSBook extends React.Component {
 
   removeName = (index) => {
     const { nameInfo } = this.state
-    //removeRegInfo(nameInfo[index].label)
+    removeRegInfo(nameInfo[index].label)
     Promise.all(nameInfo.filter((item, i) => {return i !== index}))
     .then((nameInfo) => {
       this.setAndStoreNameInfo(nameInfo)
@@ -716,6 +736,7 @@ class ENSBook extends React.Component {
           reconnectApp={this.reconnectApp}
           type={type}
           network={network}
+          reconnecting={reconnecting}
           updateName={this.updateName}
           updateNames={this.updateNames} 
           registerName={this.registerName} 
@@ -731,8 +752,7 @@ class ENSBook extends React.Component {
           regMsges={regMsges}
           regsMsges={regsMsges}
           renewMsges={renewMsges}
-          // book={this.book}
-          // cancelBook={this.cancelBook}
+          getDefaultNameReceiver={this.getDefaultNameReceiver}
           setAndStoreNameInfo={this.setAndStoreNameInfo}
         />
         <Footer />

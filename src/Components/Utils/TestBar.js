@@ -4,18 +4,15 @@ import React from 'react';
 import { hexlify } from 'ethers/lib/utils';
 
 export default function TestBar(props) {
+  const { provider } = props
 
   const testFunc1 = async () => {
-    console.log(0.5 ^ 0.25)
-    
-    // console.log(0.5 ^ 2/65536 * (10 ** 18))
-    // console.log(0.5 ^ 3/65536 * (10 ** 18))
-    // console.log(0.5 ^ 4/65536 * (10 ** 18))
-    // console.log(0.5 ^ 5/65536 * (10 ** 18))
-    // console.log(BigNumber.from())
+    const a = await provider.resolveName()
+    console.log(a)
   }
 
   const testFunc2 = async () => {
+    testFunc1(1,2)
   }
 
   return (
