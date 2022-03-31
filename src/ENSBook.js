@@ -651,13 +651,13 @@ class ENSBook extends React.Component {
   // getProviderAndSigner() return a provider, a signer and a wallet type.
   // wallet type: 'custom' | 'web3' | 'readonly'
   getProviderAndSigner = async () => {
-    let provider
     if (isCustomWallet(conf)) {
-      provider = new ethers.providers.InfuraProvider(conf.custom.wallet.network, conf.custom.infuraID)
+      let provider = new ethers.providers.InfuraProvider(conf.custom.wallet.network, conf.custom.infuraID)
       const signer = new ethers.Wallet(conf.custom.wallet.operatorPrivateKey[0], provider)
       return { provider, signer, type: 'custom' }
     } 
     //return await getWeb3Modal(fallback)
+    let provider
     try {
       web3Modal = new Web3Modal({
         cacheProvider: true, // optional
@@ -690,21 +690,27 @@ class ENSBook extends React.Component {
 
   subscribeProvider = async (provider) => {
     if (!provider.on) {
-      return;
+      return
     }
     //provider.on("close", () => this.resetApp());
     provider.on("accountsChanged", async (accounts) => {
+      if (this.state.type !== 'web3') {
+        return console.log('Your switch only works in Web3 mode.')
+      }
       this.reconnectApp(false)
-    });
+    })
     provider.on("chainChanged", async (chainId) => {
+      if (this.state.type !== 'web3') {
+        return console.log('Your switch only works in Web3 mode.')
+      }
       if (isSupportedChain(parseInt(chainId, 16))) {
         this.setState({ unsupported: false })
         this.reconnectApp()
       } else {
         this.setState({ unsupported: true })
       }
-    });
-  };
+    })
+  }
 
   render() {
     const { 
