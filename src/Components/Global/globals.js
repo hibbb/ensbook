@@ -105,7 +105,7 @@ export async function updateRegStep(label, regStep, provider) {
 
   if (regStep > 0.5) {
     regWindow.start = moment.unix(commitTxTime).add(60, 'seconds')
-    regWindow.end = moment.unix(commitTxTime).add(24, 'hours')
+    regWindow.end = moment.unix(commitTxTime).add(7, 'days')
     regStep = moment().isBefore(regWindow.end) ? regStep : 0
   }
 
