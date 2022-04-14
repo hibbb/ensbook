@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { getConf, isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo } from './Components/Global/globals'
+import { isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -14,13 +14,9 @@ import Footer from './Components/Footer/Footer'
 import MessageToasts from './Components/Utils/MessageToasts'
 import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal'
 
-let conf = getConf()
-const defaultProvider = new ethers.providers.InfuraProvider("mainnet", conf.custom.infuraID)
-// store the newest lookupList to localstorage, keep the list in configform up to date.
-const lookupList = Object.keys(conf.custom.display.lookup)
-window.localStorage.setItem('lookupList', JSON.stringify(lookupList))
-
 let web3Modal
+let conf = updateLookupList() // getConf() inside
+const defaultProvider = new ethers.providers.InfuraProvider("mainnet", conf.custom.infuraID)
 
 const INITIAL_STATE = {
   regMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerName process
