@@ -23,6 +23,7 @@ export function updateLookupList(conf) {
 
   if (oldList.length !== newList.length) {
     conf.custom.display.lookup = confFile.custom.display.lookup
+    window.localStorage.setItem("confInfo", JSON.stringify(conf))
   }
   return conf
 }
