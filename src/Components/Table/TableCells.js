@@ -293,10 +293,11 @@ export const LookupCell = (props) => {
   const { lookup } = conf.custom.display
   // When you modify lookupLinks, you also need to modify:
   // 1. the custom.display.lookup filed of conf.json
-  // 2. the nm.tb.lookup filed of en.json and cn.json
+  // 2. the tb.lookup filed of en.json and cn.json
   const lookupLinks = {
     "Etherscan": "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
     "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenIdDec}`,
+    "Gem": `https://www.gem.xyz/asset/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/${tokenIdDec}`,
     "Metadata": `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
     "eth.link": `https://${label}.eth.link/`,
     "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`

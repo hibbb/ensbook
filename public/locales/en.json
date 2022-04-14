@@ -63,6 +63,7 @@
     "lookup": {
       "Etherscan": "Etherscan",
       "Opensea": "Opensea",
+      "Gem": "Gem",
       "Metadata": "Metadata",
       "eth.link": "{{label}}.eth.link",
       "DNSRelated": "DNS with Same Label"

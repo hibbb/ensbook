@@ -2,8 +2,8 @@
 
 ## Priority 1
 
+- [ ] add looksrare & gem.xyz
 - [ ] add reReg button beside Continue
-- [ ] display the names before regNames
 - [ ] replace Bignumber .mul(105).div(100) with a better method
 
 ## Priority 2
@@ -16,6 +16,7 @@
 
 ## Completed From v1.4.0
 
+- [x] display the names before regNames
 - [x] add custom receiver input on reg Modal
 - [x] learn the new rentPrice function in EP9
 - [x] Price Range of Concern

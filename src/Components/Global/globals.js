@@ -14,6 +14,19 @@ export function getConf() {
   return confFile
 }
 
+export function updateLookupList(conf) {
+  conf = conf ?? getConf()
+  const oldList = Object.keys(conf.custom.display.lookup)
+  const newList = Object.keys(confFile.custom.display.lookup)
+  // update lookupList in localStorage
+  window.localStorage.setItem("lookupList", JSON.stringify(newList))
+
+  if (oldList.length !== newList.length) {
+    conf.custom.display.lookup = confFile.custom.display.lookup
+  }
+  return conf
+}
+
 export function getETHRegCtrlCon(providerOrSigner, network, conf) {
   conf = conf ?? getConf()
   const contractAddr = conf.fixed.contract.addr[network].ETHRegCtrl
