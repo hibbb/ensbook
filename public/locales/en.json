@@ -38,7 +38,7 @@
         "update": "Update Information",
         "regAll": "Batch Registration",
         "estAll": "Batch Registration Cost Estimation",
-        "remAll": "Remove All Names",
+        "remAll": "Remove Names",
         "hideNames": {
           "hide": "Hide Unregistrable Names",
           "show": "Show Unregistrable Names"
@@ -146,7 +146,7 @@
       }
     },
     "title": "Need Confirmation",
-    "removeNames": "Are you sure to CLEAR the table?",
+    "removeNames": "Are you sure to remove in batches?",
     "errorNetwork": {
       "title": "Unsupported Network",
       "text": "ENSBook currently supports only ethereum Mainnet and Ropsten network, please switch network in the wallet you are connected to, or disconnect from the wallet."

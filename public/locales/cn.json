@@ -38,7 +38,7 @@
         "update": "更新信息",
         "regAll": "批量注册",
         "estAll": "批量注册费用预估",
-        "remAll": "移除所有名称",
+        "remAll": "批量移除名称",
         "hideNames": {
           "hide": "隐藏不可注册的名称",
           "show": "展开所有名称"
@@ -146,7 +146,7 @@
       }
     },
     "title": "需要确认",
-    "removeNames": "您确定清空名称列表?",
+    "removeNames": "您要批量删除名称?",
     "errorNetwork": {
       "title": "暂不支持该网络",
       "text": "ENSBook 目前仅支持以太坊主网和 Ropsten 测试网, 请在您连接的钱包中切换网络, 或断开与钱包的连接。"
