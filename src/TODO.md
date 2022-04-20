@@ -2,6 +2,7 @@
 
 ## Priority 1
 
+- [ ] add favourite feature (keep red labels when click del button once)
 - [ ] add looksrare & gem.xyz
 - [ ] add reReg button beside Continue
 - [ ] replace Bignumber .mul(105).div(100) with a better method
