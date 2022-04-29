@@ -2,8 +2,6 @@
 
 ## Priority 1
 
-- [ ] add favourite feature (keep red labels when click del button once)
-- [ ] add looksrare & gem.xyz
 - [ ] add reReg button beside Continue
 - [ ] replace Bignumber .mul(105).div(100) with a better method
 
@@ -17,6 +15,8 @@
 
 ## Completed From v1.4.0
 
+- [x] add favourite feature (keep red labels when click del button once)
+- [x] add looksrare & gem.xyz
 - [x] display the names before regNames
 - [x] add custom receiver input on reg Modal
 - [x] learn the new rentPrice function in EP9
