@@ -121,9 +121,9 @@ class ENSBook extends React.Component {
         nameInfo[index].status = 'Normal'
       } else if (moment().isSameOrBefore(releaseTime)) {
         nameInfo[index].status = 'Grace'
-      } else if (moment().subtract(28, 'days').isSameOrBefore(releaseTime)) { 
+      } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
         nameInfo[index].status = 'Premium'
-      } else if (moment().subtract(28, 'days').isAfter(releaseTime)) {
+      } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
         nameInfo[index].status = 'Reopen'
       } else {
         nameInfo[index].status = 'Unknown'

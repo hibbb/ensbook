@@ -34,9 +34,9 @@ class ConfigureForm extends React.Component {
 
     renewDuration: this.conf.custom.renew.duration,
 
-    premiumPriceRange: this.conf.custom.premium.priceRange,
+    // premiumPriceRange: this.conf.custom.premium.priceRange,
     // Prepared for EP9
-    // premiumPriceRange: this.conf.custom.premium.priceRange > 21 ? 21 : this.conf.custom.premium.priceRange,
+    premiumPriceRange: this.conf.custom.premium.priceRange > 21 ? 21 : this.conf.custom.premium.priceRange,
 
     walletSwitch: this.conf.custom.wallet.switch,
     walletOperatorPrivateKey: this.conf.custom.wallet.operatorPrivateKey.join(),
@@ -247,13 +247,13 @@ class ConfigureForm extends React.Component {
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.premium.priceRange')}</InputGroup.Text>
                 <InputGroup.Text>{"≤"}</InputGroup.Text>
-                <FormControl 
+                {/* <FormControl 
                   name="premiumPriceRange" 
                   value={this.state.premiumPriceRange} 
                   onChange={this.handleChange} 
-                  aria-label="premiumPriceRange" />
+                  aria-label="premiumPriceRange" /> */}
 
-                {/* Prepared for EP9
+                {/* Prepared for EP9 */}
                 <Form.Select 
                   name="premiumPriceRange" 
                   value={this.state.premiumPriceRange} 
@@ -266,7 +266,7 @@ class ConfigureForm extends React.Component {
                         : null
                     )
                   }
-                </Form.Select> */}
+                </Form.Select>
                 <InputGroup.Text>{t('c.dollars')}</InputGroup.Text>
               </InputGroup>
 
