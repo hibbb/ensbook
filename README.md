@@ -48,14 +48,14 @@ You can use the Web version of ENSBook directly, or you can download the source 
 1. Open [ensbook.xyz](https://ensbook.xyz/) or [ensbook.eth.link](https://ensbook.eth.link/) in your browser.
 2. Connect your wallet, or ignore the connection and use read-only mode.
 3. Click the gear icon at top right corner.
-4. [Configure the custom items](#custom-configuration) to suit your own needs.
+4. Configure the custom items to suit your own needs.
 5. Save your configuration.
 
 #### Local Start
 
 1. `git clone https://github.com/hibbb/ensbook.git && cd ensbook`
 2. `yarn`
-3. [Configure the custom items](#custom-configuration) ( the "custom" field in /src/conf.json ) to suit your own needs.
+3. Configure the custom items (the "custom" field in /src/conf.json) to suit your own needs.
 4. `yarn build`
 5. `yarn global add serve`
 6. `serve -s build`

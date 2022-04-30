@@ -48,14 +48,14 @@
 1. 在浏览器中打开 [ensbook.xyz](https://ensbook.xyz/) 或者 [ensbook.eth.link](https://ensbook.eth.link/)
 2. 连接钱包，或者忽略连接使用只读模式。
 3. 点击右上角的齿轮。
-4. 按照需求 [配置自定义项](#自定义配置)。
+4. 按照需求配置自定义项。
 5. 保存配置。
 
 #### 本地运行
 
 1. `git clone https://github.com/hibbb/ensbook.git && cd ensbook`
 2. `yarn`
-3. 按照需求 [配置自定义项](#自定义配置)（修改文件 /src/conf.json 中的 custom 部分）。
+3. 按照需求配置自定义项（修改文件 /src/conf.json 中的 custom 部分）。
 4. `yarn build`
 5. `yarn global add serve`
 6. `serve build`
