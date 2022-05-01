@@ -87,7 +87,7 @@ export const StatusCell = (props) => {
       case 'Reopen':
         tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
         tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
-        tooltipArray[2] = {label: t('c.premiumEnd'), unixTime: releaseTime + moment.duration(28, 'days').asSeconds()}
+        tooltipArray[2] = {label: t('c.premiumEnd'), unixTime: releaseTime + moment.duration(21, 'days').asSeconds()}
         tooltipArray[3] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
         break
       default:
