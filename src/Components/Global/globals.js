@@ -103,6 +103,9 @@ export async function updateRegStep(label, regStep, provider) {
 
   if (regInfo.commitTxHash) { 
     commitTxReceipt = await provider.getTransactionReceipt(regInfo.commitTxHash)
+    if (!commitTxReceipt) {
+      return 0
+    }
   } else {
     return regStep
   }

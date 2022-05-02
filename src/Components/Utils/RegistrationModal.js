@@ -40,7 +40,7 @@ const RegistrationModal = (props) => {
   const onShow = async () => {
     const receiverFromRegInfo = getRegInfo(label)?.receiver
     setIsReceiverSpecified(Boolean(receiverFromRegInfo))  // disable receiver input if true
-    setReceiver(receiverFromRegInfo ?? await getDefaultNameReceiver())
+    setReceiver(receiverFromRegInfo ?? getDefaultNameReceiver())
   }
 
   const handleReceiverChange = (event) => {

@@ -13,7 +13,8 @@ const RegistrationsModal = (props) => {
     registerNamesEnd,
     defaultDuration, 
     regMsges,
-    regsMsges
+    regsMsges,
+    getDefaultNameReceiver
   } = props
 
   
@@ -21,6 +22,8 @@ const RegistrationsModal = (props) => {
   const regsAction = regsMsges[0].text   // regsBefore, regsStarted, regsEnded
 
   const [duration, setDuration] = useState(defaultDuration) // duration: as Years
+
+  const receiver = getDefaultNameReceiver()
 
   const handleChange = (event) => {
     const { value } = event.target
@@ -51,7 +54,7 @@ const RegistrationsModal = (props) => {
       <>
         <Button variant="secondary" onClick={onHide}>{t('c.cancel')}</Button>
         <Button variant="primary" onClick={()=>{
-            registerNames(moment.duration(duration, 'years').asSeconds())
+            registerNames(moment.duration(duration, 'years').asSeconds(), receiver)
           }
         }>{t('c.confirm')}</Button>
       </>
@@ -170,6 +173,17 @@ const RegistrationsModal = (props) => {
                   <CalendarWeek className="me-2" />
                   { moment().add(moment.duration(duration, 'years').asSeconds(), 'seconds').format('L') } 
                 </InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm="9">
+              <InputGroup size="sm" className="mb-2">
+                <InputGroup.Text>{t('modal.reg.receiver')}: </InputGroup.Text>
+                <FormControl 
+                  value={receiver} 
+                  disabled 
+                />
               </InputGroup>
             </Col>
           </Row>
