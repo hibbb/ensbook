@@ -96,7 +96,7 @@ class ENSBook extends React.Component {
     return expiresTimeBignumber.toNumber() // unix timestamp
   }
 
-  getDefaultNameReceiver = async () => {
+  getDefaultNameReceiver = () => {
     const defaultReceiver = conf.custom.register.receiver 
       ? conf.custom.register.receiver 
       : (this.state.ensname ?? this.state.address)

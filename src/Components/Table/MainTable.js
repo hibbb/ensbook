@@ -60,6 +60,7 @@ class MainTable extends React.Component {
             estimateCosts={estimateCosts}
             regMsges={regMsges}
             regsMsges={regsMsges}
+            getDefaultNameReceiver={getDefaultNameReceiver}
           />
           <TableBody 
             type={type}

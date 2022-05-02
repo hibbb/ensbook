@@ -31,7 +31,8 @@ export const TableHead = (props) => {
     removeNames, 
     estimateCosts, 
     regMsges,
-    regsMsges
+    regsMsges,
+    getDefaultNameReceiver
   } = props
 
   const jsonSort = (array, key) => {
@@ -181,6 +182,7 @@ export const TableHead = (props) => {
             defaultDuration={defaultDuration}
             regMsges={regMsges}
             regsMsges={regsMsges}
+            getDefaultNameReceiver={getDefaultNameReceiver}
           />
         </th>
         <th>{t('tb.th.lu')}</th>
