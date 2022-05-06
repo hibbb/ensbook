@@ -172,6 +172,7 @@
     "disconnect": "断开连接",
     "relatedTime": "相关时间",
     "currentTime": "当前时间",
+    "registrationTime": "注册时间", 
     "expiresTime": "到期时间",
     "releaseTime": "释放时间",
     "premiumEnd": "溢价结束",

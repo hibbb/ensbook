@@ -64,6 +64,10 @@ export function getRegistrableNames(nameInfo) {
   return nameInfo.filter(nameItem => isRegistrable(nameItem.status))
 }
 
+export function haveRegistrableNames(nameInfo) {
+  return nameInfo.findIndex(row => isRegistrable(row.status)) > -1
+}
+
 export function haveUnregistrableNames(nameInfo) {
   return nameInfo.findIndex(row => !isRegistrable(row.status)) > -1
 }

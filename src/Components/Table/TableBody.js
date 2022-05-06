@@ -10,7 +10,7 @@ export const TableBody = (props) => {
     nameInfo, 
     setAndStoreNameInfo, 
     conf, 
-    updateName, 
+    updateNames, 
     registerName, 
     registerNameEnd, 
     renewName,
@@ -47,9 +47,10 @@ export const TableBody = (props) => {
             index={index}
             status={row.status} 
             reconnecting={reconnecting}
+            registrationTime={row.registrationTime}
             expiresTime={row.expiresTime}
             releaseTime={row.releaseTime}
-            updateName={updateName}
+            updateNames={updateNames}
             defaultDuration={conf.custom.register.duration}
             renewName={renewName}
             renewNameEnd={renewNameEnd}

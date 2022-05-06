@@ -47,7 +47,7 @@ export const LabelCell = (props) => {
 }
 
 export const StatusCell = (props) => {
-  const { label, index, status, reconnecting, releaseTime, expiresTime, updateName, type, renewName, renewNameEnd, defaultDuration, priceRange, renewMsges } = props
+  const { label, status, reconnecting, registrationTime, releaseTime, expiresTime, updateNames, type, renewName, renewNameEnd, defaultDuration, priceRange, renewMsges } = props
   const [modalShow, setModalShow] = useState(false)
 
   const graceEndingFlag = (
@@ -57,9 +57,8 @@ export const StatusCell = (props) => {
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
   
   const premiumEndingFlag = (
-    status === 'Premium' 
-    // && moment().unix() > releaseTime + (1 - priceRange / 100000) * 28 * 86400
     // Prepared for EP9
+    status === 'Premium' 
     && priceRange < 21 
     && moment().isAfter(moment.unix(releaseTime).add(priceRange, 'days'))
   )
@@ -79,16 +78,18 @@ export const StatusCell = (props) => {
     switch(status) {
       case 'Normal':
       case 'Grace':
-        tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
-        tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
-        tooltipArray[2] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
+        tooltipArray[0] = {label: t('c.registrationTime'), unixTime: registrationTime}
+        tooltipArray[1] = {label: t('c.expiresTime'), unixTime: expiresTime}
+        tooltipArray[2] = {label: t('c.releaseTime'), unixTime: releaseTime}
+        tooltipArray[3] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
         break
       case 'Premium':
       case 'Reopen':
-        tooltipArray[0] = {label: t('c.expiresTime'), unixTime: expiresTime}
-        tooltipArray[1] = {label: t('c.releaseTime'), unixTime: releaseTime}
-        tooltipArray[2] = {label: t('c.premiumEnd'), unixTime: releaseTime + moment.duration(21, 'days').asSeconds()}
-        tooltipArray[3] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
+        tooltipArray[0] = {label: t('c.registrationTime'), unixTime: registrationTime}
+        tooltipArray[1] = {label: t('c.expiresTime'), unixTime: expiresTime}
+        tooltipArray[2] = {label: t('c.releaseTime'), unixTime: releaseTime}
+        tooltipArray[3] = {label: t('c.premiumEnd'), unixTime: releaseTime + moment.duration(21, 'days').asSeconds()}
+        tooltipArray[4] = {label: t('c.currentTime'), unixTime: moment().unix(), current: true}
         break
       default:
         tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
@@ -158,7 +159,7 @@ export const StatusCell = (props) => {
             }
           </Tooltip>
         }>        
-        <span className={'td-status status-' + status + graceEndingClass + premiumEndingClass} onClick={()=>updateName(index)}>
+        <span className={'td-status status-' + status + graceEndingClass + premiumEndingClass} onClick={()=>updateNames([label])}>
           {t('nm.sta.' + status)}
           <NameAge />
         </span>
