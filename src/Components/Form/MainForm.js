@@ -11,7 +11,7 @@ class MainForm extends React.Component {
   state = this.initialState
 
   addNames = async (labels) => {
-    const { nameInfo, setAndStoreNameInfo, updateName } = this.props
+    const { nameInfo, setAndStoreNameInfo, updateNames } = this.props
 
     labels = labels.replace(/[,.'"?!@#$%^&*()/\\\\]/g, ' ').trim()
     if (labels.length < 1) { return false }
@@ -30,7 +30,6 @@ class MainForm extends React.Component {
     })
     // caculate the differences between the new and original labels, to avoid duplicates 
     let diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]; 
-    const originNameInfoLen = nameInfo.length
 
     diffLabelsArr.map(label => 
       nameInfo.push({
@@ -43,9 +42,8 @@ class MainForm extends React.Component {
     setAndStoreNameInfo(nameInfo, false)
 
     // update the status of newly added names
-    for(let index = originNameInfoLen; index < nameInfo.length; index++) {
-      updateName(index)
-    }
+    await updateNames(diffLabelsArr)
+    
     toast.info(t('msg.setAndStoreNameInfo'))
   }
 

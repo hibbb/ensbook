@@ -7,6 +7,7 @@ import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
 import { isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList } from './Components/Global/globals'
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -103,54 +104,72 @@ class ENSBook extends React.Component {
     return defaultReceiver
   }
 
-  updateName = async (index, messageShowFlag = true) => {
+  updateNames = async (labels, messageShowFlag = true) => {
     const { nameInfo } = this.state
-    const expiresTimeStamp = await this.getExpiresTimeStamp(nameInfo[index].label) // unix timestamp
-    const expiresTime = moment.unix(expiresTimeStamp)
-    const releaseTime = moment.unix(expiresTimeStamp).add(90, 'days')
+    labels = labels ?? nameInfo.map(item => item.label)
 
-    if (expiresTimeStamp < 1) {
-      nameInfo[index].status = 'Open'
-      nameInfo[index].expiresTime = 0
-      nameInfo[index].releaseTime = 0 
-    } else {
-      nameInfo[index].expiresTime = expiresTime.unix()
-      nameInfo[index].releaseTime = releaseTime.unix()
-      
-      if (moment().isSameOrBefore(expiresTime)) {
-        nameInfo[index].status = 'Normal'
-      } else if (moment().isSameOrBefore(releaseTime)) {
-        nameInfo[index].status = 'Grace'
-      } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
-        nameInfo[index].status = 'Premium'
-      } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
-        nameInfo[index].status = 'Reopen'
+    const namesQuery = `
+      query($labels: [String!]) {
+        registrations(where: {labelName_in: $labels}) {
+          labelName,
+          id,
+          expiryDate,
+          registrationDate,
+        }
+      }
+    `
+    const client = new ApolloClient({
+      uri: 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+      cache: new InMemoryCache(),
+    })
+    
+    const data = await client.query({
+      query: gql(namesQuery),
+      variables: {labels: labels},
+    })
+
+    const { registrations } = data.data
+
+    for (let i = 0; i < labels.length; i ++) {
+      const ri = registrations.findIndex(item => item.labelName === labels[i])
+      const ni = nameInfo.findIndex(item => item.label === labels[i])
+
+      if (ri < 0) {
+        nameInfo[ni].status = 'Open'
+        nameInfo[ni].expiresTime = 0
+        nameInfo[ni].releaseTime = 0 
+        nameInfo[ni].registrationTime = 0
       } else {
-        nameInfo[index].status = 'Unknown'
+        const expiresTime = moment.unix(registrations[ri].expiryDate)
+        const releaseTime = moment.unix(registrations[ri].expiryDate).add(90, 'days')
+        
+        nameInfo[ni].registrationTime = Number(registrations[ri].registrationDate)
+        nameInfo[ni].expiresTime = expiresTime.unix()
+        nameInfo[ni].releaseTime = releaseTime.unix()
+
+        if (moment().isSameOrBefore(expiresTime)) {
+          nameInfo[ni].status = 'Normal'
+        } else if (moment().isSameOrBefore(releaseTime)) {
+          nameInfo[ni].status = 'Grace'
+        } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
+          nameInfo[ni].status = 'Premium'
+        } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
+          nameInfo[ni].status = 'Reopen'
+        } else {
+          nameInfo[ni].status = 'Unknown'
+        }
+      }
+
+      if (nameInfo[ni].regStep > 0) {
+        nameInfo[ni].regStep = await updateRegStep(nameInfo[ni].label, nameInfo[ni].regStep, this.state.provider)
       }
     }
 
-    if (nameInfo[index].regStep > 0) {
-      nameInfo[index].regStep = await updateRegStep(nameInfo[index].label, nameInfo[index].regStep, this.state.provider)
-    }
-
     this.setAndStoreNameInfo(nameInfo, messageShowFlag)
-    return expiresTimeStamp
-  }
-
-  updateNameByLabel = async (label) => {
-    const index = this.state.nameInfo.findIndex(item => item.label === label)
-    return this.updateName(index)
   }
 
   updateBalance = async () => {
     this.setState({ balance: utils.formatEther(await this.state.signer.getBalance()) }) 
-  }
-
-  updateNames = async (messageShowFlag = true) => {
-    this.state.nameInfo.map(async (row, index) => {
-      return await this.updateName(index, messageShowFlag)
-    })
   }
 
   // registerName actions: regBefore, regStarted, regSupended, regSucceeded, regFailed
@@ -463,7 +482,7 @@ class ENSBook extends React.Component {
 
   registerNameEnd = (label) => {
     this.setState({ regMsges: INITIAL_STATE.regMsges })
-    this.updateNameByLabel(label)
+    this.updateNames([label])
     this.updateBalance()
   }
 
@@ -599,7 +618,7 @@ class ENSBook extends React.Component {
 
   renewNameEnd = (label) => {
     this.setState({ renewMsges: INITIAL_STATE.renewMsges })
-    this.updateNameByLabel(label)
+    this.updateNames([label])
     this.updateBalance()
   }
 
@@ -740,7 +759,7 @@ class ENSBook extends React.Component {
         <MainForm 
           nameInfo={nameInfo}
           setAndStoreNameInfo={this.setAndStoreNameInfo}
-          updateName={this.updateName}
+          updateNames={this.updateNames}
         />
         <MainTable 
           conf={conf}
@@ -749,7 +768,6 @@ class ENSBook extends React.Component {
           type={type}
           network={network}
           reconnecting={reconnecting}
-          updateName={this.updateName}
           updateNames={this.updateNames} 
           registerName={this.registerName} 
           registerNames={this.registerNames}

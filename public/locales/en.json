@@ -172,6 +172,7 @@
     "disconnect": "Disconnect",
     "relatedTime": "Related Times",
     "currentTime": "Current",
+    "registrationTime": "Reg", 
     "expiresTime": "Expires",
     "releaseTime": "Release",
     "premiumEnd": "Reopen",

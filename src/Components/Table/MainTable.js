@@ -33,7 +33,6 @@ class MainTable extends React.Component {
       renewNameEnd,
       setAndStoreNameInfo, 
       type,  
-      updateName, 
       updateNames
     } = this.props
 
@@ -69,7 +68,7 @@ class MainTable extends React.Component {
             nameInfo={nameInfo} 
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
-            updateName={updateName}
+            updateNames={updateNames}
             registerName={registerName} 
             registerNameEnd={registerNameEnd}
             renewName={renewName}
