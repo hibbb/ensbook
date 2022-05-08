@@ -2,6 +2,7 @@
 
 ## Priority 1
 
+- [ ] double check the status before every signle registration when bulk registering
 - [ ] add reReg button beside Continue
 - [ ] replace Bignumber .mul(105).div(100) with a better method
 

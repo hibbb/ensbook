@@ -6,8 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList } from './Components/Global/globals'
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+import { isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, getNames } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -105,67 +104,15 @@ class ENSBook extends React.Component {
   }
 
   updateNames = async (labels, messageShowFlag = true) => {
-    const { nameInfo } = this.state
+    let { nameInfo, provider } = this.state
     labels = labels ?? nameInfo.map(item => item.label)
+    const labelsGroupsCount = Math.ceil(labels.length/100)
 
-    const namesQuery = `
-      query($labels: [String!]) {
-        registrations(where: {labelName_in: $labels}) {
-          labelName,
-          id,
-          expiryDate,
-          registrationDate,
-        }
-      }
-    `
-    const client = new ApolloClient({
-      uri: 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
-      cache: new InMemoryCache(),
-    })
-    
-    const data = await client.query({
-      query: gql(namesQuery),
-      variables: {labels: labels},
-    })
-
-    const { registrations } = data.data
-
-    for (let i = 0; i < labels.length; i ++) {
-      const ri = registrations.findIndex(item => item.labelName === labels[i])
-      const ni = nameInfo.findIndex(item => item.label === labels[i])
-
-      if (ri < 0) {
-        nameInfo[ni].status = 'Open'
-        nameInfo[ni].expiresTime = 0
-        nameInfo[ni].releaseTime = 0 
-        nameInfo[ni].registrationTime = 0
-      } else {
-        const expiresTime = moment.unix(registrations[ri].expiryDate)
-        const releaseTime = moment.unix(registrations[ri].expiryDate).add(90, 'days')
-        
-        nameInfo[ni].registrationTime = Number(registrations[ri].registrationDate)
-        nameInfo[ni].expiresTime = expiresTime.unix()
-        nameInfo[ni].releaseTime = releaseTime.unix()
-
-        if (moment().isSameOrBefore(expiresTime)) {
-          nameInfo[ni].status = 'Normal'
-        } else if (moment().isSameOrBefore(releaseTime)) {
-          nameInfo[ni].status = 'Grace'
-        } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
-          nameInfo[ni].status = 'Premium'
-        } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
-          nameInfo[ni].status = 'Reopen'
-        } else {
-          nameInfo[ni].status = 'Unknown'
-        }
-      }
-
-      if (nameInfo[ni].regStep > 0) {
-        nameInfo[ni].regStep = await updateRegStep(nameInfo[ni].label, nameInfo[ni].regStep, this.state.provider)
-      }
+    for (let n = 0; n < labelsGroupsCount; n++) {
+      const labelsGroup = labels.slice(n * 100, n * 100 + 100)
+      nameInfo = await getNames(labelsGroup, nameInfo, provider)
+      this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     }
-
-    this.setAndStoreNameInfo(nameInfo, messageShowFlag)
   }
 
   updateBalance = async () => {
