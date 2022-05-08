@@ -1,5 +1,6 @@
 import confFile from '../../conf.json'
 import { Contract } from 'ethers'
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import moment from 'moment'
 
 export function getConf() {
@@ -146,4 +147,69 @@ export async function updateRegStep(label, regStep, provider) {
 
 export function removeRegInfo(label) {
   window.localStorage.removeItem("regInfo-" + label)
+}
+
+export async function getNames(labelsGroup, nameInfo, provider) {
+  if (labelsGroup.length > 100) {
+    return nameInfo
+  }
+
+  const namesQuery = `
+    query($labelsGroup: [String!]) {
+      registrations(where: {labelName_in: $labelsGroup}) {
+        labelName,
+        id,
+        expiryDate,
+        registrationDate,
+      }
+    }
+  `
+  const client = new ApolloClient({
+    uri: 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+    cache: new InMemoryCache(),
+  })
+
+  const data = await client.query({
+    query: gql(namesQuery),
+    variables: {labelsGroup: labelsGroup},
+  })
+
+  const { registrations } = data.data
+
+  for (let i = 0; i < labelsGroup.length; i++) {
+    const ri = registrations.findIndex(item => item.labelName === labelsGroup[i])
+    const ni = nameInfo.findIndex(item => item.label === labelsGroup[i])
+
+    if (ri < 0) {
+      nameInfo[ni].status = 'Open'
+      nameInfo[ni].expiresTime = 0
+      nameInfo[ni].releaseTime = 0 
+      nameInfo[ni].registrationTime = 0
+    } else {
+      const expiresTime = moment.unix(registrations[ri].expiryDate)
+      const releaseTime = moment.unix(registrations[ri].expiryDate).add(90, 'days')
+      
+      nameInfo[ni].registrationTime = Number(registrations[ri].registrationDate)
+      nameInfo[ni].expiresTime = expiresTime.unix()
+      nameInfo[ni].releaseTime = releaseTime.unix()
+
+      if (moment().isSameOrBefore(expiresTime)) {
+        nameInfo[ni].status = 'Normal'
+      } else if (moment().isSameOrBefore(releaseTime)) {
+        nameInfo[ni].status = 'Grace'
+      } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
+        nameInfo[ni].status = 'Premium'
+      } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
+        nameInfo[ni].status = 'Reopen'
+      } else {
+        nameInfo[ni].status = 'Unknown'
+      }
+    }
+
+    if (nameInfo[ni].regStep > 0) {
+      nameInfo[ni].regStep = await updateRegStep(nameInfo[ni].label, nameInfo[ni].regStep, provider)
+    }
+  }
+
+  return nameInfo
 }
