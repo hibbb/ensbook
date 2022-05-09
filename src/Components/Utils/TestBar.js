@@ -8,7 +8,22 @@ import React from 'react';
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
-
+    const a = [
+      {
+        "label": "la",
+        "age": "a1"
+      },
+      {
+        "label": "lb",
+        "age": "b1"
+      },
+      {
+        "label": "lc",
+        "age": "c1"
+      }
+    ]
+    const r = a.filter(nameItem => nameItem.label === 'lb')[0]
+    console.log(r)
   }
 
   const testFunc2 = async () => {

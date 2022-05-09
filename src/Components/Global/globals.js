@@ -65,6 +65,10 @@ export function getRegistrableNames(nameInfo) {
   return nameInfo.filter(nameItem => isRegistrable(nameItem.status))
 }
 
+export function getNameItemByLabel(label, nameInfo) {
+  return nameInfo.filter(nameItem => nameItem.label === label)[0] // return a struct item
+}
+
 export function haveRegistrableNames(nameInfo) {
   return nameInfo.findIndex(row => isRegistrable(row.status)) > -1
 }
