@@ -153,10 +153,14 @@ export function removeRegInfo(label) {
   window.localStorage.removeItem("regInfo-" + label)
 }
 
-export async function getNames(labelsGroup, nameInfo, provider) {
+export async function getNames(labelsGroup, nameInfo, provider, network) {
   if (labelsGroup.length > 100) {
     return nameInfo
   }
+
+  const subgraphUri = network === "ropsten"
+    ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensropsten'
+    : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens'
 
   const namesQuery = `
     query($labelsGroup: [String!]) {
@@ -172,7 +176,7 @@ export async function getNames(labelsGroup, nameInfo, provider) {
     }
   `
   const client = new ApolloClient({
-    uri: 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+    uri: subgraphUri,
     cache: new InMemoryCache(),
   })
 

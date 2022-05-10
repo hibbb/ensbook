@@ -105,13 +105,13 @@ class ENSBook extends React.Component {
   }
 
   updateNames = async (labels, messageShowFlag = true) => {
-    let { nameInfo, provider } = this.state
+    let { nameInfo, provider, network } = this.state
     labels = labels ?? nameInfo.map(item => item.label)
     const labelsGroupsCount = Math.ceil(labels.length/100)
 
     for (let n = 0; n < labelsGroupsCount; n++) {
       const labelsGroup = labels.slice(n * 100, n * 100 + 100)
-      nameInfo = await getNames(labelsGroup, nameInfo, provider)
+      nameInfo = await getNames(labelsGroup, nameInfo, provider, network)
       this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     }
   }
