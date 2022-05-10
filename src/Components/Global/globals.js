@@ -22,7 +22,7 @@ export function updateLookupList(conf) {
   // update lookupList in localStorage
   window.localStorage.setItem("lookupList", JSON.stringify(newList))
 
-  if (oldList.length !== newList.length) {
+  if (oldList.sort().toString() !== newList.sort().toString()) {
     conf.custom.display.lookup = confFile.custom.display.lookup
     window.localStorage.setItem("confInfo", JSON.stringify(conf))
   }
@@ -63,6 +63,10 @@ export function isRegistrable(status) {
 
 export function getRegistrableNames(nameInfo) {
   return nameInfo.filter(nameItem => isRegistrable(nameItem.status))
+}
+
+export function getNameItemByLabel(label, nameInfo) {
+  return nameInfo.filter(nameItem => nameItem.label === label)[0] // return a struct item
 }
 
 export function haveRegistrableNames(nameInfo) {
@@ -149,10 +153,14 @@ export function removeRegInfo(label) {
   window.localStorage.removeItem("regInfo-" + label)
 }
 
-export async function getNames(labelsGroup, nameInfo, provider) {
+export async function getNames(labelsGroup, nameInfo, provider, network) {
   if (labelsGroup.length > 100) {
     return nameInfo
   }
+
+  const subgraphUri = network === "ropsten"
+    ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensropsten'
+    : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens'
 
   const namesQuery = `
     query($labelsGroup: [String!]) {
@@ -161,11 +169,14 @@ export async function getNames(labelsGroup, nameInfo, provider) {
         id,
         expiryDate,
         registrationDate,
+        registrant {
+          id
+        }
       }
     }
   `
   const client = new ApolloClient({
-    uri: 'https://api.thegraph.com/subgraphs/name/ensdomains/ens',
+    uri: subgraphUri,
     cache: new InMemoryCache(),
   })
 
@@ -195,8 +206,10 @@ export async function getNames(labelsGroup, nameInfo, provider) {
 
       if (moment().isSameOrBefore(expiresTime)) {
         nameInfo[ni].status = 'Normal'
+        nameInfo[ni].owner = registrations[ri].registrant.id
       } else if (moment().isSameOrBefore(releaseTime)) {
         nameInfo[ni].status = 'Grace'
+        nameInfo[ni].owner = registrations[ri].registrant.id
       } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
         nameInfo[ni].status = 'Premium'
       } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {

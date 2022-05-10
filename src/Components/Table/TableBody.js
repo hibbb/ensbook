@@ -78,6 +78,7 @@ export const TableBody = (props) => {
           <LookupCell
             label={row.label}
             tokenId={row.tokenId}
+            owner={row.owner}
             conf={conf}
             network={network}
           />

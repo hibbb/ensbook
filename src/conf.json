@@ -13,7 +13,8 @@
         "Opensea": true,
         "Gem": true,
         "Metadata": true,
-        "eth.link": false,
+        "Inventory": false, 
+        "LinkETH": false,
         "DNSRelated": false
       } 
     },

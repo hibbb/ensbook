@@ -8,7 +8,8 @@ import React from 'react';
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
-
+    let a = Number("abc")
+    console.log(!a)
   }
 
   const testFunc2 = async () => {

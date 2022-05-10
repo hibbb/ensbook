@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, getNames } from './Components/Global/globals'
+import { isCustomWallet, isSupportedChain, getRegistrableNames, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, getNames, isRegistrable, getNameItemByLabel } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -104,13 +104,13 @@ class ENSBook extends React.Component {
   }
 
   updateNames = async (labels, messageShowFlag = true) => {
-    let { nameInfo, provider } = this.state
+    let { nameInfo, provider, network } = this.state
     labels = labels ?? nameInfo.map(item => item.label)
     const labelsGroupsCount = Math.ceil(labels.length/100)
 
     for (let n = 0; n < labelsGroupsCount; n++) {
       const labelsGroup = labels.slice(n * 100, n * 100 + 100)
-      nameInfo = await getNames(labelsGroup, nameInfo, provider)
+      nameInfo = await getNames(labelsGroup, nameInfo, provider, network)
       this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     }
   }
@@ -436,7 +436,8 @@ class ENSBook extends React.Component {
   // registerNames actions: regsBefore, regsStarted, regsEnded
 
   registerNames = async (duration, receiver) => {
-    const registrableNames = getRegistrableNames(this.state.nameInfo)
+    const { nameInfo } = this.state
+    const registrableNames = getRegistrableNames(nameInfo)
 
     let regsMsges = [{ 
       time: moment(), 
@@ -446,7 +447,14 @@ class ENSBook extends React.Component {
     this.setState({ regsMsges })
 
     for (let i = 0; i < registrableNames.length; i++) {
-      const regResult = await this.registerName(registrableNames[i].label, duration, receiver)
+      // double check if each name is registrable when it is its turn
+      await this.updateNames([registrableNames[i].label])
+      const nameItem = getNameItemByLabel(registrableNames[i].label, nameInfo)
+      // if is registrable, start its registration process
+      const regResult = isRegistrable(nameItem.status)
+        ? await this.registerName(registrableNames[i].label, duration, receiver)
+        : 0
+      
       if (regResult === 3) {
         regsMsges.push({
           time: moment(),

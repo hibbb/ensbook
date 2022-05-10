@@ -65,7 +65,8 @@
       "Opensea": "Opensea",
       "Gem": "Gem",
       "Metadata": "Metadata",
-      "eth.link": "{{label}}.eth.link",
+      "Inventory": "Owner's Inventory",
+      "LinkETH": "{{label}}.eth.link",
       "DNSRelated": "DNS with Same Label"
     }
   },
