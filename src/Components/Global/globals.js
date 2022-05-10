@@ -22,7 +22,7 @@ export function updateLookupList(conf) {
   // update lookupList in localStorage
   window.localStorage.setItem("lookupList", JSON.stringify(newList))
 
-  if (oldList.length !== newList.length) {
+  if (oldList.sort().toString() !== newList.sort().toString()) {
     conf.custom.display.lookup = confFile.custom.display.lookup
     window.localStorage.setItem("confInfo", JSON.stringify(conf))
   }
@@ -165,6 +165,9 @@ export async function getNames(labelsGroup, nameInfo, provider) {
         id,
         expiryDate,
         registrationDate,
+        registrant {
+          id
+        }
       }
     }
   `
@@ -199,8 +202,10 @@ export async function getNames(labelsGroup, nameInfo, provider) {
 
       if (moment().isSameOrBefore(expiresTime)) {
         nameInfo[ni].status = 'Normal'
+        nameInfo[ni].owner = registrations[ri].registrant.id
       } else if (moment().isSameOrBefore(releaseTime)) {
         nameInfo[ni].status = 'Grace'
+        nameInfo[ni].owner = registrations[ri].registrant.id
       } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
         nameInfo[ni].status = 'Premium'
       } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {

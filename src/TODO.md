@@ -2,12 +2,8 @@
 
 ## Priority 1
 
-- [ ] double check the status before every signle registration when bulk registering
 - [ ] support selecting which name to reg or renew
-- [ ] use 'auto' or null instead of 0 as default in gasprice input
-- [ ] update balance in real time
-- [ ] add reReg button beside Continue
-- [ ] replace Bignumber .mul(105).div(100) with a better method
+- [ ] add the owner's inventory in lookups
 
 ## Priority 2
 
@@ -19,6 +15,7 @@
 
 ## Completed From v1.4.0
 
+- [x] double check the status before every signle registration when bulk registering
 - [x] add favourite feature (keep red labels when click del button once)
 - [x] add looksrare & gem.xyz
 - [x] display the names before regNames

@@ -21,7 +21,7 @@ export const LabelCell = (props) => {
       if (labelClickCount === 1) {
         levelUp(index)
       }
-      labelClickCount = 0;
+      labelClickCount = 0
     }, 350);
   }
 
@@ -69,7 +69,7 @@ export const StatusCell = (props) => {
       return array
     }
     array.sort(function(x, y) {return x[key] - y[key]})
-    return array;
+    return array
   }
 
   let tooltipArray = []
@@ -288,7 +288,7 @@ export const RegisterCell = (props) => {
 }
 
 export const LookupCell = (props) => {
-  const { conf, label, tokenId, network } = props
+  const { conf, label, tokenId, owner, network } = props
   const tokenIdDec = BigNumber.from(tokenId).toString()
   // for td-lookup
   const { lookup } = conf.custom.display
@@ -296,20 +296,42 @@ export const LookupCell = (props) => {
   // 1. the custom.display.lookup filed of conf.json
   // 2. the tb.lookup filed of en.json and cn.json
   const lookupLinks = {
-    "Etherscan": "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth",
-    "Opensea": `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenIdDec}`,
-    "Gem": `https://www.gem.xyz/asset/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/${tokenIdDec}`,
-    "Metadata": `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`,
-    "eth.link": `https://${label}.eth.link/`,
-    "DNSRelated": `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
+    Etherscan: {
+      precondition: true,
+      link: "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth"
+    },
+    Opensea: {
+      precondition: network === "mainnet" || network === "homestead",
+      link: `https://opensea.io/assets/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenIdDec}`
+    },
+    Gem: {
+      precondition: network === "mainnet" || network === "homestead",
+      link: `https://www.gem.xyz/asset/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/${tokenIdDec}`
+    },
+    Metadata: {
+      precondition: true,
+      link: `https://metadata.ens.domains/${network}/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/${tokenId}`
+    },
+    Inventory: {
+      precondition: utils.isAddress(owner),
+      link: `https://etherscan.io/token/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85?a=${owner}#inventory`
+    },
+    LinkETH: {
+      precondition: network === "mainnet" || network === "homestead",
+      link: `https://${label}.eth.link/`
+    },
+    DNSRelated: {
+      precondition: true,
+      link: `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
+    }
   }
 
   return (
     Object.keys(lookupLinks).map(item => 
-      lookup[item]
+      lookup[item] && lookupLinks[item].precondition
       ? (
         <OverlayTrigger key={'lookup-key-' + item} placement="top" overlay={<Tooltip>{t('tb.lookup.' + item, {label: label})}</Tooltip>}>
-          <a href={lookupLinks[item]} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
+          <a href={lookupLinks[item].link} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
         </OverlayTrigger>
       )
       : null
