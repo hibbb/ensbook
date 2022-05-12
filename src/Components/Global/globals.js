@@ -29,18 +29,23 @@ export function updateLookupList(conf) {
   return conf
 }
 
-export function getETHRegCtrlCon(providerOrSigner, network, conf) {
+export function getContract(providerOrSigner, network, conf, contract) {
   conf = conf ?? getConf()
-  const contractAddr = conf.fixed.contract.addr[network].ETHRegCtrl
-  const contractAbi = conf.fixed.contract.abi.ETHRegCtrl
+  const contractAddr = conf.fixed.contract.addr[network][contract]
+  const contractAbi = conf.fixed.contract.abi[contract]
   return new Contract(contractAddr, contractAbi, providerOrSigner)
 }
 
+export function getETHRegCtrlCon(providerOrSigner, network, conf) {
+  return getContract(providerOrSigner, network, conf, "ETHRegCtrl")
+}
+
 export function getBaseRegImpCon(providerOrSigner, network, conf) {
-  conf = conf ?? getConf()
-  const contractAddr = conf.fixed.contract.addr[network].BaseRegImp
-  const contractAbi = conf.fixed.contract.abi.BaseRegImp
-  return new Contract(contractAddr, contractAbi, providerOrSigner)
+  return getContract(providerOrSigner, network, conf, "BaseRegImp")
+}
+
+export function getBulkRenewCon(providerOrSigner, network, conf) {
+  return getContract(providerOrSigner, network, conf, "BulkRenew")
 }
 
 export function isCustomWallet(conf) {

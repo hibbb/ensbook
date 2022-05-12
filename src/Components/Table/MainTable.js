@@ -9,7 +9,40 @@ class MainTable extends React.Component {
   }
   
   // Hide unregistrable names or not
-  state = { "hideNames": false }
+  state = { 
+    "hideNames": false,
+    "regList": [],
+    "renewList": []
+  }
+
+  addRegName = (label) => {
+    const { regList } = this.state
+    regList.push(label)
+    this.setState({ regList })
+  }
+
+  removeRegName = (label) => {
+    const regList = this.state.regList.filter(item => item !== label)
+    this.setState({ regList })
+  }
+
+  clearRegList = () => {
+    this.setState({ regList: [] })
+  }
+
+  addRenewName = (label) => {
+    const renewList = this.state.renewList.push(label)
+    this.setState({ renewList })
+  }
+
+  removeRenewName = (label) => {
+    const renewList = this.state.renewList.filter(item => item !== label)
+    this.setState({ renewList })
+  }
+
+  clearRenewList = () => {
+    this.setState({ renewList: [] })
+  }
 
   render() {
     const { 
@@ -36,11 +69,17 @@ class MainTable extends React.Component {
       updateNames
     } = this.props
 
+    const { 
+      hideNames, 
+      regList, 
+      renewList, 
+    } = this.state
+
     const switchHideFlag = () => {
-      this.setState({ "hideNames": !this.state.hideNames})
+      this.setState({ "hideNames": !hideNames })
       setAndStoreNameInfo(nameInfo, false)
     }
-  
+    
     return (
       <div className="row table-wrapper">
         <table className="table table-hover ebr-tb">
@@ -52,6 +91,10 @@ class MainTable extends React.Component {
             updateNames={updateNames}
             registerNames={registerNames}
             registerNamesEnd={registerNamesEnd}
+            regList={regList}
+            clearRegList={this.clearRegList}
+            renewList={renewList}
+            clearRenewList={this.clearRenewList}
             defaultDuration={conf.custom.register.duration}
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
@@ -71,6 +114,10 @@ class MainTable extends React.Component {
             updateNames={updateNames}
             registerName={registerName} 
             registerNameEnd={registerNameEnd}
+            addRegName={this.addRegName}
+            addRenewName={this.addRenewName}
+            removeRegName={this.removeRegName}
+            removeRenewName={this.removeRenewName}
             renewName={renewName}
             renewNameEnd={renewNameEnd}
             hideNames={this.state.hideNames}

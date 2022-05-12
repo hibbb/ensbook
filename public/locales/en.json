@@ -34,10 +34,10 @@
         "lb": "Sort by Label",
         "ti": "Sort by Time",
         "sta": "Sort by Status",
-        "renew": "Batch Renewal",
+        "renew": "Bulk Renewal",
         "update": "Update Information",
-        "regAll": "Batch Registration",
-        "estAll": "Batch Registration Cost Estimation",
+        "regAll": "Bulk Registration",
+        "estAll": "Bulk Registration Cost Estimation",
         "remAll": "Remove Names",
         "hideNames": {
           "hide": "Hide Unregistrable Names",
@@ -53,6 +53,7 @@
         "lb": "Click to Change the Label Color",
         "renew": "Renew {{label}}.eth",
         "est": "Registration Cost Estimation",
+        "addRegName": "Add to Bulk Registration List",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",
         "continue": "Continue to the Registration Process",
@@ -131,10 +132,10 @@
       }
     },
     "regs": {
-      "title": "Batch Registration",
+      "title": "Bulk Registration",
       "tip": "The information for the names you want to register is as follows: ",
-      "names": "All Registrable Names in the Table",
-      "regsEnded": "The batch registration has been ended."
+      "names": "Checked Names in the Table",
+      "regsEnded": "The bulk registration has been ended."
     },
     "renew": {
       "title": "Renew",

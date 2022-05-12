@@ -54,12 +54,14 @@
         "mainnet": {
           "BaseRegImp": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
           "ETHRegCtrl": "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
-          "PubRes": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
+          "PubRes": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+          "BulkRenew": "0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035"
         },
         "ropsten": {
           "BaseRegImp": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
           "ETHRegCtrl": "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
-          "PubRes": "0x42D63ae25990889E35F215bC95884039Ba354115"
+          "PubRes": "0x42D63ae25990889E35F215bC95884039Ba354115",
+          "BulkRenew": "0x051b02245D826757EfaF5C6209D4D79FB39FBC45"
         }
       },
       "abi": {
@@ -74,6 +76,9 @@
           "function registerWithConfig(string name, address owner, uint256 duration, bytes32 secret, address resolver, address addr) payable",
           "function renew(string name, uint duration) payable",
           "function rentPrice(string name, uint duration) view returns (uint)"
+        ],
+        "BulkRenew": [
+          "function renewAll(string[] names, uint duration) payable"
         ]
       }
     }

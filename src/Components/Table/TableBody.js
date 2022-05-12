@@ -18,6 +18,8 @@ export const TableBody = (props) => {
     updateNames, 
     registerName, 
     registerNameEnd, 
+    addRegName,
+    removeRegName,
     renewName,
     renewNameEnd,
     hideNames, 
@@ -75,6 +77,8 @@ export const TableBody = (props) => {
             registerName={registerName} 
             regStep={row.regStep}
             registerNameEnd={registerNameEnd}
+            addRegName={addRegName}
+            removeRegName={removeRegName}
             regMsges={regMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
           />

@@ -436,9 +436,8 @@ class ENSBook extends React.Component {
 
   // registerNames actions: regsBefore, regsStarted, regsEnded
 
-  registerNames = async (duration, receiver) => {
+  registerNames = async (regList, duration, receiver) => {
     const { nameInfo } = this.state
-    const registrableNames = getRegistrableNames(nameInfo)
 
     let regsMsges = [{ 
       time: moment(), 
@@ -447,27 +446,27 @@ class ENSBook extends React.Component {
     }]
     this.setState({ regsMsges })
 
-    for (let i = 0; i < registrableNames.length; i++) {
+    for (let i = 0; i < regList.length; i++) {
       // double check if each name is registrable when it is its turn
-      await this.updateNames([registrableNames[i].label])
-      const nameItem = getNameItemByLabel(registrableNames[i].label, nameInfo)
+      await this.updateNames([regList[i]])
+      const nameItem = getNameItemByLabel(regList[i], nameInfo)
       // if is registrable, start its registration process
       const regResult = isRegistrable(nameItem.status)
-        ? await this.registerName(registrableNames[i].label, duration, receiver)
+        ? await this.registerName(regList[i], duration, receiver)
         : 0
       
       if (regResult === 3) {
         regsMsges.push({
           time: moment(),
           type: "succeeded",
-          text: registrableNames[i].label + '.eth'
+          text: regList[i] + '.eth'
         })
         this.setState({ regsMsges })
       } else {
         regsMsges.push({
           time: moment(),
           type: "failed",
-          text: registrableNames[i].label + '.eth'
+          text: regList[i] + '.eth'
         })
         this.setState({ regsMsges })
       }

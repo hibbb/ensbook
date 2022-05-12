@@ -8,8 +8,9 @@ import React from 'react';
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
-    let a = Number("abc")
-    console.log(!a)
+    let a = ['a', 'b', 'c']
+    a.filter(item => item !== 'b')
+    console.log(a)
   }
 
   const testFunc2 = async () => {

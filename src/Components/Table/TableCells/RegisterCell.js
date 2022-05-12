@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Calculator } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 import { isRegistrable } from '../../Global/globals';
@@ -16,6 +16,8 @@ export const RegisterCell = (props) => {
     defaultDuration, 
     registerName, 
     regStep, 
+    addRegName,
+    removeRegName,
     estimateCost, 
     registerNameEnd, 
     regMsges, 
@@ -38,9 +40,23 @@ export const RegisterCell = (props) => {
 
   const [modalShow, setModalShow] = useState(false)
 
+  const handleRegCheckboxChange = (event) => {
+    const { name, checked } = event.target
+    checked ? addRegName(name) : removeRegName(name)
+  }
+
   if (isRegistrable(status)) {
     return (
       <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
+        <OverlayTrigger placement="top" overlay={
+          <Tooltip>{t('tb.td.tips.addRegName')}</Tooltip>
+        }>
+          <input className="form-check-input checkbox-reg" 
+            type="checkbox" 
+            name={label} 
+            onChange={handleRegCheckboxChange}
+          />
+        </OverlayTrigger>
         <OverlayTrigger placement="top" overlay={
           <Tooltip>{
             regStep > 0
@@ -100,6 +116,7 @@ export const RegisterCell = (props) => {
   if (status === 'Unknown') {
     return (
       <div id={"trigger-unknown-" + label} className="btn-group" role="group" aria-label="Unknown">
+        <input className="form-check-input checkbox-reg" type="checkbox" disabled />
         <button type="button" className="btn-plain" disabled>
           {t('nm.sta.Unknown')}
         </button>
@@ -109,6 +126,7 @@ export const RegisterCell = (props) => {
 
   return (
     <div id={"trigger-reged-" + label} className="btn-group" role="group" aria-label="RegisterName">
+      <input className="form-check-input checkbox-reg" type="checkbox" disabled />
       <button type="button" className="btn-plain" disabled>
         {t('tb.td.reged')}
       </button>

@@ -25,6 +25,10 @@ export const TableHead = (props) => {
     updateNames, 
     registerNames, 
     registerNamesEnd,
+    regList,
+    clearRegList,
+    renewList,
+    clearRenewList,
     defaultDuration,
     hideNames, 
     switchHideFlag, 
@@ -112,6 +116,9 @@ export const TableHead = (props) => {
 
   const [regNamesModalShow, setRegNamesModalShow] = useState(false)
 
+  const isBulkReg = () => regList.length > 0
+  const isBulkRenew = () => renewList.length > 0
+
 
   return (
     <thead>
@@ -155,8 +162,8 @@ export const TableHead = (props) => {
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.regAll')}</Tooltip>}>
             <button
               type="button" 
-              className="btn-plain btn-reg" 
-              disabled={ !isCustomWallet() || reconnecting || !haveRegistrableNames(nameInfo) }
+              className={"btn-plain btn-bulk-reg " + (isBulkReg() ? "is-bulk-reg" : "")}
+              disabled={ !isCustomWallet() || reconnecting || !isBulkReg() }
               onClick={()=>setRegNamesModalShow(true)} 
               >
               {t('tb.th.reg')}
@@ -179,6 +186,8 @@ export const TableHead = (props) => {
             onHide={()=>setRegNamesModalShow(false)}
             registerNames={registerNames}
             registerNamesEnd={registerNamesEnd}
+            regList={regList}
+            clearRegList={clearRegList}
             defaultDuration={defaultDuration}
             regMsges={regMsges}
             regsMsges={regsMsges}
