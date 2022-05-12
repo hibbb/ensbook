@@ -4,6 +4,7 @@
 
 - [ ] support selecting which name to reg or renew
 - [ ] add the owner's inventory in lookups
+- [ ] read fixed config only from the confFile
 
 ## Priority 2
 

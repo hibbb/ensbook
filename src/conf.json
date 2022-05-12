@@ -9,7 +9,7 @@
     "infuraID": "bdd658fb48684fba924654acab554917",
     "display": {
       "lookup": {
-        "Etherscan": true,
+        "RelatedInfo": true,
         "Opensea": true,
         "Gem": true,
         "Metadata": true,

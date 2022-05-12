@@ -57,8 +57,38 @@ export function isSupportedChain(key) {
   }
 }
 
+export function isMainnet(key) {
+  if (typeof(key) === 'string') {
+    return key === "mainnet" || key === "homestead"
+  }
+  if (typeof(key) === 'number') {
+    return key === 1
+  }
+}
+
+export function isRopsten(key) {
+  if (typeof(key) === 'string') {
+    return key === "ropsten"
+  }
+  if (typeof(key) === 'number') {
+    return key === 3
+  }
+}
+
+export function isOpen(status) {
+  return status === "Open"
+}
+
+export function isNormal(status) {
+  return status === "Normal"
+}
+
 export function isRegistrable(status) {
   return status === "Open" || status === "Reopen" || status === "Premium"
+}
+
+export function isRenewable(status) {
+  return status === "Normal" || status === "Grace"
 }
 
 export function getRegistrableNames(nameInfo) {
@@ -75,10 +105,6 @@ export function haveRegistrableNames(nameInfo) {
 
 export function haveUnregistrableNames(nameInfo) {
   return nameInfo.findIndex(row => !isRegistrable(row.status)) > -1
-}
-
-export function isRenewable(status) {
-  return status === "Normal" || status === "Grace"
 }
 
 export function haveRenewableNames(nameInfo) {

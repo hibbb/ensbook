@@ -1,6 +1,11 @@
 import React from 'react';
 import { isRegistrable } from '../Global/globals';
-import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './TableCells';
+// import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './TableCells';
+import { LabelCell } from './TableCells/LabelCell';
+import { LookupCell } from './TableCells/LookupCell';
+import { StatusCell } from './TableCells/StatusCell';
+import { RegisterCell } from './TableCells/RegisterCell';
+import { DelCell } from './TableCells/DelCell';
 
 export const TableBody = (props) => {
   const { 
@@ -77,6 +82,7 @@ export const TableBody = (props) => {
         <td className='td-lookup'>
           <LookupCell
             label={row.label}
+            status={row.status} 
             tokenId={row.tokenId}
             owner={row.owner}
             conf={conf}

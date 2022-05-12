@@ -61,7 +61,7 @@
       }
     },
     "lookup": {
-      "Etherscan": "Etherscan",
+      "RelatedInfo": "相关信息",
       "Opensea": "Opensea",
       "Gem": "Gem",
       "Metadata": "元数据",
