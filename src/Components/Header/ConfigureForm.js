@@ -9,8 +9,6 @@ import {
 } from 'react-bootstrap'
 import { 
   Gear, 
-  // InfoCircle, 
-  // BoxArrowUpRight, 
   CaretRightFill, 
   ChevronDown, 
   CheckCircle, 

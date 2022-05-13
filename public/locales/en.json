@@ -28,6 +28,7 @@
       "lu": "Lookup",
       "sta": "Status",
       "reg": "Reg",
+      "renew": "Renew",
       "del": "Del",
       "tips": {
         "no": "Sort by Label Color",
@@ -49,11 +50,13 @@
       "reg": "Register",
       "continue": "Continue", 
       "reged": "Registered", 
+      "renew": "Renew",
       "tips": {
         "lb": "Click to Change the Label Color",
         "renew": "Renew {{label}}.eth",
         "est": "Registration Cost Estimation",
         "addRegName": "Add to Bulk Registration List",
+        "addRenewName": "Add to Bulk Renewal List",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",
         "continue": "Continue to the Registration Process",

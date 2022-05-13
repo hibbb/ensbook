@@ -361,11 +361,20 @@ button.btn-plain[disabled] {
   color: #aaaaaa;
   text-decoration: none;
 }
-.btn-bulk-reg {
+.btn-bulk-reg, .btn-bulk-renew {
   font-weight: 400;
+  padding: 0 0.375rem;
+  border-radius: 0.2rem;
 }
-.is-bulk-reg {
-  background-color: #eede01;
+.is-bulk-reg, .is-bulk-renew {
+  font-weight: 300;
+  background-color: #0dcaf0;
+  color: white;
+}
+.is-bulk-reg:hover, .is-bulk-renew:hover {
+  text-decoration: none;
+  background-color: #0aa2c0;
+  border-color: #0aa2c0;
 }
 .form-placeholder {
   background-color: #e9ecef;

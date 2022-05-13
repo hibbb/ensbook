@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
-import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Calculator } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 import { isRegistrable } from '../../Global/globals';
@@ -78,16 +78,15 @@ export const RegisterCell = (props) => {
         </OverlayTrigger>
         {
           regStep > 0
-          ? <OverlayTrigger placement="top" overlay={
-              <Tooltip>
-                {t('tb.td.tips.regStep', {regStep: regStep})}
-              </Tooltip>
+          ? (
+            <OverlayTrigger placement="top" overlay={
+              <Tooltip>{t('tb.td.tips.regStep', {regStep: regStep})}</Tooltip>
             }>
-              <span className="ms-2 td-reg-step">
-                {regStep}/3
-              </span>
+              <span className="ms-2 td-reg-step">{regStep}/3</span>
             </OverlayTrigger>
-          : <OverlayTrigger placement="top" overlay={
+          )
+          : (
+            <OverlayTrigger placement="top" overlay={
               <Tooltip>
                 <TooltipEstimateCost estimating={estimating} t={t} />
               </Tooltip>
@@ -96,6 +95,7 @@ export const RegisterCell = (props) => {
                 <Calculator />
               </button>
             </OverlayTrigger>
+          )
         }
         <RegistrationModal 
           show={modalShow}

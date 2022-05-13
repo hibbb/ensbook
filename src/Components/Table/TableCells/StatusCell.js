@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { Calendar2Plus } from 'react-bootstrap-icons';
 import { t } from 'i18next';
-import { isRenewable } from '../../Global/globals';
-import RenewalModal from '../../Utils/RenewalModal';
 
 
 export const StatusCell = (props) => {
-  const { label, status, reconnecting, registrationTime, releaseTime, expiresTime, updateNames, type, renewName, renewNameEnd, defaultDuration, priceRange, renewMsges } = props
-  const [modalShow, setModalShow] = useState(false)
+  const { 
+    label, 
+    status, 
+    registrationTime, 
+    releaseTime, 
+    expiresTime, 
+    updateNames, 
+    priceRange 
+  } = props
 
   const graceEndingFlag = (
     status === 'Grace' 
@@ -60,31 +64,7 @@ export const StatusCell = (props) => {
     tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
   }  
 
-  const RenewNameButton = () => {
-    if (isRenewable(status)) {
-      if (type === 'readonly' || reconnecting) {
-        return (
-          <button type="button" disabled className="btn-plain btn-sub ms-2">
-            <Calendar2Plus />
-          </button>
-        )
-      } else {
-        return (
-          <OverlayTrigger placement="top" overlay={
-            <Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>
-          }>
-            <button type="button" 
-              className="btn-plain btn-sub ms-2" 
-              onClick={()=>setModalShow(true)}
-            >
-              <Calendar2Plus />
-            </button>
-          </OverlayTrigger>          
-        )
-      }
-    } 
-    return null
-  }
+
 
   const NameAge = () => {
     if (status === 'Normal') {
@@ -126,17 +106,6 @@ export const StatusCell = (props) => {
           <NameAge />
         </span>
       </OverlayTrigger>
-      <RenewNameButton />
-      <RenewalModal 
-        show={modalShow} 
-        onHide={()=>setModalShow(false)}
-        label={label}
-        expiresTime={expiresTime}
-        renewName={renewName}
-        renewNameEnd={renewNameEnd}
-        defaultDuration={defaultDuration}
-        renewMsges={renewMsges}
-      />
     </>
   )
 }

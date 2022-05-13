@@ -1,11 +1,11 @@
 import React from 'react';
 import { isRegistrable } from '../Global/globals';
-// import { LabelCell, LookupCell, StatusCell, RegisterCell, DelCell } from './TableCells';
 import { LabelCell } from './TableCells/LabelCell';
 import { LookupCell } from './TableCells/LookupCell';
 import { StatusCell } from './TableCells/StatusCell';
 import { RegisterCell } from './TableCells/RegisterCell';
 import { DelCell } from './TableCells/DelCell';
+import { RenewCell } from './TableCells/RenewCell';
 
 export const TableBody = (props) => {
   const { 
@@ -22,6 +22,8 @@ export const TableBody = (props) => {
     removeRegName,
     renewName,
     renewNameEnd,
+    addRenewName,
+    removeRenewName,
     hideNames, 
     removeName, 
     estimateCost,
@@ -81,6 +83,21 @@ export const TableBody = (props) => {
             removeRegName={removeRegName}
             regMsges={regMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
+          />
+        </td>
+        <td>
+          <RenewCell
+            type={type}
+            label={row.label} 
+            status={row.status} 
+            expiresTime={row.expiresTime}
+            defaultDuration={conf.custom.renew.duration}
+            renewName={renewName} 
+            renewNameEnd={renewNameEnd}
+            renewMsges={renewMsges}
+            reconnecting={reconnecting}
+            addRenewName={addRenewName}
+            removeRenewName={removeRenewName}
           />
         </td>
         <td className='td-lookup'>

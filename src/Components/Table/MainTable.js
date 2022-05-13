@@ -31,7 +31,8 @@ class MainTable extends React.Component {
   }
 
   addRenewName = (label) => {
-    const renewList = this.state.renewList.push(label)
+    const { renewList } = this.state
+    renewList.push(label)
     this.setState({ renewList })
   }
 
@@ -115,8 +116,8 @@ class MainTable extends React.Component {
             registerName={registerName} 
             registerNameEnd={registerNameEnd}
             addRegName={this.addRegName}
-            addRenewName={this.addRenewName}
             removeRegName={this.removeRegName}
+            addRenewName={this.addRenewName}
             removeRenewName={this.removeRenewName}
             renewName={renewName}
             renewNameEnd={renewNameEnd}
