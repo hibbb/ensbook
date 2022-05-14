@@ -28,6 +28,10 @@ class MainTable extends React.Component {
 
   clearRegList = () => {
     this.setState({ regList: [] })
+    const regCheckboxes = document.getElementsByClassName("reg-checkbox")
+    for (let i = 0; i < regCheckboxes.length; i ++) {
+      regCheckboxes[i].checked = false
+    }
   }
 
   addRenewName = (label) => {
@@ -43,6 +47,11 @@ class MainTable extends React.Component {
 
   clearRenewList = () => {
     this.setState({ renewList: [] })
+    const renewCheckboxes = document.getElementsByClassName("renew-checkbox")
+    for (let i = 0; i < renewCheckboxes.length; i ++) {
+      renewCheckboxes[i].checked = false
+    }
+    console.log('RenewList Cleared.')
   }
 
   render() {
@@ -58,13 +67,16 @@ class MainTable extends React.Component {
       registerNameEnd,
       registerNames, 
       registerNamesEnd,
-      regMsges, 
-      regsMsges,
       removeNames, 
       removeName, 
       renewMsges,
       renewName,
       renewNameEnd,
+      renewNames,
+      renewNamesEnd,
+      regMsges, 
+      regsMsges,
+      renewsMsges,
       setAndStoreNameInfo, 
       type,  
       updateNames
@@ -89,11 +101,14 @@ class MainTable extends React.Component {
             reconnecting={reconnecting}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
+            conf={conf}
             updateNames={updateNames}
             registerNames={registerNames}
             registerNamesEnd={registerNamesEnd}
             regList={regList}
             clearRegList={this.clearRegList}
+            renewNames={renewNames}
+            renewNamesEnd={renewNamesEnd}
             renewList={renewList}
             clearRenewList={this.clearRenewList}
             defaultDuration={conf.custom.register.duration}
@@ -103,6 +118,7 @@ class MainTable extends React.Component {
             estimateCosts={estimateCosts}
             regMsges={regMsges}
             regsMsges={regsMsges}
+            renewsMsges={renewsMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
           />
           <TableBody 

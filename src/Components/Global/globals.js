@@ -1,4 +1,5 @@
 import confFile from '../../conf.json'
+import confFixed from '../../confFixed.json'
 import { Contract } from 'ethers'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import moment from 'moment'
@@ -13,6 +14,10 @@ export function getConf() {
     return confStored
   }
   return confFile
+}
+
+export function getConfFixed() {
+  return confFixed
 }
 
 export function updateLookupList(conf) {
@@ -31,8 +36,8 @@ export function updateLookupList(conf) {
 
 export function getContract(providerOrSigner, network, conf, contract) {
   conf = conf ?? getConf()
-  const contractAddr = conf.fixed.contract.addr[network][contract]
-  const contractAbi = conf.fixed.contract.abi[contract]
+  const contractAddr = confFixed.contract.addr[network][contract]
+  const contractAbi = confFixed.contract.abi[contract]
   return new Contract(contractAddr, contractAbi, providerOrSigner)
 }
 

@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import { Modal, Button, InputGroup, FormControl, Col, Row, Spinner } from 'react-bootstrap';
-import { ChevronCompactRight, CheckCircleFill, XCircleFill, CalendarWeek, DashCircleFill } from 'react-bootstrap-icons';
+import { ChevronCompactRight, CheckCircleFill, XCircleFill, DashCircleFill } from 'react-bootstrap-icons';
 import moment from 'moment';
 import { t } from 'i18next';
 
 
-const RenewalModal = (props) => {
+const RenewalsModal = (props) => {
   const { 
     show, 
     onHide, 
-    label,
-    expiresTime,
-    renewName,
-    renewNameEnd,
+    renewNames,
+    renewNamesEnd,
+    renewList,
+    clearRenewList,
     defaultDuration, 
-    renewMsges
+    renewsMsges
   } = props
 
   // renewBefore, renewStarted, renewSucceeded, renewFailed, renewSuspended
-  const renewAction = renewMsges[0].text  
+  const renewsAction = renewsMsges[0].text  
 
   const [duration, setDuration] = useState(defaultDuration) // duration: as Years
 
@@ -29,12 +29,12 @@ const RenewalModal = (props) => {
   }
 
   const ActionButton = () => {
-    function renewEnd () {
+    function renewsEnd () {
       onHide()
-      renewNameEnd(label)
+      renewNamesEnd()
     }
 
-    if (renewAction === 'renewStarted') {
+    if (renewsAction === 'renewsStarted') {
       return (
         <Button variant="secondary" disabled>
           {t('nm.sta.Renewing')}
@@ -43,35 +43,36 @@ const RenewalModal = (props) => {
       )
     }
 
-    if (renewAction === 'renewFailed' || renewAction === 'renewSucceeded' || renewAction === 'renewSuspended') {
-      return <Button variant="primary" onClick={()=>renewEnd()}>{t('c.end')}</Button>
+    if (renewsAction === 'renewsFailed' || renewsAction === 'renewsSucceeded' || renewsAction === 'renewsSuspended') {
+      return <Button variant="primary" onClick={()=>renewsEnd()}>{t('c.end')}</Button>
     }
 
     return (
       <>
         <Button variant="secondary" onClick={onHide}>{t('c.cancel')}</Button>
         <Button variant="primary" onClick={()=>{
-            renewName(label, moment.duration(duration, 'years').asSeconds())
+            clearRenewList()
+            renewNames(renewList, moment.duration(duration, 'years').asSeconds())
           }
         }>{t('c.confirm')}</Button>
       </>
     )
   }
 
-  const RenewActionMsgIcon = () => {
-    if (renewAction === 'renewSucceeded') {
+  const RenewsActionMsgIcon = () => {
+    if (renewsAction === 'renewsSucceeded') {
       return (
         <span className="modal-message-text">
           <CheckCircleFill className="modal-message-icon action-succeeded" />
         </span>
       )
-    } else if (renewAction === 'renewFailed') {
+    } else if (renewsAction === 'renewsFailed') {
       return (
         <span className="modal-message-text">
           <XCircleFill className="modal-message-icon action-failed" />
         </span>
       )
-    } else if (renewAction === 'renewSuspended') {
+    } else if (renewsAction === 'renewsSuspended') {
       return (
         <span className="modal-message-text">
           <DashCircleFill className="modal-message-icon action-suspend" />
@@ -82,24 +83,24 @@ const RenewalModal = (props) => {
     }
   }
   
-  const RenewActionMsg = () => {
-    if (renewAction === 'renewBefore' || renewAction === 'renewStarted') {
+  const RenewsActionMsg = () => {
+    if (renewsAction === 'renewsBefore' || renewsAction === 'renewsStarted') {
       return null
     }
     return (
       <p className={"modal-message message-action"}>
-        <span className="modal-message-time" title={renewMsges[0].time.fromNow()}>
-          {renewMsges[0].time.format('HH:mm:ss')}
+        <span className="modal-message-time" title={renewsMsges[0].time.fromNow()}>
+          {renewsMsges[0].time.format('HH:mm:ss')}
         </span>
         <ChevronCompactRight className="modal-message-icon" />
-        <RenewActionMsgIcon />
+        <RenewsActionMsgIcon />
       </p>
     )
   }
 
-  const RenewInfoMsges = () => {
+  const RenewsInfoMsges = () => {
     return (
-      renewMsges.slice(1).map((message, index) => { 
+      renewsMsges.slice(1).map((message, index) => { 
         return (
           <p key={index} className={"modal-message message-" + message.type}>
             <span className="modal-message-time" title={message.time.fromNow()}>
@@ -116,18 +117,18 @@ const RenewalModal = (props) => {
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
       <Modal.Header>
-        <Modal.Title>{ t('modal.renew.title') }</Modal.Title>
+        <Modal.Title>{ t('modal.renews.title') }</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p className="modal-tip">
-          {t('modal.renew.tip')}
+          {t('modal.renews.tip')}
         </p>
         <div className="mb-3 duration-input">
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
                 <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
-                <FormControl className="modal-name-label" value={label + '.eth'} disabled />
+                <FormControl className="modal-name-label" value={t('modal.renews.names')} disabled />
               </InputGroup>
             </Col>
           </Row>
@@ -137,19 +138,15 @@ const RenewalModal = (props) => {
                 <InputGroup.Text>{t('c.duration')}: </InputGroup.Text>
                 <FormControl value={duration} 
                   onChange={handleChange} 
-                  disabled={ !(renewAction === "renewBefore" || renewAction === "renewSuspended") } 
+                  disabled={!(renewsAction === "renewsBefore" || renewsAction === "renewsSuspended")} 
                 />
                 <InputGroup.Text>{t('c.years')}</InputGroup.Text>
-                <InputGroup.Text className="ms-2 until-time">
-                  <CalendarWeek className="me-2" />
-                  { moment.unix(expiresTime).add(moment.duration(duration, 'years').asSeconds(), 'seconds').format('L') } 
-                </InputGroup.Text>
               </InputGroup>
             </Col>
           </Row>
         </div>
-        <RenewInfoMsges />
-        <RenewActionMsg />
+        <RenewsInfoMsges />
+        <RenewsActionMsg />
       </Modal.Body>
       <Modal.Footer>
         <ActionButton />    
@@ -158,4 +155,4 @@ const RenewalModal = (props) => {
   )
 }
 
-export default RenewalModal
+export default RenewalsModal

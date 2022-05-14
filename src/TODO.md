@@ -2,9 +2,8 @@
 
 ## Priority 1
 
-- [ ] support selecting which name to reg or renew
-- [ ] add the owner's inventory in lookups
-- [ ] read fixed config only from the confFile
+- [ ] multiple name deletion methods
+- [ ] move sort of level approach to the label column
 
 ## Priority 2
 
@@ -16,6 +15,9 @@
 
 ## Completed From v1.4.0
 
+- [x] read fixed config only from the app instead of localstorage
+- [x] support selecting which name to reg or renew
+- [x] add the owner's inventory in lookups
 - [x] double check the status before every signle registration when bulk registering
 - [x] add favourite feature (keep red labels when click del button once)
 - [x] add looksrare & gem.xyz

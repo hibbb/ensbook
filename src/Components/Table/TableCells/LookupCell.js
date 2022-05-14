@@ -2,7 +2,7 @@ import React from 'react';
 import { BigNumber, utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
-import { isMainnet, isNormal, isOpen, isRenewable, isRopsten } from '../../Global/globals';
+import { getConfFixed, isMainnet, isNormal, isOpen, isRenewable, isRopsten } from '../../Global/globals';
 
 
 export const LookupCell = (props) => {
@@ -15,7 +15,7 @@ export const LookupCell = (props) => {
   )
   
   // for td-lookup
-  const { addr } = conf.fixed.contract
+  const { addr } = getConfFixed().contract
   const { lookup } = conf.custom.display
   // When you modify lookupLinks, you also need to modify:
   // 1. the custom.display.lookup filed of conf.json

@@ -1,6 +1,6 @@
 {
   "name": "ensbook",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "author": "liu.ensuser.eth",
   "private": true,
   "dependencies": {

@@ -36,7 +36,7 @@ const RegistrationsModal = (props) => {
   const ActionButton = () => {
     function regsEnd() {
       onHide()
-      registerNamesEnd()
+      registerNamesEnd(regList)
     }
 
     if (regsAction === 'regsStarted') {

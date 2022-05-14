@@ -27,7 +27,7 @@ export const LabelCell = (props) => {
     <>
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}>
         <span className={`td-level td-level-${level}`} onClick={()=>oneClickToLevelUp()}>
-          {label}
+          {label}<span className="dot-eth">.eth</span>
         </span>
       </OverlayTrigger>
       <OverlayTrigger placement="top" overlay={<Tooltip>ENS APP</Tooltip>}>

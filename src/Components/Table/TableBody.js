@@ -1,5 +1,5 @@
 import React from 'react';
-import { isRegistrable } from '../Global/globals';
+import { isCustomWallet, isRegistrable } from '../Global/globals';
 import { LabelCell } from './TableCells/LabelCell';
 import { LookupCell } from './TableCells/LookupCell';
 import { StatusCell } from './TableCells/StatusCell';
@@ -74,6 +74,7 @@ export const TableBody = (props) => {
             index={index}
             defaultDuration={conf.custom.register.duration}
             status={row.status} 
+            isCustomWallet={isCustomWallet(conf)}
             reconnecting={reconnecting}
             estimateCost={estimateCost}
             registerName={registerName} 

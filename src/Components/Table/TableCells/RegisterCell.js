@@ -12,6 +12,7 @@ export const RegisterCell = (props) => {
   const { 
     label, 
     status, 
+    isCustomWallet,
     reconnecting, 
     defaultDuration, 
     registerName, 
@@ -51,9 +52,10 @@ export const RegisterCell = (props) => {
         <OverlayTrigger placement="top" overlay={
           <Tooltip>{t('tb.td.tips.addRegName')}</Tooltip>
         }>
-          <input className="form-check-input checkbox-reg" 
+          <input className="form-check-input reg-checkbox" 
             type="checkbox" 
             name={label} 
+            disabled={!isCustomWallet}
             onChange={handleRegCheckboxChange}
           />
         </OverlayTrigger>
@@ -66,7 +68,7 @@ export const RegisterCell = (props) => {
         }>
           <button type="button" 
             disabled={type==='readonly' || reconnecting}
-            className="btn-plain btn-reg" 
+            className="btn-plain btn-reg ms-2" 
             onClick={()=>setModalShow(true)} 
           >
             {
@@ -116,8 +118,8 @@ export const RegisterCell = (props) => {
   if (status === 'Unknown') {
     return (
       <div id={"trigger-unknown-" + label} className="btn-group" role="group" aria-label="Unknown">
-        <input className="form-check-input checkbox-reg" type="checkbox" disabled />
-        <button type="button" className="btn-plain" disabled>
+        <input className="form-check-input reg-checkbox" type="checkbox" disabled />
+        <button type="button" className="btn-plain ms-2" disabled>
           {t('nm.sta.Unknown')}
         </button>
       </div>
@@ -126,8 +128,8 @@ export const RegisterCell = (props) => {
 
   return (
     <div id={"trigger-reged-" + label} className="btn-group" role="group" aria-label="RegisterName">
-      <input className="form-check-input checkbox-reg" type="checkbox" disabled />
-      <button type="button" className="btn-plain" disabled>
+      <input className="form-check-input reg-checkbox" type="checkbox" disabled />
+      <button type="button" className="btn-plain ms-2" disabled>
         {t('tb.td.reged')}
       </button>
     </div>
