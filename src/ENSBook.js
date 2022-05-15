@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, getNames, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed } from './Components/Global/globals'
+import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -113,7 +113,7 @@ class ENSBook extends React.Component {
 
     for (let n = 0; n < labelsGroupsCount; n++) {
       const labelsGroup = labels.slice(n * 100, n * 100 + 100)
-      nameInfo = await getNames(labelsGroup, nameInfo, provider, network)
+      nameInfo = await queryNameInfo(labelsGroup, nameInfo, provider, network)
       this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     }
   }
@@ -807,6 +807,7 @@ class ENSBook extends React.Component {
           nameInfo={nameInfo}
           setAndStoreNameInfo={this.setAndStoreNameInfo}
           updateNames={this.updateNames}
+          network={network}
         />
         <MainTable 
           conf={conf}

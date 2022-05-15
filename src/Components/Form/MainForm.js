@@ -3,6 +3,8 @@ import { utils } from 'ethers';
 import { toast } from 'react-toastify'
 import namehash from '@ensdomains/eth-ens-namehash'
 import { t } from 'i18next';
+import { isAddress } from 'ethers/lib/utils';
+import { getNamesOfOwner } from '../Global/globals';
 
 class MainForm extends React.Component {
   initialState = {
@@ -10,15 +12,10 @@ class MainForm extends React.Component {
   }
   state = this.initialState
 
-  addNames = async (labels) => {
-    const { nameInfo, setAndStoreNameInfo, updateNames } = this.props
-
+  handleLabels = (labels) => {
     labels = labels.replace(/[,.'"?!@#$%^&*()/\\\\]/g, ' ').trim()
     if (labels.length < 1) { return false }
     // create an Array(originLabelsSet) including the original labels
-    const originLabelsSet = new Set()
-    nameInfo.map(row => originLabelsSet.add(row.label))
-    // split the string by spaces to labels and remove duplicates
     const newLabelsSet = new Set(labels.split(/\s+/));
     // only retain the labels whose length >= 3
     let newLabelsArr = [...newLabelsSet].filter(label => label.length >= 3)
@@ -29,8 +26,25 @@ class MainForm extends React.Component {
       return null
     })
     // caculate the differences between the new and original labels, to avoid duplicates 
-    let diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]; 
+    return newLabelsArr 
+  }
 
+  addNames = async (labels) => {
+    const { nameInfo, setAndStoreNameInfo, updateNames, network } = this.props
+    let newLabelsArr = this.handleLabels(labels)
+    
+    const addressPosition = newLabelsArr.findIndex(item => isAddress(item))
+
+    // if typed in a address, ENSBook will add the names that belong to the address
+    if (addressPosition > -1) {
+      newLabelsArr = await getNamesOfOwner(newLabelsArr[addressPosition], network)
+    }
+
+    // create an Array(originLabelsSet) including the original labels
+    const originLabelsSet = new Set()
+    nameInfo.map(row => originLabelsSet.add(row.label))
+
+    const diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]
     diffLabelsArr.map(label => 
       nameInfo.push({
         "label": label,

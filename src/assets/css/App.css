@@ -130,6 +130,10 @@ h1 a .title-ens {
 .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem rgb(13 110 253 / 25%);
 }
+.form-check-input:checked {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+}
 .msg-default {
   background-color: #ffffff;
   color: #666;
@@ -546,12 +550,15 @@ button.btn-plain[disabled] {
 
 .test-bar {
   border-radius: 0.25rem;
-  background-color: #eaeaea;
+  background-color: #eede0165;
+  color: crimson;
 }
-.test-bar > span {
+.test-bar strong {
+  font-family: "ebr-semibold";
+}
+.test-bar-buttons > span {
   cursor: pointer;
-  color: #0dcaf0;
 }
-.test-bar > span:hover {
+.test-bar-buttons > span:hover {
   text-decoration: underline;
 }

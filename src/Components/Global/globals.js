@@ -189,39 +189,48 @@ export function removeRegInfo(label) {
   window.localStorage.removeItem("regInfo-" + label)
 }
 
-export async function getNames(labelsGroup, nameInfo, provider, network) {
-  if (labelsGroup.length > 100) {
-    return nameInfo
-  }
-
+export async function queryData(queryCode, network) {
   const subgraphUri = network === "ropsten"
     ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensropsten'
     : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens'
 
-  const namesQuery = `
-    query($labelsGroup: [String!]) {
-      registrations(where: {labelName_in: $labelsGroup}) {
-        labelName,
-        id,
-        expiryDate,
-        registrationDate,
-        registrant {
-          id
-        }
-      }
-    }
-  `
   const client = new ApolloClient({
     uri: subgraphUri,
     cache: new InMemoryCache(),
   })
 
-  const data = await client.query({
-    query: gql(namesQuery),
-    variables: {labelsGroup: labelsGroup},
+  const queryResult = await client.query({
+    query: gql(queryCode.str),
+    variables: queryCode.vars,
   })
 
-  const { registrations } = data.data
+  return queryResult.data
+}
+
+export async function getNamesOfOwner(owner, network) {
+  const queryCode = {
+    str: `query($owner: ID!) { registrations(where: {registrant: $owner}) { labelName } }`,
+    vars: { owner: owner }
+  }
+  const { registrations } = await queryData(queryCode, network)
+  return registrations.map(item => item.labelName)  // labels Array
+}
+
+export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
+  if (labelsGroup.length > 100) {
+    return nameInfo
+  }
+
+  const queryCode = {
+    str: `query($labelsGroup: [String!]) {
+      registrations(where: {labelName_in: $labelsGroup}) {
+        labelName, id, expiryDate, registrationDate, registrant { id }
+      }
+    }`,
+    vars: { labelsGroup: labelsGroup }
+  } 
+
+  const { registrations } = await queryData(queryCode, network)
 
   for (let i = 0; i < labelsGroup.length; i++) {
     const ri = registrations.findIndex(item => item.labelName === labelsGroup[i])
