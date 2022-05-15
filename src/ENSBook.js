@@ -837,7 +837,6 @@ class ENSBook extends React.Component {
           setAndStoreNameInfo={this.setAndStoreNameInfo}
         />
         <Footer />
-        <TestBar />
         <MessageToasts onRef={(ref)=>{this.MessageToasts=ref}} />
         <UnsupportedNetworkModal show={unsupported} disconnectApp={this.disconnectApp} />
       </div>
