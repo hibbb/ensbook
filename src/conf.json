@@ -1,7 +1,7 @@
 {
   "projectName": "ENSBook",
   "author": "liu.ensuser.eth",
-  "host": "remote",
+  "host": "local",
   "repository": "https://github.com/hibbb/ensbook/",
   "custom": {
     "pageTag": "",
