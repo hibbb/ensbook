@@ -213,7 +213,8 @@ export async function getNamesOfOwner(owner, network) {
     vars: { owner: owner }
   }
   const { registrations } = await queryData(queryCode, network)
-  return registrations.map(item => item.labelName)  // labels Array
+  const labelsArr =  registrations.map(item => item.labelName)  // labels Array
+  return labelsArr.filter(item => item && item.trim())  // remove null/undefined...
 }
 
 export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {

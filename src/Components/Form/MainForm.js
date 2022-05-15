@@ -39,12 +39,14 @@ class MainForm extends React.Component {
     if (addressPosition > -1) {
       newLabelsArr = await getNamesOfOwner(newLabelsArr[addressPosition], network)
     }
+    console.log(newLabelsArr)
 
     // create an Array(originLabelsSet) including the original labels
     const originLabelsSet = new Set()
     nameInfo.map(row => originLabelsSet.add(row.label))
 
     const diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]
+
     diffLabelsArr.map(label => 
       nameInfo.push({
         "label": label,
