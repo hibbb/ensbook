@@ -1,4 +1,5 @@
 import confFile from '../../conf.json'
+import confFixed from '../../confFixed.json'
 import { Contract } from 'ethers'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import moment from 'moment'
@@ -15,6 +16,10 @@ export function getConf() {
   return confFile
 }
 
+export function getConfFixed() {
+  return confFixed
+}
+
 export function updateLookupList(conf) {
   conf = conf ?? getConf()
   const oldList = Object.keys(conf.custom.display.lookup)
@@ -29,18 +34,23 @@ export function updateLookupList(conf) {
   return conf
 }
 
-export function getETHRegCtrlCon(providerOrSigner, network, conf) {
+export function getContract(providerOrSigner, network, conf, contract) {
   conf = conf ?? getConf()
-  const contractAddr = conf.fixed.contract.addr[network].ETHRegCtrl
-  const contractAbi = conf.fixed.contract.abi.ETHRegCtrl
+  const contractAddr = confFixed.contract.addr[network][contract]
+  const contractAbi = confFixed.contract.abi[contract]
   return new Contract(contractAddr, contractAbi, providerOrSigner)
 }
 
+export function getETHRegCtrlCon(providerOrSigner, network, conf) {
+  return getContract(providerOrSigner, network, conf, "ETHRegCtrl")
+}
+
 export function getBaseRegImpCon(providerOrSigner, network, conf) {
-  conf = conf ?? getConf()
-  const contractAddr = conf.fixed.contract.addr[network].BaseRegImp
-  const contractAbi = conf.fixed.contract.abi.BaseRegImp
-  return new Contract(contractAddr, contractAbi, providerOrSigner)
+  return getContract(providerOrSigner, network, conf, "BaseRegImp")
+}
+
+export function getBulkRenewCon(providerOrSigner, network, conf) {
+  return getContract(providerOrSigner, network, conf, "BulkRenew")
 }
 
 export function isCustomWallet(conf) {
@@ -57,8 +67,38 @@ export function isSupportedChain(key) {
   }
 }
 
+export function isMainnet(key) {
+  if (typeof(key) === 'string') {
+    return key === "mainnet" || key === "homestead"
+  }
+  if (typeof(key) === 'number') {
+    return key === 1
+  }
+}
+
+export function isRopsten(key) {
+  if (typeof(key) === 'string') {
+    return key === "ropsten"
+  }
+  if (typeof(key) === 'number') {
+    return key === 3
+  }
+}
+
+export function isOpen(status) {
+  return status === "Open"
+}
+
+export function isNormal(status) {
+  return status === "Normal"
+}
+
 export function isRegistrable(status) {
   return status === "Open" || status === "Reopen" || status === "Premium"
+}
+
+export function isRenewable(status) {
+  return status === "Normal" || status === "Grace"
 }
 
 export function getRegistrableNames(nameInfo) {
@@ -75,10 +115,6 @@ export function haveRegistrableNames(nameInfo) {
 
 export function haveUnregistrableNames(nameInfo) {
   return nameInfo.findIndex(row => !isRegistrable(row.status)) > -1
-}
-
-export function isRenewable(status) {
-  return status === "Normal" || status === "Grace"
 }
 
 export function haveRenewableNames(nameInfo) {
@@ -153,39 +189,48 @@ export function removeRegInfo(label) {
   window.localStorage.removeItem("regInfo-" + label)
 }
 
-export async function getNames(labelsGroup, nameInfo, provider, network) {
-  if (labelsGroup.length > 100) {
-    return nameInfo
-  }
-
+export async function queryData(queryCode, network) {
   const subgraphUri = network === "ropsten"
     ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensropsten'
     : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens'
 
-  const namesQuery = `
-    query($labelsGroup: [String!]) {
-      registrations(where: {labelName_in: $labelsGroup}) {
-        labelName,
-        id,
-        expiryDate,
-        registrationDate,
-        registrant {
-          id
-        }
-      }
-    }
-  `
   const client = new ApolloClient({
     uri: subgraphUri,
     cache: new InMemoryCache(),
   })
 
-  const data = await client.query({
-    query: gql(namesQuery),
-    variables: {labelsGroup: labelsGroup},
+  const queryResult = await client.query({
+    query: gql(queryCode.str),
+    variables: queryCode.vars,
   })
 
-  const { registrations } = data.data
+  return queryResult.data
+}
+
+export async function getNamesOfOwner(owner, network) {
+  const queryCode = {
+    str: `query($owner: ID!) { registrations(where: {registrant: $owner}) { labelName } }`,
+    vars: { owner: owner }
+  }
+  const { registrations } = await queryData(queryCode, network)
+  return registrations.map(item => item.labelName)  // labels Array
+}
+
+export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
+  if (labelsGroup.length > 100) {
+    return nameInfo
+  }
+
+  const queryCode = {
+    str: `query($labelsGroup: [String!]) {
+      registrations(where: {labelName_in: $labelsGroup}) {
+        labelName, id, expiryDate, registrationDate, registrant { id }
+      }
+    }`,
+    vars: { labelsGroup: labelsGroup }
+  } 
+
+  const { registrations } = await queryData(queryCode, network)
 
   for (let i = 0; i < labelsGroup.length; i++) {
     const ri = registrations.findIndex(item => item.labelName === labelsGroup[i])

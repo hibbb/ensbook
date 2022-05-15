@@ -19,12 +19,6 @@ const CurrentNetwork = (props) => {
 
 class OperatorWallet extends React.Component {
 
-  componentDidMount() {
-    // if (isCustomWallet()) {
-    //   this.props.reconnectApp(true)
-    // }
-  }
-
   render() {
     const { walletInfo, reconnectApp, disconnectApp, reconnecting, scanConf } = this.props
     const { type, address, ensname, network, balance } = walletInfo

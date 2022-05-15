@@ -11,6 +11,8 @@ const RegistrationsModal = (props) => {
     onHide, 
     registerNames, 
     registerNamesEnd,
+    regList,
+    clearRegList,
     defaultDuration, 
     regMsges,
     regsMsges,
@@ -34,7 +36,7 @@ const RegistrationsModal = (props) => {
   const ActionButton = () => {
     function regsEnd() {
       onHide()
-      registerNamesEnd()
+      registerNamesEnd(regList)
     }
 
     if (regsAction === 'regsStarted') {
@@ -54,7 +56,8 @@ const RegistrationsModal = (props) => {
       <>
         <Button variant="secondary" onClick={onHide}>{t('c.cancel')}</Button>
         <Button variant="primary" onClick={()=>{
-            registerNames(moment.duration(duration, 'years').asSeconds(), receiver)
+            clearRegList()
+            registerNames(regList, moment.duration(duration, 'years').asSeconds(), receiver)
           }
         }>{t('c.confirm')}</Button>
       </>

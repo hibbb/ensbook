@@ -130,6 +130,10 @@ h1 a .title-ens {
 .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem rgb(13 110 253 / 25%);
 }
+.form-check-input:checked {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+}
 .msg-default {
   background-color: #ffffff;
   color: #666;
@@ -148,6 +152,12 @@ h1 a .title-ens {
 }
 .td-name-label {
   font-family: "ebr-semibold";
+}
+.td-name-label .dot-eth {
+  font-family: "ebr-regular";
+  font-size: 0.88rem;
+  color: #999;
+  margin-left: 0.1rem;
 }
 .td-time {
   cursor: default;
@@ -358,6 +368,21 @@ button.btn-plain[disabled] {
   color: #aaaaaa;
   text-decoration: none;
 }
+.btn-bulk-reg, .btn-bulk-renew {
+  font-weight: 400;
+  padding: 0 0.375rem;
+  border-radius: 0.2rem;
+}
+.is-bulk-reg, .is-bulk-renew {
+  font-weight: 300;
+  background-color: #0dcaf0;
+  color: white;
+}
+.is-bulk-reg:hover, .is-bulk-renew:hover {
+  text-decoration: none;
+  background-color: #0aa2c0;
+  border-color: #0aa2c0;
+}
 .form-placeholder {
   background-color: #e9ecef;
   color: #21252950;
@@ -525,12 +550,15 @@ button.btn-plain[disabled] {
 
 .test-bar {
   border-radius: 0.25rem;
-  background-color: #eaeaea;
+  background-color: #eede0165;
+  color: crimson;
 }
-.test-bar > span {
+.test-bar strong {
+  font-family: "ebr-semibold";
+}
+.test-bar-buttons > span {
   cursor: pointer;
-  color: #0dcaf0;
 }
-.test-bar > span:hover {
+.test-bar-buttons > span:hover {
   text-decoration: underline;
 }

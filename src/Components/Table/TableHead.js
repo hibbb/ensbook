@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, Calendar2Plus } from 'react-bootstrap-icons';
+import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 import RegistrationsModal from '../Utils/RegistrationsModal';
 import RemovalsModal from '../Utils/RemovalsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
-import { haveRenewableNames, haveRegistrableNames, haveUnregistrableNames, isCustomWallet } from '../Global/globals';
+import { haveUnregistrableNames, isCustomWallet } from '../Global/globals';
+import RenewalsModal from '../Utils/RenewalsModal';
 
 let ascFlag = {
   "label": true,
@@ -22,9 +23,16 @@ export const TableHead = (props) => {
     reconnecting, 
     nameInfo, 
     setAndStoreNameInfo, 
+    conf,
     updateNames, 
     registerNames, 
     registerNamesEnd,
+    regList,
+    clearRegList,
+    renewNames,
+    renewNamesEnd,
+    renewList,
+    clearRenewList,
     defaultDuration,
     hideNames, 
     switchHideFlag, 
@@ -32,8 +40,15 @@ export const TableHead = (props) => {
     estimateCosts, 
     regMsges,
     regsMsges,
+    renewsMsges,
     getDefaultNameReceiver
   } = props
+
+  const [regNamesModalShow, setRegNamesModalShow] = useState(false)
+  const [renewNamesModalShow, setRenewNamesModalShow] = useState(false)
+
+  const isBulkReg = () => regList.length > 0
+  const isBulkRenew = () => renewList.length > 0
 
   const jsonSort = (array, key) => {
     if(array.length < 2 || !key || typeof array[0] !== "object") return array
@@ -61,25 +76,49 @@ export const TableHead = (props) => {
     displaySpan.classList.add("sort-asc-" + ascFlag[key])
   }
 
-  const RenewNamesButton = () => {
-    if (haveRenewableNames(nameInfo)) {
-      if (type === 'readonly' || reconnecting) {
-        return (
-          <button type="button" disabled className="btn-plain btn-sub ms-2">
-            <Calendar2Plus />
-          </button>
-        )
-      } else {
-        return (
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
-          <button type="button" className="btn-plain btn-sub ms-2" onClick={null} disabled>
-              <Calendar2Plus />
+  const RegNamesButton = () => {
+    return !isCustomWallet(conf) || reconnecting || !isBulkReg()
+      ? (
+        <button type="button" className="btn-plain btn-bulk-reg" disabled>
+          {t('tb.th.reg')}
+        </button>
+      )
+      : (
+        <>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.regAll')}</Tooltip>}>
+            <button
+              type="button" 
+              className={"btn-plain btn-bulk-reg " + (isBulkReg() ? "is-bulk-reg" : "")}
+              onClick={()=>setRegNamesModalShow(true)} 
+              >
+              {t('tb.th.reg')}
             </button>
           </OverlayTrigger>
-        )
-      }
-    } 
-    return null
+        </>
+      )
+  }
+
+  const RenewNamesButton = () => {
+    return type === 'readonly' || reconnecting || !isBulkRenew()
+      ? (
+          <button type="button" className="btn-plain btn-bulk-renew" disabled>
+            {t('tb.th.renew')}
+          </button>
+      )
+      : (
+        <>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
+            <button
+              type="button" 
+              className={"btn-plain btn-bulk-renew " + (isBulkRenew() ? "is-bulk-renew" : "")}
+              disabled={ reconnecting || !isBulkRenew() }
+              onClick={()=>setRenewNamesModalShow(true)}  
+              >
+              {t('tb.th.renew')}
+            </button>
+          </OverlayTrigger>
+        </>
+      )
   }
 
   const HideShowButton = () => {
@@ -106,12 +145,9 @@ export const TableHead = (props) => {
 
   const estimateThese = async () => {
     setEstimating({ ...initialEstimating, status: "in" })
-    const costEther = utils.formatEther(await estimateCosts())
+    const costEther = utils.formatEther(await estimateCosts(regList))
     setEstimating({ ...initialEstimating, status: "after", cost: costEther })
   }
-
-  const [regNamesModalShow, setRegNamesModalShow] = useState(false)
-
 
   return (
     <thead>
@@ -142,7 +178,6 @@ export const TableHead = (props) => {
               {t('tb.th.sta')}
             </span>
           </OverlayTrigger>
-          <RenewNamesButton />
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}>
             <button type="button" className="btn-plain ms-2" 
               onClick={()=>updateNames()}
@@ -152,37 +187,43 @@ export const TableHead = (props) => {
           </OverlayTrigger>
         </th>
         <th>
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.regAll')}</Tooltip>}>
-            <button
-              type="button" 
-              className="btn-plain btn-reg" 
-              disabled={ !isCustomWallet() || reconnecting || !haveRegistrableNames(nameInfo) }
-              onClick={()=>setRegNamesModalShow(true)} 
-              >
-              {t('tb.th.reg')}
-            </button>
-          </OverlayTrigger>
+          <RegNamesButton />
+          <RegistrationsModal 
+            show={regNamesModalShow}
+            onHide={()=>setRegNamesModalShow(false)}
+            registerNames={registerNames}
+            registerNamesEnd={registerNamesEnd}
+            regList={regList}
+            clearRegList={clearRegList}
+            defaultDuration={defaultDuration}
+            regMsges={regMsges}
+            regsMsges={regsMsges}
+            getDefaultNameReceiver={getDefaultNameReceiver}
+          />
           <OverlayTrigger placement="top" overlay={
             <Tooltip>
               <TooltipEstimateCost estimating={estimating} />
             </Tooltip>
           }>
             <button type="button" id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
-              onClick={()=>estimateThese()}
+              onClick={()=>estimateThese()} disabled={!isBulkReg()}
             >
               <Calculator />
             </button>
           </OverlayTrigger>
           <HideShowButton />
-          <RegistrationsModal 
-            show={regNamesModalShow}
-            onHide={()=>setRegNamesModalShow(false)}
-            registerNames={registerNames}
-            registerNamesEnd={registerNamesEnd}
+        </th>
+        <th>
+          <RenewNamesButton />
+          <RenewalsModal
+            show={renewNamesModalShow}
+            onHide={()=>setRenewNamesModalShow(false)}
+            renewNames={renewNames}
+            renewNamesEnd={renewNamesEnd}
+            renewList={renewList}
+            clearRenewList={clearRenewList}
             defaultDuration={defaultDuration}
-            regMsges={regMsges}
-            regsMsges={regsMsges}
-            getDefaultNameReceiver={getDefaultNameReceiver}
+            renewsMsges={renewsMsges}
           />
         </th>
         <th>{t('tb.th.lu')}</th>

@@ -9,7 +9,50 @@ class MainTable extends React.Component {
   }
   
   // Hide unregistrable names or not
-  state = { "hideNames": false }
+  state = { 
+    "hideNames": false,
+    "regList": [],
+    "renewList": []
+  }
+
+  addRegName = (label) => {
+    const { regList } = this.state
+    regList.push(label)
+    this.setState({ regList })
+  }
+
+  removeRegName = (label) => {
+    const regList = this.state.regList.filter(item => item !== label)
+    this.setState({ regList })
+  }
+
+  clearRegList = () => {
+    this.setState({ regList: [] })
+    const regCheckboxes = document.getElementsByClassName("reg-checkbox")
+    for (let i = 0; i < regCheckboxes.length; i ++) {
+      regCheckboxes[i].checked = false
+    }
+  }
+
+  addRenewName = (label) => {
+    const { renewList } = this.state
+    renewList.push(label)
+    this.setState({ renewList })
+  }
+
+  removeRenewName = (label) => {
+    const renewList = this.state.renewList.filter(item => item !== label)
+    this.setState({ renewList })
+  }
+
+  clearRenewList = () => {
+    this.setState({ renewList: [] })
+    const renewCheckboxes = document.getElementsByClassName("renew-checkbox")
+    for (let i = 0; i < renewCheckboxes.length; i ++) {
+      renewCheckboxes[i].checked = false
+    }
+    console.log('RenewList Cleared.')
+  }
 
   render() {
     const { 
@@ -24,23 +67,32 @@ class MainTable extends React.Component {
       registerNameEnd,
       registerNames, 
       registerNamesEnd,
-      regMsges, 
-      regsMsges,
       removeNames, 
       removeName, 
       renewMsges,
       renewName,
       renewNameEnd,
+      renewNames,
+      renewNamesEnd,
+      regMsges, 
+      regsMsges,
+      renewsMsges,
       setAndStoreNameInfo, 
       type,  
       updateNames
     } = this.props
 
+    const { 
+      hideNames, 
+      regList, 
+      renewList, 
+    } = this.state
+
     const switchHideFlag = () => {
-      this.setState({ "hideNames": !this.state.hideNames})
+      this.setState({ "hideNames": !hideNames })
       setAndStoreNameInfo(nameInfo, false)
     }
-  
+    
     return (
       <div className="row table-wrapper">
         <table className="table table-hover ebr-tb">
@@ -49,9 +101,16 @@ class MainTable extends React.Component {
             reconnecting={reconnecting}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
+            conf={conf}
             updateNames={updateNames}
             registerNames={registerNames}
             registerNamesEnd={registerNamesEnd}
+            regList={regList}
+            clearRegList={this.clearRegList}
+            renewNames={renewNames}
+            renewNamesEnd={renewNamesEnd}
+            renewList={renewList}
+            clearRenewList={this.clearRenewList}
             defaultDuration={conf.custom.register.duration}
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
@@ -59,6 +118,7 @@ class MainTable extends React.Component {
             estimateCosts={estimateCosts}
             regMsges={regMsges}
             regsMsges={regsMsges}
+            renewsMsges={renewsMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
           />
           <TableBody 
@@ -71,6 +131,10 @@ class MainTable extends React.Component {
             updateNames={updateNames}
             registerName={registerName} 
             registerNameEnd={registerNameEnd}
+            addRegName={this.addRegName}
+            removeRegName={this.removeRegName}
+            addRenewName={this.addRenewName}
+            removeRenewName={this.removeRenewName}
             renewName={renewName}
             renewNameEnd={renewNameEnd}
             hideNames={this.state.hideNames}

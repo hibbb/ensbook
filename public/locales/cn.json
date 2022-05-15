@@ -28,6 +28,7 @@
       "lu": "相关信息",
       "sta": "状态",
       "reg": "注册",
+      "renew": "续费",
       "del": "删除",
       "tips": {
         "no": "按标签颜色排序",
@@ -48,11 +49,14 @@
     "td": {
       "reg": "注册",
       "continue": "继续", 
-      "reged": "已被注册", 
+      "reged": "已注册", 
+      "renew": "续费", 
       "tips": {
         "lb": "点击改变标签颜色",
         "renew": "给 {{label}}.eth 续费",
         "est": "注册费用预估",
+        "addRegName": "加入或移出批量注册列表",
+        "addRenewName": "加入或移出批量续费列表",
         "reg": "注册 {{label}}.eth",
         "reging": "正在注册中",
         "continue": "继续完成注册流程",
@@ -61,7 +65,7 @@
       }
     },
     "lookup": {
-      "Etherscan": "Etherscan",
+      "RelatedInfo": "信息概览",
       "Opensea": "Opensea",
       "Gem": "Gem",
       "Metadata": "元数据",
@@ -118,13 +122,13 @@
       "receiver": "接收者",
       "wrongReceiver": "您指定的接收者格式不正确, 请重新输入接收者并继续。",
       "register00": "{{label}}.eth 即将注册给 {{owner}}, 注册时长为 {{duration}} 年。",
-      "register10": "{{label}}.eth 请求交易已经提交, 正在等待确认。",
+      "register10": "{{label}}.eth 请求 {{txLink}} 已经提交, 正在等待确认。",
       "register11": {
         "succeed": "步骤 1 / 3 已完成: {{label}}.eth 请求 {{txLink}} 已经确认,  等待一段时间后会进行一下步。",
         "fail": "{{label}}.eth 请求失败。你可以检查这笔 {{txLink}}。"
       },
       "register20": "步骤 2 / 3 已完成: {{label}}.eth 已经准备好了, 即将进行最后一笔注册交易。",
-      "register30": "{{label}}.eth 注册交易已经提交, 正在等待确认。",
+      "register30": "{{label}}.eth 注册 {{regTxLink}} 已经提交, 正在等待确认。",
       "register31": {
         "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
         "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
@@ -133,17 +137,28 @@
     "regs": {
       "title": "批量注册",
       "tip": "您要注册的名称及信息如下: ",
-      "names": "表中所有可注册的域名",
+      "names": "已勾选的名称",
       "regsEnded": "批量注册进程已经结束。"
     },
     "renew": {
       "title": "续费",
-      "tips": "您要续费的名称及信息如下",
+      "tip": "您要续费的名称及信息如下",
       "renew00": "即将为 {{label}}.eth 续费 {{duration}} 年。",
-      "renew10": "{{label}}.eth 续费交易已经提交。",
+      "renew10": "{{label}}.eth 续费 {{txLink}} 已经提交。",
       "renew11": {
         "succeed": "{{label}}.eth 续费 {{txLink}} 已经完成。",
         "fail": "{{label}}.eth 续费失败。你可以检查这笔 {{txLink}}。"
+      }
+    },
+    "renews": {
+      "title": "批量续费",
+      "tip": "您要续费的名称及信息如下: ",
+      "names": "已勾选的名称",
+      "renews00": "即将为已勾选名称同时续费 {{duration}} 年。",
+      "renews10": "批量续费 {{txLink}} 已经提交。",
+      "renews11": {
+        "succeed": "批量续费 {{txLink}} 已经完成。",
+        "fail": "批量续费失败。您可以检查这笔 {{txLink}}。"
       }
     },
     "title": "需要确认",

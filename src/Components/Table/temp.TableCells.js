@@ -296,7 +296,7 @@ export const LookupCell = (props) => {
   // 1. the custom.display.lookup filed of conf.json
   // 2. the tb.lookup filed of en.json and cn.json
   const lookupLinks = {
-    Etherscan: {
+    RelatedInfo: {
       precondition: true,
       link: "https://" + (network === "ropsten" ? "ropsten." : "") + "etherscan.io/enslookup-search?search=" + label + ".eth"
     },
@@ -328,7 +328,7 @@ export const LookupCell = (props) => {
 
   return (
     Object.keys(lookupLinks).map(item => 
-      lookup[item] && lookupLinks[item].precondition
+      lookup[item] && lookupLinks[item].precondition  // decide which should be shown
       ? (
         <OverlayTrigger key={'lookup-key-' + item} placement="top" overlay={<Tooltip>{t('tb.lookup.' + item, {label: label})}</Tooltip>}>
           <a href={lookupLinks[item].link} className={'me-1 text-center lookup-' + item} target="_blank" rel="noreferrer">{item.slice(0, 1)}</a>  
