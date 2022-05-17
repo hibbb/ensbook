@@ -7,44 +7,60 @@ import { isAddress } from 'ethers/lib/utils';
 import { getNamesOfOwner } from '../Global/globals';
 
 class MainForm extends React.Component {
-  initialState = {
-    labels: ''
+  state = {
+    labels: '',
+    adding: false
   }
-  state = this.initialState
 
   handleLabels = (labels) => {
-    labels = labels.replace(/[,.'"?!@#$%^&*()/\\\\]/g, ' ').trim()
-    if (labels.length < 1) { return false }
-    // create an Array(originLabelsSet) including the original labels
-    const newLabelsSet = new Set(labels.split(/\s+/));
-    // only retain the labels whose length >= 3
-    let newLabelsArr = [...newLabelsSet].filter(label => label.length >= 3)
+    labels = labels.replace(/[,.'"?!@#$%^&*()+=/\\\\]/g, ' ').trim()
+    
+    if (labels.length) {
+      const labelsSet = new Set(labels.split(/\s+/))
 
-    newLabelsArr.map((label, index) => {
-      try { newLabelsArr[index] = namehash.normalize(label) } 
-      catch(err) { delete newLabelsArr[index] }
-      return null
-    })
-    // caculate the differences between the new and original labels, to avoid duplicates 
-    return newLabelsArr 
+      // only retain the labels whose length >= 3
+      let labelsArr = [...labelsSet].filter(label => label.length >= 3)
+
+      labelsArr.map((label, index) => {
+        try { labelsArr[index] = namehash.normalize(label) } 
+        catch(err) { delete labelsArr[index] }    //!!!!
+        return null
+      })
+
+      return labelsArr 
+    }
+    return []
+  }
+
+  // entering @ in front of an ENS name or an address can be used to query its names
+  isForAccount = async (str, provider) => {
+    str = str.startsWith('@') ? str.replace('@', '') : false
+    if (!str) return false
+
+    if (str.endsWith('.eth') && str.length > 6) {
+      return (await provider.resolveName(str))?.toLowerCase() ?? false
+    }
+    if (isAddress(str)) {
+      return str.toLowerCase()
+    }
+    return false
   }
 
   addNames = async (labels) => {
-    const { nameInfo, setAndStoreNameInfo, updateNames, network } = this.props
-    let newLabelsArr = this.handleLabels(labels)
-    
-    const addressPosition = newLabelsArr.findIndex(item => isAddress(item))
+    const { nameInfo, setAndStoreNameInfo, updateNames, network, provider } = this.props
 
-    // if typed in a address, ENSBook will add the names that belong to the address
-    if (addressPosition > -1) {
-      newLabelsArr = await getNamesOfOwner(newLabelsArr[addressPosition], network)
-    }
+    const account = await this.isForAccount(labels, provider)
+    const labelsArr = account 
+      ? await getNamesOfOwner(account, network) 
+      : this.handleLabels(labels)
+
+    if (labelsArr.length < 1) { return false }
 
     // create an Array(originLabelsSet) including the original labels
     const originLabelsSet = new Set()
     nameInfo.map(row => originLabelsSet.add(row.label))
 
-    const diffLabelsArr = [...new Set(newLabelsArr.filter(x => !originLabelsSet.has(x)))]
+    const diffLabelsArr = [...new Set(labelsArr.filter(x => !originLabelsSet.has(x)))]
     diffLabelsArr.map(label => 
       nameInfo.push({
         "label": label,
@@ -57,7 +73,7 @@ class MainForm extends React.Component {
 
     // update the status of newly added names
     await updateNames(diffLabelsArr)
-    
+
     toast.info(t('msg.setAndStoreNameInfo'))
   }
 
@@ -74,10 +90,13 @@ class MainForm extends React.Component {
     }
   }
 
-  submitForm = () => {
-    const labels = this.state.labels
-    this.addNames(labels)
-    this.setState(this.initialState)
+  submitForm = async () => {
+    this.setState({ adding: true })
+    const labels = this.state.labels.trim()
+    console.log(labels.length)
+    this.setState({ labels: '' })
+    await this.addNames(labels)
+    this.setState({ adding: false})
   }
 
   // Click the text box 3 times to display all current name labels.
@@ -95,7 +114,7 @@ class MainForm extends React.Component {
   
 
   render() {
-    const { labels } = this.state
+    const { labels, adding } = this.state
     return (
       <form id="add-names-form" className="row g-3 mb-3 sticky-top add-names-form">
         <div className="input-group mb-3">

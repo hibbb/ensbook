@@ -61,6 +61,8 @@ class MainTable extends React.Component {
       estimateCosts, 
       getDefaultNameReceiver, 
       nameInfo,
+      type, 
+      address,
       network, 
       reconnecting, 
       registerName, 
@@ -78,7 +80,6 @@ class MainTable extends React.Component {
       regsMsges,
       renewsMsges,
       setAndStoreNameInfo, 
-      type,  
       updateNames
     } = this.props
 
@@ -122,8 +123,9 @@ class MainTable extends React.Component {
             getDefaultNameReceiver={getDefaultNameReceiver}
           />
           <TableBody 
-            type={type}
             reconnecting={reconnecting}
+            type={type}
+            address={address}
             network={network}
             nameInfo={nameInfo} 
             setAndStoreNameInfo={setAndStoreNameInfo}

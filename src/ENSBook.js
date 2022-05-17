@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo } from './Components/Global/globals'
+import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo, isStatus } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -704,15 +704,30 @@ class ENSBook extends React.Component {
     })
   }
   
-  removeNames = () => {   // will remove all the items of lowest level by one click
+  removeNames = (flag) => {   // will remove all the items of lowest level by one click
     const { nameInfo } = this.state
-    let lowerLevel = 9  // should be equal or higher than the possible highest level
-    nameInfo.forEach(e => { lowerLevel = Math.min(e.level, lowerLevel) }) // find the lowest level
+    console.log(flag)
+    console.log(isStatus(flag))
 
-    Promise.all(nameInfo.filter((item) => {return item.level > lowerLevel}))
-    .then((nameInfo) => {
-      this.setAndStoreNameInfo(nameInfo)
-    })
+    if (isStatus(flag)) {
+      Promise.all(nameInfo.filter(item => item.status !== flag))
+      .then(nameInfo => this.setAndStoreNameInfo(nameInfo))      
+    }
+
+    if (flag === 'Lower') {
+      let lowerLevel = 9  // should be equal or higher than the possible highest level
+      nameInfo.forEach(e => { lowerLevel = Math.min(e.level, lowerLevel) }) // find the lowest level
+  
+      Promise.all(nameInfo.filter(item => item.level > lowerLevel))
+      .then((nameInfo) => {
+        this.setAndStoreNameInfo(nameInfo)
+      })  
+    }
+
+    if (flag === 'All') {
+      this.setAndStoreNameInfo([])
+    }
+
   }
 
   // getProviderAndSigner() return a provider, a signer and a wallet type.
@@ -786,7 +801,8 @@ class ENSBook extends React.Component {
       nameInfo, 
       type, 
       regMsges, regsMsges, renewMsges, renewsMsges,
-      address, ensname, network, balance 
+      address, ensname, network, balance,
+      provider
     } = this.state
 
     const walletInfo = { type, address, ensname, network, balance }
@@ -808,12 +824,14 @@ class ENSBook extends React.Component {
           setAndStoreNameInfo={this.setAndStoreNameInfo}
           updateNames={this.updateNames}
           network={network}
+          provider={provider}
         />
         <MainTable 
           conf={conf}
           nameInfo={nameInfo} 
           reconnectApp={this.reconnectApp}
           type={type}
+          address={address}
           network={network}
           reconnecting={reconnecting}
           updateNames={this.updateNames} 

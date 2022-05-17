@@ -3,6 +3,7 @@ import confFixed from '../../confFixed.json'
 import { Contract } from 'ethers'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import moment from 'moment'
+import { getAddress, isAddress } from 'ethers/lib/utils'
 
 export function getConf() {
   if (confFile.host === "remote") {
@@ -85,6 +86,11 @@ export function isRopsten(key) {
   }
 }
 
+export function isStatus(flag) {
+  const statuses = ["Open", "Normal", "Grace", "Premium", "Reopen", "Unknown"]
+  return statuses.findIndex(item => item === flag) > -1
+}
+
 export function isOpen(status) {
   return status === "Open"
 }
@@ -99,6 +105,11 @@ export function isRegistrable(status) {
 
 export function isRenewable(status) {
   return status === "Normal" || status === "Grace"
+}
+
+export function isMyName(nameOwner, connectedAccount) {
+  const precondition = isAddress(nameOwner) && isAddress(connectedAccount) 
+  return precondition ? getAddress(nameOwner) === getAddress(connectedAccount) : false
 }
 
 export function getRegistrableNames(nameInfo) {

@@ -30,6 +30,8 @@
       "reg": "Reg",
       "renew": "Renew",
       "del": "Del",
+      "lower": "Lower",
+      "all": "All",
       "tips": {
         "no": "Sort by Label Color",
         "lb": "Sort by Label",

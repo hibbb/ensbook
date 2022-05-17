@@ -1,11 +1,14 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ExclamationCircle } from 'react-bootstrap-icons';
+import { isStatus } from '../Global/globals';
 
 
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
+    const statuses = ["Open", "Normal", "Grace", "Premium", "Reopen", "Unknown"]
+    console.log(isStatus("Normal"))
   }
 
   const testFunc2 = async () => {
