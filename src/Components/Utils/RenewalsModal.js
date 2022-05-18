@@ -31,7 +31,8 @@ const RenewalsModal = (props) => {
   const ActionButton = () => {
     function renewsEnd () {
       onHide()
-      renewNamesEnd()
+      renewNamesEnd(renewList)
+      clearRenewList()
     }
 
     if (renewsAction === 'renewsStarted') {
@@ -51,7 +52,6 @@ const RenewalsModal = (props) => {
       <>
         <Button variant="secondary" onClick={onHide}>{t('c.cancel')}</Button>
         <Button variant="primary" onClick={()=>{
-            clearRenewList()
             renewNames(renewList, moment.duration(duration, 'years').asSeconds())
           }
         }>{t('c.confirm')}</Button>
