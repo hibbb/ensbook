@@ -706,15 +706,12 @@ class ENSBook extends React.Component {
   
   removeNames = (flag) => {   // will remove all the items of lowest level by one click
     const { nameInfo } = this.state
-    console.log(flag)
-    console.log(isStatus(flag))
 
     if (isStatus(flag)) {
       Promise.all(nameInfo.filter(item => item.status !== flag))
       .then(nameInfo => this.setAndStoreNameInfo(nameInfo))      
-    }
-
-    if (flag === 'Lower') {
+    } 
+    else if (flag === 'Lower') {
       let lowerLevel = 9  // should be equal or higher than the possible highest level
       nameInfo.forEach(e => { lowerLevel = Math.min(e.level, lowerLevel) }) // find the lowest level
   
@@ -722,12 +719,10 @@ class ENSBook extends React.Component {
       .then((nameInfo) => {
         this.setAndStoreNameInfo(nameInfo)
       })  
-    }
-
-    if (flag === 'All') {
+    } 
+    else if (flag === 'All') {
       this.setAndStoreNameInfo([])
     }
-
   }
 
   // getProviderAndSigner() return a provider, a signer and a wallet type.

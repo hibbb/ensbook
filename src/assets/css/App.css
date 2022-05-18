@@ -334,6 +334,7 @@ h1 a .title-ens {
   display: inline-block;
   margin: 0.15rem;
   padding: 0.2rem 0.5rem;
+  border-radius: 0.15rem;
   cursor: pointer;
 }
 .remove-tag:hover {

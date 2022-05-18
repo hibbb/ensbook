@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
-import { Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, CaretDown, CaretDownFill, CaretDownSquare } from 'react-bootstrap-icons';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, CaretDownSquare } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 import RegistrationsModal from '../Utils/RegistrationsModal';
-import RemovalsModal from '../Utils/RemovalsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
 import { haveUnregistrableNames, isCustomWallet } from '../Global/globals';
 import RenewalsModal from '../Utils/RenewalsModal';
@@ -241,40 +240,33 @@ export const TableHead = (props) => {
         </th>
         <th>{t('tb.th.lu')}</th>
         <th className="th-remove">
-            {/* <button type="button" className="btn-plain btn-del-name" 
-              data-bs-toggle="modal" 
-              data-bs-target="#removeNamesConfirmModal"
-            >
-              <XCircle />
-            </button> */}
-            <div className="dropdown">
-              <OverlayTrigger placement="top" overlay={
-                <Tooltip>{t('tb.th.tips.remAll')}</Tooltip>
-              }>
-                <button 
-                  disabled={!statusesArr.length}
-                  className="btn-plain dropdown-toggle" 
-                  type="button" id="dropdownMenuButton1" 
-                  data-bs-toggle="dropdown" 
-                  aria-expanded="false">
-                  <CaretDownSquare />
-                </button>
-              </OverlayTrigger>
-              <ul className="dropdown-menu remove-list" aria-labelledby="dropdownMenuButton1">
-                <li>
-                  {removalTags}
-                </li>
-                <li className='mt-1'>
-                  <span className="remove-tag remove-lower" onClick={()=>removeNames("Lower")}>
-                    {t('tb.th.lower')} <XCircle className='light-gray' />
-                  </span>
-                  <span className="remove-tag remove-all" onClick={()=>removeNames("All")}>
-                    {t('tb.th.all')} <XCircle className='light-gray' />
-                  </span>
-                </li>
-              </ul>
-            </div>
-          {/* <RemovalsModal removeNames={removeNames} /> */}
+          <div className="dropdown">
+            <OverlayTrigger placement="top" overlay={
+              <Tooltip>{t('tb.th.tips.remAll')}</Tooltip>
+            }>
+              <button 
+                disabled={!statusesArr.length}
+                className="btn-plain dropdown-toggle" 
+                type="button" id="dropdownMenuButton1" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+                <CaretDownSquare />
+              </button>
+            </OverlayTrigger>
+            <ul className="dropdown-menu remove-list" aria-labelledby="dropdownMenuButton1">
+              <li>
+                {removalTags}
+              </li>
+              <li className='mt-1'>
+                <span className="remove-tag remove-lower" onClick={()=>removeNames("Lower")}>
+                  {t('tb.th.lower')} <XCircle className='light-gray' />
+                </span>
+                <span className="remove-tag remove-all" onClick={()=>removeNames("All")}>
+                  {t('tb.th.all')} <XCircle className='light-gray' />
+                </span>
+              </li>
+            </ul>
+          </div>
         </th>
       </tr>
     </thead>

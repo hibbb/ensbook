@@ -218,7 +218,25 @@ export async function queryData(queryCode, network) {
   return queryResult.data
 }
 
+// entering @ in front of an ENS name or an address can be used to query its names
+export async function isForAccount(str, provider) {
+  str = str.startsWith('@') ? str.replace('@', '') : false
+  if (!str) return false
+
+  if (str.endsWith('.eth') && str.length > 6) {
+    return (await provider.resolveName(str))?.toLowerCase()
+  }
+  if (isAddress(str)) {
+    return str.toLowerCase()
+  }
+  return false
+}
+
+
 export async function getNamesOfOwner(owner, network) {
+  if (!owner) { 
+    return [] 
+  }
   const queryCode = {
     str: `query($owner: ID!) { registrations(where: {registrant: $owner}) { labelName } }`,
     vars: { owner: owner }

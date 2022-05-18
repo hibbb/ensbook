@@ -3,8 +3,7 @@ import { utils } from 'ethers';
 import { toast } from 'react-toastify'
 import namehash from '@ensdomains/eth-ens-namehash'
 import { t } from 'i18next';
-import { isAddress } from 'ethers/lib/utils';
-import { getNamesOfOwner } from '../Global/globals';
+import { getNamesOfOwner, isForAccount } from '../Global/globals';
 
 class MainForm extends React.Component {
   state = {
@@ -32,27 +31,13 @@ class MainForm extends React.Component {
     return []
   }
 
-  // entering @ in front of an ENS name or an address can be used to query its names
-  isForAccount = async (str, provider) => {
-    str = str.startsWith('@') ? str.replace('@', '') : false
-    if (!str) return false
-
-    if (str.endsWith('.eth') && str.length > 6) {
-      return (await provider.resolveName(str))?.toLowerCase() ?? false
-    }
-    if (isAddress(str)) {
-      return str.toLowerCase()
-    }
-    return false
-  }
-
   addNames = async (labels) => {
     const { nameInfo, setAndStoreNameInfo, updateNames, network, provider } = this.props
 
-    const account = await this.isForAccount(labels, provider)
-    const labelsArr = account 
-      ? await getNamesOfOwner(account, network) 
-      : this.handleLabels(labels)
+    const account = await isForAccount(labels, provider)
+    const labelsArr = account === false
+      ? this.handleLabels(labels)
+      : await getNamesOfOwner(account, network)
 
     if (labelsArr.length < 1) { return false }
 
@@ -93,9 +78,8 @@ class MainForm extends React.Component {
   submitForm = async () => {
     this.setState({ adding: true })
     const labels = this.state.labels.trim()
-    console.log(labels.length)
-    this.setState({ labels: '' })
     await this.addNames(labels)
+    this.setState({ labels: '' })
     this.setState({ adding: false})
   }
 
@@ -119,6 +103,7 @@ class MainForm extends React.Component {
       <form id="add-names-form" className="row g-3 mb-3 sticky-top add-names-form">
         <div className="input-group mb-3">
           <input type="text" 
+            disabled={adding}
             className="form-control" 
             autoComplete="off"
             name="labels"
