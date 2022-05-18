@@ -1,5 +1,5 @@
 import React from 'react';
-import { isCustomWallet, isRegistrable } from '../Global/globals';
+import { isCustomWallet, isMyName, isRegistrable } from '../Global/globals';
 import { LabelCell } from './TableCells/LabelCell';
 import { LookupCell } from './TableCells/LookupCell';
 import { StatusCell } from './TableCells/StatusCell';
@@ -10,6 +10,7 @@ import { RenewCell } from './TableCells/RenewCell';
 export const TableBody = (props) => {
   const { 
     type,
+    address, 
     network, 
     reconnecting,
     nameInfo, 
@@ -39,12 +40,15 @@ export const TableBody = (props) => {
 
     return (
       <tr key={index} className='ebr-tb-row'>
-        <td>{index + 1}</td>
+        <td className='td-index'>
+          {index + 1}
+        </td>
         <td className='td-name-label'>
           <LabelCell
             label={row.label}
             index={index}
             level={row.level}
+            isMyName={isMyName(row.owner, address)}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
           />
