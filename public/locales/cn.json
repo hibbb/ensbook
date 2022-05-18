@@ -133,8 +133,9 @@
       "register30": "{{label}}.eth 注册 {{regTxLink}} 已经提交, 正在等待确认。",
       "register31": {
         "succeed": "步骤 3 / 3 已完成: {{label}}.eth 注册 {{regTxLink}} 成功。",
-        "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}."
-      }
+        "fail": "{{label}}.eth 注册失败。你可以检查注册 {{regTxLink}}。"
+      },
+      "unregistrableNow": "{{label}}.eth 已经被抢先注册。"
     },
     "regs": {
       "title": "批量注册",

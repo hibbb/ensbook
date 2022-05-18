@@ -127,6 +127,12 @@ h1 a .title-ens {
   outline: 0;
   box-shadow: 0 0 0 0.1rem rgb(13 110 253 / 25%);
 }
+.form-check-input {
+  border: 1px solid rgba(72,60,50,.4);
+}
+.form-check-input:disabled {
+  opacity: .35;
+}
 .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem rgb(13 110 253 / 25%);
 }

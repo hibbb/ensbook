@@ -134,7 +134,8 @@
       "register31": {
         "succeed": "SETP 3 / 3 FINISHED: {{label}}.eth registration {{regTxLink}} COMPLETED.",
         "fail": "{{label}}.eth REGISTRATION FAILED. You can check the registration {{regTxLink}}."
-      }
+      },
+      "unregistrableNow": "{{label}}.eth has been pre-registered."
     },
     "regs": {
       "title": "Bulk Registration",

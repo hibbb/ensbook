@@ -32,7 +32,6 @@ export const TableHead = (props) => {
     renewNamesEnd,
     renewList,
     clearRenewList,
-    defaultDuration,
     hideNames, 
     switchHideFlag, 
     removeNames, 
@@ -207,7 +206,7 @@ export const TableHead = (props) => {
             registerNamesEnd={registerNamesEnd}
             regList={regList}
             clearRegList={clearRegList}
-            defaultDuration={defaultDuration}
+            defaultDuration={conf.custom.register.duration}
             regMsges={regMsges}
             regsMsges={regsMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
@@ -234,7 +233,7 @@ export const TableHead = (props) => {
             renewNamesEnd={renewNamesEnd}
             renewList={renewList}
             clearRenewList={clearRenewList}
-            defaultDuration={defaultDuration}
+            defaultDuration={conf.custom.renew.duration}
             renewsMsges={renewsMsges}
           />
         </th>

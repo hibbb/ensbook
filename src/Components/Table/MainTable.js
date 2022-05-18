@@ -112,7 +112,6 @@ class MainTable extends React.Component {
             renewNamesEnd={renewNamesEnd}
             renewList={renewList}
             clearRenewList={this.clearRenewList}
-            defaultDuration={conf.custom.register.duration}
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
             removeNames={removeNames}
