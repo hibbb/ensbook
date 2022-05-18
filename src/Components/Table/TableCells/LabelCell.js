@@ -4,10 +4,12 @@ import { BoxArrowUpRight } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 
 export const LabelCell = (props) => {
-  const { label, level, index, nameInfo, setAndStoreNameInfo } = props
+  const { label, level, isMyName, index, nameInfo, setAndStoreNameInfo } = props
   // for td-label
   const nameLink = `https://app.ens.domains/name/${label}.eth`
+
   let labelClickCount = 0
+
   const oneClickToLevelUp = () => {
     labelClickCount += 1;
     setTimeout(() => {
@@ -26,7 +28,7 @@ export const LabelCell = (props) => {
   return (
     <>
       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}>
-        <span className={`td-level td-level-${level}`} onClick={()=>oneClickToLevelUp()}>
+        <span className={`td-level td-level-${level} is-my-name-${isMyName}`} onClick={()=>oneClickToLevelUp()}>
           {label}<span className="dot-eth">.eth</span>
         </span>
       </OverlayTrigger>

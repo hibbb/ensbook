@@ -3,6 +3,7 @@ import confFixed from '../../confFixed.json'
 import { Contract } from 'ethers'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import moment from 'moment'
+import { getAddress, isAddress } from 'ethers/lib/utils'
 
 export function getConf() {
   if (confFile.host === "remote") {
@@ -85,6 +86,11 @@ export function isRopsten(key) {
   }
 }
 
+export function isStatus(flag) {
+  const statuses = ["Open", "Normal", "Grace", "Premium", "Reopen", "Unknown"]
+  return statuses.findIndex(item => item === flag) > -1
+}
+
 export function isOpen(status) {
   return status === "Open"
 }
@@ -99,6 +105,11 @@ export function isRegistrable(status) {
 
 export function isRenewable(status) {
   return status === "Normal" || status === "Grace"
+}
+
+export function isMyName(nameOwner, connectedAccount) {
+  const precondition = isAddress(nameOwner) && isAddress(connectedAccount) 
+  return precondition ? getAddress(nameOwner) === getAddress(connectedAccount) : false
 }
 
 export function getRegistrableNames(nameInfo) {
@@ -207,7 +218,25 @@ export async function queryData(queryCode, network) {
   return queryResult.data
 }
 
+// entering @ in front of an ENS name or an address can be used to query its names
+export async function isForAccount(str, provider) {
+  str = str.startsWith('@') ? str.replace('@', '') : false
+  if (!str) return false
+
+  if (str.endsWith('.eth') && str.length > 6) {
+    return (await provider.resolveName(str))?.toLowerCase()
+  }
+  if (isAddress(str)) {
+    return str.toLowerCase()
+  }
+  return false
+}
+
+
 export async function getNamesOfOwner(owner, network) {
+  if (!owner) { 
+    return [] 
+  }
   const queryCode = {
     str: `query($owner: ID!) { registrations(where: {registrant: $owner}) { labelName } }`,
     vars: { owner: owner }

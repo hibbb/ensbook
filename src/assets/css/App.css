@@ -150,6 +150,9 @@ h1 a .title-ens {
   background-color: #f1aeb5;
   color: #666;
 }
+.td-index {
+  color: #aaaaaa;
+}
 .td-name-label {
   font-family: "ebr-semibold";
 }
@@ -203,6 +206,9 @@ h1 a .title-ens {
 }
 .td-level-2 {
   color:limegreen;
+}
+.is-my-name-true {
+  border-bottom: 1px solid #0dcaf0;
 }
 .grace-ending {
   /* animation: grace-ending 3s infinite linear; */
@@ -313,6 +319,29 @@ h1 a .title-ens {
   display: inline-block;
   width: 6px;
   height: 6px;
+}
+.th-remove .dropdown-toggle::after {
+  display: none;
+}
+.remove-list {
+  min-width: 12rem;
+  padding: 0.2rem;
+  text-align: center;
+  font-weight: 300;
+  font-size: 0.8rem;
+}
+.remove-tag {
+  display: inline-block;
+  margin: 0.15rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.15rem;
+  cursor: pointer;
+}
+.remove-tag:hover {
+  text-decoration: underline;
+}
+.light-gray {
+  color: #aaaaaa;
 }
 .display-expiresTime {
   font-size: 0.2rem;
