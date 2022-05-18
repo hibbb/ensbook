@@ -122,6 +122,11 @@ class ENSBook extends React.Component {
     this.setState({ balance: utils.formatEther(await this.state.signer.getBalance()) }) 
   }
 
+  isRegistrableNow = async (label, nameInfo) => {
+    await this.updateNames([label], false)
+    return isRegistrable(getNameItemByLabel(label, nameInfo).status)
+  }
+
   // registerName actions: regBefore, regStarted, regSupended, regSucceeded, regFailed
 
   registerName = async (label, duration, receiver, regFrom = 0, regTo = 3) => {
@@ -161,11 +166,10 @@ class ENSBook extends React.Component {
         // Verify that the user entered a valid receiver (ETH address or ENS name)
         try { 
           const owner = await provider.resolveName(receiver)
-          if (!owner) {
-            throw new Error('This ENS does not have an address configured.')
-          }
+          if (!owner) { throw new Error('This ENS does not have an address configured.') }
+
           regInfo.receiver = receiver
-          regInfo.owner = receiver
+          regInfo.owner = owner
         } catch(e) {
           console.log(e)
           regMsges[0] = { 
@@ -179,7 +183,7 @@ class ENSBook extends React.Component {
             text: t('modal.reg.wrongReceiver') 
           })
           this.setState({ regMsges })
-          return -1
+          return 0
         }
 
         regInfo.secret = ethers.Wallet.createRandom().privateKey
@@ -227,7 +231,27 @@ class ENSBook extends React.Component {
 
     // *** regStep 0 -> 0.5
 
-    const regFrom0 = async () => {    
+    const regFrom0 = async () => {
+      // double check if each name is registrable now
+      if (!this.isRegistrableNow(label, nameInfo)) {
+        nameInfo[index].regStep = 0
+        this.setAndStoreNameInfo(nameInfo, false)
+
+        regMsges.push({ 
+          time: moment(),
+          type: "info", 
+          text: t('modal.reg.unregistrableNow', { label: label }) 
+        })
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regFailed" 
+        }
+        this.setState({ regMsges })
+        return nameInfo[index].regStep        
+      }
+
+            
       let commitOverrides = {} // config overrides 
       if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
         commitOverrides.gasPrice = utils.parseUnits(conf.custom.wallet.gasPrice.toString(), 'gwei')
@@ -330,6 +354,25 @@ class ENSBook extends React.Component {
         text: t('modal.reg.register20', { label: label }) 
       })
       this.setState({ regMsges })
+
+      // double check if each name is registrable now
+      if (!this.isRegistrableNow(label, nameInfo)) {
+        nameInfo[index].regStep = 0
+        this.setAndStoreNameInfo(nameInfo, false)
+
+        regMsges.push({ 
+          time: moment(),
+          type: "info", 
+          text: t('modal.reg.unregistrableNow', { label: label }) 
+        })
+        regMsges[0] = { 
+          time: moment(), 
+          type: "action", 
+          text: "regFailed" 
+        }
+        this.setState({ regMsges })
+        return nameInfo[index].regStep        
+      }
 
       let regOverrides = {}
       if (conf.custom.wallet.gasPrice > 0) { // conf.custom.wallet.gasPrice: gwei
@@ -441,8 +484,6 @@ class ENSBook extends React.Component {
   // registerNames actions: regsBefore, regsStarted, regsEnded
 
   registerNames = async (regList, duration, receiver) => {
-    const { nameInfo } = this.state
-
     let regsMsges = [{ 
       time: moment(), 
       type: "action", 
@@ -451,13 +492,7 @@ class ENSBook extends React.Component {
     this.setState({ regsMsges })
 
     for (let i = 0; i < regList.length; i++) {
-      // double check if each name is registrable when it is its turn
-      await this.updateNames([regList[i]])
-      const nameItem = getNameItemByLabel(regList[i], nameInfo)
-      // if is registrable, start its registration process
-      const regResult = isRegistrable(nameItem.status)
-        ? await this.registerName(regList[i], duration, receiver)
-        : 0
+      const regResult = await this.registerName(regList[i], duration, receiver)
       
       if (regResult === 3) {
         regsMsges.push({
@@ -487,7 +522,6 @@ class ENSBook extends React.Component {
       text: "regsEnded" 
     }
     this.setState({ regsMsges })
-
     this.setState({ regMsges: INITIAL_STATE.regMsges })
   }
 
