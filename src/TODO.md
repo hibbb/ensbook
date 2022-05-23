@@ -2,6 +2,7 @@
 
 ## Priority 1
 
+- [ ] let main input get focus after addNames
 - [ ] multiple name deletion methods
 - [ ] move sort of level approach to the label column
 

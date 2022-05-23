@@ -271,6 +271,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
       nameInfo[ni].expiresTime = 0
       nameInfo[ni].releaseTime = 0 
       nameInfo[ni].registrationTime = 0
+      nameInfo[ni].owner = undefined
     } else {
       const expiresTime = moment.unix(registrations[ri].expiryDate)
       const releaseTime = moment.unix(registrations[ri].expiryDate).add(90, 'days')
@@ -287,10 +288,13 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
         nameInfo[ni].owner = registrations[ri].registrant.id
       } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) { 
         nameInfo[ni].status = 'Premium'
+        nameInfo[ni].owner = undefined
       } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
         nameInfo[ni].status = 'Reopen'
+        nameInfo[ni].owner = undefined
       } else {
         nameInfo[ni].status = 'Unknown'
+        nameInfo[ni].owner = undefined
       }
     }
 

@@ -295,7 +295,7 @@ class ENSBook extends React.Component {
       })
       this.setState({ regMsges })
 
-      const commitTxReceipt = await provider.waitForTransaction(regInfo.commitTxHash, 2) // waitConfirms: 2
+      const commitTxReceipt = await provider.waitForTransaction(regInfo.commitTxHash, 3) // waitConfirms: 3
 
       if (commitTxReceipt.status) {
         nameInfo[index].regStep = 1
@@ -425,7 +425,7 @@ class ENSBook extends React.Component {
       })
       this.setState({ regMsges })
 
-      const regTxReceipt = await provider.waitForTransaction(regInfo.regTxHash, 1) // waitConfirms: 2
+      const regTxReceipt = await provider.waitForTransaction(regInfo.regTxHash, 2) // waitConfirms: 2
       // insert regInfo: regTx
       if (regTxReceipt.status) {
         nameInfo[index].regStep = 3
