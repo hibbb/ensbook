@@ -81,6 +81,7 @@ class MainForm extends React.Component {
     await this.addNames(labels)
     this.setState({ labels: '' })
     this.setState({ adding: false})
+    document.getElementById("labels").focus()
   }
 
   // Click the text box 3 times to display all current name labels.
