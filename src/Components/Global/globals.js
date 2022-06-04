@@ -54,6 +54,10 @@ export function getBulkRenewCon(providerOrSigner, network, conf) {
   return getContract(providerOrSigner, network, conf, "BulkRenew")
 }
 
+export function getBulkRegCon(providerOrSigner, network, conf) {
+  return getContract(providerOrSigner, network, conf, "BulkRegistration")
+}
+
 export function isCustomWallet(conf) {
   conf = conf ?? getConf()
   return conf.custom.wallet.switch
@@ -232,13 +236,13 @@ export async function isForAccount(str, provider) {
   return false
 }
 
-
+// fetch the registrations (upto *1000) of an account
 export async function getNamesOfOwner(owner, network) {
   if (!owner) { 
     return [] 
   }
   const queryCode = {
-    str: `query($owner: ID!) { registrations(where: {registrant: $owner}) { labelName } }`,
+    str: `query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }`,
     vars: { owner: owner }
   }
   const { registrations } = await queryData(queryCode, network)

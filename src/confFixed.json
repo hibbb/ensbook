@@ -15,7 +15,8 @@
         "BaseRegImp": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
         "ETHRegCtrl": "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
         "PubRes": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
-        "BulkRenew": "0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035"
+        "BulkRenew": "0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035",
+        "BulkRegistration": "0x22256a2812f7A771B8b224E4fb34C6f245f3E330"
       },
       "ropsten": {
         "BaseRegImp": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
@@ -40,6 +41,11 @@
       "BulkRenew": [
         "function rentPrice(string[] names, uint duration) view returns (uint)",
         "function renewAll(string[] names, uint duration) payable"
+      ],
+      "BulkRegistration": [
+        "priceAll(string[], uint256) view returns (uint)",
+        "commitAll(bytes32[])",
+        "registerAll(string[], bytes32[], uint256) payable"
       ]
     }
   }
