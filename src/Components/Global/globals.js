@@ -1,6 +1,6 @@
 import confFile from '../../conf.json'
 import confFixed from '../../confFixed.json'
-import { Contract } from 'ethers'
+import { Contract, utils } from 'ethers'
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import moment from 'moment'
 import { getAddress, isAddress } from 'ethers/lib/utils'
@@ -35,7 +35,7 @@ export function updateLookupList(conf) {
   return conf
 }
 
-export function getContract(providerOrSigner, network, conf, contract) {
+export function getContract(providerOrSigner, contract, network, conf) {
   conf = conf ?? getConf()
   const contractAddr = confFixed.contract.addr[network][contract]
   const contractAbi = confFixed.contract.abi[contract]
@@ -43,19 +43,19 @@ export function getContract(providerOrSigner, network, conf, contract) {
 }
 
 export function getETHRegCtrlCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, network, conf, "ETHRegCtrl")
+  return getContract(providerOrSigner, "ETHRegCtrl", network, conf)
 }
 
 export function getBaseRegImpCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, network, conf, "BaseRegImp")
+  return getContract(providerOrSigner, "BaseRegImp", network, conf)
 }
 
 export function getBulkRenewCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, network, conf, "BulkRenew")
+  return getContract(providerOrSigner, "BulkRenew", network, conf)
 }
 
 export function getBulkRegCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, network, conf, "BulkRegistration")
+  return getContract(providerOrSigner, "BulkRegistration", network, conf)
 }
 
 export function isCustomWallet(conf) {
@@ -223,16 +223,37 @@ export async function queryData(queryCode, network) {
 }
 
 // entering @ in front of an ENS name or an address can be used to query its names
-export async function isForAccount(str, provider) {
-  str = str.startsWith('@') ? str.replace('@', '') : false
-  if (!str) return false
+export async function isForAccount(str, provider, network) {
+  const from = str.startsWith('@') ? 'fromOwner' : (str.startsWith('#') ? 'fromAddr' : false)
 
-  if (str.endsWith('.eth') && str.length > 6) {
-    return (await provider.resolveName(str))?.toLowerCase()
+  if (from) {
+    str = str.replace('@', '').replace('#', '')
+  } else { 
+    return false 
   }
+
+  if (from === 'fromOwner' && str.endsWith('.eth') && str.length > 6) {
+    const label = str.slice(0, -4)
+    const labelHash = utils.id(label)
+    const queryCode = {
+      str: `query($labelHash: String!) {
+        registration(id: $labelHash) { registrant { id } }
+      }`,
+      vars: { labelHash: labelHash }
+    } 
+  
+    const { registration } = await queryData(queryCode, network)
+    str = registration?.registrant?.id
+  }
+
+  if (from === 'fromAddr' && str.endsWith('.eth') && str.length > 6) {
+    str = await provider.resolveName(str)
+  }
+
   if (isAddress(str)) {
     return str.toLowerCase()
   }
+
   return false
 }
 
