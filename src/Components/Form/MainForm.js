@@ -33,8 +33,7 @@ class MainForm extends React.Component {
 
   addNames = async (labels) => {
     const { nameInfo, setAndStoreNameInfo, updateNames, network, provider } = this.props
-
-    const account = await isForAccount(labels, provider)
+    const account = await isForAccount(labels, provider, network)
     const labelsArr = account === false
       ? this.handleLabels(labels)
       : await getNamesOfOwner(account, network)
