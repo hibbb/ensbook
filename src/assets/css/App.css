@@ -319,13 +319,13 @@ h1 a .title-ens {
 .th-sortable {
   cursor: pointer;
 }
-.th-sortable::after {
+/* .th-sortable::after {
   margin-left: 0.375rem;
   content: '';
   display: inline-block;
   width: 6px;
   height: 6px;
-}
+} */
 .th-remove .dropdown-toggle::after {
   display: none;
 }
@@ -357,7 +357,7 @@ h1 a .title-ens {
   font-size: 0.2rem;
   color: sienna;
 }
-.sort-asc-true::after {
+/* .sort-asc-true::after {
   border-top: 2px solid #999999;
   border-right: 2px solid #999999;
   transform: rotate(-45deg);
@@ -368,7 +368,7 @@ h1 a .title-ens {
   border-right: 2px solid #999999;
   transform: rotate(135deg);
   -webkit-transform: rotate(135deg);
-}
+} */
 .ebr-tb-row:hover > td > .td-status {
   box-shadow: 0 0 0 1px rgba(13, 202, 242, 0.275);
 }

@@ -291,6 +291,9 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     const ri = registrations.findIndex(item => item.labelName === labelsGroup[i])
     const ni = nameInfo.findIndex(item => item.label === labelsGroup[i])
 
+    // add 'length' attribute by addNames() in MainForm.js @v2.2.6 
+    nameInfo[ni].length = labelsGroup[i].length   // keep this line until 2023.12 or v3.x.x
+
     if (ri < 0) {
       nameInfo[ni].status = 'Open'
       nameInfo[ni].expiresTime = 0

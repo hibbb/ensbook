@@ -111,11 +111,14 @@ class ENSBook extends React.Component {
     labels = labels ?? nameInfo.map(item => item.label)
     const labelsGroupsCount = Math.ceil(labels.length/100)
 
+    this.setState({ fetching: true })
+
     for (let n = 0; n < labelsGroupsCount; n++) {
       const labelsGroup = labels.slice(n * 100, n * 100 + 100)
       nameInfo = await queryNameInfo(labelsGroup, nameInfo, provider, network)
       this.setAndStoreNameInfo(nameInfo, messageShowFlag)
     }
+    this.setState({ fetching: false })
   }
 
   updateBalance = async () => {
@@ -826,6 +829,7 @@ class ENSBook extends React.Component {
   render() {
     const { 
       reconnecting, 
+      fetching, 
       unsupported, 
       nameInfo, 
       type, 
@@ -863,6 +867,7 @@ class ENSBook extends React.Component {
           address={address}
           network={network}
           reconnecting={reconnecting}
+          fetching={fetching}
           updateNames={this.updateNames} 
           registerName={this.registerName} 
           registerNames={this.registerNames}

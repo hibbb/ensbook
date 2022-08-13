@@ -48,6 +48,7 @@ class MainForm extends React.Component {
     diffLabelsArr.map(label => 
       nameInfo.push({
         "label": label,
+        "length": label.length,
         "level": 0,
         "status": "Unknown",
         "tokenId": utils.id(label)

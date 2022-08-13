@@ -2,13 +2,11 @@
 
 ## Priority 1
 
-- [ ] let main input get focus after addNames
-- [ ] multiple name deletion methods
-- [ ] move sort of level approach to the label column
+- [ ] check uppercase letters with @/# ahead
+- [ ] disable sorting while fetching
 
 ## Priority 2
 
-- [ ] support inputing an address to get all name owned by the address
 
 ## Priority 3
 
@@ -16,6 +14,12 @@
 
 ## Completed From v1.4.0
 
+- [x] let main input get focus after addNames
+- [x] multiple name deletion methods
+- [x] move sort of level approach to the label column
+- [x] support inputing an address to get all name owned by the address
+- [x] add more sort methods such as length, characters, level
+- [x] disable del button when fetching
 - [x] read fixed config only from the app instead of localstorage
 - [x] support selecting which name to reg or renew
 - [x] add the owner's inventory in lookups
