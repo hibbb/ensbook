@@ -31,7 +31,7 @@ export const LookupCell = (props) => {
     },
     Opensea: {
       precondition: isMainnet(network) && isRenewable(status),
-      link: `https://opensea.io/assets/${addr[network].BaseRegImp}/${tokenIdDec}`
+      link: `https://opensea.io/assets/ethereum/${addr[network].BaseRegImp}/${tokenIdDec}`
     },
     Gem: {
       precondition: isMainnet(network) && isRenewable(status),

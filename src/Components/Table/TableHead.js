@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, CaretDownSquare } from 'react-bootstrap-icons';
+import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, CaretDownSquare, SortAlphaDown, SortAlphaDownAlt, SortDown, SortDownAlt, List, ListStars, Alarm, Stopwatch } from 'react-bootstrap-icons';
 import { t } from 'i18next';
 import RegistrationsModal from '../Utils/RegistrationsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
 import { haveUnregistrableNames, isCustomWallet } from '../Global/globals';
 import RenewalsModal from '../Utils/RenewalsModal';
 
-let ascFlag = {
-  "label": true,
-  "level": false,
-  "expiresTime": true,
-  "releaseTime": true,
-  "status": true
-}
-
 export const TableHead = (props) => {
   const { 
     type, 
     reconnecting, 
+    fetching, 
     nameInfo, 
     setAndStoreNameInfo, 
     conf,
@@ -42,6 +35,16 @@ export const TableHead = (props) => {
     getDefaultNameReceiver
   } = props
 
+  const initialAscFlags = {
+    "label": true,
+    "length": true,
+    "level": false,
+    "expiresTime": true,
+    "releaseTime": true,
+    "status": true
+  }
+  const [ascFlags, setAscFlags] = useState(initialAscFlags)
+
   const [regNamesModalShow, setRegNamesModalShow] = useState(false)
   const [renewNamesModalShow, setRenewNamesModalShow] = useState(false)
 
@@ -51,27 +54,19 @@ export const TableHead = (props) => {
   const jsonSort = (array, key) => {
     if(array.length < 2 || !key || typeof array[0] !== "object") return array
     if(typeof array[0][key] === "number") {
-      ascFlag[key]
+      ascFlags[key]
       ? array.sort(function(x, y) {return x[key] - y[key]})
       : array.sort(function(x, y) {return y[key] - x[key]})
     }
     if(typeof array[0][key] === "string") {
-      ascFlag[key]
+      ascFlags[key]
       ? array.sort(function(x, y) {return x[key].localeCompare(y[key])})
       : array.sort(function(x, y) {return y[key].localeCompare(x[key])})
     }
-    displaySortArrow(key)
-    ascFlag[key] = !ascFlag[key]
-    return array;
-  }
+    
+    setAscFlags({ ...ascFlags, ...{[key]: !ascFlags[key]} })
 
-  const displaySortArrow = (key) => {
-    let thSpans = document.getElementsByClassName("th-sortable")
-    for (let i = 0; i < thSpans.length; i++) {
-      thSpans[i].classList.remove("sort-asc-true", "sort-asc-false");
-    }
-    let displaySpan = document.getElementById("th-" + key)
-    displaySpan.classList.add("sort-asc-" + ascFlag[key])
+    return array
   }
 
   const RegNamesButton = () => {
@@ -164,36 +159,57 @@ export const TableHead = (props) => {
     <thead>
       <tr className="ebr-tb-row">
         <th>
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.no')}</Tooltip>}>
-            <span id="th-level" className="th-sortable" 
-              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "level"))}
-            >
-              {t('tb.th.no')}
-            </span>
-          </OverlayTrigger>
-        </th>
-        <th>
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.lb')}</Tooltip>}>
-            <span id="th-label" className="th-sortable" 
-              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "label"))}
-            >
-              {t('tb.th.lb')}
-            </span>
-          </OverlayTrigger>
-        </th>
-        <th>
-          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}>
-            <span id="th-expiresTime" className="th-sortable"
-              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))}
-            >
-              {t('tb.th.sta')}
-            </span>
-          </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}>
-            <button type="button" className="btn-plain ms-2" 
+            <button type="button" className="btn-plain" 
               onClick={()=>updateNames()}
             >
               <ArrowRepeat />
+            </button>
+          </OverlayTrigger>
+        </th>
+        <th>
+          <span id="th-label">
+            {t('tb.th.lb')}
+          </span>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.lb.label')}</Tooltip>}>   
+            <button type="button" className="btn-plain ms-2 th-sortable" 
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "label"))}
+            >
+              { 
+                ascFlags['label'] ? <SortAlphaDown /> : <SortAlphaDownAlt /> 
+              }
+            </button>
+          </OverlayTrigger>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.lb.length')}</Tooltip>}>   
+            <button type="button" className="btn-plain ms-2 th-sortable" 
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "length"))}
+            >
+              { 
+                ascFlags['length'] ? <SortDownAlt /> : <SortDown /> 
+              }
+            </button>
+          </OverlayTrigger>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.lb.level')}</Tooltip>}>   
+            <button type="button" className="btn-plain ms-2 th-sortable" 
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "level"))}
+            >
+              { 
+                ascFlags['level'] ? <List /> : <ListStars /> 
+              }
+            </button>
+          </OverlayTrigger>
+        </th>
+        <th>
+          <span id="th-expiresTime">
+            {t('tb.th.sta')}
+          </span>
+          <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}>   
+            <button type="button" className="btn-plain ms-2 th-sortable" 
+              onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))}
+            >
+              { 
+                ascFlags['expiresTime'] ? <Alarm /> : <Stopwatch /> 
+              }
             </button>
           </OverlayTrigger>
         </th>
@@ -244,15 +260,15 @@ export const TableHead = (props) => {
               <Tooltip>{t('tb.th.tips.remAll')}</Tooltip>
             }>
               <button 
-                disabled={!statusesArr.length}
+                disabled={!statusesArr.length || fetching}
                 className="btn-plain dropdown-toggle" 
-                type="button" id="dropdownMenuButton1" 
+                type="button" id="dropdown-remove-names" 
                 data-bs-toggle="dropdown" 
                 aria-expanded="false">
                 <CaretDownSquare />
               </button>
             </OverlayTrigger>
-            <ul className="dropdown-menu remove-list" aria-labelledby="dropdownMenuButton1">
+            <ul className="dropdown-menu remove-list" aria-labelledby="dropdown-remove-names">
               <li>
                 {removalTags}
               </li>

@@ -24,7 +24,7 @@
   "tb": {
     "th": {
       "no": "#",
-      "lb": "Label",
+      "lb": "Name",
       "lu": "Lookup",
       "sta": "Status",
       "reg": "Reg",
@@ -33,12 +33,14 @@
       "lower": "Lower",
       "all": "All",
       "tips": {
-        "no": "Sort by Label Color",
-        "lb": "Sort by Label",
-        "ti": "Sort by Time",
+        "update": "Update Information",
+        "lb": {
+          "label": "Sort by Character",
+          "length": "Sort by Length", 
+          "level": "Sort by Level"
+        },
         "sta": "Sort by Status",
         "renew": "Bulk Renewal",
-        "update": "Update Information",
         "regAll": "Bulk Registration",
         "estAll": "Bulk Registration Cost Estimation",
         "remAll": "Remove Names",
