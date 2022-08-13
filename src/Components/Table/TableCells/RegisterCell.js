@@ -17,8 +17,8 @@ export const RegisterCell = (props) => {
     defaultDuration, 
     registerName, 
     regStep, 
-    addRegName,
-    removeRegName,
+    addNameToRegList,
+    removeNameFromRegList,
     estimateCost, 
     registerNameEnd, 
     regMsges, 
@@ -43,16 +43,17 @@ export const RegisterCell = (props) => {
 
   const handleRegCheckboxChange = (event) => {
     const { name, checked } = event.target
-    checked ? addRegName(name) : removeRegName(name)
+    checked ? addNameToRegList(name) : removeNameFromRegList(name)
   }
 
   if (isRegistrable(status)) {
     return (
       <div id={"registerName-" + label} className="btn-group" role="group" aria-label="RegisterName or Estimate Price">
         <OverlayTrigger placement="top" overlay={
-          <Tooltip>{t('tb.td.tips.addRegName')}</Tooltip>
+          <Tooltip>{t('tb.td.tips.addNameToRegList')}</Tooltip>
         }>
-          <input className="form-check-input reg-checkbox" 
+          <input id={"registerName-checkbox-" + label}
+            className="form-check-input reg-checkbox" 
             type="checkbox" 
             name={label} 
             disabled={!isCustomWallet}

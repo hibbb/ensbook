@@ -3,7 +3,6 @@
 ## Priority 1
 
 - [ ] check uppercase letters with @/# ahead
-- [ ] disable sorting while fetching
 
 ## Priority 2
 
@@ -14,6 +13,7 @@
 
 ## Completed From v1.4.0
 
+- [x] disable sorting while fetching
 - [x] let main input get focus after addNames
 - [x] multiple name deletion methods
 - [x] move sort of level approach to the label column

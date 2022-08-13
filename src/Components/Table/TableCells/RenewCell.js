@@ -15,8 +15,8 @@ export const RenewCell = (props) => {
     renewNameEnd,
     renewMsges,
     reconnecting, 
-    addRenewName,
-    removeRenewName,
+    addNameToRenewList,
+    removeNameFromRenewList,
     type 
   } = props
 
@@ -24,16 +24,17 @@ export const RenewCell = (props) => {
 
   const handleRenewCheckboxChange = (event) => {
     const { name, checked } = event.target
-    checked ? addRenewName(name) : removeRenewName(name)
+    checked ? addNameToRenewList(name) : removeNameFromRenewList(name)
   }
 
   if (isRenewable(status)) {
     return (
       <div id={"renewName-" + label} className="btn-group" role="group" aria-label="RenewName">
         <OverlayTrigger placement="top" overlay={
-          <Tooltip>{t('tb.td.tips.addRenewName')}</Tooltip>
+          <Tooltip>{t('tb.td.tips.addNameToRenewList')}</Tooltip>
         }>
-          <input className="form-check-input renew-checkbox" 
+          <input id={"renewName-checkbox-" + label}
+            className="form-check-input renew-checkbox" 
             type="checkbox" 
             name={label} 
             disabled={type==='readonly' || reconnecting}
