@@ -19,12 +19,12 @@ export const TableBody = (props) => {
     updateNames, 
     registerName, 
     registerNameEnd, 
-    addRegName,
-    removeRegName,
+    addNameToRegList,
+    removeNameFromRegList,
     renewName,
     renewNameEnd,
-    addRenewName,
-    removeRenewName,
+    addNameToRenewList,
+    removeNameFromRenewList,
     hideNames, 
     removeName, 
     estimateCost,
@@ -84,8 +84,8 @@ export const TableBody = (props) => {
             registerName={registerName} 
             regStep={row.regStep}
             registerNameEnd={registerNameEnd}
-            addRegName={addRegName}
-            removeRegName={removeRegName}
+            addNameToRegList={addNameToRegList}
+            removeNameFromRegList={removeNameFromRegList}
             regMsges={regMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
           />
@@ -101,8 +101,8 @@ export const TableBody = (props) => {
             renewNameEnd={renewNameEnd}
             renewMsges={renewMsges}
             reconnecting={reconnecting}
-            addRenewName={addRenewName}
-            removeRenewName={removeRenewName}
+            addNameToRenewList={addNameToRenewList}
+            removeNameFromRenewList={removeNameFromRenewList}
           />
         </td>
         <td className='td-lookup'>

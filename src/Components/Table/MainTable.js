@@ -1,6 +1,7 @@
 import React from 'react';
 import { TableHead } from './TableHead'
 import { TableBody } from './TableBody'
+import { isStatus, removeRegInfo } from '../Global/globals';
 
 class MainTable extends React.Component {
 
@@ -15,13 +16,13 @@ class MainTable extends React.Component {
     "renewList": []
   }
 
-  addRegName = (label) => {
+  addNameToRegList = (label) => {
     const { regList } = this.state
     regList.push(label)
-    this.setState({ regList })
+    this.setState({ regList: [...new Set(regList)] })
   }
 
-  removeRegName = (label) => {
+  removeNameFromRegList = (label) => {
     const regList = this.state.regList.filter(item => item !== label)
     this.setState({ regList })
   }
@@ -34,13 +35,13 @@ class MainTable extends React.Component {
     }
   }
 
-  addRenewName = (label) => {
+  addNameToRenewList = (label) => {
     const { renewList } = this.state
     renewList.push(label)
-    this.setState({ renewList })
+    this.setState({ renewList: [...new Set(renewList)] })
   }
 
-  removeRenewName = (label) => {
+  removeNameFromRenewList = (label) => {
     const renewList = this.state.renewList.filter(item => item !== label)
     this.setState({ renewList })
   }
@@ -51,8 +52,9 @@ class MainTable extends React.Component {
     for (let i = 0; i < renewCheckboxes.length; i ++) {
       renewCheckboxes[i].checked = false
     }
-    console.log('RenewList Cleared.')
   }
+
+
 
   render() {
     const { 
@@ -70,8 +72,6 @@ class MainTable extends React.Component {
       registerNameEnd,
       registerNames, 
       registerNamesEnd,
-      removeNames, 
-      removeName, 
       renewMsges,
       renewName,
       renewNameEnd,
@@ -94,6 +94,46 @@ class MainTable extends React.Component {
       this.setState({ "hideNames": !hideNames })
       setAndStoreNameInfo(nameInfo, false)
     }
+
+    const removeName = (index) => {
+      const currentRegCheckBox = document.getElementById("registerName-checkbox-" + nameInfo[index].label)
+      const currentRenewCheckBox = document.getElementById("renewName-checkbox-" + nameInfo[index].label)
+      if (currentRegCheckBox) currentRegCheckBox.checked = false
+      if (currentRenewCheckBox) currentRenewCheckBox.checked = false
+      
+
+      this.removeNameFromRegList(nameInfo[index].label)
+      this.removeNameFromRenewList(nameInfo[index].label)
+  
+      removeRegInfo(nameInfo[index].label)
+      Promise.all(nameInfo.filter((item, i) => {return i !== index}))
+      .then((nameInfo) => {
+        setAndStoreNameInfo(nameInfo)
+      })
+    }
+    
+    const removeNames = (flag) => {   // will remove all the items of lowest level by one click
+      this.clearRegList()
+      this.clearRenewList()
+  
+      if (isStatus(flag)) {
+        Promise.all(nameInfo.filter(item => item.status !== flag))
+        .then(nameInfo => setAndStoreNameInfo(nameInfo))      
+      } 
+      else if (flag === 'Lower') {
+        let lowerLevel = 9  // should be equal or higher than the possible highest level
+        nameInfo.forEach(e => { lowerLevel = Math.min(e.level, lowerLevel) }) // find the lowest level
+    
+        Promise.all(nameInfo.filter(item => item.level > lowerLevel))
+        .then((nameInfo) => {
+          setAndStoreNameInfo(nameInfo)
+        })  
+      } 
+      else if (flag === 'All') {
+        setAndStoreNameInfo([])
+      }
+    }
+  
     
     return (
       <div className="row table-wrapper">
@@ -134,10 +174,10 @@ class MainTable extends React.Component {
             updateNames={updateNames}
             registerName={registerName} 
             registerNameEnd={registerNameEnd}
-            addRegName={this.addRegName}
-            removeRegName={this.removeRegName}
-            addRenewName={this.addRenewName}
-            removeRenewName={this.removeRenewName}
+            addNameToRegList={this.addNameToRegList}
+            removeNameFromRegList={this.removeNameFromRegList}
+            addNameToRenewList={this.addNameToRenewList}
+            removeNameFromRenewList={this.removeNameFromRenewList}
             renewName={renewName}
             renewNameEnd={renewNameEnd}
             hideNames={this.state.hideNames}

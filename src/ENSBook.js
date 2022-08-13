@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, removeRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo, isStatus } from './Components/Global/globals'
+import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -732,36 +732,6 @@ class ENSBook extends React.Component {
     return costWei
   }
 
-  removeName = (index) => {
-    const { nameInfo } = this.state
-    removeRegInfo(nameInfo[index].label)
-    Promise.all(nameInfo.filter((item, i) => {return i !== index}))
-    .then((nameInfo) => {
-      this.setAndStoreNameInfo(nameInfo)
-    })
-  }
-  
-  removeNames = (flag) => {   // will remove all the items of lowest level by one click
-    const { nameInfo } = this.state
-
-    if (isStatus(flag)) {
-      Promise.all(nameInfo.filter(item => item.status !== flag))
-      .then(nameInfo => this.setAndStoreNameInfo(nameInfo))      
-    } 
-    else if (flag === 'Lower') {
-      let lowerLevel = 9  // should be equal or higher than the possible highest level
-      nameInfo.forEach(e => { lowerLevel = Math.min(e.level, lowerLevel) }) // find the lowest level
-  
-      Promise.all(nameInfo.filter(item => item.level > lowerLevel))
-      .then((nameInfo) => {
-        this.setAndStoreNameInfo(nameInfo)
-      })  
-    } 
-    else if (flag === 'All') {
-      this.setAndStoreNameInfo([])
-    }
-  }
-
   // getProviderAndSigner() return a provider, a signer and a wallet type.
   // wallet type: 'custom' | 'web3' | 'readonly'
   getProviderAndSigner = async () => {
@@ -877,8 +847,6 @@ class ENSBook extends React.Component {
           renewNameEnd={this.renewNameEnd}
           renewNames={this.renewNames}
           renewNamesEnd={this.renewNamesEnd}
-          removeName={this.removeName} 
-          removeNames={this.removeNames}
           estimateCost={this.estimateCost}
           estimateCosts={this.estimateCosts}
           regMsges={regMsges}
