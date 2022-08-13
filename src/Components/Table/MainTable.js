@@ -65,6 +65,7 @@ class MainTable extends React.Component {
       address,
       network, 
       reconnecting, 
+      fetching, 
       registerName, 
       registerNameEnd,
       registerNames, 
@@ -100,6 +101,7 @@ class MainTable extends React.Component {
           <TableHead
             type={type}
             reconnecting={reconnecting}
+            fetching={fetching}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
