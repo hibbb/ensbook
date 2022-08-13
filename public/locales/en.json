@@ -30,7 +30,7 @@
       "reg": "Reg",
       "renew": "Renew",
       "del": "Del",
-      "lower": "Lower",
+      "lower": "Unmarked",
       "all": "All",
       "tips": {
         "update": "Update Information",
@@ -56,11 +56,11 @@
       "reged": "Reged", 
       "renew": "Renew",
       "tips": {
-        "lb": "Click to Change the Label Color",
+        "lb": "Click to Mark/Unmark",
         "renew": "Renew {{label}}.eth",
         "est": "Registration Cost Estimation",
-        "addRegName": "Add to or Remove from Bulk Registration List",
-        "addRenewName": "Add to or Remove from Bulk Renewal List",
+        "addNameToRegList": "Add to or Remove from Bulk Registration List",
+        "addNameToRenewList": "Add to or Remove from Bulk Renewal List",
         "reg": "Register {{label}}.eth",
         "reging": "Registering",
         "continue": "Continue to the Registration Process",
