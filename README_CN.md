@@ -45,7 +45,7 @@
 
 #### Web 版本
 
-1. 在浏览器中打开 [ensbook.xyz](https://ensbook.xyz/) 或者 [ensbook.eth.link](https://ensbook.eth.link/)
+1. 在浏览器中打开 [ensbook.xyz](https://ensbook.xyz/) 或者 [ensbook.eth.limo](https://ensbook.eth.limo/)
 2. 连接钱包，或者忽略连接使用只读模式。
 3. 点击右上角的齿轮。
 4. 按照需求配置自定义项。
@@ -64,5 +64,5 @@
 ### 使用提示
 
 - **特别关注**: 单击某个域名标签，可以改变它的颜色，以便特别关注某些 ENS 域名。
-- **多页模式**: 除了 [ensbook.xyz](https://ensbook.xyz/) 和 [ensbook.eth.link](https://ensbook.eth.link/) 之外，ENSBook 还开放了另外 5 个页面 (从 [1.ensbook.xyz](https://1.ensbook.xyz/) 至 [5.ensbook.xyz](https://5.ensbook.xyz/))，以便于保存和显示不同类别的域名集合，您还可以在自定义设置中给每个页面进行个性化标记。
+- **多页模式**: 除了 [ensbook.xyz](https://ensbook.xyz/) 和 [ensbook.eth.limo](https://ensbook.eth.limo/) 之外，ENSBook 还开放了另外 5 个页面 (从 [1.ensbook.xyz](https://1.ensbook.xyz/) 至 [5.ensbook.xyz](https://5.ensbook.xyz/))，以便于保存和显示不同类别的域名集合，您还可以在自定义设置中给每个页面进行个性化标记。
 - **标签导出**: 在输入文本框中连续单击三次，可以将目前列表中的域名标签导出到文本框中，方便分享和复用。
