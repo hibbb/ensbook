@@ -47,7 +47,7 @@ export const LookupCell = (props) => {
     },
     LinkETH: {
       precondition: isMainnet(network) && isRenewable(status),
-      link: `https://${label}.eth.link/`
+      link: `https://${label}.eth.limo/`
     },
     DNSRelated: {
       precondition: true,

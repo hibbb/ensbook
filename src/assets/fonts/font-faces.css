@@ -37,13 +37,3 @@
 }
 
 /* ===== ebr-code: SpaceMono ===== */
-@font-face {
-  font-family: 'ebr-code-regular';
-  src: url('./SpaceMono/SpaceMono-Regular.ttf') format('truetype');
-  font-display: fallback;
-}
-@font-face {
-  font-family: 'ebr-code-italic';
-  src: url('./SpaceMono/SpaceMono-Italic.ttf') format('truetype'); 
-  font-display: fallback;
-}

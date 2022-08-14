@@ -45,7 +45,7 @@ You can use the Web version of ENSBook directly, or you can download the source 
 
 #### Web Version
 
-1. Open [ensbook.xyz](https://ensbook.xyz/) or [ensbook.eth.link](https://ensbook.eth.link/) in your browser.
+1. Open [ensbook.xyz](https://ensbook.xyz/) or [ensbook.eth.limo](https://ensbook.eth.limo/) in your browser.
 2. Connect your wallet, or ignore the connection and use read-only mode.
 3. Click the gear icon at top right corner.
 4. Configure the custom items to suit your own needs.
@@ -66,5 +66,5 @@ You can use the Web version of ENSBook directly, or you can download the source 
 In addition to basic observation and registration functions, ENSBook has some features that are not easily discovered.
 
 - **Special Focus**: You can click a name label to change its color so that you can pay special focus to certain ENS names.
-- **Multi-page Mode**: In addition to [ensbook.xyz](https://ensbook.xyz/) and [ensbook.eth.link](https://ensbook.eth.link/), ENSBook provides five additional pages (from [1.ensbook.xyz](https://1.ensbook.xyz/) to [5.ensbook.xyz](https://5.ensbook.xyz/)) to save and display ENS name collections of different categories, and you can also set individual tags for each page in custom configuration.
+- **Multi-page Mode**: In addition to [ensbook.xyz](https://ensbook.xyz/) and [ensbook.eth.limo](https://ensbook.eth.limo/), ENSBook provides five additional pages (from [1.ensbook.xyz](https://1.ensbook.xyz/) to [5.ensbook.xyz](https://5.ensbook.xyz/)) to save and display ENS name collections of different categories, and you can also set individual tags for each page in custom configuration.
 - **Label Export**: You can click three times in the input box to export the name labels in the current page to the input box for easy sharing and reuse.
