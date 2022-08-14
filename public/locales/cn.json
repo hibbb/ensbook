@@ -74,7 +74,7 @@
       "Gem": "Gem",
       "Metadata": "元数据",
       "Inventory": "持有者的 ENS 资产库",
-      "LinkETH": "{{label}}.eth.link",
+      "LinkETH": "{{label}}.eth.limo",
       "DNSRelated": "同名 DNS 注册情况"
     }
   },

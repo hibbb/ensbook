@@ -187,7 +187,7 @@ h1 a .title-ens {
   color: #0dcaf0;
   font-size: 0.75rem;
   height: 1.2rem;
-  font-family: 'ebr-number-regular';
+  font-family: "ebr-number-regular";
 }
 .status-Unknown  { background-color: #ffffff; }
 .status-Normal   { background-color: #cccccc65; }
@@ -458,11 +458,7 @@ button.btn-plain[disabled] {
 .footnotes a:hover {
   color: black;
 }
-.version-v {
-  font-size: 0.75rem;
-  font-family: 'ebr-number-regular';
-}
-.version-number {
+.version-v, .version-number {
   font-size: 0.75rem;
 }
 .footnode-right {
