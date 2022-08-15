@@ -5,7 +5,7 @@ import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat,
 import { t } from 'i18next';
 import RegistrationsModal from '../Utils/RegistrationsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
-import { isCustomWallet, isRegistrable } from '../Global/globals';
+import { haveRegistrableNames, haveUnregistrableNames, isCustomWallet } from '../Global/globals';
 import RenewalsModal from '../Utils/RenewalsModal';
 
 export const TableHead = (props) => {
@@ -69,74 +69,6 @@ export const TableHead = (props) => {
     return array
   }
 
-  const nonBulkRegable = () => !isCustomWallet(conf) || reconnecting || !isBulkReg()
-
-  // const RegNamesButton = () => {
-  //   return !isCustomWallet(conf) || reconnecting || !isBulkReg()
-  //     ? (
-  //       <button type="button" className="btn-plain btn-bulk-reg" disabled>
-  //         {t('tb.th.reg')}
-  //       </button>
-  //     )
-  //     : (
-  //       <>
-  //         <OverlayTrigger placement="top" overlay={
-  //           <Tooltip>{t('tb.th.tips.regAll')}</Tooltip>
-  //         }>
-  //           <button type="button" 
-
-  //             className={"btn-plain btn-bulk-reg " + (isBulkReg() ? "is-bulk-reg" : "")}
-  //             onClick={()=>setRegNamesModalShow(true)} 
-  //             >
-  //             {t('tb.th.reg')}
-  //           </button>
-  //         </OverlayTrigger>
-  //       </>
-  //     )
-  // }
-
-  const nonBulkRenewable = () => type === 'readonly' || reconnecting || !isBulkRenew()
-
-  // const RenewNamesButton = () => {
-  //   return type === 'readonly' || reconnecting || !isBulkRenew()
-  //     ? (
-  //         <button type="button" className="btn-plain btn-bulk-renew" disabled>
-  //           {t('tb.th.renew')}
-  //         </button>
-  //     )
-  //     : (
-  //       <>
-  //         <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}>
-  //           <button
-  //             type="button" 
-  //             className={"btn-plain btn-bulk-renew " + (isBulkRenew() ? "is-bulk-renew" : "")}
-  //             disabled={ reconnecting || !isBulkRenew() }
-  //             onClick={()=>setRenewNamesModalShow(true)}  
-  //             >
-  //             {t('tb.th.renew')}
-  //           </button>
-  //         </OverlayTrigger>
-  //       </>
-  //     )
-  // }
-
-  const nonFoldable = () => nameInfo.findIndex(item => !isRegistrable(item.status)) < 0
-
-  // const HideShowButton = () => {
-  //   if (haveUnregistrableNames(nameInfo)) {
-  //     return (
-  //       <OverlayTrigger placement="top" overlay={<Tooltip>{t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}</Tooltip>}>
-  //         <button type="button" className="btn-plain btn-sub ms-2" 
-  //           onClick={()=>switchHideFlag()}
-  //         >
-  //           { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
-  //         </button>
-  //       </OverlayTrigger>
-  //     )
-  //   }
-  //   return null
-  // }
-
   const initialEstimating = { 
     title: "tb.th.tips.estAll", 
     status: "before", 
@@ -163,6 +95,9 @@ export const TableHead = (props) => {
     )
   })
 
+  const nonBulkRegable = () => reconnecting || !isCustomWallet(conf) || !isBulkReg()
+  const nonBulkRenewable = () => reconnecting || type === 'readonly' || !isBulkRenew()
+  const nonFoldable = () => !haveRegistrableNames(nameInfo) || !haveUnregistrableNames(nameInfo)
   const nonUpdatable = () => fetching || nameInfo.length < 1
   const nonSortable = () => fetching || nameInfo.length < 2
   const nonSortableByLength = () => fetching || (new Set(nameInfo.map(item => item.length))).size < 2
@@ -174,7 +109,7 @@ export const TableHead = (props) => {
       <tr className="ebr-tb-row">
         <th>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonUpdatable()}>{t('tb.th.tips.update')}</Tooltip>
+            <Tooltip>{t('tb.th.tips.update')}</Tooltip>
           }>
             <button type="button" className="btn-plain" 
               disabled={nonUpdatable()}
@@ -189,7 +124,7 @@ export const TableHead = (props) => {
             {t('tb.th.lb')}
           </span>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonSortable()}>{t('tb.th.tips.lb.label')}</Tooltip>
+            <Tooltip>{t('tb.th.tips.lb.label')}</Tooltip>
           }>   
             <button type="button" className="btn-plain ms-2 th-sortable" 
               disabled={nonSortable()}
@@ -201,7 +136,7 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonSortableByLength()}>{t('tb.th.tips.lb.length')}</Tooltip>
+            <Tooltip>{t('tb.th.tips.lb.length')}</Tooltip>
           }>   
             <button type="button" className="btn-plain ms-2 th-sortable" 
               disabled={nonSortableByLength()}
@@ -213,7 +148,7 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonSortableByLevel()}>{t('tb.th.tips.lb.level')}</Tooltip>
+            <Tooltip>{t('tb.th.tips.lb.level')}</Tooltip>
           }>   
             <button type="button" className="btn-plain ms-2 th-sortable" 
               disabled={nonSortableByLevel()}
@@ -230,7 +165,7 @@ export const TableHead = (props) => {
             {t('tb.th.sta')}
           </span>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonSortable()}>{t('tb.th.tips.sta')}</Tooltip>
+            <Tooltip>{t('tb.th.tips.sta')}</Tooltip>
           }>   
             <button type="button" className="btn-plain ms-2 th-sortable" 
               disabled={nonSortable()}
@@ -242,7 +177,7 @@ export const TableHead = (props) => {
         </th>
         <th>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonBulkRegable()}>{t('tb.th.tips.regAll')}</Tooltip>
+            <Tooltip>{t('tb.th.tips.regAll')}</Tooltip>
           }>
             <button type="button" 
               disabled={nonBulkRegable()}
@@ -266,7 +201,7 @@ export const TableHead = (props) => {
           />
           <OverlayTrigger placement="top" overlay={
             <Tooltip>
-              <TooltipEstimateCost estimating={estimating} disabled={!isBulkReg()} />
+              <TooltipEstimateCost estimating={estimating} />
             </Tooltip>
           }>
             <button type="button" 
@@ -278,7 +213,7 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={
-            <Tooltip disabled={nonFoldable()}>
+            <Tooltip>
               {t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}
             </Tooltip>
           }>
@@ -318,7 +253,7 @@ export const TableHead = (props) => {
         <th className="th-remove">
           <div className="dropdown">
             <OverlayTrigger placement="top" overlay={
-              <Tooltip disabled={nonRemovable()}>{t('tb.th.tips.remAll')}</Tooltip>
+              <Tooltip>{t('tb.th.tips.remAll')}</Tooltip>
             }>
               <button 
                 disabled={nonRemovable()}
