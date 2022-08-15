@@ -3,6 +3,8 @@
 ## Priority 1
 
 - [ ] check uppercase letters with @/# ahead
+- [ ] preload fonts
+- [ ] show if the name is listed on opensea/gem
 
 ## Priority 2
 
