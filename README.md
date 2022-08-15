@@ -14,21 +14,8 @@ Powered by [@ENSUser](https://twitter.com/ensuser) and written by [@forlbb](http
 - Faster registration and less GAS consumption can be achieved through custom configuration.
 - You can customize the ethereum addresses to separate the operator and receiver of the ENS name registration to protect the name security.
 - There are two connection modes: Web3 wallet and custom wallet, the default connection mode is Web3 wallet.
-- ENS name automatical registration with one click and ENS names batch registration, this feature is only available in custom wallet mode).
+- ENS name automatical registration with one click and continuing registration after interruption.
 - Continue to improve and add other features.
-
-## Update
-
-ENSBook was launched in V2 version in March 2022. The new features in this release are as follows:
-
-- Added support for Web3 wallets, such as Metamask and WalletConnect.
-- Added name renewal feature.
-- Redesigned UI.
-- Redesigned the interactive interface of registration and renewal process, with richer prompt information.
-- Supports step-by-step operations and continued operations after an interruption.
-- Supports precise customization of the registration duration and renewal duration.
-- The configuration interface has been redesigned to be more simple and practical.
-- Some other updates.
 
 ### Attention
 
@@ -65,6 +52,11 @@ You can use the Web version of ENSBook directly, or you can download the source 
 
 In addition to basic observation and registration functions, ENSBook has some features that are not easily discovered.
 
-- **Special Focus**: You can click a name label to change its color so that you can pay special focus to certain ENS names.
+- **Shortcut Input**: You can take advantage of the input box for:
+  - 1. Getting a bulk result through entering more than one name label separated by spaces at a time.
+  - 2. Getting all ENS names held by the owner of a specific NAME through the `@NAME` format (e.g. @liubenben.eth).
+  - 3. Getting all ENS names held by the address which a specific NAME resolved to through the `#NAME` format (e.g. #liubenben.eth).
+  - 4. Getting all the ENS names held by a specific ADDRESS through the `@ADDRESS` or `#ADDRESS` format (e.g. @0x123... or #0x123...).
+- **Mark Names**: You can click a name label to mark it in red so that you can pay special focus to certain ENS names.
 - **Multi-page Mode**: In addition to [ensbook.xyz](https://ensbook.xyz/) and [ensbook.eth.limo](https://ensbook.eth.limo/), ENSBook provides five additional pages (from [1.ensbook.xyz](https://1.ensbook.xyz/) to [5.ensbook.xyz](https://5.ensbook.xyz/)) to save and display ENS name collections of different categories, and you can also set individual tags for each page in custom configuration.
 - **Label Export**: You can click three times in the input box to export the name labels in the current page to the input box for easy sharing and reuse.

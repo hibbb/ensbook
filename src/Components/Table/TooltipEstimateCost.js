@@ -5,9 +5,7 @@ import { t } from 'i18next';
 class TooltipEstimateCost extends React.Component {
 
   render() {
-    const { estimating, disabled } = this.props
-
-    if (disabled) return null
+    const { estimating } = this.props
 
     if (estimating.status === "in") {
       return (
