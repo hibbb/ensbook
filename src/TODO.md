@@ -3,7 +3,6 @@
 ## Priority 1
 
 - [ ] check uppercase letters with @/# ahead
-- [ ] preload fonts
 - [ ] show if the name is listed on opensea/gem
 
 ## Priority 2
@@ -15,6 +14,7 @@
 
 ## Completed From v1.4.0
 
+- [x] preload fonts
 - [x] disable sorting while fetching
 - [x] let main input get focus after addNames
 - [x] multiple name deletion methods
