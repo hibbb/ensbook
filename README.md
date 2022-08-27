@@ -42,7 +42,7 @@ You can use the Web version of ENSBook directly, or you can download the source 
 
 1. `git clone https://github.com/hibbb/ensbook.git && cd ensbook`
 2. `yarn`
-3. Configure the custom items (the "custom" field in /src/conf.json) to suit your own needs.
+3. Configure the custom items in `/src/conf.json` to suit your own needs.
 4. `yarn build`
 5. `yarn global add serve`
 6. `serve -s build`

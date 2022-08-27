@@ -42,7 +42,7 @@
 
 1. `git clone https://github.com/hibbb/ensbook.git && cd ensbook`
 2. `yarn`
-3. 按照需求配置自定义项（修改文件 /src/conf.json 中的 custom 部分）。
+3. 按照需求配置 `/src/conf.json` 文件中的自定义项。
 4. `yarn build`
 5. `yarn global add serve`
 6. `serve build`
