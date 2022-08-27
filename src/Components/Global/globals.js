@@ -65,10 +65,11 @@ export function isCustomWallet(conf) {
 
 export function isSupportedChain(key) {
   if (typeof(key) === 'string') {
-    return ["homestead", "mainnet", "ropsten"].findIndex(item => item === key) > -1
+    return ["homestead", "mainnet", "goerli"].findIndex(item => item === key) > -1
   }
   if (typeof(key) === 'number') {
-    return [1, 3].findIndex(item => item === key) > -1
+    // ChainId: 1 for Mainnet, 3 for Ropsten, 5 for Goerli
+    return [1, 5].findIndex(item => item === key) > -1
   }
 }
 
@@ -77,7 +78,7 @@ export function isMainnet(key) {
     return key === "mainnet" || key === "homestead"
   }
   if (typeof(key) === 'number') {
-    return key === 1
+    return key === 1  // ChainId: 1 for Mainnet
   }
 }
 
@@ -86,7 +87,16 @@ export function isRopsten(key) {
     return key === "ropsten"
   }
   if (typeof(key) === 'number') {
-    return key === 3
+    return key === 3  // ChainId: 3 for Ropsten
+  }
+}
+
+export function isGoerli(key) {
+  if (typeof(key) === 'string') {
+    return key === "goerli"
+  }
+  if (typeof(key) === 'number') {
+    return key === 5  // ChainId: 5 for Goerli
   }
 }
 
@@ -205,8 +215,8 @@ export function removeRegInfo(label) {
 }
 
 export async function queryData(queryCode, network) {
-  const subgraphUri = network === "ropsten"
-    ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensropsten'
+  const subgraphUri = network === "goerli"
+    ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli'
     : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens'
 
   const client = new ApolloClient({

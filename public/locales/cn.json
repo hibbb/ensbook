@@ -170,7 +170,7 @@
     "removeNames": "您要批量删除名称?",
     "errorNetwork": {
       "title": "暂不支持该网络",
-      "text": "ENSBook 目前仅支持以太坊主网和 Ropsten 测试网, 请在您连接的钱包中切换网络, 或断开与钱包的连接。"
+      "text": "ENSBook 目前仅支持以太坊主网和 Goerli 测试网, 请在您连接的钱包中切换网络, 或断开与钱包的连接。"
     }
   },
   "c": {
@@ -186,9 +186,10 @@
     "name": "名称",
     "duration": "时长",
     "currentNetwork": "当前网络",
-    "ropsten": "Ropsten",
     "mainnet": "主网",
     "homestead": "主网",
+    "ropsten": "Ropsten",
+    "goerli": "Goerli",
     "connect": "连接",
     "disconnect": "断开连接",
     "relatedTime": "相关时间",

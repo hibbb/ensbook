@@ -7,6 +7,7 @@
 
 ## Priority 2
 
+- [ ] migrate testnet to Goerli after Merge
 
 ## Priority 3
 

@@ -2,15 +2,15 @@ import React from 'react';
 import { BigNumber, utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
-import { getConfFixed, isMainnet, isNormal, isOpen, isRenewable, isRopsten } from '../../Global/globals';
+import { getConfFixed, isGoerli, isMainnet, isNormal, isOpen, isRenewable } from '../../Global/globals';
 
 
 export const LookupCell = (props) => {
   const { conf, label, status, tokenId, owner, network } = props
   const tokenIdDec = BigNumber.from(tokenId).toString()
   const etherscanURL = (
-    isRopsten(network)
-    ? "https://ropsten.etherscan.io/"
+    isGoerli(network)
+    ? "https://goerli.etherscan.io/"
     : "https://etherscan.io/"
   )
   
@@ -26,7 +26,7 @@ export const LookupCell = (props) => {
       link: (
         isMainnet(network)
         ? `https://etherscan.io/nft/${addr[network].BaseRegImp}/${tokenIdDec}`
-        : `https://ropsten.etherscan.io/enslookup-search?search=${label}.eth`
+        : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`
       )
     },
     Opensea: {
