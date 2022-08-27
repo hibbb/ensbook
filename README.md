@@ -22,7 +22,7 @@ Powered by [@ENSUser](https://twitter.com/ensuser) and written by [@forlbb](http
 - ENSBook only supports .eth 2TLD name.
 - ENSBook is just an auxiliary tool, please use it according to your own situation.
 - ENSBook does not collect any personal information, and all your custom configurations are stored in your local environment.
-- ENSBook supports Ethereum Mainnet and Goerli network. You can perform functional tests on Goerli network first.
+- ENSBook supports Ethereum Mainnet and [Goerli Testnet](https://goerli.net/). You can perform functional tests on Goerli network first.
 
 ## Usage
 
