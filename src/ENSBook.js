@@ -51,6 +51,7 @@ class ENSBook extends React.Component {
 
     const networkname = (await provider.getNetwork()).name
     if (!isSupportedChain(networkname)) {
+      console.log(networkname)
       return this.setState({ unsupported: true })
     }
 

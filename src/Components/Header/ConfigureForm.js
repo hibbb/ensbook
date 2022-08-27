@@ -299,7 +299,7 @@ class ConfigureForm extends React.Component {
                   disabled={!this.state.walletSwitch}
                   aria-label="walletNetwork">
                   <option value="mainnet">{t('c.mainnet')}</option>
-                  <option value="ropsten">{t('c.ropsten')}</option>
+                  <option value="goerli">{t('c.goerli')}</option>
                 </Form.Select>
               </InputGroup>
               <InputGroup className={"mb-6 custom-wallet-" + Boolean(this.state.walletSwitch)} size="sm">

@@ -431,6 +431,9 @@ button.btn-plain[disabled] {
 .network-ropsten {
   color: #eb5a8d;
 }
+.network-goerli {
+  color: #eb5a8d;
+}
 .select-lang {
   border: 0;
   background-color: #e5e5e5;

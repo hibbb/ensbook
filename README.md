@@ -22,7 +22,7 @@ Powered by [@ENSUser](https://twitter.com/ensuser) and written by [@forlbb](http
 - ENSBook only supports .eth 2TLD name.
 - ENSBook is just an auxiliary tool, please use it according to your own situation.
 - ENSBook does not collect any personal information, and all your custom configurations are stored in your local environment.
-- ENSBook supports Ethereum Mainnet and Ropsten network. You can perform functional tests on Ropsten network first.
+- ENSBook supports Ethereum Mainnet and Goerli network. You can perform functional tests on Goerli network first.
 
 ## Usage
 
@@ -42,7 +42,7 @@ You can use the Web version of ENSBook directly, or you can download the source 
 
 1. `git clone https://github.com/hibbb/ensbook.git && cd ensbook`
 2. `yarn`
-3. Configure the custom items (the "custom" field in /src/conf.json) to suit your own needs.
+3. Configure the custom items in `/src/conf.json` to suit your own needs.
 4. `yarn build`
 5. `yarn global add serve`
 6. `serve -s build`
