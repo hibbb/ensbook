@@ -4,6 +4,7 @@
 
 - [ ] check uppercase letters with @/# ahead
 - [ ] show if the name is listed on opensea/gem
+- [ ] differ owners with the color derived from its address
 
 ## Priority 2
 
