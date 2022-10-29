@@ -98,7 +98,7 @@ export const TableHead = (props) => {
   const nonBulkRegable = () => reconnecting || !isCustomWallet(conf) || !isBulkReg()
   const nonBulkRenewable = () => reconnecting || type === 'readonly' || !isBulkRenew()
   const nonFoldable = () => !haveRegistrableNames(nameInfo) || !haveUnregistrableNames(nameInfo)
-  const nonUpdatable = () => fetching || nameInfo.length < 1
+  const nonUpdatable = () => nameInfo.length < 1
   const nonSortable = () => fetching || nameInfo.length < 2
   const nonSortableByLength = () => fetching || (new Set(nameInfo.map(item => item.length))).size < 2
   const nonSortableByLevel = () => fetching || (new Set(nameInfo.map(item => item.level))).size < 2
