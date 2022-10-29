@@ -8,7 +8,7 @@ Powered by [@ENSUser](https://twitter.com/ensuser) and written by [@forlbb](http
 
 ## About
 
-**ENSBook** is a lightweight tool used for observing, registering or renewing ENS names. It supports:
+**[ENSBook](https://ensbook.xyz/)** is a lightweight tool used for observing, registering or renewing ENS names. It supports:
 
 - Enter and view information of multiple ENS names at one time, includes current usage information and some historical information, etc.
 - Faster registration and less GAS consumption can be achieved through custom configuration.
