@@ -25,6 +25,7 @@ export function updateLookupList(conf) {
   conf = conf ?? getConf()
   const oldList = Object.keys(conf.custom.display.lookup)
   const newList = Object.keys(confFile.custom.display.lookup)
+  
   // update lookupList in localStorage
   window.localStorage.setItem("lookupList", JSON.stringify(newList))
 
@@ -32,6 +33,13 @@ export function updateLookupList(conf) {
     conf.custom.display.lookup = confFile.custom.display.lookup
     window.localStorage.setItem("confInfo", JSON.stringify(conf))
   }
+
+  // check if there is conf.custom.premium.priceUnit which was added in 2023.01
+  if (!conf.custom.premium.priceUnit) {
+    conf.custom.premium.priceUnit = 'ETH'
+    window.localStorage.setItem("confInfo", JSON.stringify(conf))
+  }
+  
   return conf
 }
 
@@ -55,7 +63,11 @@ export function getBulkRenewCon(providerOrSigner, network, conf) {
 }
 
 export function getBulkRegCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, "BulkRegistration", network, conf)
+  return getContract(providerOrSigner, "BulkReg", network, conf)
+}
+
+export function getETHPriceFeedCon(providerOrSigner, network, conf) {
+  return getContract(providerOrSigner, "ETHPriceFeed", network, conf)
 }
 
 export function isCustomWallet(conf) {
@@ -342,4 +354,16 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
   }
 
   return nameInfo
+}
+
+export function getPremiumPrice(releaseTime, decimal = 0) {
+  const startPrice = 100000000.0
+  const offset = 47.6837158203125
+  const FACTOR = 0.5
+
+  const relativeDate = moment.now() - releaseTime * 1000
+  const resAsDay = relativeDate / ( 24 * 60 * 60 * 1000 )
+  const exactPrice = Math.max(startPrice * FACTOR ** resAsDay - offset, 0)  // in USD
+
+  return exactPrice.toFixed(decimal)
 }

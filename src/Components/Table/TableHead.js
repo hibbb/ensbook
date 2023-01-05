@@ -111,7 +111,7 @@ export const TableHead = (props) => {
           <OverlayTrigger placement="top" overlay={
             <Tooltip>{t('tb.th.tips.update')}</Tooltip>
           }>
-            <button type="button" className="btn-plain" 
+            <button type="button" className="btn-plain btn-update" 
               disabled={nonUpdatable()}
               onClick={()=>updateNames()}
             >

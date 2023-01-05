@@ -32,9 +32,8 @@ class ConfigureForm extends React.Component {
 
     renewDuration: this.conf.custom.renew.duration,
 
-    // premiumPriceRange: this.conf.custom.premium.priceRange,
-    // Prepared for EP9
-    premiumPriceRange: this.conf.custom.premium.priceRange > 21 ? 21 : this.conf.custom.premium.priceRange,
+    premiumPriceUnit: this.conf.custom.premium.priceUnit ?? 'ETH',
+    premiumPriceRange: this.conf.custom.premium.priceRange,
 
     walletSwitch: this.conf.custom.wallet.switch,
     walletOperatorPrivateKey: this.conf.custom.wallet.operatorPrivateKey.join(),
@@ -82,6 +81,7 @@ class ConfigureForm extends React.Component {
 
     confInfo.custom.renew.duration = Number(this.state.renewDuration)
 
+    confInfo.custom.premium.priceUnit = this.state.premiumPriceUnit.trim()
     confInfo.custom.premium.priceRange = Number(this.state.premiumPriceRange)
 
     confInfo.custom.wallet.switch  = this.state.walletSwitch
@@ -106,6 +106,7 @@ class ConfigureForm extends React.Component {
 
       renewDuration: initialCustomConf.renew.duration,
 
+      premiumPriceUnit: initialCustomConf.premium.priceUnit,
       premiumPriceRange: initialCustomConf.premium.priceRange,
 
       walletSwitch: initialCustomConf.wallet.switch,
@@ -243,15 +244,26 @@ class ConfigureForm extends React.Component {
               {/* Premium */}
               <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.premium.title')}</h6>
               <InputGroup className="mb-2" size="sm">
+                <InputGroup.Text>{t('conf.premium.priceUnit')}</InputGroup.Text>
+                <Form.Select 
+                  name="premiumPriceUnit" 
+                  value={this.state.premiumPriceUnit}
+                  onChange={this.handleChange} 
+                  aria-label="premiumPriceUnit">
+                  <option value="ETH">{"ETH"}</option>
+                  <option value="USD">{"USD"}</option>
+                </Form.Select>
+              </InputGroup>
+              <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.premium.priceRange')}</InputGroup.Text>
                 <InputGroup.Text>{"≤"}</InputGroup.Text>
-                {/* <FormControl 
+                <FormControl 
                   name="premiumPriceRange" 
                   value={this.state.premiumPriceRange} 
                   onChange={this.handleChange} 
-                  aria-label="premiumPriceRange" /> */}
+                  aria-label="premiumPriceRange" />
 
-                {/* Prepared for EP9 */}
+                {/* Old version for EP9, before 2022.12
                 <Form.Select 
                   name="premiumPriceRange" 
                   value={this.state.premiumPriceRange} 
@@ -265,7 +277,8 @@ class ConfigureForm extends React.Component {
                     )
                   }
                 </Form.Select>
-                <InputGroup.Text>{t('c.dollars')}</InputGroup.Text>
+                */}
+                <InputGroup.Text>{this.state.premiumPriceUnit}</InputGroup.Text>
               </InputGroup>
 
               {/* Custom Wallet Mode */}

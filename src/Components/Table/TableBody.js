@@ -12,6 +12,7 @@ export const TableBody = (props) => {
     type,
     address, 
     network, 
+    ethPrice, 
     reconnecting,
     nameInfo, 
     setAndStoreNameInfo, 
@@ -59,6 +60,7 @@ export const TableBody = (props) => {
             label={row.label} 
             index={index}
             status={row.status} 
+            ethPrice={ethPrice}
             reconnecting={reconnecting}
             registrationTime={row.registrationTime}
             expiresTime={row.expiresTime}
@@ -68,6 +70,7 @@ export const TableBody = (props) => {
             renewName={renewName}
             renewNameEnd={renewNameEnd}
             renewMsges={renewMsges}
+            priceUnit={conf.custom.premium.priceUnit}
             priceRange={conf.custom.premium.priceRange}
           />
         </td>

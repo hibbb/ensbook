@@ -66,6 +66,7 @@ class MainTable extends React.Component {
       type, 
       address,
       network, 
+      ethPrice,
       reconnecting, 
       fetching, 
       registerName, 
@@ -168,6 +169,7 @@ class MainTable extends React.Component {
             type={type}
             address={address}
             network={network}
+            ethPrice={ethPrice}
             nameInfo={nameInfo} 
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}

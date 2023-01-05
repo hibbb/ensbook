@@ -27,7 +27,8 @@
       "duration": 1
     },
     "premium": {
-      "priceRange": 1000
+      "priceUnit": "ETH",
+      "priceRange": 10
     },
     "wallet": {
       "switch": false,

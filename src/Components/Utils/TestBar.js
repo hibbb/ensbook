@@ -1,11 +1,15 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ExclamationCircle } from 'react-bootstrap-icons';
+import { getPremiumPrice } from '../Global/globals';
+import { ethers, getDefaultProvider } from 'ethers';
 
 
 export default function TestBar(props) {
 
   const testFunc1 = async () => {
+    const p = await props.getETHPrice()
+    console.log(p)
   }
 
   const testFunc2 = async () => {

@@ -103,6 +103,7 @@
     },
     "premium": {
       "title": "溢价期",
+      "priceUnit": "价格单位",
       "priceRange": "关注的价格区间",
       "million": "百万",
       "thousand": "千"

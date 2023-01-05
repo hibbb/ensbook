@@ -6,7 +6,7 @@ import lt from 'long-timeout'
 import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { t } from 'i18next';
-import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo } from './Components/Global/globals'
+import { isCustomWallet, isSupportedChain, getETHRegCtrlCon, getBaseRegImpCon, storeRegInfo, updateRegStep, getRegInfo, updateLookupList, isRegistrable, getNameItemByLabel, getBulkRenewCon, getConfFixed, queryNameInfo, getETHPriceFeedCon } from './Components/Global/globals'
 import Header from './Components/Header/Header'
 import MainForm from './Components/Form/MainForm'
 import MainTable from './Components/Table/MainTable'
@@ -34,7 +34,8 @@ const INITIAL_STATE = {
   address: undefined,
   ensname: undefined,
   network: "mainnet",
-  balance: undefined
+  balance: undefined,
+  ethPrice: undefined
 };
 
 class ENSBook extends React.Component {
@@ -60,7 +61,8 @@ class ENSBook extends React.Component {
     const address = signer ? await signer.getAddress() : null
     const balance = address ? utils.formatEther(await provider.getBalance(address)) : null
     const ensname = address ? await provider.lookupAddress(address) : null
-    this.setState({ address, network, balance, ensname })
+    const ethPrice = conf.custom.premium.priceUnit === 'ETH' ? await this.getETHPrice() : undefined
+    this.setState({ address, network, balance, ensname, ethPrice })
     this.setState({ reconnecting: false })
 
     if (updateNamesFlag) {
@@ -773,6 +775,13 @@ class ENSBook extends React.Component {
     }
   }
 
+  getETHPrice = async () => {
+    const { provider, network } = this.state
+    const ETHPriceFeedCon = getETHPriceFeedCon(provider, network, conf)
+    const currentETHPrice = await ETHPriceFeedCon.latestAnswer()
+    return currentETHPrice.toNumber()
+  }
+
   subscribeProvider = async (provider) => {
     if (!provider.on) {
       return
@@ -805,7 +814,7 @@ class ENSBook extends React.Component {
       nameInfo, 
       type, 
       regMsges, regsMsges, renewMsges, renewsMsges,
-      address, ensname, network, balance,
+      address, ensname, network, balance, ethPrice,
       provider
     } = this.state
 
@@ -837,6 +846,7 @@ class ENSBook extends React.Component {
           type={type}
           address={address}
           network={network}
+          ethPrice={ethPrice}
           reconnecting={reconnecting}
           fetching={fetching}
           updateNames={this.updateNames} 

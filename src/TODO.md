@@ -13,6 +13,7 @@
 ## Priority 3
 
 - [ ] add reminder feature for names which will reopen, according to its time/price, maybe we need a email reminder.
+- [ ] MetaMask: 'ethereum.enable()' is deprecated and may be removed in the future. Please use the 'eth_requestAccounts' RPC method instead. For more information, see: https://eips.ethereum.org/EIPS/eip-1102
 
 ## Completed From v1.4.0
 

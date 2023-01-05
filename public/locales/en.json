@@ -103,6 +103,7 @@
     },
     "premium": {
       "title": "Premium",
+      "priceUnit": "Price Unit",
       "priceRange": "Price Range of Concern",
       "million": "Million",
       "thousand": "Thousand"

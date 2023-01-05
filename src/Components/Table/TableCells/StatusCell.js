@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
+import { getPremiumPrice } from '../../Global/globals';
 
 
 export const StatusCell = (props) => {
   const { 
     label, 
     status, 
+    ethPrice, 
     registrationTime, 
     releaseTime, 
     expiresTime, 
     updateNames, 
+    priceUnit, 
     priceRange 
   } = props
+
+  const [premiumEndingFlag, setPremiumEndingFlag] = useState(false);
 
   const graceEndingFlag = (
     status === 'Grace' 
@@ -22,20 +27,40 @@ export const StatusCell = (props) => {
   )
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
   
-  const premiumEndingFlag = (
-    // Prepared for EP9
-    status === 'Premium' 
-    && priceRange < 21 
-    && moment().isAfter(moment.unix(releaseTime).add(priceRange, 'days'))
-  )
   const premiumEndingClass = premiumEndingFlag ? ' premium-ending' : ''
 
+  const StatusText = () => {
+    let text = t('nm.sta.' + status)
+
+    if (status === 'Premium') {
+      let premiumPriceDisplay = getPremiumPrice(releaseTime)
+
+      if (priceUnit === 'ETH') {
+        premiumPriceDisplay = (premiumPriceDisplay * 1e8 / ethPrice).toFixed(2)
+      } 
+      
+      setPremiumEndingFlag(premiumPriceDisplay < priceRange)
+      text = '+ ' + premiumPriceDisplay + ' ' + priceUnit
+    }
+    
+    return (<span>{text}</span>)
+  }
+  
   const jsonSortByNumber = (array, key) => {
     if (array.length < 2 || !key || typeof array[0] !== "object" || typeof array[0][key] !== "number") {
       return array
     }
     array.sort(function(x, y) {return x[key] - y[key]})
     return array
+  }
+
+  const NameAge = () => {
+    if (status === 'Normal') {
+      return (
+        <span className="name-age">{ moment.unix(expiresTime)?.diff(moment(), 'years') }</span>
+      )
+    }
+    return null
   }
 
   let tooltipArray = []
@@ -62,17 +87,6 @@ export const StatusCell = (props) => {
     }  
   } else {
     tooltipArray[0] = {label: t('c.relatedTime'), unixTime: t('nm.sta.Unknown')}
-  }  
-
-
-
-  const NameAge = () => {
-    if (status === 'Normal') {
-      return (
-        <span className="name-age">{ moment.unix(expiresTime)?.diff(moment(), 'years') }</span>
-      )
-    }
-    return null
   }
 
   return (
@@ -102,7 +116,7 @@ export const StatusCell = (props) => {
           </Tooltip>
         }>        
         <span className={'td-status status-' + status + graceEndingClass + premiumEndingClass} onClick={()=>updateNames([label])}>
-          {t('nm.sta.' + status)}
+          <StatusText />
           <NameAge />
         </span>
       </OverlayTrigger>
