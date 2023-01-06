@@ -1,6 +1,7 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { BoxArrowUpRight } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
 
 export const LabelCell = (props) => {
@@ -34,7 +35,7 @@ export const LabelCell = (props) => {
       </OverlayTrigger>
       <OverlayTrigger placement="top" overlay={<Tooltip>ENS APP</Tooltip>}>
         <a href={nameLink} target="_blank" rel="noreferrer">
-          <BoxArrowUpRight className="external-link-icon" />
+          <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="external-link-icon" />
         </a>
       </OverlayTrigger>
     </>

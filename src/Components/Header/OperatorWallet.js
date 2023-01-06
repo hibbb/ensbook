@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
-import { Plug, WalletFill } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faWallet, faLinkSlash } from '@fortawesome/free-solid-svg-icons';
+import { faEthereum } from '@fortawesome/free-brands-svg-icons';
 import { t } from 'i18next';
 
 const CurrentNetwork = (props) => {
@@ -64,13 +66,15 @@ class OperatorWallet extends React.Component {
             {t('header.balance') + ": " + (balance ?? '').slice(0, 8) + " ETH"}
           </Tooltip>
         }>
-          <span className="wallet-balance px-2">Ξ { (balance ?? '').slice(0, 6) }</span>
+          <span className="wallet-balance px-2">
+          <FontAwesomeIcon icon={faEthereum} /> { (balance ?? '').slice(0, 6) }
+          </span>
         </OverlayTrigger>
         {
           type === 'custom'
           ? (
               <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.customMode.icon')}</Tooltip>}>
-                <WalletFill className="btn-light me-2 custom-wallet" />
+                <FontAwesomeIcon icon={faWallet} className="btn-light me-2 custom-wallet" />
               </OverlayTrigger>
             )
           : (
@@ -79,7 +83,7 @@ class OperatorWallet extends React.Component {
                   className="btn-plain me-2 wallet-disconnect"    
                   onClick={()=>disconnectApp()}
                 >
-                  <Plug />
+                  <FontAwesomeIcon icon={faLinkSlash} />
                 </button>
               </OverlayTrigger>
             )

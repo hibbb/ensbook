@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { faEthereum } from '@fortawesome/free-brands-svg-icons';
 import { t } from 'i18next';
 import { getPremiumPrice } from '../../Global/globals';
 
@@ -19,7 +22,7 @@ export const StatusCell = (props) => {
     priceRange 
   } = props
 
-  const [premiumEndingFlag, setPremiumEndingFlag] = useState(false);
+  //const [premiumEndingFlag, setPremiumEndingFlag] = useState(false);
 
   const graceEndingFlag = (
     status === 'Grace' 
@@ -27,23 +30,26 @@ export const StatusCell = (props) => {
   )
   const graceEndingClass = graceEndingFlag ? ' grace-ending' : ''
   
-  const premiumEndingClass = premiumEndingFlag ? ' premium-ending' : ''
+  const premiumEndingClass = '' //premiumEndingFlag ? ' premium-ending' : ''
 
   const StatusText = () => {
     let text = t('nm.sta.' + status)
 
     if (status === 'Premium') {
       let premiumPriceDisplay = getPremiumPrice(releaseTime)
+      let priceUnitIcon = <FontAwesomeIcon icon={faDollarSign} />
 
       if (priceUnit === 'ETH') {
         premiumPriceDisplay = (premiumPriceDisplay * 1e8 / ethPrice).toFixed(2)
+        priceUnitIcon = <FontAwesomeIcon icon={faEthereum} />
       } 
       
-      setPremiumEndingFlag(premiumPriceDisplay < priceRange)
-      text = '+ ' + premiumPriceDisplay + ' ' + priceUnit
+      //setPremiumEndingFlag(premiumPriceDisplay < priceRange)
+
+      return (<>{priceUnitIcon}  {premiumPriceDisplay}</>)
     }
     
-    return (<span>{text}</span>)
+    return (<>{text}</>)
   }
   
   const jsonSortByNumber = (array, key) => {

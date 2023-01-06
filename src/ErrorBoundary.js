@@ -1,6 +1,7 @@
 import React from 'react';
 import confFile from './conf.json'
-import { ExclamationTriangleFill, BoxArrowUpRight } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowUpRightFromSquare, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 // import { utils } from 'ethers'
 
 class ErrorBoundary extends React.Component {
@@ -32,11 +33,11 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="container">
           <div className="alert alert-warning mt-5 text-center error-boundary" role="alert">
-            <ExclamationTriangleFill /> Something went wrong. 
+            <FontAwesomeIcon icon={faTriangleExclamation} /> Something went wrong. 
             <br />
             {this.state.errorMessage}
             <hr />
-            You can <a href="https://github.com/hibbb/ensbook/issues" className="alert-link" target="_blank" rel="noreferrer">create an issue for this problem<BoxArrowUpRight className="external-link-icon" /></a> or <a href="/" className="alert-link">go back to ENSBook</a>.
+            You can <a href="https://github.com/hibbb/ensbook/issues" className="alert-link" target="_blank" rel="noreferrer">create an issue for this problem<FontAwesomeIcon icon={faArrowUpRightFromSquare} className="external-link-icon" /></a> or <a href="/" className="alert-link">go back to ENSBook</a>.
             <hr />
             If errors occur repeatedly, you can try <a className="alert-link" href="/" onClick={()=>{window.localStorage.setItem("confInfo", JSON.stringify(confFile))}}>resetting</a> the configuration.
           </div>
