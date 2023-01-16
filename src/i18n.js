@@ -1,11 +1,11 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import Backend from 'i18next-http-backend';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import Backend from "i18next-http-backend";
 // import LanguageDetector from 'i18next-browser-languagedetector';
-const defaultLanguage = window.localStorage.getItem('language')
+const defaultLanguage = window.localStorage.getItem("language");
 
 // don't want to use this?
-// have a look at the Quick start guide 
+// have a look at the Quick start guide
 // for passing in lng and translations on init
 
 i18n
@@ -21,21 +21,20 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    lng: defaultLanguage ? defaultLanguage : 'en',
-    fallbackLng: 'en',
+    lng: defaultLanguage ? defaultLanguage : "en",
+    fallbackLng: "en",
     debug: false,
     react: {
-      useSuspense: false
+      useSuspense: false,
     },
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
     backend: {
       loadPath:
-        (process.env.REACT_APP_IPFS === 'True' ? '.' : '') +
-        '/locales/{{lng}}.json'
-    }
+        (process.env.REACT_APP_IPFS === "True" ? "." : "") +
+        "/locales/{{lng}}.json",
+    },
   });
-
 
 export default i18n;

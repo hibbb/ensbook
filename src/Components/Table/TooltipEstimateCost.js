@@ -1,38 +1,35 @@
-import React from 'react';
-import { Spinner } from 'react-bootstrap';
-import { t } from 'i18next';
+import React from "react";
+import { Spinner } from "react-bootstrap";
+import { t } from "i18next";
 
 class TooltipEstimateCost extends React.Component {
-
   render() {
-    const { estimating } = this.props
+    const { estimating } = this.props;
 
     if (estimating.status === "in") {
       return (
         <>
-          <p>
-            {t(estimating.title)}
-          </p>
+          <p>{t(estimating.title)}</p>
           <div>
-            <Spinner animation="border" variant="light" className="spinner-acting" />
+            <Spinner
+              animation="border"
+              variant="light"
+              className="spinner-acting"
+            />
           </div>
         </>
-      )
+      );
     }
     if (estimating.status === "after") {
       return (
         <>
-          <p>
-            {t(estimating.title)}
-          </p>
-          <div>
-            { '≈ ' + estimating.cost.slice(0, 7) + ' ETH' }
-          </div>
+          <p>{t(estimating.title)}</p>
+          <div>{"≈ " + estimating.cost.slice(0, 7) + " ETH"}</div>
         </>
-      )
+      );
     }
-    return t(estimating.title)
+    return t(estimating.title);
   }
 }
 
-export default TooltipEstimateCost
+export default TooltipEstimateCost;
