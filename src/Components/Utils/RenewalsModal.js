@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, InputGroup, FormControl, Col, Row, Spinner } from 'react-bootstrap';
-import { ChevronCompactRight, CheckCircleFill, XCircleFill, DashCircleFill } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight, faCircleCheck, faCircleXmark, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import { t } from 'i18next';
 
@@ -63,19 +64,19 @@ const RenewalsModal = (props) => {
     if (renewsAction === 'renewsSucceeded') {
       return (
         <span className="modal-message-text">
-          <CheckCircleFill className="modal-message-icon action-succeeded" />
+          <FontAwesomeIcon icon={faCircleCheck} className="modal-message-icon action-succeeded" />
         </span>
       )
     } else if (renewsAction === 'renewsFailed') {
       return (
         <span className="modal-message-text">
-          <XCircleFill className="modal-message-icon action-failed" />
+          <FontAwesomeIcon icon={faCircleXmark} className="modal-message-icon action-failed" />
         </span>
       )
     } else if (renewsAction === 'renewsSuspended') {
       return (
         <span className="modal-message-text">
-          <DashCircleFill className="modal-message-icon action-suspend" />
+          <FontAwesomeIcon icon={faCircleMinus} className="modal-message-icon action-suspend" />
         </span>
       )
     } else {
@@ -92,7 +93,7 @@ const RenewalsModal = (props) => {
         <span className="modal-message-time" title={renewsMsges[0].time.fromNow()}>
           {renewsMsges[0].time.format('HH:mm:ss')}
         </span>
-        <ChevronCompactRight className="modal-message-icon" />
+        <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
         <RenewsActionMsgIcon />
       </p>
     )
@@ -106,7 +107,7 @@ const RenewalsModal = (props) => {
             <span className="modal-message-time" title={message.time.fromNow()}>
               {message.time.format('HH:mm:ss')}
             </span>
-            <ChevronCompactRight className="modal-message-icon" />
+            <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
             <span className="modal-message-text" dangerouslySetInnerHTML={{ __html: message.text }} />
           </p>
         )

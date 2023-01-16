@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, InputGroup, FormControl, Col, Row, Spinner } from 'react-bootstrap';
-import { ChevronCompactRight, CheckCircleFill, XCircleFill, CalendarWeek, DashCircleFill } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight, faCircleCheck, faCircleXmark, faCalendarDays, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import { t } from 'i18next';
 
@@ -62,19 +63,19 @@ const RenewalModal = (props) => {
     if (renewAction === 'renewSucceeded') {
       return (
         <span className="modal-message-text">
-          <CheckCircleFill className="modal-message-icon action-succeeded" />
+          <FontAwesomeIcon icon={faCircleCheck} className="modal-message-icon action-succeeded" />
         </span>
       )
     } else if (renewAction === 'renewFailed') {
       return (
         <span className="modal-message-text">
-          <XCircleFill className="modal-message-icon action-failed" />
+          <FontAwesomeIcon icon={faCircleXmark} className="modal-message-icon action-failed" />
         </span>
       )
     } else if (renewAction === 'renewSuspended') {
       return (
         <span className="modal-message-text">
-          <DashCircleFill className="modal-message-icon action-suspend" />
+          <FontAwesomeIcon icon={faCircleMinus} className="modal-message-icon action-suspend" />
         </span>
       )
     } else {
@@ -91,7 +92,7 @@ const RenewalModal = (props) => {
         <span className="modal-message-time" title={renewMsges[0].time.fromNow()}>
           {renewMsges[0].time.format('HH:mm:ss')}
         </span>
-        <ChevronCompactRight className="modal-message-icon" />
+        <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
         <RenewActionMsgIcon />
       </p>
     )
@@ -105,7 +106,7 @@ const RenewalModal = (props) => {
             <span className="modal-message-time" title={message.time.fromNow()}>
               {message.time.format('HH:mm:ss')}
             </span>
-            <ChevronCompactRight className="modal-message-icon" />
+            <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
             <span className="modal-message-text" dangerouslySetInnerHTML={{ __html: message.text }} />
           </p>
         )
@@ -141,7 +142,7 @@ const RenewalModal = (props) => {
                 />
                 <InputGroup.Text>{t('c.years')}</InputGroup.Text>
                 <InputGroup.Text className="ms-2 until-time">
-                  <CalendarWeek className="me-2" />
+                  <FontAwesomeIcon icon={faCalendarDays} className="me-2" />
                   { moment.unix(expiresTime).add(moment.duration(duration, 'years').asSeconds(), 'seconds').format('L') } 
                 </InputGroup.Text>
               </InputGroup>

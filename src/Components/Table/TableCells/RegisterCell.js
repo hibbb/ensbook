@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { Calculator } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalculator } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
 import { isRegistrable } from '../../Global/globals';
 import TooltipEstimateCost from '../TooltipEstimateCost';
@@ -95,7 +96,7 @@ export const RegisterCell = (props) => {
               </Tooltip>
             }>
               <button type="button" className="btn-plain btn-sub ms-2" onClick={()=>estimateThis()}>
-                <Calculator />
+                <FontAwesomeIcon icon={faCalculator} />
               </button>
             </OverlayTrigger>
           )

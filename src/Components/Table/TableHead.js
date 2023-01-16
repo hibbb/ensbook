@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { XCircle, Calculator, ChevronBarContract, ChevronBarExpand, ArrowRepeat, CaretDownSquare, SortAlphaDown, SortAlphaDownAlt, SortDown, SortDownAlt, List, ListStars, Alarm, Stopwatch } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark, faSquareCaretDown } from '@fortawesome/free-regular-svg-icons';
+import { faCalculator, faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter, faRotate, faArrowDownAZ, faArrowDownZA, faArrowDownWideShort, faArrowDownShortWide, faList, faListCheck, faClock, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
 import RegistrationsModal from '../Utils/RegistrationsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
@@ -90,7 +92,7 @@ export const TableHead = (props) => {
         key={index} 
         className={'remove-tag status-' + status}
         onClick={()=>removeNames(status)}
-      >{t('nm.sta.' + status)}  <XCircle className='light-gray' />
+      >{t('nm.sta.' + status)}  <FontAwesomeIcon icon={faCircleXmark} className='light-gray' />
       </span>
     )
   })
@@ -115,7 +117,7 @@ export const TableHead = (props) => {
               disabled={nonUpdatable()}
               onClick={()=>updateNames()}
             >
-              <ArrowRepeat />
+              <FontAwesomeIcon icon={faRotate} />
             </button>
           </OverlayTrigger>
         </th>
@@ -131,7 +133,9 @@ export const TableHead = (props) => {
               onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "label"))}
             >
               { 
-                ascFlags['label'] ? <SortAlphaDown /> : <SortAlphaDownAlt /> 
+                ascFlags['label'] 
+                ? <FontAwesomeIcon icon={faArrowDownAZ} /> 
+                : <FontAwesomeIcon icon={faArrowDownZA} />  
               }
             </button>
           </OverlayTrigger>
@@ -143,7 +147,9 @@ export const TableHead = (props) => {
               onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "length"))}
             >
               { 
-                ascFlags['length'] ? <SortDownAlt /> : <SortDown /> 
+                ascFlags['length'] 
+                ? <FontAwesomeIcon icon={faArrowDownWideShort} /> 
+                : <FontAwesomeIcon icon={faArrowDownShortWide} /> 
               }
             </button>
           </OverlayTrigger>
@@ -155,7 +161,9 @@ export const TableHead = (props) => {
               onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "level"))}
             >
               { 
-                ascFlags['level'] ? <List /> : <ListStars /> 
+                ascFlags['level'] 
+                ? <FontAwesomeIcon icon={faList} /> 
+                : <FontAwesomeIcon icon={faListCheck} />
               }
             </button>
           </OverlayTrigger>
@@ -171,7 +179,11 @@ export const TableHead = (props) => {
               disabled={nonSortable()}
               onClick={()=>setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))}
             >
-              { ascFlags['expiresTime'] ? <Alarm /> : <Stopwatch /> }
+              { 
+                ascFlags['expiresTime'] 
+                ? <FontAwesomeIcon icon={faClock} /> 
+                : <FontAwesomeIcon icon={faClockRotateLeft} /> 
+              }
             </button>
           </OverlayTrigger>
         </th>
@@ -209,7 +221,7 @@ export const TableHead = (props) => {
               id="btn-estimate-all" className="btn-plain btn-sub ms-2" 
               onClick={()=>estimateThese()}
             >
-              <Calculator />
+              <FontAwesomeIcon icon={faCalculator} />
             </button>
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={
@@ -222,7 +234,10 @@ export const TableHead = (props) => {
               className="btn-plain btn-sub ms-2" 
               onClick={()=>switchHideFlag()}
             >
-              { hideNames ? <ChevronBarExpand /> : <ChevronBarContract /> }
+              { 
+                hideNames 
+                ? <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} />
+                : <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} /> }
             </button>
           </OverlayTrigger>
         </th>
@@ -261,7 +276,7 @@ export const TableHead = (props) => {
                 type="button" id="dropdown-remove-names" 
                 data-bs-toggle="dropdown" 
                 aria-expanded="false">
-                <CaretDownSquare />
+                <FontAwesomeIcon icon={faSquareCaretDown} />
               </button>
             </OverlayTrigger>
             <ul className="dropdown-menu remove-list" aria-labelledby="dropdown-remove-names">
@@ -270,10 +285,10 @@ export const TableHead = (props) => {
               </li>
               <li className='mt-1'>
                 <span className="remove-tag remove-lower" onClick={()=>removeNames("Lower")}>
-                  {t('tb.th.lower')} <XCircle className='light-gray' />
+                  {t('tb.th.lower')} <FontAwesomeIcon icon={faCircleXmark} className='light-gray' />
                 </span>
                 <span className="remove-tag remove-all" onClick={()=>removeNames("All")}>
-                  {t('tb.th.all')} <XCircle className='light-gray' />
+                  {t('tb.th.all')} <FontAwesomeIcon icon={faCircleXmark} className='light-gray' />
                 </span>
               </li>
             </ul>

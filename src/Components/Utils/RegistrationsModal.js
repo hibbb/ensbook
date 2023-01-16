@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, InputGroup, FormControl, Col, Row, Spinner } from 'react-bootstrap';
-import { ChevronCompactRight, CheckCircleFill, XCircleFill, CalendarWeek, DashCircleFill } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight, faCircleCheck, faCircleXmark, faCalendarDays, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import { t } from 'i18next';
 
@@ -68,19 +69,19 @@ const RegistrationsModal = (props) => {
     if (regAction === 'regSucceeded') {
       return (
         <span className="modal-message-text">
-          <CheckCircleFill className="modal-message-icon action-succeeded" />
+          <FontAwesomeIcon icon={faCircleCheck} className="modal-message-icon action-succeeded" />
         </span>
       )
     } else if (regAction === 'regFailed') {
       return (
         <span className="modal-message-text">
-          <XCircleFill className="modal-message-icon action-failed" />
+          <FontAwesomeIcon icon={faCircleXmark} className="modal-message-icon action-failed" />
         </span>
       )
     } else if (regAction === 'regSuspended') {
       return (
         <span className="modal-message-text">
-          <DashCircleFill className="modal-message-icon action-suspend" />
+          <FontAwesomeIcon icon={faCircleMinus} className="modal-message-icon action-suspend" />
         </span>
       )
     } else {
@@ -97,7 +98,7 @@ const RegistrationsModal = (props) => {
         <span className="modal-message-time" title={regMsges[0].time.fromNow()}>
           {regMsges[0].time.format('HH:mm:ss')}
         </span>
-        <ChevronCompactRight className="modal-message-icon" />
+        <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
         <RegActionMsgIcon />
       </p>
     )
@@ -111,7 +112,7 @@ const RegistrationsModal = (props) => {
             <span className="modal-message-time" title={message.time.fromNow()}>
               {message.time.format('HH:mm:ss')}
             </span>
-            <ChevronCompactRight className="modal-message-icon" />
+            <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
             <span className="modal-message-text" dangerouslySetInnerHTML={{ __html: message.text }} />
           </p>
         )
@@ -127,15 +128,15 @@ const RegistrationsModal = (props) => {
             <span className="modal-message-time" title={message.time.fromNow()}>
               {message.time.format('HH:mm:ss')}
             </span>
-            <ChevronCompactRight className="modal-message-icon" />
+            <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
             {
               message.type === 'succeeded'
-                ? <CheckCircleFill className="me-2 modal-message-icon action-succeeded" />
+                ? <FontAwesomeIcon icon={faCircleCheck} className="me-2 modal-message-icon action-succeeded" />
                 : null
             }
             {
               message.type === 'failed'
-                ? <XCircleFill className="me-2 modal-message-icon action-failed" /> 
+                ? <FontAwesomeIcon icon={faCircleXmark} className="me-2 modal-message-icon action-failed" /> 
                 : null
             }
             { message.text }
@@ -173,7 +174,7 @@ const RegistrationsModal = (props) => {
                 />
                 <InputGroup.Text>{t('c.years')}</InputGroup.Text>
                 <InputGroup.Text className="ms-2 until-time">
-                  <CalendarWeek className="me-2" />
+                  <FontAwesomeIcon icon={faCalendarDays} className="me-2" />
                   { moment().add(moment.duration(duration, 'years').asSeconds(), 'seconds').format('L') } 
                 </InputGroup.Text>
               </InputGroup>

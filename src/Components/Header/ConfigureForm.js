@@ -7,13 +7,9 @@ import {
   InputGroup, 
   FormControl
 } from 'react-bootstrap'
-import { 
-  Gear, 
-  CaretRightFill, 
-  ChevronDown, 
-  CheckCircle, 
-  WalletFill 
-} from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
+import { faGear, faCaretRight, faWallet, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
 import confFile from '../../conf.json'
 
@@ -129,12 +125,12 @@ class ConfigureForm extends React.Component {
       <div className="ps-2 pe-3 d-inline-block text-start">
         <OverlayTrigger placement="bottom" overlay={<Tooltip>{t('conf.title')}</Tooltip>}>
           <button className="btn-plain" type="button" data-bs-toggle="offcanvas" data-bs-target="#configureContainer" aria-controls="configureContainer">
-            <Gear />
+            <FontAwesomeIcon icon={faGear} />
           </button>
         </OverlayTrigger>
         <div className="offcanvas offcanvas-start" data-bs-scroll="true" tabIndex="-1" id="configureContainer" aria-labelledby="configureContainerLabel">
           <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="configureContainerLabel"><Gear /> {t('conf.title')}</h5>
+            <h5 className="offcanvas-title" id="configureContainerLabel"><FontAwesomeIcon icon={faGear} /> {t('conf.title')}</h5>
             <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div className="offcanvas-body">
@@ -148,7 +144,7 @@ class ConfigureForm extends React.Component {
               </Alert> */}
 
               {/* General */}
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.general.title')}</h6>
+              <h6 className="mt-4 mb-3"><FontAwesomeIcon icon={faCaretRight} /> {t('conf.general.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.general.pageTag')}</InputGroup.Text>
                 <FormControl 
@@ -177,7 +173,7 @@ class ConfigureForm extends React.Component {
               </InputGroup>
               <InputGroup size="sm" data-bs-toggle="collapse" data-bs-target="#lookupCheckField" aria-expanded="false" aria-controls="lookupCheckField">
                 <InputGroup.Text>{t('conf.display.lookup')}</InputGroup.Text>
-                <span className="form-control text-end"><ChevronDown /></span>
+                <span className="form-control text-end"><FontAwesomeIcon icon={faChevronDown} /></span>
               </InputGroup>
               <div id="lookupCheckField" className="accordion-collapse collapse" aria-labelledby="lookupArea">
                 <div className="accordion-body lookup-accordion-body">
@@ -199,7 +195,7 @@ class ConfigureForm extends React.Component {
               </div>
 
               {/* Register */}
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.register.title')}</h6>
+              <h6 className="mt-4 mb-3"><FontAwesomeIcon icon={faCaretRight} /> {t('conf.register.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.register.duration')}</InputGroup.Text>
                 <FormControl 
@@ -230,7 +226,7 @@ class ConfigureForm extends React.Component {
               </InputGroup>
 
               {/* Renew */}
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.renew.title')}</h6>
+              <h6 className="mt-4 mb-3"><FontAwesomeIcon icon={faCaretRight} /> {t('conf.renew.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.renew.duration')}</InputGroup.Text>
                 <FormControl 
@@ -242,7 +238,7 @@ class ConfigureForm extends React.Component {
               </InputGroup>
 
               {/* Premium */}
-              <h6 className="mt-4 mb-3"><CaretRightFill /> {t('conf.premium.title')}</h6>
+              <h6 className="mt-4 mb-3"><FontAwesomeIcon icon={faCaretRight} /> {t('conf.premium.title')}</h6>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>{t('conf.premium.priceUnit')}</InputGroup.Text>
                 <Form.Select 
@@ -283,7 +279,7 @@ class ConfigureForm extends React.Component {
 
               {/* Custom Wallet Mode */}
               <h6 className="mt-4 mb-3">
-                <WalletFill className="me-2" />
+                <FontAwesomeIcon icon={faWallet} className="me-2" />
                 {t('conf.customMode.title')}
                 <Form.Check 
                   type="switch"
@@ -338,7 +334,7 @@ class ConfigureForm extends React.Component {
                   className="btn btn-primary conf-btn-save" 
                   data-bs-dismiss="offcanvas" 
                   onClick={this.submitForm}
-                >{t('c.save')} <CheckCircle /></button>
+                >{t('c.save')} <FontAwesomeIcon icon={faCircleCheck} /></button>
               </div>
             </form>
           </div>

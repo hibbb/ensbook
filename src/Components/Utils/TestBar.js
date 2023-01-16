@@ -1,6 +1,7 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { ExclamationCircle } from 'react-bootstrap-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { getPremiumPrice } from '../Global/globals';
 import { ethers, getDefaultProvider } from 'ethers';
 
@@ -20,7 +21,7 @@ export default function TestBar(props) {
       <div id="testBar" className="test-bar p-3 mt-3">
         <Row>
           <Col sm="8" className="ps-3 text-start test-bar-alert">
-            <span><ExclamationCircle className="mx-2" />The <strong>dev branch</strong> is only for dev test.</span>
+            <span><FontAwesomeIcon icon={faCircleExclamation} className="mx-2" />The <strong>dev branch</strong> is only for dev test.</span>
           </Col>
           <Col sm="4" className="text-end test-bar-buttons">
             <span className="mx-2" onClick={()=>testFunc1()}><strong>Test-1</strong></span>
