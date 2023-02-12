@@ -4,11 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { getPremiumPrice } from "../Global/globals";
 import { ethers, getDefaultProvider } from "ethers";
+import { namehash } from "ethers/lib/utils";
+import crypto from 'crypto'
 
 export default function TestBar(props) {
   const testFunc1 = async () => {
-    const p = await props.getETHPrice();
-    console.log(p);
+
   };
 
   const testFunc2 = async () => {};
