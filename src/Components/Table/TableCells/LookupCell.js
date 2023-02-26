@@ -22,8 +22,8 @@ export const LookupCell = (props) => {
   const { addr } = getConfFixed().contract;
   const { lookup } = conf.custom.display;
   // When you modify lookupLinks, you also need to modify:
-  // 1. the custom.display.lookup filed of conf.json
-  // 2. the tb.lookup filed of en.json and cn.json
+  // 1. the custom.display.lookup field of conf.json
+  // 2. the tb.lookup field of en.json and cn.json
   const lookupLinks = {
     RelatedInfo: {
       precondition:
@@ -36,9 +36,17 @@ export const LookupCell = (props) => {
       precondition: isMainnet(network) && isRenewable(status),
       link: `https://opensea.io/assets/ethereum/${addr[network].BaseRegImp}/${tokenIdDec}`,
     },
-    Gem: {
-      precondition: isMainnet(network) && isRenewable(status),
-      link: `https://www.gem.xyz/asset/${addr[network].BaseRegImp}/${tokenIdDec}`,
+    // Gem: {
+    //   precondition: isMainnet(network) && isRenewable(status),
+    //   link: `https://www.gem.xyz/asset/${addr[network].BaseRegImp}/${tokenIdDec}`,
+    // },
+    ENSVision: {
+      precondition: isMainnet(network),
+      link: `https://ens.vision/name/${label}`,
+    },
+    RareID: {
+      precondition: isMainnet(network),
+      link: `https://rare.id/items/${label}.eth`,
     },
     Metadata: {
       precondition: isNormal(status),

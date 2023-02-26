@@ -71,7 +71,8 @@
     "lookup": {
       "RelatedInfo": "Related Info",
       "Opensea": "Opensea",
-      "Gem": "Gem",
+      "ENSVision": "ENS.Vision",
+      "RareID": "Rare.ID",
       "Metadata": "Metadata",
       "Inventory": "Owner's Inventory",
       "LinkETH": "{{label}}.eth.limo",

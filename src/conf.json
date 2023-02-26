@@ -11,7 +11,8 @@
       "lookup": {
         "RelatedInfo": true,
         "Opensea": true,
-        "Gem": true,
+        "ENSVision": true,
+        "RareID": true,
         "Metadata": true,
         "Inventory": false, 
         "LinkETH": false,
