@@ -1,7 +1,7 @@
 {
   "name": "ensbook",
-  "version": "2.3.0",
-  "author": "liu.ensuser.eth",
+  "version": "2.3.1",
+  "author": "liubenben.eth",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.2",

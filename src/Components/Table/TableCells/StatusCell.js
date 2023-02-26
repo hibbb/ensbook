@@ -36,6 +36,7 @@ export const StatusCell = (props) => {
     if (status === "Premium") {
       let premiumPriceDisplay = getPremiumPrice(releaseTime);
       let priceUnitIcon = <FontAwesomeIcon icon={faDollarSign} />;
+      const shortText = text.substring(0, 3)
 
       if (priceUnit === "ETH") {
         premiumPriceDisplay = ((premiumPriceDisplay * 1e8) / ethPrice).toFixed(
@@ -48,7 +49,7 @@ export const StatusCell = (props) => {
 
       return (
         <>
-          {priceUnitIcon} {premiumPriceDisplay}
+          {shortText} {priceUnitIcon} {premiumPriceDisplay}
         </>
       );
     }
