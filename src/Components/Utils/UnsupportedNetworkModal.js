@@ -1,6 +1,6 @@
-import React from "react";
-import { Modal, Button } from "react-bootstrap";
-import { t } from "i18next";
+import React from 'react';
+import { Modal, Button } from 'react-bootstrap';
+import { t } from 'i18next';
 
 const UnsupportedNetworkModal = (props) => {
   const { show, disconnectApp } = props;
@@ -12,12 +12,12 @@ const UnsupportedNetworkModal = (props) => {
       keyboard={false}
     >
       <Modal.Header>
-        <Modal.Title>{t("modal.errorNetwork.title")}</Modal.Title>
+        <Modal.Title>{t('modal.errorNetwork.title')}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{t("modal.errorNetwork.text")}</Modal.Body>
+      <Modal.Body>{t('modal.errorNetwork.text')}</Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={() => disconnectApp()}>
-          {t("c.disconnect")}
+          {t('c.disconnect')}
         </Button>
       </Modal.Footer>
     </Modal>

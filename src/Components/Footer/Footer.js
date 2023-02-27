@@ -1,8 +1,8 @@
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTwitter, faGithub } from "@fortawesome/free-brands-svg-icons";
-import { getConf } from "../Global/globals";
-import packageJson from "../../../package.json";
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { getConf } from '../Global/globals';
+import packageJson from '../../../package.json';
 
 export default function Footer() {
   return (

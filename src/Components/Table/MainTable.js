@@ -1,7 +1,7 @@
-import React from "react";
-import { TableHead } from "./TableHead";
-import { TableBody } from "./TableBody";
-import { isStatus, removeRegInfo } from "../Global/globals";
+import React from 'react';
+import { TableHead } from './TableHead';
+import { TableBody } from './TableBody';
+import { isStatus, removeRegInfo } from '../Global/globals';
 
 class MainTable extends React.Component {
   componentDidMount() {
@@ -28,7 +28,7 @@ class MainTable extends React.Component {
 
   clearRegList = () => {
     this.setState({ regList: [] });
-    const regCheckboxes = document.getElementsByClassName("reg-checkbox");
+    const regCheckboxes = document.getElementsByClassName('reg-checkbox');
     for (let i = 0; i < regCheckboxes.length; i++) {
       regCheckboxes[i].checked = false;
     }
@@ -47,7 +47,7 @@ class MainTable extends React.Component {
 
   clearRenewList = () => {
     this.setState({ renewList: [] });
-    const renewCheckboxes = document.getElementsByClassName("renew-checkbox");
+    const renewCheckboxes = document.getElementsByClassName('renew-checkbox');
     for (let i = 0; i < renewCheckboxes.length; i++) {
       renewCheckboxes[i].checked = false;
     }
@@ -91,10 +91,10 @@ class MainTable extends React.Component {
 
     const removeName = (index) => {
       const currentRegCheckBox = document.getElementById(
-        "registerName-checkbox-" + nameInfo[index].label
+        'registerName-checkbox-' + nameInfo[index].label
       );
       const currentRenewCheckBox = document.getElementById(
-        "renewName-checkbox-" + nameInfo[index].label
+        'renewName-checkbox-' + nameInfo[index].label
       );
       if (currentRegCheckBox) currentRegCheckBox.checked = false;
       if (currentRenewCheckBox) currentRenewCheckBox.checked = false;
@@ -121,7 +121,7 @@ class MainTable extends React.Component {
         Promise.all(nameInfo.filter((item) => item.status !== flag)).then(
           (nameInfo) => setAndStoreNameInfo(nameInfo)
         );
-      } else if (flag === "Lower") {
+      } else if (flag === 'Lower') {
         let lowerLevel = 9; // should be equal or higher than the possible highest level
         nameInfo.forEach((e) => {
           lowerLevel = Math.min(e.level, lowerLevel);
@@ -132,7 +132,7 @@ class MainTable extends React.Component {
             setAndStoreNameInfo(nameInfo);
           }
         );
-      } else if (flag === "All") {
+      } else if (flag === 'All') {
         setAndStoreNameInfo([]);
       }
     };

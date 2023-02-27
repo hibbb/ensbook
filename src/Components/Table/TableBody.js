@@ -1,11 +1,11 @@
-import React from "react";
-import { isCustomWallet, isMyName, isRegistrable } from "../Global/globals";
-import { LabelCell } from "./TableCells/LabelCell";
-import { LookupCell } from "./TableCells/LookupCell";
-import { StatusCell } from "./TableCells/StatusCell";
-import { RegisterCell } from "./TableCells/RegisterCell";
-import { DelCell } from "./TableCells/DelCell";
-import { RenewCell } from "./TableCells/RenewCell";
+import React from 'react';
+import { isCustomWallet, isMyName, isRegistrable } from '../Global/globals';
+import { LabelCell } from './TableCells/LabelCell';
+import { LookupCell } from './TableCells/LookupCell';
+import { StatusCell } from './TableCells/StatusCell';
+import { RegisterCell } from './TableCells/RegisterCell';
+import { DelCell } from './TableCells/DelCell';
+import { RenewCell } from './TableCells/RenewCell';
 
 export const TableBody = (props) => {
   const {

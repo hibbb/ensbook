@@ -45,12 +45,8 @@
         "function rentPrice(string[] names, uint duration) view returns (uint)",
         "function renewAll(string[] names, uint duration) payable"
       ],
-      "ETHPriceFeed": [
-        "function latestAnswer() view returns (int256)"
-      ],
-      "BulkReg": [
-        ""
-      ]
+      "ETHPriceFeed": ["function latestAnswer() view returns (int256)"],
+      "BulkReg": [""]
     }
   }
 }

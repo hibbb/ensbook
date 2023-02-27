@@ -1,12 +1,12 @@
-import React from "react";
-import { Spinner } from "react-bootstrap";
-import { t } from "i18next";
+import React from 'react';
+import { Spinner } from 'react-bootstrap';
+import { t } from 'i18next';
 
 class TooltipEstimateCost extends React.Component {
   render() {
     const { estimating } = this.props;
 
-    if (estimating.status === "in") {
+    if (estimating.status === 'in') {
       return (
         <>
           <p>{t(estimating.title)}</p>
@@ -20,11 +20,11 @@ class TooltipEstimateCost extends React.Component {
         </>
       );
     }
-    if (estimating.status === "after") {
+    if (estimating.status === 'after') {
       return (
         <>
           <p>{t(estimating.title)}</p>
-          <div>{"≈ " + estimating.cost.slice(0, 7) + " ETH"}</div>
+          <div>{'≈ ' + estimating.cost.slice(0, 7) + ' ETH'}</div>
         </>
       );
     }

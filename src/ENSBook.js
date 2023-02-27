@@ -1,11 +1,11 @@
-import React from "react";
-import { ethers, utils } from "ethers";
-import moment from "moment";
-import "moment/locale/zh-cn";
-import lt from "long-timeout";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { t } from "i18next";
+import React from 'react';
+import { ethers, utils } from 'ethers';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+import lt from 'long-timeout';
+import Web3Modal from 'web3modal';
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import { t } from 'i18next';
 import {
   isCustomWallet,
   isSupportedChain,
@@ -21,37 +21,37 @@ import {
   getConfFixed,
   queryNameInfo,
   getETHPriceFeedCon,
-} from "./Components/Global/globals";
-import Header from "./Components/Header/Header";
-import MainForm from "./Components/Form/MainForm";
-import MainTable from "./Components/Table/MainTable";
-import Footer from "./Components/Footer/Footer";
-import TestBar from "./Components/Utils/TestBar";
-import MessageToasts from "./Components/Utils/MessageToasts";
-import UnsupportedNetworkModal from "./Components/Utils/UnsupportedNetworkModal";
+} from './Components/Global/globals';
+import Header from './Components/Header/Header';
+import MainForm from './Components/Form/MainForm';
+import MainTable from './Components/Table/MainTable';
+import Footer from './Components/Footer/Footer';
+import TestBar from './Components/Utils/TestBar';
+import MessageToasts from './Components/Utils/MessageToasts';
+import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal';
 
 let web3Modal;
 let conf = updateLookupList(); // getConf() inside
 const confFixed = getConfFixed();
 const defaultProvider = new ethers.providers.InfuraProvider(
-  "mainnet",
+  'mainnet',
   conf.custom.infuraID
 );
 
 const INITIAL_STATE = {
-  regMsges: [{ time: moment(), type: "action", text: "regBefore" }], // for registerName process
-  regsMsges: [{ time: moment(), type: "action", text: "regsBefore" }], // for registerNames process
-  renewMsges: [{ time: moment(), type: "action", text: "renewBefore" }], // for renewName process
-  renewsMsges: [{ time: moment(), type: "action", text: "renewsBefore" }], // for renewNames process
+  regMsges: [{ time: moment(), type: 'action', text: 'regBefore' }], // for registerName process
+  regsMsges: [{ time: moment(), type: 'action', text: 'regsBefore' }], // for registerNames process
+  renewMsges: [{ time: moment(), type: 'action', text: 'renewBefore' }], // for renewName process
+  renewsMsges: [{ time: moment(), type: 'action', text: 'renewsBefore' }], // for renewNames process
   reconnecting: false,
   fetching: false,
   unsupported: false,
   provider: defaultProvider,
   signer: undefined,
-  type: "readonly",
+  type: 'readonly',
   address: undefined,
   ensname: undefined,
-  network: "mainnet",
+  network: 'mainnet',
   balance: undefined,
   ethPrice: undefined,
 };
@@ -59,7 +59,7 @@ const INITIAL_STATE = {
 class ENSBook extends React.Component {
   constructor(props) {
     super(props);
-    const nameInfo = JSON.parse(window.localStorage.getItem("nameInfo")) ?? [];
+    const nameInfo = JSON.parse(window.localStorage.getItem('nameInfo')) ?? [];
     this.state = { ...INITIAL_STATE, nameInfo };
   }
 
@@ -74,14 +74,14 @@ class ENSBook extends React.Component {
       return this.setState({ unsupported: true });
     }
 
-    const network = networkname === "homestead" ? "mainnet" : networkname;
+    const network = networkname === 'homestead' ? 'mainnet' : networkname;
     const address = signer ? await signer.getAddress() : null;
     const balance = address
       ? utils.formatEther(await provider.getBalance(address))
       : null;
     const ensname = address ? await provider.lookupAddress(address) : null;
     const ethPrice =
-      conf.custom.premium.priceUnit === "ETH"
+      conf.custom.premium.priceUnit === 'ETH'
         ? await this.getETHPrice()
         : undefined;
     this.setState({ address, network, balance, ensname, ethPrice });
@@ -105,17 +105,17 @@ class ENSBook extends React.Component {
 
   setAndStoreConfInfo = (newConf) => {
     conf = newConf; // renew the global variable: conf
-    window.localStorage.setItem("confInfo", JSON.stringify(conf));
+    window.localStorage.setItem('confInfo', JSON.stringify(conf));
   };
 
   setAndStoreNameInfo = (nameInfo, messageShowFlag = true) => {
     // update nameInfo in state and store it
     this.setState({ nameInfo });
-    window.localStorage.setItem("nameInfo", JSON.stringify(nameInfo));
+    window.localStorage.setItem('nameInfo', JSON.stringify(nameInfo));
     if (messageShowFlag) {
       this.MessageToasts.messageShow(
-        "setAndStoreNameInfo",
-        t("msg.setAndStoreNameInfo")
+        'setAndStoreNameInfo',
+        t('msg.setAndStoreNameInfo')
       );
     }
   };
@@ -165,7 +165,7 @@ class ENSBook extends React.Component {
 
   registerName = async (label, duration, receiver, regFrom = 0, regTo = 3) => {
     if (regFrom >= regTo) {
-      return console.log("Warning: regFrom must < regTo.");
+      return console.log('Warning: regFrom must < regTo.');
     }
 
     const { provider, signer, network, nameInfo } = this.state;
@@ -174,8 +174,8 @@ class ENSBook extends React.Component {
     let regMsges = [
       {
         time: moment(),
-        type: "action",
-        text: "regStarted",
+        type: 'action',
+        text: 'regStarted',
       },
     ];
     this.setState({ regMsges });
@@ -184,7 +184,7 @@ class ENSBook extends React.Component {
 
     duration =
       duration ??
-      moment.duration(conf.custom.register.duration, "years").asSeconds();
+      moment.duration(conf.custom.register.duration, 'years').asSeconds();
     duration = Math.max(duration, 2419200); // 2419200 seconds = 28 days
 
     let regInfo = {
@@ -192,8 +192,8 @@ class ENSBook extends React.Component {
       owner: undefined, // owner can only be a standard ETH address
       duration: duration,
       secret: undefined,
-      resolver: "0x0000000000000000000000000000000000000000",
-      addr: "0x0000000000000000000000000000000000000000",
+      resolver: '0x0000000000000000000000000000000000000000',
+      addr: '0x0000000000000000000000000000000000000000',
       commitment: undefined,
     };
 
@@ -205,7 +205,7 @@ class ENSBook extends React.Component {
         try {
           const owner = await provider.resolveName(receiver);
           if (!owner) {
-            throw new Error("This ENS does not have an address configured.");
+            throw new Error('This ENS does not have an address configured.');
           }
 
           regInfo.receiver = receiver;
@@ -214,13 +214,13 @@ class ENSBook extends React.Component {
           console.log(e);
           regMsges[0] = {
             time: moment(),
-            type: "action",
-            text: "regBefore",
+            type: 'action',
+            text: 'regBefore',
           };
           regMsges.push({
             time: moment(),
-            type: "failed",
-            text: t("modal.reg.wrongReceiver"),
+            type: 'failed',
+            text: t('modal.reg.wrongReceiver'),
           });
           this.setState({ regMsges });
           return 0;
@@ -235,11 +235,11 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.register00", {
+          type: 'info',
+          text: t('modal.reg.register00', {
             label: label,
-            owner: regInfo.owner.substr(0, 7) + "...",
-            duration: moment.duration(duration, "seconds").asYears().toFixed(2),
+            owner: regInfo.owner.substr(0, 7) + '...',
+            duration: moment.duration(duration, 'seconds').asYears().toFixed(2),
           }),
         });
         this.setState({ regMsges });
@@ -262,12 +262,12 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.register00", {
+          type: 'info',
+          text: t('modal.reg.register00', {
             label: label,
-            owner: regInfo.owner.substr(0, 7) + "...",
+            owner: regInfo.owner.substr(0, 7) + '...',
             duration: moment
-              .duration(regInfo.duration, "seconds")
+              .duration(regInfo.duration, 'seconds')
               .asYears()
               .toFixed(2),
           }),
@@ -288,13 +288,13 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.unregistrableNow", { label: label }),
+          type: 'info',
+          text: t('modal.reg.unregistrableNow', { label: label }),
         });
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regFailed",
+          type: 'action',
+          text: 'regFailed',
         };
         this.setState({ regMsges });
         return nameInfo[index].regStep;
@@ -305,7 +305,7 @@ class ENSBook extends React.Component {
         // conf.custom.wallet.gasPrice: gwei
         commitOverrides.gasPrice = utils.parseUnits(
           conf.custom.wallet.gasPrice.toString(),
-          "gwei"
+          'gwei'
         );
       }
       commitOverrides.gasLimit = 70000;
@@ -323,8 +323,8 @@ class ENSBook extends React.Component {
         this.setState({ nameInfo });
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regSuspended",
+          type: 'action',
+          text: 'regSuspended',
         };
         this.setState({ regMsges });
         return nameInfo[index].regStep;
@@ -348,16 +348,16 @@ class ENSBook extends React.Component {
       const commitTxLink =
         '<a href="' +
         confFixed.scanConf[network] +
-        "tx/" +
+        'tx/' +
         regInfo.commitTxHash +
         '" target="_blank" rel="noreferrer">' +
-        t("c.tx") +
+        t('c.tx') +
         '</a>';
 
       regMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.reg.register10", { label: label, txLink: commitTxLink }),
+        type: 'info',
+        text: t('modal.reg.register10', { label: label, txLink: commitTxLink }),
       });
       this.setState({ regMsges });
 
@@ -372,8 +372,8 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.register11.succeed", {
+          type: 'info',
+          text: t('modal.reg.register11.succeed', {
             label: label,
             txLink: commitTxLink,
           }),
@@ -386,13 +386,13 @@ class ENSBook extends React.Component {
 
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regFailed",
+          type: 'action',
+          text: 'regFailed',
         };
         regMsges.push({
           time: moment(),
-          type: "failed",
-          text: t("modal.reg.register11.fail", {
+          type: 'failed',
+          text: t('modal.reg.register11.fail', {
             label: label,
             txLink: commitTxLink,
           }),
@@ -428,8 +428,8 @@ class ENSBook extends React.Component {
     const regFrom2 = async () => {
       regMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.reg.register20", { label: label }),
+        type: 'info',
+        text: t('modal.reg.register20', { label: label }),
       });
       this.setState({ regMsges });
 
@@ -440,13 +440,13 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.unregistrableNow", { label: label }),
+          type: 'info',
+          text: t('modal.reg.unregistrableNow', { label: label }),
         });
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regFailed",
+          type: 'action',
+          text: 'regFailed',
         };
         this.setState({ regMsges });
         return nameInfo[index].regStep;
@@ -457,7 +457,7 @@ class ENSBook extends React.Component {
         // conf.custom.wallet.gasPrice: gwei
         regOverrides.gasPrice = utils.parseUnits(
           String(conf.custom.wallet.gasPrice),
-          "gwei"
+          'gwei'
         );
       }
       regOverrides.gasLimit = conf.custom.register.registerWithConfig
@@ -485,8 +485,8 @@ class ENSBook extends React.Component {
         this.setState({ nameInfo });
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regSuspended",
+          type: 'action',
+          text: 'regSuspended',
         };
         this.setState({ regMsges });
         return nameInfo[index].regStep;
@@ -509,16 +509,16 @@ class ENSBook extends React.Component {
       const regTxLink =
         '<a href="' +
         confFixed.scanConf[network] +
-        "tx/" +
+        'tx/' +
         regInfo.regTxHash +
         '" target="_blank" rel="noreferrer">' +
-        t("c.tx") +
-        "</a>";
+        t('c.tx') +
+        '</a>';
 
       regMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.reg.register30", { label: label, regTxLink: regTxLink }),
+        type: 'info',
+        text: t('modal.reg.register30', { label: label, regTxLink: regTxLink }),
       });
       this.setState({ regMsges });
 
@@ -533,16 +533,16 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.register31.succeed", {
+          type: 'info',
+          text: t('modal.reg.register31.succeed', {
             label: label,
             regTxLink: regTxLink,
           }),
         });
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regSucceeded",
+          type: 'action',
+          text: 'regSucceeded',
         };
         this.setState({ regMsges });
         return nameInfo[index].regStep;
@@ -552,16 +552,16 @@ class ENSBook extends React.Component {
 
         regMsges.push({
           time: moment(),
-          type: "info",
-          text: t("modal.reg.register31.fail", {
+          type: 'info',
+          text: t('modal.reg.register31.fail', {
             label: label,
             regTxLink: regTxLink,
           }),
         });
         regMsges[0] = {
           time: moment(),
-          type: "action",
-          text: "regFailed",
+          type: 'action',
+          text: 'regFailed',
         };
         this.setState({ regMsges });
         return nameInfo[index].regStep;
@@ -591,8 +591,8 @@ class ENSBook extends React.Component {
     let regsMsges = [
       {
         time: moment(),
-        type: "action",
-        text: "regsStarted",
+        type: 'action',
+        text: 'regsStarted',
       },
     ];
     this.setState({ regsMsges });
@@ -603,15 +603,15 @@ class ENSBook extends React.Component {
       if (regResult === 3) {
         regsMsges.push({
           time: moment(),
-          type: "succeeded",
-          text: regList[i] + ".eth",
+          type: 'succeeded',
+          text: regList[i] + '.eth',
         });
         this.setState({ regsMsges });
       } else {
         regsMsges.push({
           time: moment(),
-          type: "failed",
-          text: regList[i] + ".eth",
+          type: 'failed',
+          text: regList[i] + '.eth',
         });
         this.setState({ regsMsges });
       }
@@ -619,13 +619,13 @@ class ENSBook extends React.Component {
 
     regsMsges.push({
       time: moment(),
-      type: "ended",
-      text: t("modal.regs.regsEnded"),
+      type: 'ended',
+      text: t('modal.regs.regsEnded'),
     });
     regsMsges[0] = {
       time: moment(),
-      type: "action",
-      text: "regsEnded",
+      type: 'action',
+      text: 'regsEnded',
     };
     this.setState({ regsMsges });
     this.setState({ regMsges: INITIAL_STATE.regMsges });
@@ -642,22 +642,22 @@ class ENSBook extends React.Component {
 
     duration =
       duration ??
-      moment.duration(conf.custom.renew.duration, "years").asSeconds();
+      moment.duration(conf.custom.renew.duration, 'years').asSeconds();
     const ETHRegCtrlCon = getETHRegCtrlCon(signer, network, conf);
 
     let renewMsges = [
       {
         time: moment(),
-        type: "action",
-        text: "renewStarted",
+        type: 'action',
+        text: 'renewStarted',
       },
     ];
     renewMsges.push({
       time: moment(),
-      type: "info",
-      text: t("modal.renew.renew00", {
+      type: 'info',
+      text: t('modal.renew.renew00', {
         label: label,
-        duration: moment.duration(duration, "seconds").asYears().toFixed(2),
+        duration: moment.duration(duration, 'seconds').asYears().toFixed(2),
       }),
     });
     this.setState({ renewMsges });
@@ -669,7 +669,7 @@ class ENSBook extends React.Component {
       // conf.custom.wallet.gasPrice: gwei
       renewOverrides.gasPrice = utils.parseUnits(
         String(conf.custom.wallet.gasPrice),
-        "gwei"
+        'gwei'
       );
     }
     renewOverrides.gasLimit = 120000; // !!!!!
@@ -683,24 +683,24 @@ class ENSBook extends React.Component {
       renewTxLink =
         '<a href="' +
         confFixed.scanConf[network] +
-        "tx/" +
+        'tx/' +
         renewTx.hash +
         '" target="_blank" rel="noreferrer">' +
-        t("c.tx") +
-        "</a>";
+        t('c.tx') +
+        '</a>';
 
       renewMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.renew.renew10", { label: label, txLink: renewTxLink }),
+        type: 'info',
+        text: t('modal.renew.renew10', { label: label, txLink: renewTxLink }),
       });
       this.setState({ renewMsges });
     } catch (e) {
       console.log(e);
       renewMsges[0] = {
         time: moment(),
-        type: "action",
-        text: "renewSuspended",
+        type: 'action',
+        text: 'renewSuspended',
       };
       this.setState({ renewMsges });
       return;
@@ -711,31 +711,31 @@ class ENSBook extends React.Component {
     if (renewTxReceipt.status) {
       renewMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.renew.renew11.succeed", {
+        type: 'info',
+        text: t('modal.renew.renew11.succeed', {
           label: label,
           txLink: renewTxLink,
         }),
       });
       renewMsges[0] = {
         time: moment(),
-        type: "action",
-        text: "renewSucceeded",
+        type: 'action',
+        text: 'renewSucceeded',
       };
       this.setState({ renewMsges });
     } else {
       renewMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.renew.renew11.fail", {
+        type: 'info',
+        text: t('modal.renew.renew11.fail', {
           label: label,
           txLink: renewTxLink,
         }),
       });
       renewMsges[0] = {
         time: moment(),
-        type: "action",
-        text: "renewFailed",
+        type: 'action',
+        text: 'renewFailed',
       };
       this.setState({ renewMsges });
     }
@@ -752,21 +752,21 @@ class ENSBook extends React.Component {
 
     duration =
       duration ??
-      moment.duration(conf.custom.renew.duration, "years").asSeconds();
+      moment.duration(conf.custom.renew.duration, 'years').asSeconds();
     const BulkRenewCon = getBulkRenewCon(signer, network, conf);
 
     let renewsMsges = [
       {
         time: moment(),
-        type: "action",
-        text: "renewsStarted",
+        type: 'action',
+        text: 'renewsStarted',
       },
     ];
     renewsMsges.push({
       time: moment(),
-      type: "info",
-      text: t("modal.renews.renews00", {
-        duration: moment.duration(duration, "seconds").asYears().toFixed(2),
+      type: 'info',
+      text: t('modal.renews.renews00', {
+        duration: moment.duration(duration, 'seconds').asYears().toFixed(2),
       }),
     });
     this.setState({ renewsMsges });
@@ -778,7 +778,7 @@ class ENSBook extends React.Component {
       // conf.custom.wallet.gasPrice: gwei
       renewsOverrides.gasPrice = utils.parseUnits(
         String(conf.custom.wallet.gasPrice),
-        "gwei"
+        'gwei'
       );
     }
     //renewsOverrides.gasLimit = 120000   // !!!!!
@@ -795,24 +795,24 @@ class ENSBook extends React.Component {
       renewsTxLink =
         '<a href="' +
         confFixed.scanConf[network] +
-        "tx/" +
+        'tx/' +
         renewsTx.hash +
         '" target="_blank" rel="noreferrer">' +
-        t("c.tx") +
-        "</a>";
+        t('c.tx') +
+        '</a>';
 
       renewsMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.renews.renews10", { txLink: renewsTxLink }),
+        type: 'info',
+        text: t('modal.renews.renews10', { txLink: renewsTxLink }),
       });
       this.setState({ renewsMsges });
     } catch (e) {
       console.log(e);
       renewsMsges[0] = {
         time: moment(),
-        type: "action",
-        text: "renewsSuspended",
+        type: 'action',
+        text: 'renewsSuspended',
       };
       this.setState({ renewsMsges });
       return;
@@ -823,25 +823,25 @@ class ENSBook extends React.Component {
     if (renewsTxReceipt.status) {
       renewsMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.renews.renews11.succeed", { txLink: renewsTxLink }),
+        type: 'info',
+        text: t('modal.renews.renews11.succeed', { txLink: renewsTxLink }),
       });
       renewsMsges[0] = {
         time: moment(),
-        type: "action",
-        text: "renewsSucceeded",
+        type: 'action',
+        text: 'renewsSucceeded',
       };
       this.setState({ renewsMsges });
     } else {
       renewsMsges.push({
         time: moment(),
-        type: "info",
-        text: t("modal.renews.renews11.fail", { txLink: renewsTxLink }),
+        type: 'info',
+        text: t('modal.renews.renews11.fail', { txLink: renewsTxLink }),
       });
       renewsMsges[0] = {
         time: moment(),
-        type: "action",
-        text: "renewsFailed",
+        type: 'action',
+        text: 'renewsFailed',
       };
       this.setState({ renewsMsges });
     }
@@ -858,14 +858,14 @@ class ENSBook extends React.Component {
 
     duration =
       duration ??
-      moment.duration(conf.custom.register.duration, "years").asSeconds();
+      moment.duration(conf.custom.register.duration, 'years').asSeconds();
     duration = Math.max(duration, 2419200); // 2419200 seconds = 28 days
     const ETHRegCtrlCon = getETHRegCtrlCon(provider, network);
     const rent = await ETHRegCtrlCon.rentPrice(label, duration);
 
     const gasPrice =
       conf.custom.register.gasPrice > 0
-        ? utils.parseUnits(conf.custom.register.gasPrice.toString(), "gwei")
+        ? utils.parseUnits(conf.custom.register.gasPrice.toString(), 'gwei')
         : await provider.getGasPrice();
     const gasFee = gasPrice.mul(50000 + 270000); // commitGasLimit + regGasLimit
     const costWei = gasFee.add(rent);
@@ -894,7 +894,7 @@ class ENSBook extends React.Component {
         conf.custom.wallet.operatorPrivateKey[0],
         provider
       );
-      return { provider, signer, type: "custom" };
+      return { provider, signer, type: 'custom' };
     }
     //return await getWeb3Modal(fallback)
     let provider;
@@ -919,10 +919,10 @@ class ENSBook extends React.Component {
       await provider.enable();
       provider = new ethers.providers.Web3Provider(provider);
       const signer = provider.getSigner();
-      return { provider, signer, type: "web3" };
+      return { provider, signer, type: 'web3' };
     } else {
       provider = defaultProvider;
-      return { provider, signer: undefined, type: "readonly" };
+      return { provider, signer: undefined, type: 'readonly' };
     }
   };
 
@@ -938,15 +938,15 @@ class ENSBook extends React.Component {
       return;
     }
     //provider.on("close", () => this.resetApp());
-    provider.on("accountsChanged", async (accounts) => {
-      if (this.state.type !== "web3") {
-        return console.log("Your switch only works in Web3 mode.");
+    provider.on('accountsChanged', async (accounts) => {
+      if (this.state.type !== 'web3') {
+        return console.log('Your switch only works in Web3 mode.');
       }
       this.reconnectApp(false);
     });
-    provider.on("chainChanged", async (chainId) => {
-      if (this.state.type !== "web3") {
-        return console.log("Your switch only works in Web3 mode.");
+    provider.on('chainChanged', async (chainId) => {
+      if (this.state.type !== 'web3') {
+        return console.log('Your switch only works in Web3 mode.');
       }
       if (isSupportedChain(parseInt(chainId, 16))) {
         this.setState({ unsupported: false });

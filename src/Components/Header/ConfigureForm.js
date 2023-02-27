@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   // Alert,
   Form,
@@ -6,20 +6,20 @@ import {
   Tooltip,
   InputGroup,
   FormControl,
-} from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck } from "@fortawesome/free-regular-svg-icons";
+} from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import {
   faGear,
   faCaretRight,
   faWallet,
   faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
-import { t } from "i18next";
-import confFile from "../../conf.json";
+} from '@fortawesome/free-solid-svg-icons';
+import { t } from 'i18next';
+import confFile from '../../conf.json';
 
 class ConfigureForm extends React.Component {
-  conf = JSON.parse(window.localStorage.getItem("confInfo"));
+  conf = JSON.parse(window.localStorage.getItem('confInfo'));
 
   state = {
     pageTag: this.conf.custom.pageTag,
@@ -33,7 +33,7 @@ class ConfigureForm extends React.Component {
 
     renewDuration: this.conf.custom.renew.duration,
 
-    premiumPriceUnit: this.conf.custom.premium.priceUnit ?? "ETH",
+    premiumPriceUnit: this.conf.custom.premium.priceUnit ?? 'ETH',
     premiumPriceRange: this.conf.custom.premium.priceRange,
 
     walletSwitch: this.conf.custom.wallet.switch,
@@ -60,7 +60,7 @@ class ConfigureForm extends React.Component {
 
   handleSelectBooleanChange = (event) => {
     const { name, value } = event.target;
-    this.setState({ [name]: value === "false" ? false : true });
+    this.setState({ [name]: value === 'false' ? false : true });
   };
 
   handleDisplayLookupChange = (event) => {
@@ -71,7 +71,7 @@ class ConfigureForm extends React.Component {
   };
 
   submitForm = () => {
-    const confInfo = JSON.parse(window.localStorage.getItem("confInfo"));
+    const confInfo = JSON.parse(window.localStorage.getItem('confInfo'));
     confInfo.custom.pageTag = this.state.pageTag.trim();
     confInfo.custom.pageTagColor = this.state.pageTagColor;
     confInfo.custom.infuraID = this.state.infuraID.trim();
@@ -90,7 +90,7 @@ class ConfigureForm extends React.Component {
 
     confInfo.custom.wallet.switch = this.state.walletSwitch;
     confInfo.custom.wallet.operatorPrivateKey =
-      this.state.walletOperatorPrivateKey.replace(/\s/g, "").split(",");
+      this.state.walletOperatorPrivateKey.replace(/\s/g, '').split(',');
     confInfo.custom.wallet.network = this.state.walletNetwork;
     confInfo.custom.wallet.gasPrice = Number(this.state.walletGasPrice);
     this.props.setAndStoreConfInfo(confInfo);
@@ -125,17 +125,17 @@ class ConfigureForm extends React.Component {
   };
 
   render() {
-    if (this.props.host !== "remote") {
+    if (this.props.host !== 'remote') {
       return null;
     }
 
-    const lookupList = JSON.parse(window.localStorage.getItem("lookupList"));
+    const lookupList = JSON.parse(window.localStorage.getItem('lookupList'));
 
     return (
       <div className="ps-2 pe-3 d-inline-block text-start">
         <OverlayTrigger
           placement="bottom"
-          overlay={<Tooltip>{t("conf.title")}</Tooltip>}
+          overlay={<Tooltip>{t('conf.title')}</Tooltip>}
         >
           <button
             className="btn-plain"
@@ -156,7 +156,7 @@ class ConfigureForm extends React.Component {
         >
           <div className="offcanvas-header">
             <h5 className="offcanvas-title" id="configureContainerLabel">
-              <FontAwesomeIcon icon={faGear} /> {t("conf.title")}
+              <FontAwesomeIcon icon={faGear} /> {t('conf.title')}
             </h5>
             <button
               type="button"
@@ -177,11 +177,11 @@ class ConfigureForm extends React.Component {
 
               {/* General */}
               <h6 className="mt-4 mb-3">
-                <FontAwesomeIcon icon={faCaretRight} />{" "}
-                {t("conf.general.title")}
+                <FontAwesomeIcon icon={faCaretRight} />{' '}
+                {t('conf.general.title')}
               </h6>
               <InputGroup className="mb-2" size="sm">
-                <InputGroup.Text>{t("conf.general.pageTag")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.general.pageTag')}</InputGroup.Text>
                 <FormControl
                   name="pageTag"
                   value={this.state.pageTag}
@@ -194,13 +194,13 @@ class ConfigureForm extends React.Component {
                     className="page-tag-color"
                     name="pageTagColor"
                     value={this.state.pageTagColor}
-                    title={t("conf.general.pageTagColorTip")}
+                    title={t('conf.general.pageTagColorTip')}
                     onChange={this.handleChange}
                   />
                 </span>
               </InputGroup>
               <InputGroup className="mb-2" size="sm">
-                <InputGroup.Text>{t("conf.general.infuraID")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.general.infuraID')}</InputGroup.Text>
                 <FormControl
                   name="infuraID"
                   value={this.state.infuraID}
@@ -215,7 +215,7 @@ class ConfigureForm extends React.Component {
                 aria-expanded="false"
                 aria-controls="lookupCheckField"
               >
-                <InputGroup.Text>{t("conf.display.lookup")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.display.lookup')}</InputGroup.Text>
                 <span className="form-control text-end">
                   <FontAwesomeIcon icon={faChevronDown} />
                 </span>
@@ -236,7 +236,7 @@ class ConfigureForm extends React.Component {
                         onChange={this.handleDisplayLookupChange}
                       />
                       <label className="form-check-label">
-                        {t("tb.lookup." + item)}
+                        {t('tb.lookup.' + item, { label: '' })}
                       </label>
                     </div>
                   ))}
@@ -245,21 +245,21 @@ class ConfigureForm extends React.Component {
 
               {/* Register */}
               <h6 className="mt-4 mb-3">
-                <FontAwesomeIcon icon={faCaretRight} />{" "}
-                {t("conf.register.title")}
+                <FontAwesomeIcon icon={faCaretRight} />{' '}
+                {t('conf.register.title')}
               </h6>
               <InputGroup className="mb-2" size="sm">
-                <InputGroup.Text>{t("conf.register.duration")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.register.duration')}</InputGroup.Text>
                 <FormControl
                   name="regDuration"
                   value={this.state.regDuration}
                   onChange={this.handleChange}
                   aria-label="regDuration"
                 />
-                <InputGroup.Text>{t("c.years")}</InputGroup.Text>
+                <InputGroup.Text>{t('c.years')}</InputGroup.Text>
               </InputGroup>
               <InputGroup className="mb-2" size="sm">
-                <InputGroup.Text>{t("conf.register.receiver")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.register.receiver')}</InputGroup.Text>
                 <FormControl
                   name="regReceiver"
                   value={this.state.regReceiver}
@@ -269,7 +269,7 @@ class ConfigureForm extends React.Component {
               </InputGroup>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>
-                  {t("conf.register.registerWithConfig")}
+                  {t('conf.register.registerWithConfig')}
                 </InputGroup.Text>
                 <Form.Select
                   name="regRegisterWithConfig"
@@ -277,48 +277,48 @@ class ConfigureForm extends React.Component {
                   onChange={this.handleSelectBooleanChange}
                   aria-label="regRegisterWithConfig"
                 >
-                  <option value="true">{t("c.true")}</option>
-                  <option value="false">{t("c.false")}</option>
+                  <option value="true">{t('c.true')}</option>
+                  <option value="false">{t('c.false')}</option>
                 </Form.Select>
               </InputGroup>
 
               {/* Renew */}
               <h6 className="mt-4 mb-3">
-                <FontAwesomeIcon icon={faCaretRight} /> {t("conf.renew.title")}
+                <FontAwesomeIcon icon={faCaretRight} /> {t('conf.renew.title')}
               </h6>
               <InputGroup className="mb-2" size="sm">
-                <InputGroup.Text>{t("conf.renew.duration")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.renew.duration')}</InputGroup.Text>
                 <FormControl
                   name="renewDuration"
                   value={this.state.renewDuration}
                   onChange={this.handleChange}
                   aria-label="renewDuration"
                 />
-                <InputGroup.Text>{t("c.years")}</InputGroup.Text>
+                <InputGroup.Text>{t('c.years')}</InputGroup.Text>
               </InputGroup>
 
               {/* Premium */}
               <h6 className="mt-4 mb-3">
-                <FontAwesomeIcon icon={faCaretRight} />{" "}
-                {t("conf.premium.title")}
+                <FontAwesomeIcon icon={faCaretRight} />{' '}
+                {t('conf.premium.title')}
               </h6>
               <InputGroup className="mb-2" size="sm">
-                <InputGroup.Text>{t("conf.premium.priceUnit")}</InputGroup.Text>
+                <InputGroup.Text>{t('conf.premium.priceUnit')}</InputGroup.Text>
                 <Form.Select
                   name="premiumPriceUnit"
                   value={this.state.premiumPriceUnit}
                   onChange={this.handleChange}
                   aria-label="premiumPriceUnit"
                 >
-                  <option value="ETH">{"ETH"}</option>
-                  <option value="USD">{"USD"}</option>
+                  <option value="ETH">{'ETH'}</option>
+                  <option value="USD">{'USD'}</option>
                 </Form.Select>
               </InputGroup>
               <InputGroup className="mb-2" size="sm">
                 <InputGroup.Text>
-                  {t("conf.premium.priceRange")}
+                  {t('conf.premium.priceRange')}
                 </InputGroup.Text>
-                <InputGroup.Text>{"≤"}</InputGroup.Text>
+                <InputGroup.Text>{'≤'}</InputGroup.Text>
                 <FormControl
                   name="premiumPriceRange"
                   value={this.state.premiumPriceRange}
@@ -347,7 +347,7 @@ class ConfigureForm extends React.Component {
               {/* Custom Wallet Mode */}
               <h6 className="mt-4 mb-3">
                 <FontAwesomeIcon icon={faWallet} className="me-2" />
-                {t("conf.customMode.title")}
+                {t('conf.customMode.title')}
                 <Form.Check
                   type="switch"
                   className="ms-3 mt-0 custom-wallet-switch"
@@ -359,12 +359,12 @@ class ConfigureForm extends React.Component {
               </h6>
               <InputGroup
                 className={
-                  "mb-2 custom-wallet-" + Boolean(this.state.walletSwitch)
+                  'mb-2 custom-wallet-' + Boolean(this.state.walletSwitch)
                 }
                 size="sm"
               >
                 <InputGroup.Text>
-                  {t("conf.customMode.operatorPrivateKey")}
+                  {t('conf.customMode.operatorPrivateKey')}
                 </InputGroup.Text>
                 <Form.Control
                   type="password"
@@ -377,12 +377,12 @@ class ConfigureForm extends React.Component {
               </InputGroup>
               <InputGroup
                 className={
-                  "mb-2 custom-wallet-" + Boolean(this.state.walletSwitch)
+                  'mb-2 custom-wallet-' + Boolean(this.state.walletSwitch)
                 }
                 size="sm"
               >
                 <InputGroup.Text>
-                  {t("conf.customMode.network")}
+                  {t('conf.customMode.network')}
                 </InputGroup.Text>
                 <Form.Select
                   name="walletNetwork"
@@ -391,18 +391,18 @@ class ConfigureForm extends React.Component {
                   disabled={!this.state.walletSwitch}
                   aria-label="walletNetwork"
                 >
-                  <option value="mainnet">{t("c.mainnet")}</option>
-                  <option value="goerli">{t("c.goerli")}</option>
+                  <option value="mainnet">{t('c.mainnet')}</option>
+                  <option value="goerli">{t('c.goerli')}</option>
                 </Form.Select>
               </InputGroup>
               <InputGroup
                 className={
-                  "mb-6 custom-wallet-" + Boolean(this.state.walletSwitch)
+                  'mb-6 custom-wallet-' + Boolean(this.state.walletSwitch)
                 }
                 size="sm"
               >
                 <InputGroup.Text>
-                  {t("conf.customMode.gasPrice")}
+                  {t('conf.customMode.gasPrice')}
                 </InputGroup.Text>
                 <FormControl
                   name="walletGasPrice"
@@ -411,7 +411,7 @@ class ConfigureForm extends React.Component {
                   disabled={!this.state.walletSwitch}
                   aria-label="walletGasPrice"
                 />
-                <InputGroup.Text>{t("c.gwei")}</InputGroup.Text>
+                <InputGroup.Text>{t('c.gwei')}</InputGroup.Text>
               </InputGroup>
 
               <div className="fixed-bottom conf-btn-box">
@@ -421,7 +421,7 @@ class ConfigureForm extends React.Component {
                   data-bs-dismiss="offcanvas"
                   onClick={this.resetConf}
                 >
-                  {t("c.reset")}
+                  {t('c.reset')}
                 </button>
                 <button
                   type="button"
@@ -429,7 +429,7 @@ class ConfigureForm extends React.Component {
                   data-bs-dismiss="offcanvas"
                   onClick={this.submitForm}
                 >
-                  {t("c.save")} <FontAwesomeIcon icon={faCircleCheck} />
+                  {t('c.save')} <FontAwesomeIcon icon={faCircleCheck} />
                 </button>
               </div>
             </form>

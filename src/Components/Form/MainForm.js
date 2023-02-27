@@ -1,18 +1,18 @@
-import React from "react";
-import { utils } from "ethers";
-import { toast } from "react-toastify";
-import namehash from "@ensdomains/eth-ens-namehash";
-import { t } from "i18next";
-import { getNamesOfOwner, isForAccount } from "../Global/globals";
+import React from 'react';
+import { utils } from 'ethers';
+import { toast } from 'react-toastify';
+import namehash from '@ensdomains/eth-ens-namehash';
+import { t } from 'i18next';
+import { getNamesOfOwner, isForAccount } from '../Global/globals';
 
 class MainForm extends React.Component {
   state = {
-    labels: "",
+    labels: '',
     adding: false,
   };
 
   handleLabels = (labels) => {
-    labels = labels.replace(/[,.'"?!@#$%^&*()+=/\\\\]/g, " ").trim();
+    labels = labels.replace(/[,.'"?!@#$%^&*()+=/\\\\]/g, ' ').trim();
 
     if (labels.length) {
       const labelsSet = new Set(labels.split(/\s+/));
@@ -59,7 +59,7 @@ class MainForm extends React.Component {
         label: label,
         length: label.length,
         level: 0,
-        status: "Unknown",
+        status: 'Unknown',
         tokenId: utils.id(label),
       })
     );
@@ -68,7 +68,7 @@ class MainForm extends React.Component {
     // update the status of newly added names
     await updateNames(diffLabelsArr);
 
-    toast.info(t("msg.setAndStoreNameInfo"));
+    toast.info(t('msg.setAndStoreNameInfo'));
   };
 
   handleChange = (event) => {
@@ -77,7 +77,7 @@ class MainForm extends React.Component {
   };
 
   handleKeyDown = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       this.submitForm();
       event.preventDefault();
       return false;
@@ -88,9 +88,9 @@ class MainForm extends React.Component {
     this.setState({ adding: true });
     const labels = this.state.labels.trim();
     await this.addNames(labels);
-    this.setState({ labels: "" });
+    this.setState({ labels: '' });
     this.setState({ adding: false });
-    document.getElementById("labels").focus();
+    document.getElementById('labels').focus();
   };
 
   // Click the text box 3 times to display all current name labels.
@@ -99,7 +99,7 @@ class MainForm extends React.Component {
     this.inputClickCount += 1;
     setTimeout(() => {
       if (this.inputClickCount === 3) {
-        const labels = this.props.nameInfo.map((item) => item.label).join(" ");
+        const labels = this.props.nameInfo.map((item) => item.label).join(' ');
         this.setState({ labels: labels });
       }
       this.inputClickCount = 0;
@@ -122,7 +122,7 @@ class MainForm extends React.Component {
             name="labels"
             id="labels"
             autoFocus
-            placeholder={t("form.holder")}
+            placeholder={t('form.holder')}
             value={labels}
             onChange={this.handleChange}
             onKeyDown={this.handleKeyDown}
@@ -133,7 +133,7 @@ class MainForm extends React.Component {
             className="btn btn-primary"
             onClick={this.submitForm}
           >
-            {t("form.btn")}
+            {t('form.btn')}
           </button>
         </div>
       </form>

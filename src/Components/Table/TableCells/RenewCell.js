@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { t } from "i18next";
-import { isRenewable } from "../../Global/globals";
-import RenewalModal from "../../Utils/RenewalModal";
+import React, { useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { t } from 'i18next';
+import { isRenewable } from '../../Global/globals';
+import RenewalModal from '../../Utils/RenewalModal';
 
 export const RenewCell = (props) => {
   const {
@@ -29,35 +29,35 @@ export const RenewCell = (props) => {
   if (isRenewable(status)) {
     return (
       <div
-        id={"renewName-" + label}
+        id={'renewName-' + label}
         className="btn-group"
         role="group"
         aria-label="RenewName"
       >
         <OverlayTrigger
           placement="top"
-          overlay={<Tooltip>{t("tb.td.tips.addNameToRenewList")}</Tooltip>}
+          overlay={<Tooltip>{t('tb.td.tips.addNameToRenewList')}</Tooltip>}
         >
           <input
-            id={"renewName-checkbox-" + label}
+            id={'renewName-checkbox-' + label}
             className="form-check-input renew-checkbox"
             type="checkbox"
             name={label}
-            disabled={type === "readonly" || reconnecting}
+            disabled={type === 'readonly' || reconnecting}
             onChange={handleRenewCheckboxChange}
           />
         </OverlayTrigger>
         <OverlayTrigger
           placement="top"
-          overlay={<Tooltip>{t("tb.td.tips.renew", { label: label })}</Tooltip>}
+          overlay={<Tooltip>{t('tb.td.tips.renew', { label: label })}</Tooltip>}
         >
           <button
             type="button"
             className="btn-plain ms-2"
-            disabled={type === "readonly" || reconnecting}
+            disabled={type === 'readonly' || reconnecting}
             onClick={() => setModalShow(true)}
           >
-            {t("tb.td.renew")}
+            {t('tb.td.renew')}
           </button>
         </OverlayTrigger>
         <RenewalModal
@@ -82,7 +82,7 @@ export const RenewCell = (props) => {
         disabled
       />
       <button type="button" disabled className="btn-plain ms-2">
-        {t("tb.td.renew")}
+        {t('tb.td.renew')}
       </button>
     </>
   );

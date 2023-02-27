@@ -1,16 +1,16 @@
-import confFile from "../../conf.json";
-import confFixed from "../../confFixed.json";
-import { Contract, utils } from "ethers";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import moment from "moment";
-import { getAddress, isAddress } from "ethers/lib/utils";
+import confFile from '../../conf.json';
+import confFixed from '../../confFixed.json';
+import { Contract, utils } from 'ethers';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import moment from 'moment';
+import { getAddress, isAddress } from 'ethers/lib/utils';
 
 export function getConf() {
-  if (confFile.host === "remote") {
-    let confStored = JSON.parse(window.localStorage.getItem("confInfo"));
+  if (confFile.host === 'remote') {
+    let confStored = JSON.parse(window.localStorage.getItem('confInfo'));
     if (!confStored) {
       confStored = confFile;
-      window.localStorage.setItem("confInfo", JSON.stringify(confStored));
+      window.localStorage.setItem('confInfo', JSON.stringify(confStored));
     }
     return confStored;
   }
@@ -27,17 +27,17 @@ export function updateLookupList(conf) {
   const newList = Object.keys(confFile.custom.display.lookup);
 
   // update lookupList in localStorage
-  window.localStorage.setItem("lookupList", JSON.stringify(newList));
+  window.localStorage.setItem('lookupList', JSON.stringify(newList));
 
   if (oldList.sort().toString() !== newList.sort().toString()) {
     conf.custom.display.lookup = confFile.custom.display.lookup;
-    window.localStorage.setItem("confInfo", JSON.stringify(conf));
+    window.localStorage.setItem('confInfo', JSON.stringify(conf));
   }
 
   // check if there is conf.custom.premium.priceUnit which was added in 2023.01
   if (!conf.custom.premium.priceUnit) {
-    conf.custom.premium.priceUnit = "ETH";
-    window.localStorage.setItem("confInfo", JSON.stringify(conf));
+    conf.custom.premium.priceUnit = 'ETH';
+    window.localStorage.setItem('confInfo', JSON.stringify(conf));
   }
 
   return conf;
@@ -51,23 +51,23 @@ export function getContract(providerOrSigner, contract, network, conf) {
 }
 
 export function getETHRegCtrlCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, "ETHRegCtrl", network, conf);
+  return getContract(providerOrSigner, 'ETHRegCtrl', network, conf);
 }
 
 export function getBaseRegImpCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, "BaseRegImp", network, conf);
+  return getContract(providerOrSigner, 'BaseRegImp', network, conf);
 }
 
 export function getBulkRenewCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, "BulkRenew", network, conf);
+  return getContract(providerOrSigner, 'BulkRenew', network, conf);
 }
 
 export function getBulkRegCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, "BulkReg", network, conf);
+  return getContract(providerOrSigner, 'BulkReg', network, conf);
 }
 
 export function getETHPriceFeedCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, "ETHPriceFeed", network, conf);
+  return getContract(providerOrSigner, 'ETHPriceFeed', network, conf);
 }
 
 export function isCustomWallet(conf) {
@@ -76,63 +76,63 @@ export function isCustomWallet(conf) {
 }
 
 export function isSupportedChain(key) {
-  if (typeof key === "string") {
+  if (typeof key === 'string') {
     return (
-      ["homestead", "mainnet", "goerli"].findIndex((item) => item === key) > -1
+      ['homestead', 'mainnet', 'goerli'].findIndex((item) => item === key) > -1
     );
   }
-  if (typeof key === "number") {
+  if (typeof key === 'number') {
     // ChainId: 1 for Mainnet, 3 for Ropsten, 5 for Goerli
     return [1, 5].findIndex((item) => item === key) > -1;
   }
 }
 
 export function isMainnet(key) {
-  if (typeof key === "string") {
-    return key === "mainnet" || key === "homestead";
+  if (typeof key === 'string') {
+    return key === 'mainnet' || key === 'homestead';
   }
-  if (typeof key === "number") {
+  if (typeof key === 'number') {
     return key === 1; // ChainId: 1 for Mainnet
   }
 }
 
 export function isRopsten(key) {
-  if (typeof key === "string") {
-    return key === "ropsten";
+  if (typeof key === 'string') {
+    return key === 'ropsten';
   }
-  if (typeof key === "number") {
+  if (typeof key === 'number') {
     return key === 3; // ChainId: 3 for Ropsten
   }
 }
 
 export function isGoerli(key) {
-  if (typeof key === "string") {
-    return key === "goerli";
+  if (typeof key === 'string') {
+    return key === 'goerli';
   }
-  if (typeof key === "number") {
+  if (typeof key === 'number') {
     return key === 5; // ChainId: 5 for Goerli
   }
 }
 
 export function isStatus(flag) {
-  const statuses = ["Open", "Normal", "Grace", "Premium", "Reopen", "Unknown"];
+  const statuses = ['Open', 'Normal', 'Grace', 'Premium', 'Reopen', 'Unknown'];
   return statuses.findIndex((item) => item === flag) > -1;
 }
 
 export function isOpen(status) {
-  return status === "Open";
+  return status === 'Open';
 }
 
 export function isNormal(status) {
-  return status === "Normal";
+  return status === 'Normal';
 }
 
 export function isRegistrable(status) {
-  return status === "Open" || status === "Reopen" || status === "Premium";
+  return status === 'Open' || status === 'Reopen' || status === 'Premium';
 }
 
 export function isRenewable(status) {
-  return status === "Normal" || status === "Grace";
+  return status === 'Normal' || status === 'Grace';
 }
 
 export function isMyName(nameOwner, connectedAccount) {
@@ -164,11 +164,11 @@ export function haveRenewableNames(nameInfo) {
 
 export function storeRegInfo(label, regInfo) {
   // regInfo: { owner, duration, secret, resolver, addr, commitment, commitTxHash,regTxHash }
-  window.localStorage.setItem("regInfo-" + label, JSON.stringify(regInfo));
+  window.localStorage.setItem('regInfo-' + label, JSON.stringify(regInfo));
 }
 
 export function getRegInfo(label) {
-  return JSON.parse(window.localStorage.getItem("regInfo-" + label));
+  return JSON.parse(window.localStorage.getItem('regInfo-' + label));
 }
 
 export async function updateRegStep(label, regStep, provider) {
@@ -210,8 +210,8 @@ export async function updateRegStep(label, regStep, provider) {
   }
 
   if (regStep > 0.5) {
-    regWindow.start = moment.unix(commitTxTime).add(60, "seconds");
-    regWindow.end = moment.unix(commitTxTime).add(7, "days");
+    regWindow.start = moment.unix(commitTxTime).add(60, 'seconds');
+    regWindow.end = moment.unix(commitTxTime).add(7, 'days');
     regStep = moment().isBefore(regWindow.end) ? regStep : 0;
   }
 
@@ -232,14 +232,14 @@ export async function updateRegStep(label, regStep, provider) {
 }
 
 export function removeRegInfo(label) {
-  window.localStorage.removeItem("regInfo-" + label);
+  window.localStorage.removeItem('regInfo-' + label);
 }
 
 export async function queryData(queryCode, network) {
   const subgraphUri =
-    network === "goerli"
-      ? "https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli"
-      : "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
+    network === 'goerli'
+      ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli'
+      : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
 
   const client = new ApolloClient({
     uri: subgraphUri,
@@ -256,19 +256,19 @@ export async function queryData(queryCode, network) {
 
 // entering @ in front of an ENS name or an address can be used to query its names
 export async function isForAccount(str, provider, network) {
-  const from = str.startsWith("@")
-    ? "fromOwner"
-    : str.startsWith("#")
-    ? "fromAddr"
+  const from = str.startsWith('@')
+    ? 'fromOwner'
+    : str.startsWith('#')
+    ? 'fromAddr'
     : false;
 
   if (from) {
-    str = str.replace("@", "").replace("#", "");
+    str = str.replace('@', '').replace('#', '');
   } else {
     return false;
   }
 
-  if (from === "fromOwner" && str.endsWith(".eth") && str.length > 6) {
+  if (from === 'fromOwner' && str.endsWith('.eth') && str.length > 6) {
     const label = str.slice(0, -4);
     const labelHash = utils.id(label);
     const queryCode = {
@@ -282,7 +282,7 @@ export async function isForAccount(str, provider, network) {
     str = registration?.registrant?.id;
   }
 
-  if (from === "fromAddr" && str.endsWith(".eth") && str.length > 6) {
+  if (from === 'fromAddr' && str.endsWith('.eth') && str.length > 6) {
     str = await provider.resolveName(str);
   }
 
@@ -333,7 +333,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     nameInfo[ni].length = labelsGroup[i].length; // keep this line until 2023.12 or v3.x.x
 
     if (ri < 0) {
-      nameInfo[ni].status = "Open";
+      nameInfo[ni].status = 'Open';
       nameInfo[ni].expiresTime = 0;
       nameInfo[ni].releaseTime = 0;
       nameInfo[ni].registrationTime = 0;
@@ -342,7 +342,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
       const expiresTime = moment.unix(registrations[ri].expiryDate);
       const releaseTime = moment
         .unix(registrations[ri].expiryDate)
-        .add(90, "days");
+        .add(90, 'days');
 
       nameInfo[ni].registrationTime = Number(
         registrations[ri].registrationDate
@@ -351,19 +351,19 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
       nameInfo[ni].releaseTime = releaseTime.unix();
 
       if (moment().isSameOrBefore(expiresTime)) {
-        nameInfo[ni].status = "Normal";
+        nameInfo[ni].status = 'Normal';
         nameInfo[ni].owner = registrations[ri].registrant.id;
       } else if (moment().isSameOrBefore(releaseTime)) {
-        nameInfo[ni].status = "Grace";
+        nameInfo[ni].status = 'Grace';
         nameInfo[ni].owner = registrations[ri].registrant.id;
-      } else if (moment().subtract(21, "days").isSameOrBefore(releaseTime)) {
-        nameInfo[ni].status = "Premium";
+      } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) {
+        nameInfo[ni].status = 'Premium';
         nameInfo[ni].owner = undefined;
-      } else if (moment().subtract(21, "days").isAfter(releaseTime)) {
-        nameInfo[ni].status = "Reopen";
+      } else if (moment().subtract(21, 'days').isAfter(releaseTime)) {
+        nameInfo[ni].status = 'Reopen';
         nameInfo[ni].owner = undefined;
       } else {
-        nameInfo[ni].status = "Unknown";
+        nameInfo[ni].status = 'Unknown';
         nameInfo[ni].owner = undefined;
       }
     }

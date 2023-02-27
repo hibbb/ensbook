@@ -1,8 +1,8 @@
-import React from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
-import { t } from "i18next";
+import React from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { t } from 'i18next';
 
 export const LabelCell = (props) => {
   const { label, level, isMyName, index, nameInfo, setAndStoreNameInfo } =
@@ -31,7 +31,7 @@ export const LabelCell = (props) => {
     <>
       <OverlayTrigger
         placement="top"
-        overlay={<Tooltip>{t("tb.td.tips.lb")}</Tooltip>}
+        overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}
       >
         <span
           className={`td-level td-level-${level} is-my-name-${isMyName}`}

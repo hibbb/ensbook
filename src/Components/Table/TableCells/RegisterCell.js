@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { utils } from "ethers";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator } from "@fortawesome/free-solid-svg-icons";
-import { t } from "i18next";
-import { isRegistrable } from "../../Global/globals";
-import TooltipEstimateCost from "../TooltipEstimateCost";
-import RegistrationModal from "../../Utils/RegistrationModal";
+import React, { useState } from 'react';
+import { utils } from 'ethers';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalculator } from '@fortawesome/free-solid-svg-icons';
+import { t } from 'i18next';
+import { isRegistrable } from '../../Global/globals';
+import TooltipEstimateCost from '../TooltipEstimateCost';
+import RegistrationModal from '../../Utils/RegistrationModal';
 
 export const RegisterCell = (props) => {
   const {
@@ -27,16 +27,16 @@ export const RegisterCell = (props) => {
   } = props;
 
   const initialEstimating = {
-    title: "tb.td.tips.est",
-    status: "before",
-    cost: "",
+    title: 'tb.td.tips.est',
+    status: 'before',
+    cost: '',
   };
   const [estimating, setEstimating] = useState(initialEstimating);
 
   const estimateThis = async () => {
-    setEstimating({ ...initialEstimating, status: "in" });
+    setEstimating({ ...initialEstimating, status: 'in' });
     const costEther = utils.formatEther(await estimateCost(label));
-    setEstimating({ ...initialEstimating, status: "after", cost: costEther });
+    setEstimating({ ...initialEstimating, status: 'after', cost: costEther });
   };
 
   const [modalShow, setModalShow] = useState(false);
@@ -49,17 +49,17 @@ export const RegisterCell = (props) => {
   if (isRegistrable(status)) {
     return (
       <div
-        id={"registerName-" + label}
+        id={'registerName-' + label}
         className="btn-group"
         role="group"
         aria-label="RegisterName or Estimate Price"
       >
         <OverlayTrigger
           placement="top"
-          overlay={<Tooltip>{t("tb.td.tips.addNameToRegList")}</Tooltip>}
+          overlay={<Tooltip>{t('tb.td.tips.addNameToRegList')}</Tooltip>}
         >
           <input
-            id={"registerName-checkbox-" + label}
+            id={'registerName-checkbox-' + label}
             className="form-check-input reg-checkbox"
             type="checkbox"
             name={label}
@@ -72,25 +72,25 @@ export const RegisterCell = (props) => {
           overlay={
             <Tooltip>
               {regStep > 0
-                ? t("tb.td.tips.continue")
-                : t("tb.td.tips.reg", { label: label })}
+                ? t('tb.td.tips.continue')
+                : t('tb.td.tips.reg', { label: label })}
             </Tooltip>
           }
         >
           <button
             type="button"
-            disabled={type === "readonly" || reconnecting}
+            disabled={type === 'readonly' || reconnecting}
             className="btn-plain btn-reg ms-2"
             onClick={() => setModalShow(true)}
           >
-            {regStep > 0 ? t("tb.td.continue") : t("tb.td.reg")}
+            {regStep > 0 ? t('tb.td.continue') : t('tb.td.reg')}
           </button>
         </OverlayTrigger>
         {regStep > 0 ? (
           <OverlayTrigger
             placement="top"
             overlay={
-              <Tooltip>{t("tb.td.tips.regStep", { regStep: regStep })}</Tooltip>
+              <Tooltip>{t('tb.td.tips.regStep', { regStep: regStep })}</Tooltip>
             }
           >
             <span className="ms-2 td-reg-step">{regStep}/3</span>
@@ -129,10 +129,10 @@ export const RegisterCell = (props) => {
     );
   }
 
-  if (status === "Unknown") {
+  if (status === 'Unknown') {
     return (
       <div
-        id={"trigger-unknown-" + label}
+        id={'trigger-unknown-' + label}
         className="btn-group"
         role="group"
         aria-label="Unknown"
@@ -143,7 +143,7 @@ export const RegisterCell = (props) => {
           disabled
         />
         <button type="button" className="btn-plain ms-2" disabled>
-          {t("nm.sta.Unknown")}
+          {t('nm.sta.Unknown')}
         </button>
       </div>
     );
@@ -151,7 +151,7 @@ export const RegisterCell = (props) => {
 
   return (
     <div
-      id={"trigger-reged-" + label}
+      id={'trigger-reged-' + label}
       className="btn-group"
       role="group"
       aria-label="RegisterName"
@@ -162,7 +162,7 @@ export const RegisterCell = (props) => {
         disabled
       />
       <button type="button" className="btn-plain ms-2" disabled>
-        {t("tb.td.reged")}
+        {t('tb.td.reged')}
       </button>
     </div>
   );

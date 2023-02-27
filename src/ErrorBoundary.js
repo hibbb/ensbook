@@ -1,16 +1,16 @@
-import React from "react";
-import confFile from "./conf.json";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from 'react';
+import confFile from './conf.json';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowUpRightFromSquare,
   faTriangleExclamation,
-} from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons';
 // import { utils } from 'ethers'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, errorMessage: "" };
+    this.state = { hasError: false, errorMessage: '' };
   }
 
   static getDerivedStateFromError(error) {
@@ -24,8 +24,8 @@ class ErrorBoundary extends React.Component {
   }
 
   logErrorToMyService = (error, errorInfo) => {
-    this.setState({ errorMessage: "Error Message: " + error.message });
-    console.log("ErrorInfo: ");
+    this.setState({ errorMessage: 'Error Message: ' + error.message });
+    console.log('ErrorInfo: ');
     console.log(errorInfo);
   };
 
@@ -43,7 +43,7 @@ class ErrorBoundary extends React.Component {
             <br />
             {this.state.errorMessage}
             <hr />
-            You can{" "}
+            You can{' '}
             <a
               href="https://github.com/hibbb/ensbook/issues"
               className="alert-link"
@@ -55,26 +55,26 @@ class ErrorBoundary extends React.Component {
                 icon={faArrowUpRightFromSquare}
                 className="external-link-icon"
               />
-            </a>{" "}
-            or{" "}
+            </a>{' '}
+            or{' '}
             <a href="/" className="alert-link">
               go back to ENSBook
             </a>
             .
             <hr />
-            If errors occur repeatedly, you can try{" "}
+            If errors occur repeatedly, you can try{' '}
             <a
               className="alert-link"
               href="/"
               onClick={() => {
                 window.localStorage.setItem(
-                  "confInfo",
+                  'confInfo',
                   JSON.stringify(confFile)
                 );
               }}
             >
               resetting
-            </a>{" "}
+            </a>{' '}
             the configuration.
           </div>
         </div>

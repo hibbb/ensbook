@@ -1,25 +1,25 @@
-import React from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { useTranslation } from "react-i18next";
-import moment from "moment";
-import { t } from "i18next";
+import React from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import moment from 'moment';
+import { t } from 'i18next';
 
 export default function LanguageSwitcher(props) {
-  const usingLang = window.localStorage.getItem("language") ?? "en";
+  const usingLang = window.localStorage.getItem('language') ?? 'en';
   const { i18n } = useTranslation();
-  moment.locale(usingLang === "cn" ? "zh-cn" : usingLang);
+  moment.locale(usingLang === 'cn' ? 'zh-cn' : usingLang);
 
   const selectLang = () => {
-    const value = document.getElementById("select-lang").value;
-    window.localStorage.setItem("language", value);
+    const value = document.getElementById('select-lang').value;
+    window.localStorage.setItem('language', value);
     i18n.changeLanguage(value);
-    moment.locale(value === "cn" ? "zh-cn" : value);
+    moment.locale(value === 'cn' ? 'zh-cn' : value);
   };
 
   return (
     <OverlayTrigger
       placement="bottom"
-      overlay={<Tooltip>{t("header.language")}</Tooltip>}
+      overlay={<Tooltip>{t('header.language')}</Tooltip>}
     >
       <span className="lang-span">
         <select

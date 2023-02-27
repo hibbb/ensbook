@@ -1,43 +1,11 @@
-import React from "react";
-import { Col, Row } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import React from 'react';
+import { Col, Row } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 export default function TestBar(props) {
-  const testFunc1 = async () => {
-    let a = displayNumber(88567)
-    console.log(a)
-  };
-  const displayNumber = (num) => { 
-    if (num < 10) {
-      num = num.toFixed(2)
-    }
-    else if (num < 100) {
-      num = num.toFixed(1)
-    }
-    else if (num < 1000) {
-      num = num.toFixed(0)
-    }
-    else if (num < 10000) {
-      num = (num/1000).toFixed(2) + 'K'
-    }
-    else if (num < 100000) {
-      num = (num / 1000).toFixed(1) + 'K'
-    }
-    else if (num < 1000000) {
-      num = (num / 1000).toFixed(0) + 'K'
-    }
-    else if (num < 10000000) {
-      num = (num / 1000000).toFixed(2) + 'M'
-    }
-    else if (num < 100000000) {
-      num = (num / 1000000).toFixed(1) + 'M'
-    }
-    else {
-      num = (num / 1000000).toFixed(0) + 'M'
-    }
-    return num;
-  }
+  const testFunc1 = async () => {};
+
   const testFunc2 = async () => {};
 
   return (

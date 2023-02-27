@@ -1,9 +1,9 @@
-import React from "react";
-import AppTitle from "./AppTitle";
-import LanguageSwitcher from "./LanguageSwitcher";
-import OperatorWallet from "./OperatorWallet";
-import ConfigureForm from "./ConfigureForm";
-import { getConfFixed } from "../Global/globals";
+import React from 'react';
+import AppTitle from './AppTitle';
+import LanguageSwitcher from './LanguageSwitcher';
+import OperatorWallet from './OperatorWallet';
+import ConfigureForm from './ConfigureForm';
+import { getConfFixed } from '../Global/globals';
 
 export default function Header(props) {
   const {

@@ -14,10 +14,10 @@
         "ENSVision": true,
         "RareID": true,
         "Metadata": true,
-        "Inventory": false, 
+        "Inventory": false,
         "LinkETH": false,
         "DNSRelated": false
-      } 
+      }
     },
     "register": {
       "receiver": "",
@@ -34,10 +34,10 @@
     "wallet": {
       "switch": false,
       "operatorPrivateKey": [
-        "382ea71f11aa27eef5d67fb75056f93b32db50fd9c3e08063f6ad63eba59f319"   
+        "382ea71f11aa27eef5d67fb75056f93b32db50fd9c3e08063f6ad63eba59f319"
       ],
       "network": "mainnet",
       "gasPrice": 0
     }
-  } 
+  }
 }

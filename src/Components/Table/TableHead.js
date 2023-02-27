@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { utils } from "ethers";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from 'react';
+import { utils } from 'ethers';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCircleXmark,
   faSquareCaretDown,
-} from "@fortawesome/free-regular-svg-icons";
+} from '@fortawesome/free-regular-svg-icons';
 import {
   faCalculator,
   faDownLeftAndUpRightToCenter,
@@ -19,16 +19,16 @@ import {
   faListCheck,
   faClock,
   faClockRotateLeft,
-} from "@fortawesome/free-solid-svg-icons";
-import { t } from "i18next";
-import RegistrationsModal from "../Utils/RegistrationsModal";
-import TooltipEstimateCost from "./TooltipEstimateCost";
+} from '@fortawesome/free-solid-svg-icons';
+import { t } from 'i18next';
+import RegistrationsModal from '../Utils/RegistrationsModal';
+import TooltipEstimateCost from './TooltipEstimateCost';
 import {
   haveRegistrableNames,
   haveUnregistrableNames,
   isCustomWallet,
-} from "../Global/globals";
-import RenewalsModal from "../Utils/RenewalsModal";
+} from '../Global/globals';
+import RenewalsModal from '../Utils/RenewalsModal';
 
 export const TableHead = (props) => {
   const {
@@ -74,8 +74,8 @@ export const TableHead = (props) => {
   const [ascFlags, setAscFlags] = useState(initialAscFlags);
 
   const jsonSort = (array, key) => {
-    if (array.length < 2 || !key || typeof array[0] !== "object") return array;
-    if (typeof array[0][key] === "number") {
+    if (array.length < 2 || !key || typeof array[0] !== 'object') return array;
+    if (typeof array[0][key] === 'number') {
       ascFlags[key]
         ? array.sort(function (x, y) {
             return x[key] - y[key];
@@ -84,7 +84,7 @@ export const TableHead = (props) => {
             return y[key] - x[key];
           });
     }
-    if (typeof array[0][key] === "string") {
+    if (typeof array[0][key] === 'string') {
       ascFlags[key]
         ? array.sort(function (x, y) {
             return x[key].localeCompare(y[key]);
@@ -100,16 +100,16 @@ export const TableHead = (props) => {
   };
 
   const initialEstimating = {
-    title: "tb.th.tips.estAll",
-    status: "before",
-    cost: "",
+    title: 'tb.th.tips.estAll',
+    status: 'before',
+    cost: '',
   };
   const [estimating, setEstimating] = useState(initialEstimating);
 
   const estimateThese = async () => {
-    setEstimating({ ...initialEstimating, status: "in" });
+    setEstimating({ ...initialEstimating, status: 'in' });
     const costEther = utils.formatEther(await estimateCosts(regList));
-    setEstimating({ ...initialEstimating, status: "after", cost: costEther });
+    setEstimating({ ...initialEstimating, status: 'after', cost: costEther });
   };
 
   const statusesArr = Array.from(new Set(nameInfo.map((item) => item.status)));
@@ -118,10 +118,10 @@ export const TableHead = (props) => {
     return (
       <span
         key={index}
-        className={"remove-tag status-" + status}
+        className={'remove-tag status-' + status}
         onClick={() => removeNames(status)}
       >
-        {t("nm.sta." + status)}{" "}
+        {t('nm.sta.' + status)}{' '}
         <FontAwesomeIcon icon={faCircleXmark} className="light-gray" />
       </span>
     );
@@ -130,7 +130,7 @@ export const TableHead = (props) => {
   const nonBulkRegable = () =>
     reconnecting || !isCustomWallet(conf) || !isBulkReg();
   const nonBulkRenewable = () =>
-    reconnecting || type === "readonly" || !isBulkRenew();
+    reconnecting || type === 'readonly' || !isBulkRenew();
   const nonFoldable = () =>
     !haveRegistrableNames(nameInfo) || !haveUnregistrableNames(nameInfo);
   const nonUpdatable = () => nameInfo.length < 1;
@@ -147,7 +147,7 @@ export const TableHead = (props) => {
         <th>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.update")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.update')}</Tooltip>}
           >
             <button
               type="button"
@@ -160,18 +160,18 @@ export const TableHead = (props) => {
           </OverlayTrigger>
         </th>
         <th>
-          <span id="th-label">{t("tb.th.lb")}</span>
+          <span id="th-label">{t('tb.th.lb')}</span>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.lb.label")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.lb.label')}</Tooltip>}
           >
             <button
               type="button"
               className="btn-plain ms-2 th-sortable"
               disabled={nonSortable()}
-              onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, "label"))}
+              onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, 'label'))}
             >
-              {ascFlags["label"] ? (
+              {ascFlags['label'] ? (
                 <FontAwesomeIcon icon={faArrowDownAZ} />
               ) : (
                 <FontAwesomeIcon icon={faArrowDownZA} />
@@ -180,15 +180,15 @@ export const TableHead = (props) => {
           </OverlayTrigger>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.lb.length")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.lb.length')}</Tooltip>}
           >
             <button
               type="button"
               className="btn-plain ms-2 th-sortable"
               disabled={nonSortableByLength()}
-              onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, "length"))}
+              onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, 'length'))}
             >
-              {ascFlags["length"] ? (
+              {ascFlags['length'] ? (
                 <FontAwesomeIcon icon={faArrowDownWideShort} />
               ) : (
                 <FontAwesomeIcon icon={faArrowDownShortWide} />
@@ -197,15 +197,15 @@ export const TableHead = (props) => {
           </OverlayTrigger>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.lb.level")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.lb.level')}</Tooltip>}
           >
             <button
               type="button"
               className="btn-plain ms-2 th-sortable"
               disabled={nonSortableByLevel()}
-              onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, "level"))}
+              onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, 'level'))}
             >
-              {ascFlags["level"] ? (
+              {ascFlags['level'] ? (
                 <FontAwesomeIcon icon={faList} />
               ) : (
                 <FontAwesomeIcon icon={faListCheck} />
@@ -214,20 +214,20 @@ export const TableHead = (props) => {
           </OverlayTrigger>
         </th>
         <th>
-          <span id="th-expiresTime">{t("tb.th.sta")}</span>
+          <span id="th-expiresTime">{t('tb.th.sta')}</span>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.sta")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.sta')}</Tooltip>}
           >
             <button
               type="button"
               className="btn-plain ms-2 th-sortable"
               disabled={nonSortable()}
               onClick={() =>
-                setAndStoreNameInfo(jsonSort(nameInfo, "expiresTime"))
+                setAndStoreNameInfo(jsonSort(nameInfo, 'expiresTime'))
               }
             >
-              {ascFlags["expiresTime"] ? (
+              {ascFlags['expiresTime'] ? (
                 <FontAwesomeIcon icon={faClock} />
               ) : (
                 <FontAwesomeIcon icon={faClockRotateLeft} />
@@ -238,17 +238,17 @@ export const TableHead = (props) => {
         <th>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.regAll")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.regAll')}</Tooltip>}
           >
             <button
               type="button"
               disabled={nonBulkRegable()}
               className={
-                "btn-plain btn-bulk-reg " + (isBulkReg() ? "is-bulk-reg" : "")
+                'btn-plain btn-bulk-reg ' + (isBulkReg() ? 'is-bulk-reg' : '')
               }
               onClick={() => setRegNamesModalShow(true)}
             >
-              {t("tb.th.reg")}
+              {t('tb.th.reg')}
             </button>
           </OverlayTrigger>
           <RegistrationsModal
@@ -285,7 +285,7 @@ export const TableHead = (props) => {
             placement="top"
             overlay={
               <Tooltip>
-                {t("tb.th.tips.hideNames." + (hideNames ? "show" : "hide"))}
+                {t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}
               </Tooltip>
             }
           >
@@ -306,18 +306,18 @@ export const TableHead = (props) => {
         <th>
           <OverlayTrigger
             placement="top"
-            overlay={<Tooltip>{t("tb.th.tips.renew")}</Tooltip>}
+            overlay={<Tooltip>{t('tb.th.tips.renew')}</Tooltip>}
           >
             <button
               type="button"
               disabled={nonBulkRenewable()}
               className={
-                "btn-plain btn-bulk-renew " +
-                (isBulkRenew() ? "is-bulk-renew" : "")
+                'btn-plain btn-bulk-renew ' +
+                (isBulkRenew() ? 'is-bulk-renew' : '')
               }
               onClick={() => setRenewNamesModalShow(true)}
             >
-              {t("tb.th.renew")}
+              {t('tb.th.renew')}
             </button>
           </OverlayTrigger>
           <RenewalsModal
@@ -331,12 +331,12 @@ export const TableHead = (props) => {
             renewsMsges={renewsMsges}
           />
         </th>
-        <th>{t("tb.th.lu")}</th>
+        <th>{t('tb.th.lu')}</th>
         <th className="th-remove">
           <div className="dropdown">
             <OverlayTrigger
               placement="top"
-              overlay={<Tooltip>{t("tb.th.tips.remAll")}</Tooltip>}
+              overlay={<Tooltip>{t('tb.th.tips.remAll')}</Tooltip>}
             >
               <button
                 disabled={nonRemovable()}
@@ -357,9 +357,9 @@ export const TableHead = (props) => {
               <li className="mt-1">
                 <span
                   className="remove-tag remove-lower"
-                  onClick={() => removeNames("Lower")}
+                  onClick={() => removeNames('Lower')}
                 >
-                  {t("tb.th.lower")}{" "}
+                  {t('tb.th.lower')}{' '}
                   <FontAwesomeIcon
                     icon={faCircleXmark}
                     className="light-gray"
@@ -367,9 +367,9 @@ export const TableHead = (props) => {
                 </span>
                 <span
                   className="remove-tag remove-all"
-                  onClick={() => removeNames("All")}
+                  onClick={() => removeNames('All')}
                 >
-                  {t("tb.th.all")}{" "}
+                  {t('tb.th.all')}{' '}
                   <FontAwesomeIcon
                     icon={faCircleXmark}
                     className="light-gray"

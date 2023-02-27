@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Modal,
   Button,
@@ -7,17 +7,17 @@ import {
   Col,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+} from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronRight,
   faCircleCheck,
   faCircleXmark,
   faCalendarDays,
   faCircleMinus,
-} from "@fortawesome/free-solid-svg-icons";
-import moment from "moment";
-import { t } from "i18next";
+} from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
+import { t } from 'i18next';
 
 const RegistrationsModal = (props) => {
   const {
@@ -53,10 +53,10 @@ const RegistrationsModal = (props) => {
       clearRegList();
     }
 
-    if (regsAction === "regsStarted") {
+    if (regsAction === 'regsStarted') {
       return (
         <Button variant="secondary" disabled>
-          {t("nm.sta.Registering")}
+          {t('nm.sta.Registering')}
           <Spinner
             animation="border"
             variant="light"
@@ -66,10 +66,10 @@ const RegistrationsModal = (props) => {
       );
     }
 
-    if (regsAction === "regsEnded") {
+    if (regsAction === 'regsEnded') {
       return (
         <Button variant="primary" onClick={() => regsEnd()}>
-          {t("c.end")}
+          {t('c.end')}
         </Button>
       );
     }
@@ -77,26 +77,26 @@ const RegistrationsModal = (props) => {
     return (
       <>
         <Button variant="secondary" onClick={onHide}>
-          {t("c.cancel")}
+          {t('c.cancel')}
         </Button>
         <Button
           variant="primary"
           onClick={() => {
             registerNames(
               regList,
-              moment.duration(duration, "years").asSeconds(),
+              moment.duration(duration, 'years').asSeconds(),
               receiver
             );
           }}
         >
-          {t("c.confirm")}
+          {t('c.confirm')}
         </Button>
       </>
     );
   };
 
   const RegActionMsgIcon = () => {
-    if (regAction === "regSucceeded") {
+    if (regAction === 'regSucceeded') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -105,7 +105,7 @@ const RegistrationsModal = (props) => {
           />
         </span>
       );
-    } else if (regAction === "regFailed") {
+    } else if (regAction === 'regFailed') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -114,7 +114,7 @@ const RegistrationsModal = (props) => {
           />
         </span>
       );
-    } else if (regAction === "regSuspended") {
+    } else if (regAction === 'regSuspended') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -129,13 +129,13 @@ const RegistrationsModal = (props) => {
   };
 
   const RegActionMsg = () => {
-    if (regAction === "regBefore" || regAction === "regStarted") {
+    if (regAction === 'regBefore' || regAction === 'regStarted') {
       return null;
     }
     return (
-      <p className={"modal-message message-action"}>
+      <p className={'modal-message message-action'}>
         <span className="modal-message-time" title={regMsges[0].time.fromNow()}>
-          {regMsges[0].time.format("HH:mm:ss")}
+          {regMsges[0].time.format('HH:mm:ss')}
         </span>
         <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
         <RegActionMsgIcon />
@@ -146,9 +146,9 @@ const RegistrationsModal = (props) => {
   const RegInfoMsges = () => {
     return regMsges.slice(1).map((message, index) => {
       return (
-        <p key={index} className={"modal-message message-" + message.type}>
+        <p key={index} className={'modal-message message-' + message.type}>
           <span className="modal-message-time" title={message.time.fromNow()}>
-            {message.time.format("HH:mm:ss")}
+            {message.time.format('HH:mm:ss')}
           </span>
           <FontAwesomeIcon
             icon={faChevronRight}
@@ -166,21 +166,21 @@ const RegistrationsModal = (props) => {
   const RegsInfoMsges = () => {
     return regsMsges.slice(1).map((message, index) => {
       return (
-        <p key={index} className={"modal-message message-" + message.type}>
+        <p key={index} className={'modal-message message-' + message.type}>
           <span className="modal-message-time" title={message.time.fromNow()}>
-            {message.time.format("HH:mm:ss")}
+            {message.time.format('HH:mm:ss')}
           </span>
           <FontAwesomeIcon
             icon={faChevronRight}
             className="modal-message-icon"
           />
-          {message.type === "succeeded" ? (
+          {message.type === 'succeeded' ? (
             <FontAwesomeIcon
               icon={faCircleCheck}
               className="me-2 modal-message-icon action-succeeded"
             />
           ) : null}
-          {message.type === "failed" ? (
+          {message.type === 'failed' ? (
             <FontAwesomeIcon
               icon={faCircleXmark}
               className="me-2 modal-message-icon action-failed"
@@ -195,18 +195,18 @@ const RegistrationsModal = (props) => {
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
       <Modal.Header>
-        <Modal.Title>{t("modal.regs.title")}</Modal.Title>
+        <Modal.Title>{t('modal.regs.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="modal-tip">{t("modal.regs.tip")}</p>
+        <p className="modal-tip">{t('modal.regs.tip')}</p>
         <div className="mb-3 duration-input">
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
-                <InputGroup.Text>{t("c.name")}: </InputGroup.Text>
+                <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
                 <FormControl
                   className="modal-name-label"
-                  value={t("modal.regs.names")}
+                  value={t('modal.regs.names')}
                   disabled
                 />
               </InputGroup>
@@ -215,23 +215,23 @@ const RegistrationsModal = (props) => {
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
-                <InputGroup.Text>{t("c.duration")}: </InputGroup.Text>
+                <InputGroup.Text>{t('c.duration')}: </InputGroup.Text>
                 <FormControl
                   value={duration}
                   onChange={handleChange}
                   disabled={
-                    !(regAction === "regBefore" || regAction === "regSuspended")
+                    !(regAction === 'regBefore' || regAction === 'regSuspended')
                   }
                 />
-                <InputGroup.Text>{t("c.years")}</InputGroup.Text>
+                <InputGroup.Text>{t('c.years')}</InputGroup.Text>
                 <InputGroup.Text className="ms-2 until-time">
                   <FontAwesomeIcon icon={faCalendarDays} className="me-2" />
                   {moment()
                     .add(
-                      moment.duration(duration, "years").asSeconds(),
-                      "seconds"
+                      moment.duration(duration, 'years').asSeconds(),
+                      'seconds'
                     )
-                    .format("L")}
+                    .format('L')}
                 </InputGroup.Text>
               </InputGroup>
             </Col>
@@ -239,7 +239,7 @@ const RegistrationsModal = (props) => {
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
-                <InputGroup.Text>{t("modal.reg.receiver")}: </InputGroup.Text>
+                <InputGroup.Text>{t('modal.reg.receiver')}: </InputGroup.Text>
                 <FormControl value={receiver} disabled />
               </InputGroup>
             </Col>

@@ -1,15 +1,15 @@
-import React from "react";
-import { Toast } from "bootstrap/dist/js/bootstrap.bundle.min";
+import React from 'react';
+import { Toast } from 'bootstrap/dist/js/bootstrap.bundle.min';
 
 class MessageToasts extends React.Component {
   componentDidMount() {
     this.props.onRef(this); // call parent component
   }
 
-  messageShow(id, message, autohide = "true", delay = "5000") {
+  messageShow(id, message, autohide = 'true', delay = '5000') {
     const toastElement = document.getElementById(id);
-    toastElement.setAttribute("data-bs-autohide", autohide);
-    toastElement.setAttribute("data-bs-delay", delay);
+    toastElement.setAttribute('data-bs-autohide', autohide);
+    toastElement.setAttribute('data-bs-delay', delay);
     toastElement.firstElementChild.firstElementChild.innerHTML = message;
     const messageToast = new Toast(toastElement);
     messageToast.show();
@@ -24,7 +24,7 @@ class MessageToasts extends React.Component {
       // 'register11',
       // 'register20',
       // 'register31',
-      "setAndStoreNameInfo",
+      'setAndStoreNameInfo',
     ];
 
     return (

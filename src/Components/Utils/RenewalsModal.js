@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Modal,
   Button,
@@ -7,16 +7,16 @@ import {
   Col,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+} from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronRight,
   faCircleCheck,
   faCircleXmark,
   faCircleMinus,
-} from "@fortawesome/free-solid-svg-icons";
-import moment from "moment";
-import { t } from "i18next";
+} from '@fortawesome/free-solid-svg-icons';
+import moment from 'moment';
+import { t } from 'i18next';
 
 const RenewalsModal = (props) => {
   const {
@@ -48,10 +48,10 @@ const RenewalsModal = (props) => {
       clearRenewList();
     }
 
-    if (renewsAction === "renewsStarted") {
+    if (renewsAction === 'renewsStarted') {
       return (
         <Button variant="secondary" disabled>
-          {t("nm.sta.Renewing")}
+          {t('nm.sta.Renewing')}
           <Spinner
             animation="border"
             variant="light"
@@ -62,13 +62,13 @@ const RenewalsModal = (props) => {
     }
 
     if (
-      renewsAction === "renewsFailed" ||
-      renewsAction === "renewsSucceeded" ||
-      renewsAction === "renewsSuspended"
+      renewsAction === 'renewsFailed' ||
+      renewsAction === 'renewsSucceeded' ||
+      renewsAction === 'renewsSuspended'
     ) {
       return (
         <Button variant="primary" onClick={() => renewsEnd()}>
-          {t("c.end")}
+          {t('c.end')}
         </Button>
       );
     }
@@ -76,25 +76,25 @@ const RenewalsModal = (props) => {
     return (
       <>
         <Button variant="secondary" onClick={onHide}>
-          {t("c.cancel")}
+          {t('c.cancel')}
         </Button>
         <Button
           variant="primary"
           onClick={() => {
             renewNames(
               renewList,
-              moment.duration(duration, "years").asSeconds()
+              moment.duration(duration, 'years').asSeconds()
             );
           }}
         >
-          {t("c.confirm")}
+          {t('c.confirm')}
         </Button>
       </>
     );
   };
 
   const RenewsActionMsgIcon = () => {
-    if (renewsAction === "renewsSucceeded") {
+    if (renewsAction === 'renewsSucceeded') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -103,7 +103,7 @@ const RenewalsModal = (props) => {
           />
         </span>
       );
-    } else if (renewsAction === "renewsFailed") {
+    } else if (renewsAction === 'renewsFailed') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -112,7 +112,7 @@ const RenewalsModal = (props) => {
           />
         </span>
       );
-    } else if (renewsAction === "renewsSuspended") {
+    } else if (renewsAction === 'renewsSuspended') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -127,16 +127,16 @@ const RenewalsModal = (props) => {
   };
 
   const RenewsActionMsg = () => {
-    if (renewsAction === "renewsBefore" || renewsAction === "renewsStarted") {
+    if (renewsAction === 'renewsBefore' || renewsAction === 'renewsStarted') {
       return null;
     }
     return (
-      <p className={"modal-message message-action"}>
+      <p className={'modal-message message-action'}>
         <span
           className="modal-message-time"
           title={renewsMsges[0].time.fromNow()}
         >
-          {renewsMsges[0].time.format("HH:mm:ss")}
+          {renewsMsges[0].time.format('HH:mm:ss')}
         </span>
         <FontAwesomeIcon icon={faChevronRight} className="modal-message-icon" />
         <RenewsActionMsgIcon />
@@ -147,9 +147,9 @@ const RenewalsModal = (props) => {
   const RenewsInfoMsges = () => {
     return renewsMsges.slice(1).map((message, index) => {
       return (
-        <p key={index} className={"modal-message message-" + message.type}>
+        <p key={index} className={'modal-message message-' + message.type}>
           <span className="modal-message-time" title={message.time.fromNow()}>
-            {message.time.format("HH:mm:ss")}
+            {message.time.format('HH:mm:ss')}
           </span>
           <FontAwesomeIcon
             icon={faChevronRight}
@@ -167,18 +167,18 @@ const RenewalsModal = (props) => {
   return (
     <Modal show={show} onHide={onHide} backdrop="static" keyboard={false}>
       <Modal.Header>
-        <Modal.Title>{t("modal.renews.title")}</Modal.Title>
+        <Modal.Title>{t('modal.renews.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p className="modal-tip">{t("modal.renews.tip")}</p>
+        <p className="modal-tip">{t('modal.renews.tip')}</p>
         <div className="mb-3 duration-input">
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
-                <InputGroup.Text>{t("c.name")}: </InputGroup.Text>
+                <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
                 <FormControl
                   className="modal-name-label"
-                  value={t("modal.renews.names")}
+                  value={t('modal.renews.names')}
                   disabled
                 />
               </InputGroup>
@@ -187,18 +187,18 @@ const RenewalsModal = (props) => {
           <Row>
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
-                <InputGroup.Text>{t("c.duration")}: </InputGroup.Text>
+                <InputGroup.Text>{t('c.duration')}: </InputGroup.Text>
                 <FormControl
                   value={duration}
                   onChange={handleChange}
                   disabled={
                     !(
-                      renewsAction === "renewsBefore" ||
-                      renewsAction === "renewsSuspended"
+                      renewsAction === 'renewsBefore' ||
+                      renewsAction === 'renewsSuspended'
                     )
                   }
                 />
-                <InputGroup.Text>{t("c.years")}</InputGroup.Text>
+                <InputGroup.Text>{t('c.years')}</InputGroup.Text>
               </InputGroup>
             </Col>
           </Row>
