@@ -26,7 +26,6 @@ import Header from './Components/Header/Header';
 import MainForm from './Components/Form/MainForm';
 import MainTable from './Components/Table/MainTable';
 import Footer from './Components/Footer/Footer';
-import TestBar from './Components/Utils/TestBar';
 import MessageToasts from './Components/Utils/MessageToasts';
 import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal';
 
