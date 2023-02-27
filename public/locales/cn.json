@@ -71,7 +71,8 @@
     "lookup": {
       "RelatedInfo": "信息概览",
       "Opensea": "Opensea",
-      "Gem": "Gem",
+      "ENSVision": "ENS.Vision",
+      "RareID": "Rare.ID",
       "Metadata": "元数据",
       "Inventory": "持有者的 ENS 资产库",
       "LinkETH": "{{label}}.eth.limo",
@@ -103,6 +104,7 @@
     },
     "premium": {
       "title": "溢价期",
+      "priceUnit": "价格单位",
       "priceRange": "关注的价格区间",
       "million": "百万",
       "thousand": "千"

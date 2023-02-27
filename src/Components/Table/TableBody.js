@@ -8,42 +8,41 @@ import { DelCell } from './TableCells/DelCell';
 import { RenewCell } from './TableCells/RenewCell';
 
 export const TableBody = (props) => {
-  const { 
+  const {
     type,
-    address, 
-    network, 
+    address,
+    network,
+    ethPrice,
     reconnecting,
-    nameInfo, 
-    setAndStoreNameInfo, 
-    conf, 
-    updateNames, 
-    registerName, 
-    registerNameEnd, 
+    nameInfo,
+    setAndStoreNameInfo,
+    conf,
+    updateNames,
+    registerName,
+    registerNameEnd,
     addNameToRegList,
     removeNameFromRegList,
     renewName,
     renewNameEnd,
     addNameToRenewList,
     removeNameFromRenewList,
-    hideNames, 
-    removeName, 
+    hideNames,
+    removeName,
     estimateCost,
-    regMsges, 
+    regMsges,
     renewMsges,
-    getDefaultNameReceiver
-  } = props
+    getDefaultNameReceiver,
+  } = props;
 
   const rows = props.nameInfo.map((row, index) => {
     if (hideNames && !isRegistrable(row.status)) {
-      return null
+      return null;
     }
 
     return (
-      <tr key={index} className='ebr-tb-row'>
-        <td className='td-index'>
-          {index + 1}
-        </td>
-        <td className='td-name-label'>
+      <tr key={index} className="ebr-tb-row">
+        <td className="td-index">{index + 1}</td>
+        <td className="td-name-label">
           <LabelCell
             label={row.label}
             index={index}
@@ -56,9 +55,10 @@ export const TableBody = (props) => {
         <td>
           <StatusCell
             type={type}
-            label={row.label} 
+            label={row.label}
             index={index}
-            status={row.status} 
+            status={row.status}
+            ethPrice={ethPrice}
             reconnecting={reconnecting}
             registrationTime={row.registrationTime}
             expiresTime={row.expiresTime}
@@ -68,20 +68,21 @@ export const TableBody = (props) => {
             renewName={renewName}
             renewNameEnd={renewNameEnd}
             renewMsges={renewMsges}
+            priceUnit={conf.custom.premium.priceUnit}
             priceRange={conf.custom.premium.priceRange}
           />
         </td>
         <td>
-          <RegisterCell 
+          <RegisterCell
             type={type}
-            label={row.label} 
+            label={row.label}
             index={index}
             defaultDuration={conf.custom.register.duration}
-            status={row.status} 
+            status={row.status}
             isCustomWallet={isCustomWallet(conf)}
             reconnecting={reconnecting}
             estimateCost={estimateCost}
-            registerName={registerName} 
+            registerName={registerName}
             regStep={row.regStep}
             registerNameEnd={registerNameEnd}
             addNameToRegList={addNameToRegList}
@@ -93,11 +94,11 @@ export const TableBody = (props) => {
         <td>
           <RenewCell
             type={type}
-            label={row.label} 
-            status={row.status} 
+            label={row.label}
+            status={row.status}
             expiresTime={row.expiresTime}
             defaultDuration={conf.custom.renew.duration}
-            renewName={renewName} 
+            renewName={renewName}
             renewNameEnd={renewNameEnd}
             renewMsges={renewMsges}
             reconnecting={reconnecting}
@@ -105,10 +106,10 @@ export const TableBody = (props) => {
             removeNameFromRenewList={removeNameFromRenewList}
           />
         </td>
-        <td className='td-lookup'>
+        <td className="td-lookup">
           <LookupCell
             label={row.label}
-            status={row.status} 
+            status={row.status}
             tokenId={row.tokenId}
             owner={row.owner}
             conf={conf}
@@ -116,17 +117,11 @@ export const TableBody = (props) => {
           />
         </td>
         <td>
-          <DelCell
-            label={row.label}
-            index={index}
-            removeName={removeName}
-          />
+          <DelCell label={row.label} index={index} removeName={removeName} />
         </td>
       </tr>
-    )
-  })
-  
-  return (
-    <tbody>{rows}</tbody>
-  )
-}
+    );
+  });
+
+  return <tbody>{rows}</tbody>;
+};
