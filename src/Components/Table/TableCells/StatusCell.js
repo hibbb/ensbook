@@ -30,26 +30,63 @@ export const StatusCell = (props) => {
 
   const premiumEndingClass = ""; //premiumEndingFlag ? ' premium-ending' : ''
 
+  const displayNumber = (num) => { 
+    if (num < 0.9995) {
+      num = (num / 1).toFixed(3)
+    }
+    else if (num < 9.995) {
+      num = (num / 1).toFixed(2)
+    }
+    else if (num < 99.95) {
+      num = (num / 1).toFixed(1)
+    }
+    else if (num < 999.5) {
+      num = (num / 1).toFixed(0)
+    }
+    else if (num < 9995) {
+      num = (num / 1000).toFixed(2) + 'K'
+    }
+    else if (num < 99950) {
+      num = (num / 1000).toFixed(1) + 'K'
+    }
+    else if (num < 999500) {
+      num = (num / 1000).toFixed(0) + 'K'
+    }
+    else if (num < 9995000) {
+      num = (num / 1000000).toFixed(2) + 'M'
+    }
+    else if (num < 99950000) {
+      num = (num / 1000000).toFixed(1) + 'M'
+    }
+    else {
+      num = (num / 1000000).toFixed(0) + 'M'
+    }
+    return num;
+  }
+
   const StatusText = () => {
     let text = t("nm.sta." + status);
 
     if (status === "Premium") {
-      let premiumPriceDisplay = getPremiumPrice(releaseTime);
-      let priceUnitIcon = <FontAwesomeIcon icon={faDollarSign} />;
-      const shortText = text.substring(0, 3)
+      let inUsd = getPremiumPrice(releaseTime);
+      let premiumPrice = '';
+      let priceUnitIcon;
 
       if (priceUnit === "ETH") {
-        premiumPriceDisplay = ((premiumPriceDisplay * 1e8) / ethPrice).toFixed(
-          2
-        );
+        let inEth = (inUsd * 1e8) / ethPrice;
+        premiumPrice = displayNumber(inEth)
         priceUnitIcon = <FontAwesomeIcon icon={faEthereum} />;
       }
+      else {
+        premiumPrice = displayNumber(inUsd)
+        priceUnitIcon = <FontAwesomeIcon icon={faDollarSign} />;
+      }
 
-      //setPremiumEndingFlag(premiumPriceDisplay < priceRange)
+      //setPremiumEndingFlag(premiumPrice < priceRange)
 
       return (
         <>
-          {shortText} {priceUnitIcon} {premiumPriceDisplay}
+          + {priceUnitIcon} {premiumPrice}
         </>
       );
     }
