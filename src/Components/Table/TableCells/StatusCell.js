@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment';
 import Clock from 'react-live-clock';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -20,15 +20,6 @@ export const StatusCell = (props) => {
     priceUnit,
     priceRange,
   } = props;
-
-  // const [premiumEndingFlag, setPremiumEndingFlag] = useState(false);
-
-  const graceEndingFlag =
-    status === 'Grace' &&
-    moment().add(7, 'days').isAfter(moment.unix(releaseTime));
-  const graceEndingClass = graceEndingFlag ? ' grace-ending' : '';
-
-  const premiumEndingClass = ''; // premiumEndingFlag ? ' premium-ending' : "";
 
   const displayNumber = (num) => {
     if (num < 0.9995) {
@@ -57,31 +48,54 @@ export const StatusCell = (props) => {
 
   const StatusText = () => {
     let text = t('nm.sta.' + status);
+    let statusClass = 'td-status status-' + status;
 
-    if (status === 'Premium') {
-      let inUsd = getPremiumPrice(releaseTime);
-      let premiumPrice = '';
-      let priceUnitIcon;
+    if (status === 'Normal') {
+      text = (
+        <>
+          {text}
+          <span className="name-age">
+            {moment.unix(expiresTime)?.diff(moment(), 'years')}
+          </span>
+        </>
+      );
+    } else if (status === 'Grace') {
+      if (moment().add(7, 'days').isAfter(moment.unix(releaseTime))) {
+        statusClass += ' grace-ending';
+      }
+    } else if (status === 'Premium') {
+      let premiumPrice = getPremiumPrice(releaseTime); // premiumPrice in USD
 
       if (priceUnit === 'ETH') {
-        let inEth = (inUsd * 1e8) / ethPrice;
-        premiumPrice = displayNumber(inEth);
-        priceUnitIcon = <FontAwesomeIcon icon={faEthereum} />;
-      } else {
-        premiumPrice = displayNumber(inUsd);
-        priceUnitIcon = <FontAwesomeIcon icon={faDollarSign} />;
+        premiumPrice = (premiumPrice * 1e8) / ethPrice; // premiumPrice in ETH
       }
 
-      //setPremiumEndingFlag(premiumPrice < priceRange)
+      if (premiumPrice < priceRange) {
+        statusClass += ' premium-ending';
+      }
 
-      return (
+      let priceUnitIcon =
+        priceUnit === 'ETH' ? (
+          <FontAwesomeIcon icon={faEthereum} />
+        ) : (
+          <FontAwesomeIcon icon={faDollarSign} />
+        );
+      
+      // premiumPrice would be NAN when converting price in USD to price in ETH
+      text = premiumPrice ? (
         <>
-          + {priceUnitIcon} {premiumPrice}
+          + {priceUnitIcon} {displayNumber(premiumPrice)}
         </>
+      ) : (
+        text
       );
     }
 
-    return <>{text}</>;
+    return (
+      <span className={statusClass} onClick={() => updateNames([label])}>
+        {text}
+      </span>
+    );
   };
 
   const jsonSortByNumber = (array, key) => {
@@ -97,17 +111,6 @@ export const StatusCell = (props) => {
       return x[key] - y[key];
     });
     return array;
-  };
-
-  const NameAge = () => {
-    if (status === 'Normal') {
-      return (
-        <span className="name-age">
-          {moment.unix(expiresTime)?.diff(moment(), 'years')}
-        </span>
-      );
-    }
-    return null;
   };
 
   let tooltipArray = [];
@@ -192,14 +195,8 @@ export const StatusCell = (props) => {
           </Tooltip>
         }
       >
-        <span
-          className={
-            'td-status status-' + status + graceEndingClass + premiumEndingClass
-          }
-          onClick={() => updateNames([label])}
-        >
+        <span>
           <StatusText />
-          <NameAge />
         </span>
       </OverlayTrigger>
     </>
