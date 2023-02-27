@@ -4,57 +4,65 @@ import { t } from 'i18next';
 import { isRenewable } from '../../Global/globals';
 import RenewalModal from '../../Utils/RenewalModal';
 
-
 export const RenewCell = (props) => {
-  const { 
-    label, 
-    status, 
+  const {
+    label,
+    status,
     expiresTime,
-    defaultDuration, 
+    defaultDuration,
     renewName,
     renewNameEnd,
     renewMsges,
-    reconnecting, 
+    reconnecting,
     addNameToRenewList,
     removeNameFromRenewList,
-    type 
-  } = props
+    type,
+  } = props;
 
-  const [modalShow, setModalShow] = useState(false)
+  const [modalShow, setModalShow] = useState(false);
 
   const handleRenewCheckboxChange = (event) => {
-    const { name, checked } = event.target
-    checked ? addNameToRenewList(name) : removeNameFromRenewList(name)
-  }
+    const { name, checked } = event.target;
+    checked ? addNameToRenewList(name) : removeNameFromRenewList(name);
+  };
 
   if (isRenewable(status)) {
     return (
-      <div id={"renewName-" + label} className="btn-group" role="group" aria-label="RenewName">
-        <OverlayTrigger placement="top" overlay={
-          <Tooltip>{t('tb.td.tips.addNameToRenewList')}</Tooltip>
-        }>
-          <input id={"renewName-checkbox-" + label}
-            className="form-check-input renew-checkbox" 
-            type="checkbox" 
-            name={label} 
-            disabled={type==='readonly' || reconnecting}
+      <div
+        id={'renewName-' + label}
+        className="btn-group"
+        role="group"
+        aria-label="RenewName"
+      >
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip>{t('tb.td.tips.addNameToRenewList')}</Tooltip>}
+        >
+          <input
+            id={'renewName-checkbox-' + label}
+            className="form-check-input renew-checkbox"
+            type="checkbox"
+            name={label}
+            disabled={type === 'readonly' || reconnecting}
             onChange={handleRenewCheckboxChange}
           />
-        </OverlayTrigger>  
-        <OverlayTrigger placement="top" overlay={
-          <Tooltip>{t('tb.td.tips.renew', {label: label})}</Tooltip>
-        }>
-          <button type="button" 
-            className="btn-plain ms-2" 
-            disabled={type==='readonly' || reconnecting}
-            onClick={()=>setModalShow(true)}
+        </OverlayTrigger>
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip>{t('tb.td.tips.renew', { label: label })}</Tooltip>}
+        >
+          <button
+            type="button"
+            className="btn-plain ms-2"
+            disabled={type === 'readonly' || reconnecting}
+            onClick={() => setModalShow(true)}
           >
             {t('tb.td.renew')}
           </button>
         </OverlayTrigger>
-        <RenewalModal 
-          show={modalShow} 
-          onHide={()=>setModalShow(false)}
+        <RenewalModal
+          show={modalShow}
+          onHide={() => setModalShow(false)}
           label={label}
           expiresTime={expiresTime}
           renewName={renewName}
@@ -62,17 +70,20 @@ export const RenewCell = (props) => {
           defaultDuration={defaultDuration}
           renewMsges={renewMsges}
         />
-      </div>        
-    )
+      </div>
+    );
   }
-  
+
   return (
-    <>      
-      <input className="form-check-input renew-checkbox" type="checkbox" disabled />
+    <>
+      <input
+        className="form-check-input renew-checkbox"
+        type="checkbox"
+        disabled
+      />
       <button type="button" disabled className="btn-plain ms-2">
         {t('tb.td.renew')}
       </button>
     </>
-  )
-
-}
+  );
+};
