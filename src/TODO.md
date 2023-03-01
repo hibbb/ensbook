@@ -5,7 +5,6 @@
 - [ ] check uppercase letters with @/# ahead
 - [ ] show if the name is listed on opensea/gem
 - [ ] differ owners with the color derived from its address
-- [ ] move related info to the left
 
 ## Priority 2
 
@@ -18,6 +17,7 @@
 
 ## Completed From v1.4.0
 
+- [x] move related info to the left
 - [x] migrate testnet to Goerli after Merge
 - [x] preload fonts
 - [x] disable sorting while fetching
