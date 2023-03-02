@@ -8,7 +8,7 @@
 
 ## Priority 2
 
-- [ ] migrate testnet to Goerli after Merge
+- [ ] support multi-owners-manage
 
 ## Priority 3
 
@@ -17,6 +17,8 @@
 
 ## Completed From v1.4.0
 
+- [x] move related info to the left
+- [x] migrate testnet to Goerli after Merge
 - [x] preload fonts
 - [x] disable sorting while fetching
 - [x] let main input get focus after addNames

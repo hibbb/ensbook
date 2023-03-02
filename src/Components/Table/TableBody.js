@@ -72,6 +72,16 @@ export const TableBody = (props) => {
             priceRange={conf.custom.premium.priceRange}
           />
         </td>
+        <td className="td-lookup">
+          <LookupCell
+            label={row.label}
+            status={row.status}
+            tokenId={row.tokenId}
+            owner={row.owner}
+            conf={conf}
+            network={network}
+          />
+        </td>
         <td>
           <RegisterCell
             type={type}
@@ -104,16 +114,6 @@ export const TableBody = (props) => {
             reconnecting={reconnecting}
             addNameToRenewList={addNameToRenewList}
             removeNameFromRenewList={removeNameFromRenewList}
-          />
-        </td>
-        <td className="td-lookup">
-          <LookupCell
-            label={row.label}
-            status={row.status}
-            tokenId={row.tokenId}
-            owner={row.owner}
-            conf={conf}
-            network={network}
           />
         </td>
         <td>
