@@ -235,6 +235,7 @@ export const TableHead = (props) => {
             </button>
           </OverlayTrigger>
         </th>
+        <th>{t('tb.th.lu')}</th>
         <th>
           <OverlayTrigger
             placement="top"
@@ -331,7 +332,6 @@ export const TableHead = (props) => {
             renewsMsges={renewsMsges}
           />
         </th>
-        <th>{t('tb.th.lu')}</th>
         <th className="th-remove">
           <div className="dropdown">
             <OverlayTrigger
