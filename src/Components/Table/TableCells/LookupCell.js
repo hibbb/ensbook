@@ -33,7 +33,7 @@ export const LookupCell = (props) => {
         : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`,
     },
     Opensea: {
-      precondition: isMainnet(network) && isRenewable(status),
+      precondition: isMainnet(network),
       link: `https://opensea.io/assets/ethereum/${addr[network].BaseRegImp}/${tokenIdDec}`,
     },
     // Gem: {
@@ -44,9 +44,9 @@ export const LookupCell = (props) => {
       precondition: isMainnet(network),
       link: `https://ens.vision/name/${label}`,
     },
-    RareID: {
+    Godid: {
       precondition: isMainnet(network),
-      link: `https://rare.id/items/${label}.eth`,
+      link: `https://godid.io//items/${label}.eth`,
     },
     Metadata: {
       precondition: isNormal(status),
