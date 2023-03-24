@@ -12,7 +12,7 @@
         "RelatedInfo": true,
         "Opensea": true,
         "ENSVision": true,
-        "RareID": true,
+        "Godid": true,
         "Metadata": true,
         "Inventory": false,
         "LinkETH": false,
