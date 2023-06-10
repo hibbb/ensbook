@@ -69,9 +69,10 @@
       }
     },
     "lookup": {
-      "RelatedInfo": "Related Info",
+      "EtherScan": "EtherScan",
+      "CheckTool": "Check the Name",
       "Opensea": "Opensea",
-      "ENSVision": "ENS.Vision",
+      "Vision": "ENS.Vision",
       "Godid": "Godid",
       "Metadata": "Metadata",
       "Inventory": "Owner's Inventory",

@@ -8,7 +8,7 @@ export const LabelCell = (props) => {
   const { label, level, isMyName, index, nameInfo, setAndStoreNameInfo } =
     props;
   // for td-label
-  const nameLink = `https://app.ens.domains/name/${label}.eth`;
+  const nameLink = `https://app.ens.domains/${label}.eth`;
 
   let labelClickCount = 0;
 

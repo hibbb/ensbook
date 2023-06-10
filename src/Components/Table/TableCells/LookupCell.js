@@ -25,22 +25,22 @@ export const LookupCell = (props) => {
   // 1. the custom.display.lookup field of conf.json
   // 2. the tb.lookup field of en.json and cn.json
   const lookupLinks = {
-    RelatedInfo: {
+    EtherScan: {
       precondition:
         isRenewable(status) || (isMainnet(network) && !isOpen(status)),
       link: isMainnet(network)
         ? `https://etherscan.io/nft/${addr[network].BaseRegImp}/${tokenIdDec}`
         : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`,
     },
+    CheckTool: {
+      precondition: isRenewable(status),
+      link: `https://tools.ens.domains/check/${label}.eth`,
+    },
     Opensea: {
       precondition: isMainnet(network),
       link: `https://opensea.io/assets/ethereum/${addr[network].BaseRegImp}/${tokenIdDec}`,
     },
-    // Gem: {
-    //   precondition: isMainnet(network) && isRenewable(status),
-    //   link: `https://www.gem.xyz/asset/${addr[network].BaseRegImp}/${tokenIdDec}`,
-    // },
-    ENSVision: {
+    Vision: {
       precondition: isMainnet(network),
       link: `https://ens.vision/name/${label}`,
     },
