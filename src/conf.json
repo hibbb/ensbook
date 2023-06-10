@@ -10,10 +10,11 @@
     "display": {
       "lookup": {
         "RelatedInfo": true,
+        "CheckTool": true,
         "Opensea": true,
-        "ENSVision": true,
+        "Vision": true,
         "Godid": true,
-        "Metadata": true,
+        "Metadata": false,
         "Inventory": false,
         "LinkETH": false,
         "DNSRelated": false

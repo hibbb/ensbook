@@ -69,9 +69,10 @@
       }
     },
     "lookup": {
-      "RelatedInfo": "信息概览",
+      "EtherScan": "EtherScan",
+      "CheckTool": "官方查询工具",
       "Opensea": "Opensea",
-      "ENSVision": "ENS.Vision",
+      "Vision": "ENS.Vision",
       "Godid": "Godid",
       "Metadata": "元数据",
       "Inventory": "持有者的 ENS 资产库",
