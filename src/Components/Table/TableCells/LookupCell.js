@@ -25,7 +25,7 @@ export const LookupCell = (props) => {
   // 1. the custom.display.lookup field of conf.json
   // 2. the tb.lookup field of en.json and cn.json
   const lookupLinks = {
-    RelatedInfo: {
+    EtherScan: {
       precondition:
         isRenewable(status) || (isMainnet(network) && !isOpen(status)),
       link: isMainnet(network)
