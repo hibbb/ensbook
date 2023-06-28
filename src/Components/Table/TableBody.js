@@ -47,6 +47,7 @@ export const TableBody = (props) => {
             label={row.label}
             index={index}
             level={row.level}
+            wrapped={row.wrapped}
             isMyName={isMyName(row.owner, address)}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
@@ -78,6 +79,7 @@ export const TableBody = (props) => {
             status={row.status}
             tokenId={row.tokenId}
             owner={row.owner}
+            wrapped={row.wrapped}
             conf={conf}
             network={network}
           />
