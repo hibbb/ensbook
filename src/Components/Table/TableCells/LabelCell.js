@@ -5,7 +5,7 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
 
 export const LabelCell = (props) => {
-  const { label, level, isMyName, index, nameInfo, setAndStoreNameInfo } =
+  const { label, level, wrapped, isMyName, index, nameInfo, setAndStoreNameInfo } =
     props;
   // for td-label
   const nameLink = `https://app.ens.domains/${label}.eth`;
@@ -34,7 +34,7 @@ export const LabelCell = (props) => {
         overlay={<Tooltip>{t('tb.td.tips.lb')}</Tooltip>}
       >
         <span
-          className={`td-level td-level-${level} is-my-name-${isMyName}`}
+          className={`td-level td-level-${level} is-my-name-${isMyName} is-wrapped-${wrapped}`}
           onClick={() => oneClickToLevelUp()}
         >
           {label}

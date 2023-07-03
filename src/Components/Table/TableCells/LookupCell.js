@@ -10,16 +10,25 @@ import {
   isOpen,
   isRenewable,
 } from '../../Global/globals';
+import { namehash } from 'ethers/lib/utils';
 
 export const LookupCell = (props) => {
-  const { conf, label, status, tokenId, owner, network } = props;
-  const tokenIdDec = BigNumber.from(tokenId).toString();
+  const { conf, label, status, tokenId, owner, wrapped, network } = props;
+  const { addr } = getConfFixed().contract;
+
+  const tokenIdOrNamehashDec = wrapped
+    ? BigNumber.from(namehash(label + '.eth')).toString()
+    : BigNumber.from(tokenId).toString();
+
+  const tokenContractAddr = wrapped
+    ? addr[network].NameWrapper
+    : addr[network].BaseRegImp
+
   const etherscanURL = isGoerli(network)
     ? 'https://goerli.etherscan.io/'
     : 'https://etherscan.io/';
 
   // for td-lookup
-  const { addr } = getConfFixed().contract;
   const { lookup } = conf.custom.display;
   // When you modify lookupLinks, you also need to modify:
   // 1. the custom.display.lookup field of conf.json
@@ -29,41 +38,43 @@ export const LookupCell = (props) => {
       precondition:
         isRenewable(status) || (isMainnet(network) && !isOpen(status)),
       link: isMainnet(network)
-        ? `https://etherscan.io/nft/${addr[network].BaseRegImp}/${tokenIdDec}`
-        : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`,
+        ? `https://etherscan.io/nft/${tokenContractAddr}/${tokenIdOrNamehashDec}`
+        : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`
     },
     CheckTool: {
       precondition: isRenewable(status),
-      link: `https://tools.ens.domains/check/${label}.eth`,
+      link: `https://tools.ens.domains/check/${label}.eth`
     },
     Opensea: {
       precondition: isMainnet(network),
-      link: `https://opensea.io/assets/ethereum/${addr[network].BaseRegImp}/${tokenIdDec}`,
+      link: wrapped
+        ? `https://opensea.io/assets/ethereum/${tokenContractAddr}/${tokenIdOrNamehashDec}`
+        : `https://opensea.io/assets/ethereum/${tokenContractAddr}/${tokenIdOrNamehashDec}`
     },
     Vision: {
       precondition: isMainnet(network),
-      link: `https://ens.vision/name/${label}`,
+      link: `https://ens.vision/name/${label}`
     },
     Godid: {
       precondition: isMainnet(network),
-      link: `https://godid.io//items/${label}.eth`,
+      link: `https://godid.io//items/${label}.eth`
     },
     Metadata: {
       precondition: isNormal(status),
-      link: `https://metadata.ens.domains/${network}/${addr[network].BaseRegImp}/${tokenId}`,
+      link: `https://metadata.ens.domains/${network}/${addr[network].BaseRegImp}/${tokenId}`
     },
     Inventory: {
       precondition:
         isMainnet(network) && isRenewable(status) && utils.isAddress(owner),
-      link: `${etherscanURL}token/${addr[network].BaseRegImp}?a=${owner}#inventory`,
+      link: `${etherscanURL}token/${tokenContractAddr}?a=${owner}#inventory`
     },
     LinkETH: {
       precondition: isMainnet(network) && isRenewable(status),
-      link: `https://${label}.eth.limo/`,
+      link: `https://${label}.eth.limo/`
     },
     DNSRelated: {
       precondition: true,
-      link: `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`,
+      link: `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
     },
   };
 

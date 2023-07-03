@@ -3,8 +3,6 @@
 ## Priority 1
 
 - [ ] check uppercase letters with @/# ahead
-- [ ] show if the name is listed on opensea/gem
-- [ ] differ owners with the color derived from its address
 
 ## Priority 2
 
@@ -17,6 +15,8 @@
 
 ## Completed From v1.4.0
 
+- [x] separate the opensea url based on whether the name is wrapped or not
+- [x] add an attribute of wrapping status into nameInfo
 - [x] move related info to the left
 - [x] migrate testnet to Goerli after Merge
 - [x] preload fonts

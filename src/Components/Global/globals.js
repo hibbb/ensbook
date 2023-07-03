@@ -311,24 +311,33 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
   if (labelsGroup.length > 100) {
     return nameInfo;
   }
+  const namesGroup = labelsGroup.map(label => label + '.eth')
 
   const queryCode = {
-    str: `query($labelsGroup: [String!]) {
+    str: `query($labelsGroup: [String!], $namesGroup: [String!]) {
       registrations(where: {labelName_in: $labelsGroup}) {
         labelName, id, expiryDate, registrationDate, registrant { id }
       }
+      wrappedDomains(where: {name_in: $namesGroup}) {
+        name, owner { id }
+      }
     }`,
-    vars: { labelsGroup: labelsGroup },
+    vars: { labelsGroup: labelsGroup, namesGroup: namesGroup },
   };
 
-  const { registrations } = await queryData(queryCode, network);
+  const { registrations, wrappedDomains } = await queryData(queryCode, network);
 
   for (let i = 0; i < labelsGroup.length; i++) {
     const ri = registrations.findIndex(
       (item) => item.labelName === labelsGroup[i]
     );
     const ni = nameInfo.findIndex((item) => item.label === labelsGroup[i]);
+    const wi = wrappedDomains.findIndex((item) => item.name === labelsGroup[i] + '.eth');
+    const isWrappedName = wi > -1
 
+    const actualOwner = isWrappedName ? wrappedDomains[wi].owner.id : registrations[ri].registrant.id
+
+    nameInfo[ni].wrapped = isWrappedName
     // add 'length' attribute by addNames() in MainForm.js @v2.2.6
     nameInfo[ni].length = labelsGroup[i].length; // keep this line until 2023.12 or v3.x.x
 
@@ -352,10 +361,10 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
 
       if (moment().isSameOrBefore(expiresTime)) {
         nameInfo[ni].status = 'Normal';
-        nameInfo[ni].owner = registrations[ri].registrant.id;
+        nameInfo[ni].owner = actualOwner;
       } else if (moment().isSameOrBefore(releaseTime)) {
         nameInfo[ni].status = 'Grace';
-        nameInfo[ni].owner = registrations[ri].registrant.id;
+        nameInfo[ni].owner = actualOwner;
       } else if (moment().subtract(21, 'days').isSameOrBefore(releaseTime)) {
         nameInfo[ni].status = 'Premium';
         nameInfo[ni].owner = undefined;

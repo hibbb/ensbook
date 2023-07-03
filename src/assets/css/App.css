@@ -250,6 +250,11 @@ h1 a .title-ens {
 .is-my-name-true {
   border-bottom: 1px solid #0dcaf0;
 }
+.is-wrapped-true {
+  padding: 0.07rem 0.35rem;
+  border-radius: 0.25rem;
+  background-color: #0dcaf035;
+}
 .grace-ending {
   /* animation: grace-ending 3s infinite linear; */
   background-image: linear-gradient(
