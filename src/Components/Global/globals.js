@@ -335,7 +335,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     const wi = wrappedDomains.findIndex((item) => item.name === labelsGroup[i] + '.eth');
     const isWrappedName = wi > -1
 
-    const actualOwner = isWrappedName ? wrappedDomains[wi].owner.id : registrations[ri].registrant.id
+    const actualOwner = isWrappedName ? wrappedDomains[wi].owner.id : registrations[ri]?.registrant.id
 
     nameInfo[ni].wrapped = isWrappedName
     // add 'length' attribute by addNames() in MainForm.js @v2.2.6
