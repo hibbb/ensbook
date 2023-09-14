@@ -57,7 +57,7 @@ export const LookupCell = (props) => {
     },
     Godid: {
       precondition: isMainnet(network),
-      link: `https://godid.io//items/${label}.eth`
+      link: `https://godid.io/items/${label}.eth`
     },
     Metadata: {
       precondition: isNormal(status),
