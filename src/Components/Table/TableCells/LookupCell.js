@@ -74,7 +74,7 @@ export const LookupCell = (props) => {
     },
     DNSRelated: {
       precondition: true,
-      link: `https://domains.google.com/registrar/search?tab=1&searchTerm=${label}`
+      link: `https://instantdomainsearch.com/domain/extensions?q=${label}`
     },
   };
 
