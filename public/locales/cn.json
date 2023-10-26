@@ -142,12 +142,6 @@
       },
       "unregistrableNow": "{{label}}.eth 已经被抢先注册。"
     },
-    "regs": {
-      "title": "批量注册",
-      "tip": "您要注册的名称及信息如下: ",
-      "names": "已勾选的名称",
-      "regsEnded": "批量注册进程已经结束。"
-    },
     "renew": {
       "title": "续费",
       "tip": "您要续费的名称及信息如下",

@@ -1,6 +1,6 @@
 {
   "name": "ensbook",
-  "version": "2.3.6",
+  "version": "2.4.01",
   "author": "liubenben.eth",
   "private": true,
   "dependencies": {
@@ -15,10 +15,9 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@walletconnect/web3-provider": "^1.7.1",
+    "@web3modal/wagmi": "^3.1.0",
     "babel-plugin-macros": "^3.1.0",
     "bootstrap": "^5.1.3",
-    "ethers": "^5.5.1",
     "graphql": "^16.4.0",
     "i18next": "^21.5.3",
     "i18next-http-backend": "^1.3.1",
@@ -35,8 +34,9 @@
     "react-moment": "^1.1.1",
     "react-scripts": "5.0.1",
     "react-toastify": "^8.2.0",
-    "web-vitals": "^1.0.1",
-    "web3modal": "^1.9.5"
+    "viem": "^1.16.6",
+    "wagmi": "^1.4.5",
+    "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -45,6 +45,10 @@
     "eject": "react-app-rewired eject"
   },
   "eslintConfig": {
+    "env": {
+      "es2020": true,
+      "browser": true
+    },
     "extends": [
       "react-app",
       "react-app/jest"

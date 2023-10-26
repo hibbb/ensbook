@@ -5,7 +5,6 @@ import {
   faArrowUpRightFromSquare,
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
-// import { utils } from 'ethers'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

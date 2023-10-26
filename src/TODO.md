@@ -3,6 +3,9 @@
 ## Priority 1
 
 - [ ] check uppercase letters with @/# ahead
+- [ ] del confFix ?
+- [ ] just use public and wallet client?
+- [ ] del ensname?
 
 ## Priority 2
 

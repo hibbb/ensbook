@@ -30,13 +30,7 @@ export default function Header(props) {
           reconnectApp={reconnectApp}
           setAndStoreConfInfo={setAndStoreConfInfo}
         />
-        <OperatorWallet
-          walletInfo={walletInfo}
-          reconnectApp={reconnectApp}
-          disconnectApp={disconnectApp}
-          reconnecting={reconnecting}
-          scanConf={getConfFixed().scanConf}
-        />
+        <w3m-button />
       </div>
     </div>
   );

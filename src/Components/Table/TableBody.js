@@ -1,22 +1,22 @@
 import React from 'react';
-import { isCustomWallet, isMyName, isRegistrable } from '../Global/globals';
+import { fetchChainId, getETHPrice, isMyName, isRegistrable, readCon } from '../Global/globals';
 import { LabelCell } from './TableCells/LabelCell';
 import { LookupCell } from './TableCells/LookupCell';
 import { StatusCell } from './TableCells/StatusCell';
 import { RegisterCell } from './TableCells/RegisterCell';
 import { DelCell } from './TableCells/DelCell';
 import { RenewCell } from './TableCells/RenewCell';
+import { walletClient } from '../Global/clients';
 
 export const TableBody = (props) => {
   const {
-    type,
-    address,
-    network,
-    ethPrice,
     reconnecting,
     nameInfo,
     setAndStoreNameInfo,
     conf,
+    ethPrice,
+    walletAddress,
+    chainId,
     updateNames,
     registerName,
     registerNameEnd,
@@ -48,14 +48,13 @@ export const TableBody = (props) => {
             index={index}
             level={row.level}
             wrapped={row.wrapped}
-            isMyName={isMyName(row.owner, address)}
+            isMyName={isMyName(row.owner, walletAddress)}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
           />
         </td>
         <td>
           <StatusCell
-            type={type}
             label={row.label}
             index={index}
             status={row.status}
@@ -81,17 +80,15 @@ export const TableBody = (props) => {
             owner={row.owner}
             wrapped={row.wrapped}
             conf={conf}
-            network={network}
+            chainId={chainId}
           />
         </td>
         <td>
           <RegisterCell
-            type={type}
             label={row.label}
             index={index}
             defaultDuration={conf.custom.register.duration}
             status={row.status}
-            isCustomWallet={isCustomWallet(conf)}
             reconnecting={reconnecting}
             estimateCost={estimateCost}
             registerName={registerName}
@@ -105,7 +102,6 @@ export const TableBody = (props) => {
         </td>
         <td>
           <RenewCell
-            type={type}
             label={row.label}
             status={row.status}
             expiresTime={row.expiresTime}

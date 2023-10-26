@@ -5,6 +5,8 @@ import { faWallet, faLinkSlash } from '@fortawesome/free-solid-svg-icons';
 import { faEthereum } from '@fortawesome/free-brands-svg-icons';
 import { t } from 'i18next';
 
+// need to omit this page
+
 const CurrentNetwork = (props) => {
   const { network } = props;
   return (

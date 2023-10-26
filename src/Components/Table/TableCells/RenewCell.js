@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
-import { isRenewable } from '../../Global/globals';
+import { isReadOnly, isRenewable } from '../../Global/globals';
 import RenewalModal from '../../Utils/RenewalModal';
 
 export const RenewCell = (props) => {
@@ -16,7 +16,6 @@ export const RenewCell = (props) => {
     reconnecting,
     addNameToRenewList,
     removeNameFromRenewList,
-    type,
   } = props;
 
   const [modalShow, setModalShow] = useState(false);
@@ -43,7 +42,7 @@ export const RenewCell = (props) => {
             className="form-check-input renew-checkbox"
             type="checkbox"
             name={label}
-            disabled={type === 'readonly' || reconnecting}
+            disabled={ isReadOnly() || reconnecting }
             onChange={handleRenewCheckboxChange}
           />
         </OverlayTrigger>
@@ -54,7 +53,7 @@ export const RenewCell = (props) => {
           <button
             type="button"
             className="btn-plain ms-2"
-            disabled={type === 'readonly' || reconnecting}
+            disabled={ isReadOnly() || reconnecting }
             onClick={() => setModalShow(true)}
           >
             {t('tb.td.renew')}

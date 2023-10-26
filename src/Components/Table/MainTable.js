@@ -8,6 +8,7 @@ class MainTable extends React.Component {
     this.props.reconnectApp();
   }
 
+
   // Hide unregistrable names or not
   state = {
     hideNames: false,
@@ -57,26 +58,21 @@ class MainTable extends React.Component {
     const {
       conf,
       estimateCost,
-      estimateCosts,
       getDefaultNameReceiver,
       nameInfo,
-      type,
-      address,
-      network,
       ethPrice,
+      walletAddress,
+      chainId,
       reconnecting,
       fetching,
       registerName,
       registerNameEnd,
-      registerNames,
-      registerNamesEnd,
       renewMsges,
       renewName,
       renewNameEnd,
       renewNames,
       renewNamesEnd,
       regMsges,
-      regsMsges,
       renewsMsges,
       setAndStoreNameInfo,
       updateNames,
@@ -141,15 +137,12 @@ class MainTable extends React.Component {
       <div className="row table-wrapper">
         <table className="table table-hover ebr-tb">
           <TableHead
-            type={type}
             reconnecting={reconnecting}
             fetching={fetching}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
             updateNames={updateNames}
-            registerNames={registerNames}
-            registerNamesEnd={registerNamesEnd}
             regList={regList}
             clearRegList={this.clearRegList}
             renewNames={renewNames}
@@ -159,18 +152,15 @@ class MainTable extends React.Component {
             hideNames={this.state.hideNames}
             switchHideFlag={switchHideFlag}
             removeNames={removeNames}
-            estimateCosts={estimateCosts}
             regMsges={regMsges}
-            regsMsges={regsMsges}
             renewsMsges={renewsMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
           />
           <TableBody
             reconnecting={reconnecting}
-            type={type}
-            address={address}
-            network={network}
             ethPrice={ethPrice}
+            walletAddress={walletAddress}
+            chainId={chainId}
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}

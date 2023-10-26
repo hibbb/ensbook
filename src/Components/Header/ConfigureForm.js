@@ -12,7 +12,6 @@ import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import {
   faGear,
   faCaretRight,
-  faWallet,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
@@ -35,11 +34,6 @@ class ConfigureForm extends React.Component {
 
     premiumPriceUnit: this.conf.custom.premium.priceUnit ?? 'ETH',
     premiumPriceRange: this.conf.custom.premium.priceRange,
-
-    walletSwitch: this.conf.custom.wallet.switch,
-    walletOperatorPrivateKey: this.conf.custom.wallet.operatorPrivateKey.join(),
-    walletNetwork: this.conf.custom.wallet.network,
-    walletGasPrice: this.conf.custom.wallet.gasPrice,
   };
 
   premiumPriceArray = [
@@ -88,11 +82,6 @@ class ConfigureForm extends React.Component {
     confInfo.custom.premium.priceUnit = this.state.premiumPriceUnit.trim();
     confInfo.custom.premium.priceRange = Number(this.state.premiumPriceRange);
 
-    confInfo.custom.wallet.switch = this.state.walletSwitch;
-    confInfo.custom.wallet.operatorPrivateKey =
-      this.state.walletOperatorPrivateKey.replace(/\s/g, '').split(',');
-    confInfo.custom.wallet.network = this.state.walletNetwork;
-    confInfo.custom.wallet.gasPrice = Number(this.state.walletGasPrice);
     this.props.setAndStoreConfInfo(confInfo);
     this.props.reconnectApp();
   };
@@ -113,12 +102,6 @@ class ConfigureForm extends React.Component {
 
       premiumPriceUnit: initialCustomConf.premium.priceUnit,
       premiumPriceRange: initialCustomConf.premium.priceRange,
-
-      walletSwitch: initialCustomConf.wallet.switch,
-      walletOperatorPrivateKey:
-        initialCustomConf.wallet.operatorPrivateKey.join(),
-      walletNetwork: initialCustomConf.wallet.network,
-      walletGasPrice: initialCustomConf.wallet.gasPrice,
     });
     this.props.setAndStoreConfInfo(confFile);
     this.props.reconnectApp();
@@ -325,93 +308,7 @@ class ConfigureForm extends React.Component {
                   onChange={this.handleChange}
                   aria-label="premiumPriceRange"
                 />
-
-                {/* Old version for EP9, before 2022.12
-                <Form.Select 
-                  name="premiumPriceRange" 
-                  value={this.state.premiumPriceRange} 
-                  onChange={this.handleChange} 
-                  aria-label="premiumPriceRange">
-                  {
-                    this.premiumPriceArray.map(
-                      (item, index) => index > 8
-                        ? <option key={index} value={index}>{item}</option>
-                        : null
-                    )
-                  }
-                </Form.Select>
-                */}
                 <InputGroup.Text>{this.state.premiumPriceUnit}</InputGroup.Text>
-              </InputGroup>
-
-              {/* Custom Wallet Mode */}
-              <h6 className="mt-4 mb-3">
-                <FontAwesomeIcon icon={faWallet} className="me-2" />
-                {t('conf.customMode.title')}
-                <Form.Check
-                  type="switch"
-                  className="ms-3 mt-0 custom-wallet-switch"
-                  inline
-                  name="walletSwitch"
-                  checked={this.state.walletSwitch}
-                  onChange={this.handleSwitchChange}
-                />
-              </h6>
-              <InputGroup
-                className={
-                  'mb-2 custom-wallet-' + Boolean(this.state.walletSwitch)
-                }
-                size="sm"
-              >
-                <InputGroup.Text>
-                  {t('conf.customMode.operatorPrivateKey')}
-                </InputGroup.Text>
-                <Form.Control
-                  type="password"
-                  name="walletOperatorPrivateKey"
-                  value={this.state.walletOperatorPrivateKey}
-                  onChange={this.handleChange}
-                  disabled={!this.state.walletSwitch}
-                  aria-label="walletOperatorPrivateKey"
-                />
-              </InputGroup>
-              <InputGroup
-                className={
-                  'mb-2 custom-wallet-' + Boolean(this.state.walletSwitch)
-                }
-                size="sm"
-              >
-                <InputGroup.Text>
-                  {t('conf.customMode.network')}
-                </InputGroup.Text>
-                <Form.Select
-                  name="walletNetwork"
-                  value={this.state.walletNetwork}
-                  onChange={this.handleChange}
-                  disabled={!this.state.walletSwitch}
-                  aria-label="walletNetwork"
-                >
-                  <option value="mainnet">{t('c.mainnet')}</option>
-                  <option value="goerli">{t('c.goerli')}</option>
-                </Form.Select>
-              </InputGroup>
-              <InputGroup
-                className={
-                  'mb-6 custom-wallet-' + Boolean(this.state.walletSwitch)
-                }
-                size="sm"
-              >
-                <InputGroup.Text>
-                  {t('conf.customMode.gasPrice')}
-                </InputGroup.Text>
-                <FormControl
-                  name="walletGasPrice"
-                  value={this.state.walletGasPrice}
-                  onChange={this.handleChange}
-                  disabled={!this.state.walletSwitch}
-                  aria-label="walletGasPrice"
-                />
-                <InputGroup.Text>{t('c.gwei')}</InputGroup.Text>
               </InputGroup>
 
               <div className="fixed-bottom conf-btn-box">

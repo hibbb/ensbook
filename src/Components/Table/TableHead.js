@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -21,28 +20,23 @@ import {
   faClockRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
-import RegistrationsModal from '../Utils/RegistrationsModal';
 import TooltipEstimateCost from './TooltipEstimateCost';
 import {
   haveRegistrableNames,
   haveUnregistrableNames,
-  isCustomWallet,
+  isReadOnly,
 } from '../Global/globals';
 import RenewalsModal from '../Utils/RenewalsModal';
+import { formatEther } from 'viem';
 
 export const TableHead = (props) => {
   const {
-    type,
     reconnecting,
     fetching,
     nameInfo,
     setAndStoreNameInfo,
     conf,
     updateNames,
-    registerNames,
-    registerNamesEnd,
-    regList,
-    clearRegList,
     renewNames,
     renewNamesEnd,
     renewList,
@@ -50,17 +44,12 @@ export const TableHead = (props) => {
     hideNames,
     switchHideFlag,
     removeNames,
-    estimateCosts,
-    regMsges,
-    regsMsges,
     renewsMsges,
     getDefaultNameReceiver,
   } = props;
 
-  const [regNamesModalShow, setRegNamesModalShow] = useState(false);
   const [renewNamesModalShow, setRenewNamesModalShow] = useState(false);
 
-  const isBulkReg = () => regList.length > 0;
   const isBulkRenew = () => renewList.length > 0;
 
   const initialAscFlags = {
@@ -104,13 +93,6 @@ export const TableHead = (props) => {
     status: 'before',
     cost: '',
   };
-  const [estimating, setEstimating] = useState(initialEstimating);
-
-  const estimateThese = async () => {
-    setEstimating({ ...initialEstimating, status: 'in' });
-    const costEther = utils.formatEther(await estimateCosts(regList));
-    setEstimating({ ...initialEstimating, status: 'after', cost: costEther });
-  };
 
   const statusesArr = Array.from(new Set(nameInfo.map((item) => item.status)));
 
@@ -127,10 +109,8 @@ export const TableHead = (props) => {
     );
   });
 
-  const nonBulkRegable = () =>
-    reconnecting || !isCustomWallet(conf) || !isBulkReg();
   const nonBulkRenewable = () =>
-    reconnecting || type === 'readonly' || !isBulkRenew();
+    reconnecting || isReadOnly() || !isBulkRenew();
   const nonFoldable = () =>
     !haveRegistrableNames(nameInfo) || !haveUnregistrableNames(nameInfo);
   const nonUpdatable = () => nameInfo.length < 1;
@@ -237,51 +217,7 @@ export const TableHead = (props) => {
         </th>
         <th>{t('tb.th.lu')}</th>
         <th>
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>{t('tb.th.tips.regAll')}</Tooltip>}
-          >
-            <button
-              type="button"
-              disabled={nonBulkRegable()}
-              className={
-                'btn-plain btn-bulk-reg ' + (isBulkReg() ? 'is-bulk-reg' : '')
-              }
-              onClick={() => setRegNamesModalShow(true)}
-            >
-              {t('tb.th.reg')}
-            </button>
-          </OverlayTrigger>
-          <RegistrationsModal
-            show={regNamesModalShow}
-            onHide={() => setRegNamesModalShow(false)}
-            registerNames={registerNames}
-            registerNamesEnd={registerNamesEnd}
-            regList={regList}
-            clearRegList={clearRegList}
-            defaultDuration={conf.custom.register.duration}
-            regMsges={regMsges}
-            regsMsges={regsMsges}
-            getDefaultNameReceiver={getDefaultNameReceiver}
-          />
-          <OverlayTrigger
-            placement="top"
-            overlay={
-              <Tooltip>
-                <TooltipEstimateCost estimating={estimating} />
-              </Tooltip>
-            }
-          >
-            <button
-              type="button"
-              disabled={!isBulkReg()}
-              id="btn-estimate-all"
-              className="btn-plain btn-sub ms-2"
-              onClick={() => estimateThese()}
-            >
-              <FontAwesomeIcon icon={faCalculator} />
-            </button>
-          </OverlayTrigger>
+          {t('tb.th.reg')}
           <OverlayTrigger
             placement="top"
             overlay={

@@ -1,9 +1,15 @@
 import confFile from '../../conf.json';
 import confFixed from '../../confFixed.json';
-import { Contract, utils } from 'ethers';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import moment from 'moment';
-import { getAddress, isAddress } from 'ethers/lib/utils';
+import { getAddress, isAddress, keccak256, toHex } from 'viem';
+import { publicClient, walletClient } from './clients';
+// import { ETHRegCtrlAbi } from './abi/ethRegCtrlAbi';
+// import { BaseRegImpAbi } from './abi/baseRegImpAbi';
+// import { BulkRenewAbi } from './abi/bulkRenewAbi';
+// import { ETHPriceFeedAbi } from './abi/ethPriceFeedAbi';
+import { abis } from './abis';
+import { addrs } from './addrs';
 
 export function getConf() {
   if (confFile.host === 'remote') {
@@ -43,36 +49,38 @@ export function updateLookupList(conf) {
   return conf;
 }
 
-export function getContract(providerOrSigner, contract, network, conf) {
-  conf = conf ?? getConf();
-  const contractAddr = confFixed.contract.addr[network][contract];
-  const contractAbi = confFixed.contract.abi[contract];
-  return new Contract(contractAddr, contractAbi, providerOrSigner);
+export async function fetchChainId() {
+  return (await walletClient.getChainId()) ?? 1
 }
 
-export function getETHRegCtrlCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, 'ETHRegCtrl', network, conf);
+export async function getETHPrice() {
+  const chainId = await fetchChainId()
+  const currentETHPrice = await readCon('ETHPriceFeed', chainId, 'latestAnswer')
+  console.log(currentETHPrice)
+  return Number.parseInt(currentETHPrice);
 }
 
-export function getBaseRegImpCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, 'BaseRegImp', network, conf);
+export async function writeCon(contractName, chainId, functionName, args) {
+  return await walletClient.writeContract({
+    address: addrs[chainId][contractName],
+    abi: abis[contractName],
+    functionName,
+    args
+  })
 }
 
-export function getBulkRenewCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, 'BulkRenew', network, conf);
+export async function readCon(contractName, chainId, functionName, args) {
+  console.log([contractName, chainId, functionName, args])
+  return await publicClient.readContract({
+    address: addrs[chainId][contractName],
+    abi: abis[contractName],
+    functionName,
+    args
+  })
 }
 
-export function getBulkRegCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, 'BulkReg', network, conf);
-}
-
-export function getETHPriceFeedCon(providerOrSigner, network, conf) {
-  return getContract(providerOrSigner, 'ETHPriceFeed', network, conf);
-}
-
-export function isCustomWallet(conf) {
-  conf = conf ?? getConf();
-  return conf.custom.wallet.switch;
+export function isReadOnly() {  // need to deal
+  console.log("if we need this function, let's add some codes here")
 }
 
 export function isSupportedChain(key) {
@@ -171,7 +179,7 @@ export function getRegInfo(label) {
   return JSON.parse(window.localStorage.getItem('regInfo-' + label));
 }
 
-export async function updateRegStep(label, regStep, provider) {
+export async function updateRegStep(label, regStep) {
   if (regStep === 0 || regStep === 3) {
     removeRegInfo(label);
     return 0;
@@ -188,18 +196,16 @@ export async function updateRegStep(label, regStep, provider) {
   let regWindow = {};
 
   if (regInfo.commitTxHash) {
-    commitTxReceipt = await provider.getTransactionReceipt(
-      regInfo.commitTxHash
-    );
-    if (!commitTxReceipt) {
+    commitTxReceipt = await publicClient.getTransactionReceipt({ hash: regInfo.commitTxHash });
+    if (commitTxReceipt.status !== 'success') {
       return 0;
     }
   } else {
     return regStep;
   }
 
-  if (commitTxReceipt) {
-    commitTxTime = (await provider.getBlock(commitTxReceipt.blockNumber))
+  if (commitTxReceipt.status === 'success') {
+    commitTxTime = (await publicClient.getBlock({ blockNumber: commitTxReceipt.blockNumber }))
       .timestamp;
   } else {
     return regStep;
@@ -220,11 +226,9 @@ export async function updateRegStep(label, regStep, provider) {
   }
 
   if (regStep === 2.5) {
-    const regTxReceipt = await provider.getTransactionReceipt(
-      regInfo.regTxHash
-    );
+    const regTxReceipt = await publicClient.getTransactionReceipt({ hash: regInfo.regTxHash });
     if (regTxReceipt) {
-      regStep = regTxReceipt.status ? 3 : 0;
+      regStep = regTxReceipt.status === 'success' ? 3 : 0;
     } // if regTxReceipt is null reStep is still 2.5
   }
 
@@ -235,11 +239,13 @@ export function removeRegInfo(label) {
   window.localStorage.removeItem('regInfo-' + label);
 }
 
-export async function queryData(queryCode, network) {
+export async function queryData(queryCode) {
+  const chainId = await fetchChainId();
+
   const subgraphUri =
-    network === 'goerli'
-      ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli'
-      : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
+  chainId === 5
+    ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli'
+    : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
 
   const client = new ApolloClient({
     uri: subgraphUri,
@@ -255,7 +261,7 @@ export async function queryData(queryCode, network) {
 }
 
 // entering @ in front of an ENS name or an address can be used to query its names
-export async function isForAccount(str, provider, network) {
+export async function isForAccount(str) {
   const from = str.startsWith('@')
     ? 'fromOwner'
     : str.startsWith('#')
@@ -270,7 +276,7 @@ export async function isForAccount(str, provider, network) {
 
   if (from === 'fromOwner' && str.endsWith('.eth') && str.length > 6) {
     const label = str.slice(0, -4);
-    const labelHash = utils.id(label);
+    const labelHash = keccak256(toHex(label));
     const queryCode = {
       str: `query($labelHash: String!) {
         registration(id: $labelHash) { registrant { id } }
@@ -278,12 +284,12 @@ export async function isForAccount(str, provider, network) {
       vars: { labelHash: labelHash },
     };
 
-    const { registration } = await queryData(queryCode, network);
+    const { registration } = await queryData(queryCode);
     str = registration?.registrant?.id;
   }
 
   if (from === 'fromAddr' && str.endsWith('.eth') && str.length > 6) {
-    str = await provider.resolveName(str);
+    str = await publicClient.resolveName(str);
   }
 
   if (isAddress(str)) {
@@ -294,7 +300,7 @@ export async function isForAccount(str, provider, network) {
 }
 
 // fetch the registrations (upto *1000) of an account
-export async function getNamesOfOwner(owner, network) {
+export async function getNamesOfOwner(owner) {
   if (!owner) {
     return [];
   }
@@ -302,12 +308,12 @@ export async function getNamesOfOwner(owner, network) {
     str: `query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }`,
     vars: { owner: owner },
   };
-  const { registrations } = await queryData(queryCode, network);
+  const { registrations } = await queryData(queryCode);
   const labelsArr = registrations.map((item) => item.labelName); // labels Array
   return labelsArr.filter((item) => item && item.trim()); // remove null/undefined...
 }
 
-export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
+export async function queryNameInfo(labelsGroup, nameInfo) {
   if (labelsGroup.length > 100) {
     return nameInfo;
   }
@@ -325,7 +331,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     vars: { labelsGroup: labelsGroup, namesGroup: namesGroup },
   };
 
-  const { registrations, wrappedDomains } = await queryData(queryCode, network);
+  const { registrations, wrappedDomains } = await queryData(queryCode);
 
   for (let i = 0; i < labelsGroup.length; i++) {
     const ri = registrations.findIndex(
@@ -380,8 +386,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     if (nameInfo[ni].regStep > 0) {
       nameInfo[ni].regStep = await updateRegStep(
         nameInfo[ni].label,
-        nameInfo[ni].regStep,
-        provider
+        nameInfo[ni].regStep
       );
     }
   }

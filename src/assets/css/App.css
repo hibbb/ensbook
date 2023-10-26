@@ -137,6 +137,7 @@ h1 a .title-ens {
 }
 .add-names-form {
   background-color: #f5f5f5;
+  z-index: 100!important;
 }
 .form-control:focus,
 .form-select:focus {
@@ -485,12 +486,6 @@ button.btn-plain[disabled] {
 .btn-sub {
   font-size: 0.88rem;
 }
-.network-ropsten {
-  color: #eb5a8d;
-}
-.network-goerli {
-  color: #eb5a8d;
-}
 .select-lang {
   border: 0;
   background-color: #e5e5e5;
@@ -616,10 +611,6 @@ button.btn-plain[disabled] {
 }
 .conf-btn-save {
   margin: 0 1rem;
-}
-
-.web3modal-modal-lightbox {
-  z-index: 2000 !important;
 }
 
 /* ==== reload bootstrap ==== */

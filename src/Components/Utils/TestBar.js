@@ -2,9 +2,15 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { walletClient, publicClient } from '../Global/clients';
+import { addrs } from '../Global/addrs';
+import { getETHPrice } from '../Global/globals';
 
 export default function TestBar(props) {
-  const testFunc1 = async () => {};
+  const testFunc1 = async () => {
+    const a = await getETHPrice()
+    console.log(a)
+  };
 
   const testFunc2 = async () => {};
 

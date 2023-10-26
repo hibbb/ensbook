@@ -1,5 +1,4 @@
 import React from 'react';
-import { BigNumber, utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
 import {
@@ -10,21 +9,21 @@ import {
   isOpen,
   isRenewable,
 } from '../../Global/globals';
-import { namehash } from 'ethers/lib/utils';
+import { isAddress, namehash } from 'viem';
 
 export const LookupCell = (props) => {
-  const { conf, label, status, tokenId, owner, wrapped, network } = props;
-  const { addr } = getConfFixed().contract;
+  const { conf, label, status, tokenId, owner, wrapped, chainId } = props;
+  const { addr } = getConfFixed().contract; // need to deal
 
   const tokenIdOrNamehashDec = wrapped
-    ? BigNumber.from(namehash(label + '.eth')).toString()
-    : BigNumber.from(tokenId).toString();
+    ? BigInt(namehash(label + '.eth')).toString()
+    : BigInt(tokenId).toString();
 
   const tokenContractAddr = wrapped
-    ? addr[network].NameWrapper
-    : addr[network].BaseRegImp
+    ? addr[chainId].NameWrapper
+    : addr[chainId].BaseRegImp
 
-  const etherscanURL = isGoerli(network)
+  const etherscanURL = isGoerli(chainId)
     ? 'https://goerli.etherscan.io/'
     : 'https://etherscan.io/';
 
@@ -36,8 +35,8 @@ export const LookupCell = (props) => {
   const lookupLinks = {
     EtherScan: {
       precondition:
-        isRenewable(status) || (isMainnet(network) && !isOpen(status)),
-      link: isMainnet(network)
+        isRenewable(status) || (isMainnet(chainId) && !isOpen(status)),
+      link: isMainnet(chainId)
         ? `https://etherscan.io/nft/${tokenContractAddr}/${tokenIdOrNamehashDec}`
         : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`
     },
@@ -46,30 +45,30 @@ export const LookupCell = (props) => {
       link: `https://tools.ens.domains/check/${label}.eth`
     },
     Opensea: {
-      precondition: isMainnet(network),
+      precondition: isMainnet(chainId),
       link: wrapped
         ? `https://opensea.io/assets/ethereum/${tokenContractAddr}/${tokenIdOrNamehashDec}`
         : `https://opensea.io/assets/ethereum/${tokenContractAddr}/${tokenIdOrNamehashDec}`
     },
     Vision: {
-      precondition: isMainnet(network),
+      precondition: isMainnet(chainId),
       link: `https://ens.vision/name/${label}`
     },
     Godid: {
-      precondition: isMainnet(network),
+      precondition: isMainnet(chainId),
       link: `https://godid.io/items/${label}.eth`
     },
     Metadata: {
-      precondition: isNormal(status),
-      link: `https://metadata.ens.domains/${network}/${addr[network].BaseRegImp}/${tokenId}`
+      precondition: isNormal(status) && isMainnet(chainId),
+      link: `https://metadata.ens.domains/mainnet/${addr[chainId].BaseRegImp}/${tokenId}`
     },
     Inventory: {
       precondition:
-        isMainnet(network) && isRenewable(status) && utils.isAddress(owner),
+        isMainnet(chainId) && isRenewable(status) && isAddress(owner),
       link: `${etherscanURL}token/${tokenContractAddr}?a=${owner}#inventory`
     },
     LinkETH: {
-      precondition: isMainnet(network) && isRenewable(status),
+      precondition: isMainnet(chainId) && isRenewable(status),
       link: `https://${label}.eth.limo/`
     },
     DNSRelated: {

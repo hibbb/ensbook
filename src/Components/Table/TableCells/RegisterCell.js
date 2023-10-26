@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import { utils } from 'ethers';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalculator } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
-import { isRegistrable } from '../../Global/globals';
+import { isReadOnly, isRegistrable } from '../../Global/globals';
 import TooltipEstimateCost from '../TooltipEstimateCost';
 import RegistrationModal from '../../Utils/RegistrationModal';
+import { formatEther } from 'viem';
 
 export const RegisterCell = (props) => {
   const {
     label,
     status,
-    isCustomWallet,
     reconnecting,
     defaultDuration,
     registerName,
@@ -23,7 +22,6 @@ export const RegisterCell = (props) => {
     registerNameEnd,
     regMsges,
     getDefaultNameReceiver,
-    type,
   } = props;
 
   const initialEstimating = {
@@ -35,16 +33,11 @@ export const RegisterCell = (props) => {
 
   const estimateThis = async () => {
     setEstimating({ ...initialEstimating, status: 'in' });
-    const costEther = utils.formatEther(await estimateCost(label));
+    const costEther = formatEther(await estimateCost(label));
     setEstimating({ ...initialEstimating, status: 'after', cost: costEther });
   };
 
   const [modalShow, setModalShow] = useState(false);
-
-  const handleRegCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    checked ? addNameToRegList(name) : removeNameFromRegList(name);
-  };
 
   if (isRegistrable(status)) {
     return (
@@ -54,19 +47,6 @@ export const RegisterCell = (props) => {
         role="group"
         aria-label="RegisterName or Estimate Price"
       >
-        <OverlayTrigger
-          placement="top"
-          overlay={<Tooltip>{t('tb.td.tips.addNameToRegList')}</Tooltip>}
-        >
-          <input
-            id={'registerName-checkbox-' + label}
-            className="form-check-input reg-checkbox"
-            type="checkbox"
-            name={label}
-            disabled={!isCustomWallet}
-            onChange={handleRegCheckboxChange}
-          />
-        </OverlayTrigger>
         <OverlayTrigger
           placement="top"
           overlay={
@@ -79,8 +59,8 @@ export const RegisterCell = (props) => {
         >
           <button
             type="button"
-            disabled={type === 'readonly' || reconnecting}
-            className="btn-plain btn-reg ms-2"
+            disabled={ isReadOnly() || reconnecting }
+            className="btn-plain btn-reg"
             onClick={() => setModalShow(true)}
           >
             {regStep > 0 ? t('tb.td.continue') : t('tb.td.reg')}
@@ -93,7 +73,7 @@ export const RegisterCell = (props) => {
               <Tooltip>{t('tb.td.tips.regStep', { regStep: regStep })}</Tooltip>
             }
           >
-            <span className="ms-2 td-reg-step">{regStep}/3</span>
+            <span className="td-reg-step">{regStep}/3</span>
           </OverlayTrigger>
         ) : (
           <OverlayTrigger
@@ -137,12 +117,7 @@ export const RegisterCell = (props) => {
         role="group"
         aria-label="Unknown"
       >
-        <input
-          className="form-check-input reg-checkbox"
-          type="checkbox"
-          disabled
-        />
-        <button type="button" className="btn-plain ms-2" disabled>
+        <button type="button" className="btn-plain" disabled>
           {t('nm.sta.Unknown')}
         </button>
       </div>
@@ -156,12 +131,7 @@ export const RegisterCell = (props) => {
       role="group"
       aria-label="RegisterName"
     >
-      <input
-        className="form-check-input reg-checkbox"
-        type="checkbox"
-        disabled
-      />
-      <button type="button" className="btn-plain ms-2" disabled>
+      <button type="button" className="btn-plain" disabled>
         {t('tb.td.reged')}
       </button>
     </div>

@@ -1,9 +1,9 @@
 import React from 'react';
-import { utils } from 'ethers';
 import { toast } from 'react-toastify';
 import namehash from '@ensdomains/eth-ens-namehash';
 import { t } from 'i18next';
 import { getNamesOfOwner, isForAccount } from '../Global/globals';
+import { keccak256, toHex } from 'viem';
 
 class MainForm extends React.Component {
   state = {
@@ -35,13 +35,13 @@ class MainForm extends React.Component {
   };
 
   addNames = async (labels) => {
-    const { nameInfo, setAndStoreNameInfo, updateNames, network, provider } =
+    const { nameInfo, setAndStoreNameInfo, updateNames } =
       this.props;
-    const account = await isForAccount(labels, provider, network);
+    const account = await isForAccount(labels);
     const labelsArr =
       account === false
         ? this.handleLabels(labels)
-        : await getNamesOfOwner(account, network);
+        : await getNamesOfOwner(account);
 
     if (labelsArr.length < 1) {
       return false;
@@ -60,7 +60,7 @@ class MainForm extends React.Component {
         length: label.length,
         level: 0,
         status: 'Unknown',
-        tokenId: utils.id(label),
+        tokenId: keccak256(toHex(label)),
       })
     );
     setAndStoreNameInfo(nameInfo, false);
