@@ -16,12 +16,11 @@ export const RegisterCell = (props) => {
     defaultDuration,
     registerName,
     regStep,
-    addNameToRegList,
-    removeNameFromRegList,
     estimateCost,
     registerNameEnd,
     regMsges,
     getDefaultNameReceiver,
+    walletAddress
   } = props;
 
   const initialEstimating = {
@@ -59,7 +58,7 @@ export const RegisterCell = (props) => {
         >
           <button
             type="button"
-            disabled={ isReadOnly() || reconnecting }
+            disabled={ isReadOnly(walletAddress) || reconnecting }
             className="btn-plain btn-reg"
             onClick={() => setModalShow(true)}
           >

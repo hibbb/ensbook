@@ -2,7 +2,6 @@ import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
 import {
-  getConfFixed,
   isGoerli,
   isMainnet,
   isNormal,
@@ -10,18 +9,19 @@ import {
   isRenewable,
 } from '../../Global/globals';
 import { isAddress, namehash } from 'viem';
+import { addrs } from '../../Global/addrs';
 
 export const LookupCell = (props) => {
   const { conf, label, status, tokenId, owner, wrapped, chainId } = props;
-  const { addr } = getConfFixed().contract; // need to deal
+  const contractAddrs = addrs;
 
   const tokenIdOrNamehashDec = wrapped
     ? BigInt(namehash(label + '.eth')).toString()
     : BigInt(tokenId).toString();
 
   const tokenContractAddr = wrapped
-    ? addr[chainId].NameWrapper
-    : addr[chainId].BaseRegImp
+    ? contractAddrs[chainId].NameWrapper
+    : contractAddrs[chainId].BaseRegImp
 
   const etherscanURL = isGoerli(chainId)
     ? 'https://goerli.etherscan.io/'
@@ -60,7 +60,7 @@ export const LookupCell = (props) => {
     },
     Metadata: {
       precondition: isNormal(status) && isMainnet(chainId),
-      link: `https://metadata.ens.domains/mainnet/${addr[chainId].BaseRegImp}/${tokenId}`
+      link: `https://metadata.ens.domains/mainnet/${contractAddrs[chainId].BaseRegImp}/${tokenId}`
     },
     Inventory: {
       precondition:

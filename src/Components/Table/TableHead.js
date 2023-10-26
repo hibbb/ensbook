@@ -6,7 +6,6 @@ import {
   faSquareCaretDown,
 } from '@fortawesome/free-regular-svg-icons';
 import {
-  faCalculator,
   faDownLeftAndUpRightToCenter,
   faUpRightAndDownLeftFromCenter,
   faRotate,
@@ -20,14 +19,12 @@ import {
   faClockRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { t } from 'i18next';
-import TooltipEstimateCost from './TooltipEstimateCost';
 import {
   haveRegistrableNames,
   haveUnregistrableNames,
   isReadOnly,
 } from '../Global/globals';
 import RenewalsModal from '../Utils/RenewalsModal';
-import { formatEther } from 'viem';
 
 export const TableHead = (props) => {
   const {
@@ -36,6 +33,7 @@ export const TableHead = (props) => {
     nameInfo,
     setAndStoreNameInfo,
     conf,
+    walletAddress,
     updateNames,
     renewNames,
     renewNamesEnd,
@@ -45,7 +43,6 @@ export const TableHead = (props) => {
     switchHideFlag,
     removeNames,
     renewsMsges,
-    getDefaultNameReceiver,
   } = props;
 
   const [renewNamesModalShow, setRenewNamesModalShow] = useState(false);
@@ -88,12 +85,6 @@ export const TableHead = (props) => {
     return array;
   };
 
-  const initialEstimating = {
-    title: 'tb.th.tips.estAll',
-    status: 'before',
-    cost: '',
-  };
-
   const statusesArr = Array.from(new Set(nameInfo.map((item) => item.status)));
 
   const removalTags = statusesArr.map((status, index) => {
@@ -110,7 +101,7 @@ export const TableHead = (props) => {
   });
 
   const nonBulkRenewable = () =>
-    reconnecting || isReadOnly() || !isBulkRenew();
+    reconnecting || isReadOnly(walletAddress) || !isBulkRenew();
   const nonFoldable = () =>
     !haveRegistrableNames(nameInfo) || !haveUnregistrableNames(nameInfo);
   const nonUpdatable = () => nameInfo.length < 1;

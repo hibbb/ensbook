@@ -142,6 +142,7 @@ class MainTable extends React.Component {
             nameInfo={nameInfo}
             setAndStoreNameInfo={setAndStoreNameInfo}
             conf={conf}
+            walletAddress={walletAddress}
             updateNames={updateNames}
             regList={regList}
             clearRegList={this.clearRegList}

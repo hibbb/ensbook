@@ -8,8 +8,6 @@ import { getETHPrice } from '../Global/globals';
 
 export default function TestBar(props) {
   const testFunc1 = async () => {
-    const a = await getETHPrice()
-    console.log(a)
   };
 
   const testFunc2 = async () => {};

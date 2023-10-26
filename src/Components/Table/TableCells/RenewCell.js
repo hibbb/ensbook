@@ -16,6 +16,7 @@ export const RenewCell = (props) => {
     reconnecting,
     addNameToRenewList,
     removeNameFromRenewList,
+    walletAddress
   } = props;
 
   const [modalShow, setModalShow] = useState(false);
@@ -42,7 +43,7 @@ export const RenewCell = (props) => {
             className="form-check-input renew-checkbox"
             type="checkbox"
             name={label}
-            disabled={ isReadOnly() || reconnecting }
+            disabled={ isReadOnly(walletAddress) || reconnecting }
             onChange={handleRenewCheckboxChange}
           />
         </OverlayTrigger>
@@ -53,7 +54,7 @@ export const RenewCell = (props) => {
           <button
             type="button"
             className="btn-plain ms-2"
-            disabled={ isReadOnly() || reconnecting }
+            disabled={ isReadOnly(walletAddress) || reconnecting }
             onClick={() => setModalShow(true)}
           >
             {t('tb.td.renew')}

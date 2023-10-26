@@ -1,12 +1,11 @@
 import React from 'react';
-import { fetchChainId, getETHPrice, isMyName, isRegistrable, readCon } from '../Global/globals';
+import { isMyName, isRegistrable } from '../Global/globals';
 import { LabelCell } from './TableCells/LabelCell';
 import { LookupCell } from './TableCells/LookupCell';
 import { StatusCell } from './TableCells/StatusCell';
 import { RegisterCell } from './TableCells/RegisterCell';
 import { DelCell } from './TableCells/DelCell';
 import { RenewCell } from './TableCells/RenewCell';
-import { walletClient } from '../Global/clients';
 
 export const TableBody = (props) => {
   const {
@@ -98,6 +97,7 @@ export const TableBody = (props) => {
             removeNameFromRegList={removeNameFromRegList}
             regMsges={regMsges}
             getDefaultNameReceiver={getDefaultNameReceiver}
+            walletAddress={walletAddress}
           />
         </td>
         <td>
@@ -112,6 +112,7 @@ export const TableBody = (props) => {
             reconnecting={reconnecting}
             addNameToRenewList={addNameToRenewList}
             removeNameFromRenewList={removeNameFromRenewList}
+            walletAddress={walletAddress}
           />
         </td>
         <td>

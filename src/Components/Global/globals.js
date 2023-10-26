@@ -1,5 +1,4 @@
 import confFile from '../../conf.json';
-import confFixed from '../../confFixed.json';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import moment from 'moment';
 import { getAddress, isAddress, keccak256, toHex } from 'viem';
@@ -11,6 +10,7 @@ import { publicClient, walletClient } from './clients';
 import { abis } from './abis';
 import { addrs } from './addrs';
 
+
 export function getConf() {
   if (confFile.host === 'remote') {
     let confStored = JSON.parse(window.localStorage.getItem('confInfo'));
@@ -21,10 +21,6 @@ export function getConf() {
     return confStored;
   }
   return confFile;
-}
-
-export function getConfFixed() {
-  return confFixed;
 }
 
 export function updateLookupList(conf) {
@@ -56,7 +52,6 @@ export async function fetchChainId() {
 export async function getETHPrice() {
   const chainId = await fetchChainId()
   const currentETHPrice = await readCon('ETHPriceFeed', chainId, 'latestAnswer')
-  console.log(currentETHPrice)
   return Number.parseInt(currentETHPrice);
 }
 
@@ -70,7 +65,6 @@ export async function writeCon(contractName, chainId, functionName, args) {
 }
 
 export async function readCon(contractName, chainId, functionName, args) {
-  console.log([contractName, chainId, functionName, args])
   return await publicClient.readContract({
     address: addrs[chainId][contractName],
     abi: abis[contractName],
@@ -79,8 +73,8 @@ export async function readCon(contractName, chainId, functionName, args) {
   })
 }
 
-export function isReadOnly() {  // need to deal
-  console.log("if we need this function, let's add some codes here")
+export function isReadOnly(walletAddress) {  // need to deal
+  return !walletAddress
 }
 
 export function isSupportedChain(key) {

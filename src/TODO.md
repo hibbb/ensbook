@@ -6,6 +6,7 @@
 - [ ] del confFix ?
 - [ ] just use public and wallet client?
 - [ ] del ensname?
+- [ ] wallet field
 
 ## Priority 2
 

@@ -11,7 +11,6 @@ import {
   updateLookupList,
   isRegistrable,
   getNameItemByLabel,
-  getConfFixed,
   queryNameInfo,
   fetchChainId,
   readCon,
@@ -25,15 +24,15 @@ import Footer from './Components/Footer/Footer';
 import TestBar from './Components/Utils/TestBar';
 import MessageToasts from './Components/Utils/MessageToasts';
 import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal';
-import { createPublicClient, createWalletClient, custom, formatEther, http, keccak256, parseUnits, toHex } from 'viem';
-import { mainnet, sepolia } from 'viem/chains'
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { keccak256, parseUnits, toHex } from 'viem';
+import { generatePrivateKey } from 'viem/accounts'
 import { publicClient, walletClient } from './Components/Global/clients';
 import { normalize } from 'viem/ens'
 import { addrs } from './Components/Global/addrs';
+import { ensConstants, explorers } from './Components/Global/constants';
 
 let conf = updateLookupList(); // getConf() inside
-const confFixed = getConfFixed();
+const provider = window.ethereum
 
 const INITIAL_STATE = {
   regMsges: [{ time: moment(), type: 'action', text: 'regBefore' }], // for registerName process
@@ -67,7 +66,6 @@ class ENSBook extends React.Component {
       console.log(chainId);
       return this.setState({ unsupported: true });
     }
-
 
     this.setState({ ethPrice, walletAddress, chainId});
     this.setState({ reconnecting: false });
@@ -317,13 +315,13 @@ class ENSBook extends React.Component {
 
     const regFrom05 = async () => {
       const commitTxLink =
-        '<a href="' +
-        confFixed.scanConf[chainId] +
-        'tx/' +
-        regInfo.commitTxHash +
-        '" target="_blank" rel="noreferrer">' +
-        t('c.tx') +
-        '</a>';
+        '<a href="' 
+        + explorers[chainId] 
+        + 'tx/' 
+        + regInfo.commitTxHash 
+        + '" target="_blank" rel="noreferrer">' 
+        + t('c.tx') 
+        + '</a>';
 
       regMsges.push({
         time: moment(),
@@ -383,7 +381,7 @@ class ENSBook extends React.Component {
     const regFrom1 = async () => {
       // long-timeout is necessary for durations >24.8 days
       const wait = (ms) => new Promise((resolve) => lt.setTimeout(resolve, ms));
-      await wait(confFixed.ensConf.minCommitmentAge * 1000);
+      await wait(ensConstants.minCommitmentAge * 1000);
 
       nameInfo[index].regStep = 2;
       this.setAndStoreNameInfo(nameInfo, false);
@@ -471,13 +469,13 @@ class ENSBook extends React.Component {
 
     const regFrom25 = async () => {
       const regTxLink =
-        '<a href="' +
-        confFixed.scanConf[chainId] +
-        'tx/' +
-        regInfo.regTxHash +
-        '" target="_blank" rel="noreferrer">' +
-        t('c.tx') +
-        '</a>';
+        '<a href="' 
+        + explorers[chainId] 
+        + 'tx/' 
+        + regInfo.regTxHash 
+        + '" target="_blank" rel="noreferrer">' 
+        + t('c.tx') 
+        + '</a>';
 
       regMsges.push({
         time: moment(),
@@ -588,13 +586,13 @@ class ENSBook extends React.Component {
       // submit the 2nd transaction
       renewTx = await writeCon('ETHRegCtrl', chainId, 'renew', renewArgs);
       renewTxLink =
-        '<a href="' +
-        confFixed.scanConf[chainId] +
-        'tx/' +
-        renewTx.hash +
-        '" target="_blank" rel="noreferrer">' +
-        t('c.tx') +
-        '</a>';
+        '<a href="' 
+        + explorers[chainId] 
+        + 'tx/' 
+        + renewTx.hash 
+        + '" target="_blank" rel="noreferrer">' 
+        + t('c.tx') 
+        + '</a>';
 
       renewMsges.push({
         time: moment(),
@@ -698,13 +696,13 @@ class ENSBook extends React.Component {
     try {
       renewsTx = await writeCon('BulkRenew', chainId, 'renewAll', renewAllArgs);
       renewsTxLink =
-        '<a href="' +
-        confFixed.scanConf[chainId] +
-        'tx/' +
-        renewsTx.hash +
-        '" target="_blank" rel="noreferrer">' +
-        t('c.tx') +
-        '</a>';
+        '<a href="' 
+        + explorers[chainId] 
+        + 'tx/' 
+        + renewsTx.hash 
+        + '" target="_blank" rel="noreferrer">' 
+        + t('c.tx') 
+        + '</a>';
 
       renewsMsges.push({
         time: moment(),
@@ -781,17 +779,20 @@ class ENSBook extends React.Component {
     return costWei;
   };
 
-  subscribeProvider = async (publicClient) => {   // need to deal
-    if (!publicClient.on) {
+  subscribeProvider = async (provider) => {   // need to deal
+    if (!provider.on) {
+      console.log('!provider.on')
       return;
     }
-    publicClient.on('accountsChanged', async (accounts) => {
+    provider.on('accountsChanged', async (accounts) => {
+      console.log('accounts-changed')
+      console.log(accounts)
       // if (this.state.type !== 'web3') {
       //   return console.log('Your switch only works in Web3 mode.');
       // }
       // this.reconnectApp(false);
     });
-    publicClient.on('chainChanged', async (chainId) => {
+    provider.on('chainChanged', async (chainId) => {
       // if (this.state.type !== 'web3') {
       //   return console.log('Your switch only works in Web3 mode.');
       // }
@@ -826,10 +827,7 @@ class ENSBook extends React.Component {
       <div id="main-wrapper" className="container main-wrapper">
         <Header
           conf={conf}
-          confFixed={confFixed}
           reconnectApp={this.reconnectApp}
-          disconnectApp={this.disconnectApp}
-          reconnecting={reconnecting}
           setAndStoreConfInfo={this.setAndStoreConfInfo}
         />
         <MainForm

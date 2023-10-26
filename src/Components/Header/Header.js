@@ -1,17 +1,12 @@
 import React from 'react';
 import AppTitle from './AppTitle';
 import LanguageSwitcher from './LanguageSwitcher';
-import OperatorWallet from './OperatorWallet';
 import ConfigureForm from './ConfigureForm';
-import { getConfFixed } from '../Global/globals';
 
 export default function Header(props) {
   const {
     conf,
-    walletInfo,
     reconnectApp,
-    disconnectApp,
-    reconnecting,
     setAndStoreConfInfo,
   } = props;
 
