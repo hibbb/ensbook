@@ -23,7 +23,16 @@ const chains = [mainnet, sepolia]
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
 
 // 3. Create modal
-createWeb3Modal({ wagmiConfig, projectId, chains })
+createWeb3Modal({ 
+  wagmiConfig, 
+  projectId, 
+  chains,
+  themeMode: 'light',
+  themeVariables: {
+    '--w3m-font-family': 'ebr-semibold',
+    '--w3m-color-mix': '#0DCAF0'
+  }
+})
 
 export default function App() {
   const { t } = useTranslation();

@@ -115,7 +115,7 @@ class ConfigureForm extends React.Component {
     const lookupList = JSON.parse(window.localStorage.getItem('lookupList'));
 
     return (
-      <div className="ps-2 pe-3 d-inline-block text-start">
+      <div className="ps-3 pe-3 d-inline-block text-start">
         <OverlayTrigger
           placement="bottom"
           overlay={<Tooltip>{t('conf.title')}</Tooltip>}

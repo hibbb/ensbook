@@ -21,10 +21,10 @@ export default function LanguageSwitcher(props) {
       placement="bottom"
       overlay={<Tooltip>{t('header.language')}</Tooltip>}
     >
-      <span className="lang-span">
+      <span className="ps-1 pe-2 lang-span">
         <select
           id="select-lang"
-          className="ms-2 select-lang"
+          className="select-lang"
           aria-label="language"
           name="language"
           value={usingLang}

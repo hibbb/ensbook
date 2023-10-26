@@ -332,8 +332,9 @@ h1 a .title-ens {
   text-align: center;
 }
 .header-right {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 @media (min-width: 768px) {
   .header-left {
@@ -486,10 +487,18 @@ button.btn-plain[disabled] {
 .btn-sub {
   font-size: 0.88rem;
 }
+.lang-span {
+  padding-right: 0.15rem;
+  background-color: #e5e5e5;
+  border-radius: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
 .select-lang {
   border: 0;
   background-color: #e5e5e5;
-  border-radius: 0.15rem;
+  padding: 0.1rem 0.25rem;
   font-size: 0.85rem;
 }
 .wallet-connect {

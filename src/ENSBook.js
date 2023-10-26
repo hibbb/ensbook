@@ -30,9 +30,9 @@ import { publicClient, walletClient } from './Components/Global/clients';
 import { normalize } from 'viem/ens'
 import { addrs } from './Components/Global/addrs';
 import { ensConstants, explorers } from './Components/Global/constants';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
 
 let conf = updateLookupList(); // getConf() inside
-const provider = window.ethereum
 
 const INITIAL_STATE = {
   regMsges: [{ time: moment(), type: 'action', text: 'regBefore' }], // for registerName process
@@ -60,6 +60,22 @@ class ENSBook extends React.Component {
     const ethPrice = conf.custom.premium.priceUnit === 'ETH' ? await getETHPrice() : undefined;
     const [ walletAddress ] = await walletClient.getAddresses();
     const chainId = await fetchChainId();
+
+    const provider = window.ethereum
+    
+    // await EthereumProvider.init({
+    //   projectId: '874c843cfae3946d6543580b683a1047', // REQUIRED your projectId
+    //   chains: [1, 5], // REQUIRED chain ids
+    //   showQrModal: false, // REQUIRED set to "true" to use @walletconnect/modal
+    //   methods: ['eth_requestAccounts'], // REQUIRED ethereum methods
+    //   events: ['chainChanged', 'accountsChanged', 'connect', 'disconnect'], // REQUIRED ethereum events
+    // })
+    provider.on('chainChanged', (chainId) => {
+      console.log('chainChanged')
+      console.log(chainId)
+    })
+    await provider.enable()
+
     
     if (!isSupportedChain(chainId)) {
       console.log('chainId');

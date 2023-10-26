@@ -25,7 +25,7 @@ export default function Header(props) {
           reconnectApp={reconnectApp}
           setAndStoreConfInfo={setAndStoreConfInfo}
         />
-        <w3m-button />
+        <w3m-button balance='hide' class='pe-2 d-inline-block text-start' />
       </div>
     </div>
   );
