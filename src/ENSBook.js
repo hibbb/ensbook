@@ -30,7 +30,6 @@ import { publicClient, walletClient } from './Components/Global/clients';
 import { normalize } from 'viem/ens'
 import { addrs } from './Components/Global/addrs';
 import { ensConstants, explorers } from './Components/Global/constants';
-import { EthereumProvider } from '@walletconnect/ethereum-provider';
 
 let conf = updateLookupList(); // getConf() inside
 
@@ -61,20 +60,22 @@ class ENSBook extends React.Component {
     const [ walletAddress ] = await walletClient.getAddresses();
     const chainId = await fetchChainId();
 
-    const provider = window.ethereum
-    
-    // await EthereumProvider.init({
-    //   projectId: '874c843cfae3946d6543580b683a1047', // REQUIRED your projectId
-    //   chains: [1, 5], // REQUIRED chain ids
-    //   showQrModal: false, // REQUIRED set to "true" to use @walletconnect/modal
-    //   methods: ['eth_requestAccounts'], // REQUIRED ethereum methods
-    //   events: ['chainChanged', 'accountsChanged', 'connect', 'disconnect'], // REQUIRED ethereum events
-    // })
-    provider.on('chainChanged', (chainId) => {
-      console.log('chainChanged')
-      console.log(chainId)
-    })
-    await provider.enable()
+    console.log('c1')
+    console.log(this.props.bookModal)
+    const { open, selectedNetworkId } = this.props.bookModal.getState()
+
+    if (selectedNetworkId) {
+
+      console.log(selectedNetworkId)
+      // const provider = window.ethereum
+
+      // provider.on('chainChanged', (chainId) => {
+      //   console.log('chainChanged')
+      //   console.log(chainId)
+      // })
+      // await provider.enable()
+
+    }
 
     
     if (!isSupportedChain(chainId)) {
