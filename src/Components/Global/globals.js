@@ -51,7 +51,11 @@ export async function fetchChainId() {
 
 export async function getETHPrice() {
   const chainId = await fetchChainId()
+  console.log('chainId3')
+  console.log(chainId)
   const currentETHPrice = await readCon('ETHPriceFeed', chainId, 'latestAnswer')
+  console.log('currentETHPrice')
+  console.log(currentETHPrice)
   return Number.parseInt(currentETHPrice);
 }
 

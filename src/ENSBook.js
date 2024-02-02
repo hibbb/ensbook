@@ -103,6 +103,33 @@ class ENSBook extends React.Component {
     this.updateNames();
   };
 
+  subscribeProvider = async (provider) => {   // need to deal
+    if (!provider.on) {
+      console.log('!provider.on')
+      return;
+    }
+    provider.on('accountsChanged', async (accounts) => {
+      console.log('accounts-changed')
+      console.log(accounts)
+      // if (this.state.type !== 'web3') {
+      //   return console.log('Your switch only works in Web3 mode.');
+      // }
+      // this.reconnectApp(false);
+    });
+    provider.on('chainChanged', async (chainId) => {
+      // if (this.state.type !== 'web3') {
+      //   return console.log('Your switch only works in Web3 mode.');
+      // }
+      // if (isSupportedChain(parseInt(chainId, 16))) {
+      //   this.setState({ unsupported: false });
+      //   this.reconnectApp();
+      // } else {
+      //   this.setState({ unsupported: true });
+      // }
+    });
+  };
+
+
   setAndStoreConfInfo = (newConf) => {
     conf = newConf; // renew the global variable: conf
     window.localStorage.setItem('confInfo', JSON.stringify(conf));
@@ -794,32 +821,6 @@ class ENSBook extends React.Component {
     const costWei = gasFee + BigInt(rent);
 
     return costWei;
-  };
-
-  subscribeProvider = async (provider) => {   // need to deal
-    if (!provider.on) {
-      console.log('!provider.on')
-      return;
-    }
-    provider.on('accountsChanged', async (accounts) => {
-      console.log('accounts-changed')
-      console.log(accounts)
-      // if (this.state.type !== 'web3') {
-      //   return console.log('Your switch only works in Web3 mode.');
-      // }
-      // this.reconnectApp(false);
-    });
-    provider.on('chainChanged', async (chainId) => {
-      // if (this.state.type !== 'web3') {
-      //   return console.log('Your switch only works in Web3 mode.');
-      // }
-      // if (isSupportedChain(parseInt(chainId, 16))) {
-      //   this.setState({ unsupported: false });
-      //   this.reconnectApp();
-      // } else {
-      //   this.setState({ unsupported: true });
-      // }
-    });
   };
 
   render() {
