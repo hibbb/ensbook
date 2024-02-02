@@ -53,7 +53,7 @@ export const LookupCell = (props) => {
     },
     Vision: {
       precondition: isMainnet(network),
-      link: `https://ens.vision/name/${label}`
+      link: `https://vision.io/name/${label}`
     },
     Godid: {
       precondition: isMainnet(network),

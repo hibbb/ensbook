@@ -6,7 +6,18 @@ import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 export default function TestBar(props) {
   const testFunc1 = async () => {};
 
+<<<<<<< HEAD
+  const testFunc1 = async () => {
+    let a = ['oklend', '12h00m00', '61997', 'baffler', '51990', 'samecoin', '20h59', 'flatland', 'npool', null, '00h00m01']
+    let b = a.filter(item => item && item.trim())
+    console.log(b)
+  }
+
+  const testFunc2 = async () => {
+  }
+=======
   const testFunc2 = async () => {};
+>>>>>>> dev
 
   return (
     <>
