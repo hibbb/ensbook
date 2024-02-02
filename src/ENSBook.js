@@ -28,7 +28,6 @@ import MainTable from './Components/Table/MainTable';
 import Footer from './Components/Footer/Footer';
 import MessageToasts from './Components/Utils/MessageToasts';
 import UnsupportedNetworkModal from './Components/Utils/UnsupportedNetworkModal';
-import TestBar from './Components/Utils/TestBar';
 
 let web3Modal;
 let conf = updateLookupList(); // getConf() inside
