@@ -239,7 +239,7 @@ export async function queryData(queryCode, network) {
   const subgraphUri =
     network === 'goerli'
       ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli'
-      : 'https://api.thegraph.com/subgraphs/name/ensdomains/ens';
+      : 'https://gateway-arbitrum.network.thegraph.com/api/9380cc86a43a0042d692548c3b0bd9e2/subgraphs/id/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH';
 
   const client = new ApolloClient({
     uri: subgraphUri,
