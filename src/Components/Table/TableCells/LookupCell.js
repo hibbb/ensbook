@@ -17,7 +17,7 @@ export const LookupCell = (props) => {
   const { addr } = getConfFixed().contract;
 
   const tokenIdOrNamehashDec = wrapped
-    ? BigNumber.from(namehash(label + '.eth')).toString()
+    ? BigNumber.from(namehash(`${label}.eth`)).toString()
     : BigNumber.from(tokenId).toString();
 
   const tokenContractAddr = wrapped
@@ -53,7 +53,7 @@ export const LookupCell = (props) => {
     },
     Vision: {
       precondition: isMainnet(network),
-      link: `https://vision.io/name/${label}`
+      link: `https://vision.io/name/ens/${label}.eth`
     },
     Godid: {
       precondition: isMainnet(network),
@@ -81,13 +81,13 @@ export const LookupCell = (props) => {
   return Object.keys(lookupLinks).map((item) =>
     lookup[item] && lookupLinks[item].precondition ? ( // decide which should be shown
       <OverlayTrigger
-        key={'lookup-key-' + item}
+        key={`lookup-key-${item}`}
         placement="top"
-        overlay={<Tooltip>{t('tb.lookup.' + item, { label: label })}</Tooltip>}
+        overlay={<Tooltip>{t(`tb.lookup.${item}`, { label: label })}</Tooltip>}
       >
         <a
           href={lookupLinks[item].link}
-          className={'me-1 text-center lookup-' + item}
+          className={`me-1 text-center lookup-${item}`}
           target="_blank"
           rel="noreferrer"
         >
