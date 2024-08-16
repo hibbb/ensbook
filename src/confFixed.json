@@ -3,7 +3,7 @@
     "GRACE_PERIOD": 90,
     "MIN_REGISTRATION_DURATION": 28,
     "minCommitmentAge": 60,
-    "maxCommitmentAge": 604800
+    "maxCommitmentAge": 86400
   },
   "scanConf": {
     "mainnet": "https://etherscan.io/",
