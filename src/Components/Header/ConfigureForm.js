@@ -392,7 +392,7 @@ class ConfigureForm extends React.Component {
                   aria-label="walletNetwork"
                 >
                   <option value="mainnet">{t('c.mainnet')}</option>
-                  <option value="goerli">{t('c.goerli')}</option>
+                  <option value="sepolia">{t('c.sepolia')}</option>
                 </Form.Select>
               </InputGroup>
               <InputGroup

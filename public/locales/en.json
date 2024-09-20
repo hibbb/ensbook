@@ -173,7 +173,7 @@
     "removeNames": "Are you sure to remove in batches?",
     "errorNetwork": {
       "title": "Unsupported Network",
-      "text": "ENSBook currently supports only ethereum Mainnet and Goerli network, please switch network in the wallet you are connected to, or disconnect from the wallet."
+      "text": "ENSBook currently supports only ethereum Mainnet and Sepolia network, please switch network in the wallet you are connected to, or disconnect from the wallet."
     }
   },
   "c": {
@@ -192,7 +192,7 @@
     "mainnet": "Mainnet",
     "homestead": "Mainnet",
     "ropsten": "Ropsten",
-    "goerli": "Goerli",
+    "sepolia": "Sepolia",
     "connect": "Connect",
     "disconnect": "Disconnect",
     "relatedTime": "Related Times",

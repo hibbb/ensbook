@@ -18,7 +18,7 @@
 - [x] separate the opensea url based on whether the name is wrapped or not
 - [x] add an attribute of wrapping status into nameInfo
 - [x] move related info to the left
-- [x] migrate testnet to Goerli after Merge
+- [x] migrate testnet to sepolia after Merge
 - [x] preload fonts
 - [x] disable sorting while fetching
 - [x] let main input get focus after addNames
