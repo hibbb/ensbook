@@ -59,6 +59,10 @@ export const LookupCell = (props) => {
       precondition: isMainnet(network),
       link: `https://godid.io/items/${label}.eth`
     },
+    FollowProtocol: {
+      precondition: isMainnet(network) && isRenewable(status),
+      link: `https://ethfollow.xyz/${label}.eth`
+    },
     Metadata: {
       precondition: isNormal(status),
       link: `https://metadata.ens.domains/${network}/${addr[network].BaseRegImp}/${tokenId}`

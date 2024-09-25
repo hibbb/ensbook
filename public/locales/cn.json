@@ -74,6 +74,7 @@
       "Opensea": "Opensea",
       "Vision": "ENS.Vision",
       "Godid": "Godid",
+      "FollowProtocol": "Eth 关注协议",
       "Metadata": "元数据",
       "Inventory": "持有者的 ENS 资产库",
       "LinkETH": "{{label}}.eth.limo",
