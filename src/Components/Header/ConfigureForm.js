@@ -60,7 +60,7 @@ class ConfigureForm extends React.Component {
 
   handleSelectBooleanChange = (event) => {
     const { name, value } = event.target;
-    this.setState({ [name]: value === 'false' ? false : true });
+    this.setState({ [name]: value !== 'false' });
   };
 
   handleDisplayLookupChange = (event) => {
@@ -163,7 +163,7 @@ class ConfigureForm extends React.Component {
               className="btn-close text-reset"
               data-bs-dismiss="offcanvas"
               aria-label="Close"
-            ></button>
+            />
           </div>
           <div className="offcanvas-body">
             <form>
@@ -236,7 +236,7 @@ class ConfigureForm extends React.Component {
                         onChange={this.handleDisplayLookupChange}
                       />
                       <label className="form-check-label">
-                        {t('tb.lookup.' + item, { label: '' })}
+                        {t(`tb.lookup.${item}`, { label: '' })}
                       </label>
                     </div>
                   ))}
@@ -359,7 +359,7 @@ class ConfigureForm extends React.Component {
               </h6>
               <InputGroup
                 className={
-                  'mb-2 custom-wallet-' + Boolean(this.state.walletSwitch)
+                  `mb-2 custom-wallet-${Boolean(this.state.walletSwitch)}`
                 }
                 size="sm"
               >
@@ -377,7 +377,7 @@ class ConfigureForm extends React.Component {
               </InputGroup>
               <InputGroup
                 className={
-                  'mb-2 custom-wallet-' + Boolean(this.state.walletSwitch)
+                  `mb-2 custom-wallet-${Boolean(this.state.walletSwitch)}`
                 }
                 size="sm"
               >
@@ -397,7 +397,7 @@ class ConfigureForm extends React.Component {
               </InputGroup>
               <InputGroup
                 className={
-                  'mb-6 custom-wallet-' + Boolean(this.state.walletSwitch)
+                  `mb-6 custom-wallet-${Boolean(this.state.walletSwitch)}`
                 }
                 size="sm"
               >

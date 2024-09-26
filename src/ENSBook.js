@@ -71,22 +71,24 @@ class ENSBook extends React.Component {
 
     const networkname = (await provider.getNetwork()).name;
     if (!isSupportedChain(networkname)) {
-      console.log(networkname);
       return this.setState({ unsupported: true });
     }
 
-    const network = networkname === 'homestead' ? 'mainnet' : networkname;
+    const network = (networkname === 'homestead') ? 'mainnet' : networkname;
     const address = signer ? await signer.getAddress() : null;
     const balance = address
       ? utils.formatEther(await provider.getBalance(address))
       : null;
     const ensname = (address && isMainnet(network)) ? await provider.lookupAddress(address) : null;
+
+    this.setState({ address, network, balance, ensname });
+
     const ethPrice =
       conf.custom.premium.priceUnit === 'ETH'
         ? await this.getETHPrice()
         : undefined;
-    this.setState({ address, network, balance, ensname, ethPrice });
-    this.setState({ reconnecting: false });
+
+    this.setState({ ethPrice, reconnecting: false });
 
     if (updateNamesFlag) {
       await this.updateNames();

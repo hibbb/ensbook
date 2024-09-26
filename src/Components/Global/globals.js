@@ -34,12 +34,6 @@ export function updateLookupList(_conf) {
     window.localStorage.setItem('confInfo', JSON.stringify(conf));
   }
 
-  // check if there is conf.custom.premium.priceUnit which was added in 2023.01
-  if (!conf.custom.premium.priceUnit) {
-    conf.custom.premium.priceUnit = 'ETH';
-    window.localStorage.setItem('confInfo', JSON.stringify(conf));
-  }
-
   return conf;
 }
 
