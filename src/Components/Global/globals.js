@@ -21,8 +21,8 @@ export function getConfFixed() {
   return confFixed;
 }
 
-export function updateLookupList(conf) {
-  conf = conf ?? getConf();
+export function updateLookupList(_conf) {
+  const conf = _conf ?? getConf();
   const oldList = Object.keys(conf.custom.display.lookup);
   const newList = Object.keys(confFile.custom.display.lookup);
 
@@ -34,17 +34,11 @@ export function updateLookupList(conf) {
     window.localStorage.setItem('confInfo', JSON.stringify(conf));
   }
 
-  // check if there is conf.custom.premium.priceUnit which was added in 2023.01
-  if (!conf.custom.premium.priceUnit) {
-    conf.custom.premium.priceUnit = 'ETH';
-    window.localStorage.setItem('confInfo', JSON.stringify(conf));
-  }
-
   return conf;
 }
 
-export function getContract(providerOrSigner, contract, network, conf) {
-  conf = conf ?? getConf();
+export function getContract(providerOrSigner, contract, network, _conf) {
+  const conf = _conf ?? getConf();
   const contractAddr = confFixed.contract.addr[network][contract];
   const contractAbi = confFixed.contract.abi[contract];
   return new Contract(contractAddr, contractAbi, providerOrSigner);
@@ -70,20 +64,20 @@ export function getETHPriceFeedCon(providerOrSigner, network, conf) {
   return getContract(providerOrSigner, 'ETHPriceFeed', network, conf);
 }
 
-export function isCustomWallet(conf) {
-  conf = conf ?? getConf();
+export function isCustomWallet(_conf) {
+  const conf = _conf ?? getConf();
   return conf.custom.wallet.switch;
 }
 
 export function isSupportedChain(key) {
   if (typeof key === 'string') {
     return (
-      ['homestead', 'mainnet', 'goerli'].findIndex((item) => item === key) > -1
+      ['homestead', 'mainnet', 'sepolia'].findIndex((item) => item === key) > -1
     );
   }
   if (typeof key === 'number') {
-    // ChainId: 1 for Mainnet, 3 for Ropsten, 5 for Goerli
-    return [1, 5].findIndex((item) => item === key) > -1;
+    // ChainId: 1 for Mainnet, 3 for Ropsten, 11155111 for Sepolia
+    return [1, 11155111].findIndex((item) => item === key) > -1;
   }
 }
 
@@ -105,12 +99,12 @@ export function isRopsten(key) {
   }
 }
 
-export function isGoerli(key) {
+export function isSepolia(key) {
   if (typeof key === 'string') {
-    return key === 'goerli';
+    return key === 'sepolia';
   }
   if (typeof key === 'number') {
-    return key === 5; // ChainId: 5 for Goerli
+    return key === 11155111; // ChainId: 11155111 for Sepolia
   }
 }
 
@@ -164,14 +158,16 @@ export function haveRenewableNames(nameInfo) {
 
 export function storeRegInfo(label, regInfo) {
   // regInfo: { owner, duration, secret, resolver, addr, commitment, commitTxHash,regTxHash }
-  window.localStorage.setItem('regInfo-' + label, JSON.stringify(regInfo));
+  window.localStorage.setItem(`regInfo-${label}`, JSON.stringify(regInfo));
 }
 
 export function getRegInfo(label) {
-  return JSON.parse(window.localStorage.getItem('regInfo-' + label));
+  return JSON.parse(window.localStorage.getItem(`regInfo-${label}`));
 }
 
-export async function updateRegStep(label, regStep, provider) {
+export async function updateRegStep(label, _regStep, provider) {
+  let regStep = _regStep
+
   if (regStep === 0 || regStep === 3) {
     removeRegInfo(label);
     return 0;
@@ -185,7 +181,7 @@ export async function updateRegStep(label, regStep, provider) {
 
   let commitTxReceipt;
   let commitTxTime;
-  let regWindow = {};
+  const regWindow = {};
 
   if (regInfo.commitTxHash) {
     commitTxReceipt = await provider.getTransactionReceipt(
@@ -232,13 +228,13 @@ export async function updateRegStep(label, regStep, provider) {
 }
 
 export function removeRegInfo(label) {
-  window.localStorage.removeItem('regInfo-' + label);
+  window.localStorage.removeItem(`regInfo-${label}`);
 }
 
 export async function queryData(queryCode, network) {
   const subgraphUri =
-    network === 'goerli'
-      ? 'https://api.thegraph.com/subgraphs/name/ensdomains/ensgoerli'
+    network === 'sepolia'
+      ? 'https://api.studio.thegraph.com/query/49574/enssepolia/version/latest'
       : 'https://gateway-arbitrum.network.thegraph.com/api/9380cc86a43a0042d692548c3b0bd9e2/subgraphs/id/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH';
 
   const client = new ApolloClient({
@@ -255,7 +251,9 @@ export async function queryData(queryCode, network) {
 }
 
 // entering @ in front of an ENS name or an address can be used to query its names
-export async function isForAccount(str, provider, network) {
+export async function isForAccount(_str, provider, network) {
+  let str = _str
+  
   const from = str.startsWith('@')
     ? 'fromOwner'
     : str.startsWith('#')
@@ -299,19 +297,19 @@ export async function getNamesOfOwner(owner, network) {
     return [];
   }
   const queryCode = {
-    str: `query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }`,
+    str: "query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }",
     vars: { owner: owner },
   };
   const { registrations } = await queryData(queryCode, network);
   const labelsArr = registrations.map((item) => item.labelName); // labels Array
-  return labelsArr.filter((item) => item && item.trim()); // remove null/undefined...
+  return labelsArr.filter((item) => item?.trim()); // remove null/undefined...
 }
 
 export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
   if (labelsGroup.length > 100) {
     return nameInfo;
   }
-  const namesGroup = labelsGroup.map(label => label + '.eth')
+  const namesGroup = labelsGroup.map(label => `${label}.eth`)
 
   const queryCode = {
     str: `query($labelsGroup: [String!], $namesGroup: [String!]) {
@@ -332,7 +330,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
       (item) => item.labelName === labelsGroup[i]
     );
     const ni = nameInfo.findIndex((item) => item.label === labelsGroup[i]);
-    const wi = wrappedDomains.findIndex((item) => item.name === labelsGroup[i] + '.eth');
+    const wi = wrappedDomains.findIndex((item) => item.name === `${labelsGroup[i]}.eth`);
     const isWrappedName = wi > -1
 
     const actualOwner = isWrappedName ? wrappedDomains[wi].owner.id : registrations[ri]?.registrant.id

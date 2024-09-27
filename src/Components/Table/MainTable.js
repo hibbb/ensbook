@@ -91,10 +91,10 @@ class MainTable extends React.Component {
 
     const removeName = (index) => {
       const currentRegCheckBox = document.getElementById(
-        'registerName-checkbox-' + nameInfo[index].label
+        `registerName-checkbox-${nameInfo[index].label}`
       );
       const currentRenewCheckBox = document.getElementById(
-        'renewName-checkbox-' + nameInfo[index].label
+        `renewName-checkbox-${nameInfo[index].label}`
       );
       if (currentRegCheckBox) currentRegCheckBox.checked = false;
       if (currentRenewCheckBox) currentRenewCheckBox.checked = false;
@@ -123,6 +123,7 @@ class MainTable extends React.Component {
         );
       } else if (flag === 'Lower') {
         let lowerLevel = 9; // should be equal or higher than the possible highest level
+        // biome-ignore lint/complexity/noForEach: <explanation>
         nameInfo.forEach((e) => {
           lowerLevel = Math.min(e.level, lowerLevel);
         }); // find the lowest level
