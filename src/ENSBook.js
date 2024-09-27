@@ -81,14 +81,12 @@ class ENSBook extends React.Component {
       : null;
     const ensname = (address && isMainnet(network)) ? await provider.lookupAddress(address) : null;
 
-    this.setState({ address, network, balance, ensname });
-
     const ethPrice =
       conf.custom.premium.priceUnit === 'ETH'
-        ? await this.getETHPrice()
+        ? await this.getETHPrice(provider, network)
         : undefined;
 
-    this.setState({ ethPrice, reconnecting: false });
+    this.setState({ address, network, balance, ensname, ethPrice, reconnecting: false });
 
     if (updateNamesFlag) {
       await this.updateNames();
@@ -905,8 +903,7 @@ class ENSBook extends React.Component {
     return { provider, signer: undefined, type: 'readonly' };
   };
 
-  getETHPrice = async () => {
-    const { provider, network } = this.state;
+  getETHPrice = async (provider, network) => {
     const ETHPriceFeedCon = getETHPriceFeedCon(provider, network, conf);
     const currentETHPrice = await ETHPriceFeedCon.latestAnswer();
     return currentETHPrice.toNumber();
