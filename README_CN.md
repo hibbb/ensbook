@@ -22,7 +22,7 @@
 - ENSBook 仅支持 .eth 二级名称 (类似 ensbook.eth)。
 - ENSBook 只是一个辅助工具，请根据自己的情况使用。
 - ENSBook 不收集任何个人信息，所有自定义配置都存储在您的本地环境中。
-- ENSBook 支持以太坊主网和 [Goerli 测试网](https://goerli.net/)，您可以先在 Goerli 网络上进行功能测试。
+- ENSBook 支持以太坊主网和 sepolia 测试网，您可以先在 sepolia 网络上进行功能测试。
 
 ## 使用
 

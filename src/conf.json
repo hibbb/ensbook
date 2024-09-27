@@ -14,6 +14,7 @@
         "Opensea": true,
         "Vision": true,
         "Godid": true,
+        "FollowProtocol": true,
         "Metadata": false,
         "Inventory": false,
         "LinkETH": false,

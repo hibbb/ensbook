@@ -4,7 +4,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { t } from 'i18next';
 import {
   getConfFixed,
-  isGoerli,
+  isSepolia,
   isMainnet,
   isNormal,
   isOpen,
@@ -24,8 +24,8 @@ export const LookupCell = (props) => {
     ? addr[network].NameWrapper
     : addr[network].BaseRegImp
 
-  const etherscanURL = isGoerli(network)
-    ? 'https://goerli.etherscan.io/'
+  const etherscanURL = isSepolia(network)
+    ? 'https://sepolia.etherscan.io/'
     : 'https://etherscan.io/';
 
   // for td-lookup
@@ -39,7 +39,7 @@ export const LookupCell = (props) => {
         isRenewable(status) || (isMainnet(network) && !isOpen(status)),
       link: isMainnet(network)
         ? `https://etherscan.io/nft/${tokenContractAddr}/${tokenIdOrNamehashDec}`
-        : `https://goerli.etherscan.io/enslookup-search?search=${label}.eth`
+        : `https://sepolia.etherscan.io/nft/${tokenContractAddr}/${tokenIdOrNamehashDec}`
     },
     CheckTool: {
       precondition: isRenewable(status),
@@ -58,6 +58,10 @@ export const LookupCell = (props) => {
     Godid: {
       precondition: isMainnet(network),
       link: `https://godid.io/items/${label}.eth`
+    },
+    FollowProtocol: {
+      precondition: isMainnet(network) && isRenewable(status),
+      link: `https://ethfollow.xyz/${label}.eth`
     },
     Metadata: {
       precondition: isNormal(status),
