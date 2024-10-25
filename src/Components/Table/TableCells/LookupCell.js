@@ -63,6 +63,10 @@ export const LookupCell = (props) => {
       precondition: isMainnet(network) && isRenewable(status),
       link: `https://ethfollow.xyz/${label}.eth`
     },
+    Whois: {
+      precondition: isMainnet(network),
+      link: `https://ethtools.com/ethereum-name-service/ens-whois/${label}.eth`
+    },
     Metadata: {
       precondition: isNormal(status),
       link: `https://metadata.ens.domains/${network}/${addr[network].BaseRegImp}/${tokenId}`
