@@ -15,6 +15,7 @@
         "Vision": true,
         "Godid": true,
         "FollowProtocol": true,
+        "Whois": false,
         "Metadata": false,
         "Inventory": false,
         "LinkETH": false,
