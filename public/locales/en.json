@@ -75,6 +75,7 @@
       "Vision": "ENS.Vision",
       "Godid": "Godid",
       "FollowProtocol": "Eth Follow",
+      "Whois": "Whois",
       "Metadata": "Metadata",
       "Inventory": "Owner's Inventory",
       "LinkETH": "{{label}}.eth.limo",
