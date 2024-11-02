@@ -38,7 +38,6 @@ export function updateLookupList(_conf) {
 }
 
 export function getContract(providerOrSigner, contract, network, _conf) {
-  const conf = _conf ?? getConf();
   const contractAddr = confFixed.contract.addr[network][contract];
   const contractAbi = confFixed.contract.abi[contract];
   return new Contract(contractAddr, contractAbi, providerOrSigner);
@@ -272,12 +271,30 @@ export async function isForAccount(_str, provider, network) {
     const queryCode = {
       str: `query($labelHash: String!) {
         registration(id: $labelHash) { registrant { id } }
+        wrappedDomain(id: $labelHash) { owner { id }}
       }`,
       vars: { labelHash: labelHash },
     };
 
-    const { registration } = await queryData(queryCode, network);
-    str = registration?.registrant?.id;
+    const { registration, wrappedDomain } = await queryData(queryCode, network);
+    // str = registration?.registrant?.id;
+
+    console.log("registration:")
+    console.log(registration)
+    console.log("wrappedDomain:")
+    console.log(wrappedDomain)
+    
+    str = wrappedDomain.owner
+    ? wrappedDomain.owner.id
+    : registration?.registrant?.id;
+
+    console.log("str:")
+    console.log(str)
+
+
+    // // // if (str.toLowerCase() === confFixed.contract.addr[network].NameWrapper.toLowerCase()) {
+    // // //   str = 
+    // // // }
   }
 
   if (from === 'fromAddr' && str.endsWith('.eth') && str.length > 6) {
@@ -297,13 +314,32 @@ export async function getNamesOfOwner(owner, network) {
     return [];
   }
   const queryCode = {
-    str: "query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }",
+    str: `query($owner: ID!) {
+      account (id: $owner) {
+        domains (first: 1000) { labelName }
+        wrappedDomains (first: 1000) { name }
+      }
+    }`,
     vars: { owner: owner },
   };
-  const { registrations } = await queryData(queryCode, network);
-  const labelsArr = registrations.map((item) => item.labelName); // labels Array
+  const { account } = await queryData(queryCode, network);
+  const labelsArr = account.domains.map((item) => item.labelName); // labels Array
   return labelsArr.filter((item) => item?.trim()); // remove null/undefined...
 }
+
+// fetch the registrations (upto *1000) of an account
+// export async function getNamesOfOwner(owner, network) {
+//   if (!owner) {
+//     return [];
+//   }
+//   const queryCode = {
+//     str: "query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }",
+//     vars: { owner: owner },
+//   };
+//   const { registrations } = await queryData(queryCode, network);
+//   const labelsArr = registrations.map((item) => item.labelName); // labels Array
+//   return labelsArr.filter((item) => item?.trim()); // remove null/undefined...
+// }
 
 export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
   if (labelsGroup.length > 100) {
