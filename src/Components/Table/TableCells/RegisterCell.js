@@ -49,7 +49,7 @@ export const RegisterCell = (props) => {
   if (isRegistrable(status)) {
     return (
       <div
-        id={'registerName-' + label}
+        id={`registerName-${label}`}
         className="btn-group"
         role="group"
         aria-label="RegisterName or Estimate Price"
@@ -59,7 +59,7 @@ export const RegisterCell = (props) => {
           overlay={<Tooltip>{t('tb.td.tips.addNameToRegList')}</Tooltip>}
         >
           <input
-            id={'registerName-checkbox-' + label}
+            id={`registerName-checkbox-${label}`}
             className="form-check-input reg-checkbox"
             type="checkbox"
             name={label}
@@ -132,7 +132,7 @@ export const RegisterCell = (props) => {
   if (status === 'Unknown') {
     return (
       <div
-        id={'trigger-unknown-' + label}
+        id={`trigger-unknown-${label}`}
         className="btn-group"
         role="group"
         aria-label="Unknown"
@@ -151,7 +151,7 @@ export const RegisterCell = (props) => {
 
   return (
     <div
-      id={'trigger-reged-' + label}
+      id={`trigger-reged-${label}`}
       className="btn-group"
       role="group"
       aria-label="RegisterName"

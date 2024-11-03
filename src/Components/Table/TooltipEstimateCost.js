@@ -24,7 +24,7 @@ class TooltipEstimateCost extends React.Component {
       return (
         <>
           <p>{t(estimating.title)}</p>
-          <div>{'≈ ' + estimating.cost.slice(0, 7) + ' ETH'}</div>
+          <div>{`≈ ${estimating.cost.slice(0, 7)} ETH`}</div>
         </>
       );
     }

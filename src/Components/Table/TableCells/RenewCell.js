@@ -29,7 +29,7 @@ export const RenewCell = (props) => {
   if (isRenewable(status)) {
     return (
       <div
-        id={'renewName-' + label}
+        id={`renewName-${label}`}
         className="btn-group"
         role="group"
         aria-label="RenewName"
@@ -39,7 +39,7 @@ export const RenewCell = (props) => {
           overlay={<Tooltip>{t('tb.td.tips.addNameToRenewList')}</Tooltip>}
         >
           <input
-            id={'renewName-checkbox-' + label}
+            id={`renewName-checkbox-${label}`}
             className="form-check-input renew-checkbox"
             type="checkbox"
             name={label}

@@ -12,8 +12,8 @@ const CurrentNetwork = (props) => {
       placement="bottom"
       overlay={<Tooltip>{t('c.currentNetwork')}</Tooltip>}
     >
-      <span className={'network pe-2 network-' + (network ?? 'mainnet')}>
-        {t('c.' + (network ?? 'mainnet'))}
+      <span className={`network pe-2 network-${network ?? 'mainnet'}`}>
+        {t(`c.${network ?? 'mainnet'}`)}
       </span>
     </OverlayTrigger>
   );
@@ -25,7 +25,7 @@ class OperatorWallet extends React.Component {
       this.props;
     const { type, address, ensname, network, balance } = walletInfo;
     const readableAddress = address
-      ? address.slice(0, 5) + '...' + address.slice(-4)
+      ? `${address.slice(0, 5)}...${address.slice(-4)}`
       : null;
     const walletScanLink = `${scanConf[network]}address/${address}`;
 
@@ -59,7 +59,7 @@ class OperatorWallet extends React.Component {
         <CurrentNetwork network={network} />
         <OverlayTrigger
           placement="bottom"
-          overlay={<Tooltip>{t('header.account') + ': ' + address}</Tooltip>}
+          overlay={<Tooltip>{`${t('header.account')}: ${address}`}</Tooltip>}
         >
           <span className="wallet-address">
             <a href={walletScanLink} target="_blank" rel="noreferrer">
@@ -71,10 +71,7 @@ class OperatorWallet extends React.Component {
           placement="bottom"
           overlay={
             <Tooltip>
-              {t('header.balance') +
-                ': ' +
-                (balance ?? '').slice(0, 8) +
-                ' ETH'}
+              {`${t('header.balance')}: ${(balance ?? '').slice(0, 8)} ETH`}
             </Tooltip>
           }
         >

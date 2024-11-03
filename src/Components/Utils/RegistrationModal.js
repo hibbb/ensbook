@@ -141,27 +141,29 @@ const RegistrationModal = (props) => {
             icon={faCircleCheck}
             className="me-2 modal-message-icon action-succeeded"
           />
-          {label + '.eth'}
+          {`${label}.eth`}
         </span>
       );
-    } else if (regAction === 'regFailed') {
+    } 
+    if (regAction === 'regFailed') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
             icon={faCircleXmark}
             className="me-2 modal-message-icon action-failed"
           />
-          {label + '.eth'}
+          {`${label}.eth`}
         </span>
       );
-    } else if (regAction === 'regSuspended') {
+    }
+    if (regAction === 'regSuspended') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
             icon={faCircleMinus}
             className="me-2 modal-message-icon action-suspend"
           />
-          {label + '.eth'}
+          {`${label}.eth`}
         </span>
       );
     }
@@ -184,9 +186,9 @@ const RegistrationModal = (props) => {
   };
 
   const RegInfoMsges = () => {
-    return regMsges.slice(1).map((message, index) => {
+    return regMsges.slice(1).map((message) => {
       return (
-        <p key={index} className={'modal-message message-' + message.type}>
+        <p key={message.slice(0, 9)} className={`modal-message message-${message.type}`}>
           <span className="modal-message-time" title={message.time.fromNow()}>
             {message.time.format('HH:mm:ss')}
           </span>
@@ -221,7 +223,7 @@ const RegistrationModal = (props) => {
             <Col sm="9">
               <InputGroup size="sm" className="mb-2">
                 <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
-                <FormControl value={label + '.eth'} disabled />
+                <FormControl value={`${label}.eth`} disabled />
               </InputGroup>
             </Col>
           </Row>
