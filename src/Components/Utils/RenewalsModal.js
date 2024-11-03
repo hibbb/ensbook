@@ -103,7 +103,8 @@ const RenewalsModal = (props) => {
           />
         </span>
       );
-    } else if (renewsAction === 'renewsFailed') {
+    }
+    if (renewsAction === 'renewsFailed') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -112,7 +113,8 @@ const RenewalsModal = (props) => {
           />
         </span>
       );
-    } else if (renewsAction === 'renewsSuspended') {
+    }
+    if (renewsAction === 'renewsSuspended') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -121,9 +123,8 @@ const RenewalsModal = (props) => {
           />
         </span>
       );
-    } else {
-      return null;
     }
+    return null;
   };
 
   const RenewsActionMsg = () => {
@@ -145,9 +146,9 @@ const RenewalsModal = (props) => {
   };
 
   const RenewsInfoMsges = () => {
-    return renewsMsges.slice(1).map((message, index) => {
+    return renewsMsges.slice(1).map((message) => {
       return (
-        <p key={index} className={'modal-message message-' + message.type}>
+        <p key={message.slice(0, 9)} className={`modal-message message-${message.type}`}>
           <span className="modal-message-time" title={message.time.fromNow()}>
             {message.time.format('HH:mm:ss')}
           </span>

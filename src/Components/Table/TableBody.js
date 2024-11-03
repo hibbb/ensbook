@@ -40,7 +40,7 @@ export const TableBody = (props) => {
     }
 
     return (
-      <tr key={index} className="ebr-tb-row">
+      <tr key={row.label} className="ebr-tb-row">
         <td className="td-index">{index + 1}</td>
         <td className="td-name-label">
           <LabelCell

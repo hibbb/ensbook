@@ -77,21 +77,13 @@ export const TableHead = (props) => {
     if (array.length < 2 || !key || typeof array[0] !== 'object') return array;
     if (typeof array[0][key] === 'number') {
       ascFlags[key]
-        ? array.sort(function (x, y) {
-            return x[key] - y[key];
-          })
-        : array.sort(function (x, y) {
-            return y[key] - x[key];
-          });
+        ? array.sort((x, y) => x[key] - y[key])
+        : array.sort((x, y) => y[key] - x[key]);
     }
     if (typeof array[0][key] === 'string') {
       ascFlags[key]
-        ? array.sort(function (x, y) {
-            return x[key].localeCompare(y[key]);
-          })
-        : array.sort(function (x, y) {
-            return y[key].localeCompare(x[key]);
-          });
+        ? array.sort((x, y) => x[key].localeCompare(y[key]))
+        : array.sort((x, y) => y[key].localeCompare(x[key]));
     }
 
     setAscFlags({ ...ascFlags, [key]: !ascFlags[key] });
@@ -114,14 +106,14 @@ export const TableHead = (props) => {
 
   const statusesArr = Array.from(new Set(nameInfo.map((item) => item.status)));
 
-  const removalTags = statusesArr.map((status, index) => {
+  const removalTags = statusesArr.map((status) => {
     return (
       <span
-        key={index}
-        className={'remove-tag status-' + status}
+        key={status}
+        className={`remove-tag status-${status}`}
         onClick={() => removeNames(status)}
       >
-        {t('nm.sta.' + status)}{' '}
+        {t(`nm.sta.${status}`)}{' '}
         <FontAwesomeIcon icon={faCircleXmark} className="light-gray" />
       </span>
     );
@@ -171,7 +163,7 @@ export const TableHead = (props) => {
               disabled={nonSortable()}
               onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, 'label'))}
             >
-              {ascFlags['label'] ? (
+              {ascFlags.label ? (
                 <FontAwesomeIcon icon={faArrowDownAZ} />
               ) : (
                 <FontAwesomeIcon icon={faArrowDownZA} />
@@ -188,7 +180,7 @@ export const TableHead = (props) => {
               disabled={nonSortableByLength()}
               onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, 'length'))}
             >
-              {ascFlags['length'] ? (
+              {ascFlags.length ? (
                 <FontAwesomeIcon icon={faArrowDownWideShort} />
               ) : (
                 <FontAwesomeIcon icon={faArrowDownShortWide} />
@@ -205,7 +197,7 @@ export const TableHead = (props) => {
               disabled={nonSortableByLevel()}
               onClick={() => setAndStoreNameInfo(jsonSort(nameInfo, 'level'))}
             >
-              {ascFlags['level'] ? (
+              {ascFlags.level ? (
                 <FontAwesomeIcon icon={faList} />
               ) : (
                 <FontAwesomeIcon icon={faListCheck} />
@@ -227,7 +219,7 @@ export const TableHead = (props) => {
                 setAndStoreNameInfo(jsonSort(nameInfo, 'expiresTime'))
               }
             >
-              {ascFlags['expiresTime'] ? (
+              {ascFlags.expiresTime ? (
                 <FontAwesomeIcon icon={faClock} />
               ) : (
                 <FontAwesomeIcon icon={faClockRotateLeft} />
@@ -245,7 +237,7 @@ export const TableHead = (props) => {
               type="button"
               disabled={nonBulkRegable()}
               className={
-                'btn-plain btn-bulk-reg ' + (isBulkReg() ? 'is-bulk-reg' : '')
+                `btn-plain btn-bulk-reg ${isBulkReg() ? 'is-bulk-reg' : ''}`
               }
               onClick={() => setRegNamesModalShow(true)}
             >
@@ -286,7 +278,7 @@ export const TableHead = (props) => {
             placement="top"
             overlay={
               <Tooltip>
-                {t('tb.th.tips.hideNames.' + (hideNames ? 'show' : 'hide'))}
+                {t(`tb.th.tips.hideNames.${hideNames ? 'show' : 'hide'}`)}
               </Tooltip>
             }
           >
@@ -313,8 +305,7 @@ export const TableHead = (props) => {
               type="button"
               disabled={nonBulkRenewable()}
               className={
-                'btn-plain btn-bulk-renew ' +
-                (isBulkRenew() ? 'is-bulk-renew' : '')
+                `btn-plain btn-bulk-renew ${isBulkRenew() ? 'is-bulk-renew' : ''}`
               }
               onClick={() => setRenewNamesModalShow(true)}
             >

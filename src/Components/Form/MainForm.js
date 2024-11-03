@@ -11,14 +11,14 @@ class MainForm extends React.Component {
     adding: false,
   };
 
-  handleLabels = (labels) => {
-    labels = labels.replace(/[,.'"?!@#$%^&*()+=/\\\\]/g, ' ').trim();
+  handleLabels = (_labels) => {
+    const labels = _labels.replace(/[,.'"?!@#$%^&*()+=/\\\\]/g, ' ').trim();
 
     if (labels.length) {
       const labelsSet = new Set(labels.split(/\s+/));
-
+  
       // only retain the labels whose length >= 3
-      let labelsArr = [...labelsSet].filter((label) => label.length >= 3);
+      const labelsArr = [...labelsSet].filter((label) => label.length >= 3);
 
       labelsArr.map((label, index) => {
         try {
@@ -38,10 +38,15 @@ class MainForm extends React.Component {
     const { nameInfo, setAndStoreNameInfo, updateNames, network, provider } =
       this.props;
     const account = await isForAccount(labels, provider, network);
-    const labelsArr =
-      account === false
-        ? this.handleLabels(labels)
-        : await getNamesOfOwner(account, network);
+    
+    let labelsArr
+    
+    if (account) {
+      labelsArr = await getNamesOfOwner(account, network)
+    } else {
+      labelsArr = this.handleLabels(labels)
+    }
+    console.log(labelsArr)
 
     if (labelsArr.length < 1) {
       return false;
@@ -95,15 +100,18 @@ class MainForm extends React.Component {
 
   // Click the text box 3 times to display all current name labels.
   inputClickCount = 0;
+
+  clearClickCount = () => {
+    if (this.inputClickCount === 3) {
+      const labels = this.props.nameInfo.map((item) => item.label).join(' ');
+      this.setState({ labels: labels });
+    }
+    this.inputClickCount = 0;
+  };
+
   displayLabels = () => {
     this.inputClickCount += 1;
-    setTimeout(() => {
-      if (this.inputClickCount === 3) {
-        const labels = this.props.nameInfo.map((item) => item.label).join(' ');
-        this.setState({ labels: labels });
-      }
-      this.inputClickCount = 0;
-    }, 500);
+    setTimeout(this.clearClickCount, 500);
   };
 
   render() {
@@ -121,6 +129,7 @@ class MainForm extends React.Component {
             autoComplete="off"
             name="labels"
             id="labels"
+            // biome-ignore lint/a11y/noAutofocus: <explanation>
             autoFocus
             placeholder={t('form.holder')}
             value={labels}

@@ -32,8 +32,7 @@ i18n
     },
     backend: {
       loadPath:
-        (process.env.REACT_APP_IPFS === 'True' ? '.' : '') +
-        '/locales/{{lng}}.json',
+        `${process.env.REACT_APP_IPFS === 'True' ? '.' : ''}/locales/{{lng}}.json`,
     },
   });
 

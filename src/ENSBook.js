@@ -893,7 +893,7 @@ class ENSBook extends React.Component {
 
     if (provider) {
       await this.subscribeProvider(provider);
-      await provider.enable();
+      await provider.request({ method: 'eth_requestAccounts' });
       provider = new ethers.providers.Web3Provider(provider);
       const signer = provider.getSigner();
       return { provider, signer, type: 'web3' };
