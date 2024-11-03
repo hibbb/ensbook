@@ -1,9 +1,9 @@
 import confFile from '../../conf.json';
 import confFixed from '../../confFixed.json';
-import { Contract, utils } from 'ethers';
+import { Contract } from 'ethers';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import moment from 'moment';
-import { getAddress, isAddress } from 'ethers/lib/utils';
+import { getAddress, isAddress, namehash } from 'ethers/lib/utils';
 
 export function getConf() {
   if (confFile.host === 'remote') {
@@ -38,7 +38,6 @@ export function updateLookupList(_conf) {
 }
 
 export function getContract(providerOrSigner, contract, network, _conf) {
-  const conf = _conf ?? getConf();
   const contractAddr = confFixed.contract.addr[network][contract];
   const contractAbi = confFixed.contract.abi[contract];
   return new Contract(contractAddr, contractAbi, providerOrSigner);
@@ -251,41 +250,46 @@ export async function queryData(queryCode, network) {
 }
 
 // entering @ in front of an ENS name or an address can be used to query its names
-export async function isForAccount(_str, provider, network) {
+export async function isForAccount(_str, network) {
   let str = _str
+  let owner
+  let from
   
-  const from = str.startsWith('@')
-    ? 'fromOwner'
-    : str.startsWith('#')
-    ? 'fromAddr'
-    : false;
-
-  if (from) {
-    str = str.replace('@', '').replace('#', '');
+  if (str.startsWith('@')) {
+    from = 'fromOwner';
+    str = str.replace('@', '');
+  } else if (str.startsWith('#')) {
+    from = 'fromAddr';
+    str = str.replace('#', '');
   } else {
     return false;
   }
 
-  if (from === 'fromOwner' && str.endsWith('.eth') && str.length > 6) {
-    const label = str.slice(0, -4);
-    const labelHash = utils.id(label);
+  if (str.endsWith('.eth') && str.length > 6) {
+    const domainID = namehash(str)
     const queryCode = {
-      str: `query($labelHash: String!) {
-        registration(id: $labelHash) { registrant { id } }
+      str: `query($domainID: ID!) {
+        domain(id: $domainID) {
+          registrant { id }
+          wrappedOwner { id }
+          resolver { addr { id } }
+        }
       }`,
-      vars: { labelHash: labelHash },
+      vars: { domainID: domainID },
     };
 
-    const { registration } = await queryData(queryCode, network);
-    str = registration?.registrant?.id;
+    const { domain } = await queryData(queryCode, network);
+    
+    if (from === 'fromOwner') {
+      owner = domain.wrappedOwner ? domain?.wrappedOwner?.id : domain?.registrant?.id;
+    }
+    if (from === 'fromAddr') {
+      owner = domain.resolver?.addr?.id;
+    }
   }
-
-  if (from === 'fromAddr' && str.endsWith('.eth') && str.length > 6) {
-    str = await provider.resolveName(str);
-  }
-
-  if (isAddress(str)) {
-    return str.toLowerCase();
+  
+  if (isAddress(owner)) {
+    return owner.toLowerCase();
   }
 
   return false;
@@ -296,13 +300,30 @@ export async function getNamesOfOwner(owner, network) {
   if (!owner) {
     return [];
   }
+
+  // namehash("eth")
+  const ethDomainID = "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae"
+
   const queryCode = {
-    str: "query($owner: ID!) { registrations(first: 1000, where: {registrant: $owner}) { labelName } }",
-    vars: { owner: owner },
+    str: `query($owner: ID!, $ethDomainID: String) {
+      registrations (first: 500, where: { registrant: $owner, domain_: { parent: $ethDomainID } }) { labelName }
+      wrappedDomains (first: 500, where: { owner: $owner, domain_: { parent: $ethDomainID } }) { name }
+    }`,
+    vars: { owner: owner, ethDomainID: ethDomainID },
   };
-  const { registrations } = await queryData(queryCode, network);
-  const labelsArr = registrations.map((item) => item.labelName); // labels Array
-  return labelsArr.filter((item) => item?.trim()); // remove null/undefined...
+  const { registrations, wrappedDomains } = await queryData(queryCode, network);
+
+  // domains' labels Array
+  const domainsLabels = registrations.map((item) => item.labelName);
+  // wrappedDomains' labels Array, cut the last 4 charactors '.eth' of name
+  const wrappedDomainsLabels = wrappedDomains.map((item) => item.name.slice(0, -4));
+  
+  const labelsArr = [
+    ...domainsLabels.filter((item) => item?.trim()),
+    ...wrappedDomainsLabels.filter((item) => item?.trim())
+  ]
+
+  return labelsArr
 }
 
 export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
@@ -313,10 +334,10 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
 
   const queryCode = {
     str: `query($labelsGroup: [String!], $namesGroup: [String!]) {
-      registrations(where: {labelName_in: $labelsGroup}) {
+      registrations(where: { labelName_in: $labelsGroup }) {
         labelName, id, expiryDate, registrationDate, registrant { id }
       }
-      wrappedDomains(where: {name_in: $namesGroup}) {
+      wrappedDomains(where: { name_in: $namesGroup }) {
         name, owner { id }
       }
     }`,
@@ -336,8 +357,6 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     const actualOwner = isWrappedName ? wrappedDomains[wi].owner.id : registrations[ri]?.registrant.id
 
     nameInfo[ni].wrapped = isWrappedName
-    // add 'length' attribute by addNames() in MainForm.js @v2.2.6
-    nameInfo[ni].length = labelsGroup[i].length; // keep this line until 2023.12 or v3.x.x
 
     if (ri < 0) {
       nameInfo[ni].status = 'Open';

@@ -10,16 +10,18 @@ export const LabelCell = (props) => {
   // for td-label
   const nameLink = `https://app.ens.domains/${label}.eth`;
 
-  let labelClickCount = 0;
+  const [clickTimeout, setClickTimeout] = React.useState(null);
 
   const oneClickToLevelUp = () => {
-    labelClickCount += 1;
-    setTimeout(() => {
-      if (labelClickCount === 1) {
-        levelUp(index);
-      }
-      labelClickCount = 0;
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+    }
+    
+    const timeoutId = setTimeout(() => {
+      levelUp(index);
     }, 350);
+    
+    setClickTimeout(timeoutId);
   };
 
   const levelUp = (index) => {

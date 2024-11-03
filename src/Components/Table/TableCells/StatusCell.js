@@ -21,34 +21,35 @@ export const StatusCell = (props) => {
     priceRange,
   } = props;
 
-  const displayNumber = (num) => {
+  const displayNumber = (_num) => {
+    let num = _num;
     if (num < 0.9995) {
-      num = parseFloat((num / 1).toFixed(3));
+      num = Number.parseFloat((num / 1).toFixed(3));
     } else if (num < 9.995) {
-      num = parseFloat((num / 1).toFixed(2));
+      num = Number.parseFloat((num / 1).toFixed(2));
     } else if (num < 99.95) {
-      num = parseFloat((num / 1).toFixed(1));
+      num = Number.parseFloat((num / 1).toFixed(1));
     } else if (num < 999.5) {
       num = (num / 1).toFixed(0);
     } else if (num < 9995) {
-      num = parseFloat((num / 1000).toFixed(2)) + 'K';
+      num = `${Number.parseFloat((num / 1000).toFixed(2))}K`;
     } else if (num < 99950) {
-      num = parseFloat((num / 1000).toFixed(1)) + 'K';
+      num = `${Number.parseFloat((num / 1000).toFixed(1))}K`;
     } else if (num < 999500) {
-      num = (num / 1000).toFixed(0) + 'K';
+      num = `${(num / 1000).toFixed(0)}K`;
     } else if (num < 9995000) {
-      num = parseFloat((num / 1000000).toFixed(2)) + 'M';
+      num = `${Number.parseFloat((num / 1000000).toFixed(2))}M`;
     } else if (num < 99950000) {
-      num = parseFloat((num / 1000000).toFixed(1)) + 'M';
+      num = `${Number.parseFloat((num / 1000000).toFixed(1))}M`;
     } else {
-      num = (num / 1000000).toFixed(0) + 'M';
+      num = `${(num / 1000000).toFixed(0)}M`;
     }
     return num;
   };
 
   const StatusText = () => {
-    let text = t('nm.sta.' + status);
-    let statusClass = 'td-status status-' + status;
+    let text = t(`nm.sta.${status}`);
+    let statusClass = `td-status status-${status}`;
 
     if (status === 'Normal') {
       text = (
@@ -74,7 +75,7 @@ export const StatusCell = (props) => {
         statusClass += ' premium-ending';
       }
 
-      let priceUnitIcon =
+      const priceUnitIcon =
         priceUnit === 'ETH' ? (
           <FontAwesomeIcon icon={faEthereum} />
         ) : (
@@ -107,13 +108,11 @@ export const StatusCell = (props) => {
     ) {
       return array;
     }
-    array.sort(function (x, y) {
-      return x[key] - y[key];
-    });
+    array.sort((x, y) => x[key] - y[key]);
     return array;
   };
 
-  let tooltipArray = [];
+  const tooltipArray = [];
 
   if (expiresTime > 0) {
     switch (status) {
@@ -171,9 +170,9 @@ export const StatusCell = (props) => {
             {jsonSortByNumber(tooltipArray, 'unixTime').map((item, index) => {
               return (
                 <p
-                  key={index}
+                  key={item.unixTime}
                   className={
-                    'd-flex justify-content-between current-' + item.current ??
+                    `d-flex justify-content-between current-${item.current}` ??
                     'false'
                   }
                 >

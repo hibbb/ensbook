@@ -18,6 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import { t } from 'i18next';
+import { utils } from 'ethers';
 
 const RegistrationsModal = (props) => {
   const {
@@ -105,7 +106,8 @@ const RegistrationsModal = (props) => {
           />
         </span>
       );
-    } else if (regAction === 'regFailed') {
+    }
+    if (regAction === 'regFailed') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -114,7 +116,8 @@ const RegistrationsModal = (props) => {
           />
         </span>
       );
-    } else if (regAction === 'regSuspended') {
+    }
+    if (regAction === 'regSuspended') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -123,9 +126,8 @@ const RegistrationsModal = (props) => {
           />
         </span>
       );
-    } else {
-      return null;
     }
+    return null;
   };
 
   const RegActionMsg = () => {
@@ -144,9 +146,9 @@ const RegistrationsModal = (props) => {
   };
 
   const RegInfoMsges = () => {
-    return regMsges.slice(1).map((message, index) => {
+    return regMsges.slice(1).map((message) => {
       return (
-        <p key={index} className={'modal-message message-' + message.type}>
+        <p key={message.slice(0, 9)} className={`modal-message message-${message.type}`}>
           <span className="modal-message-time" title={message.time.fromNow()}>
             {message.time.format('HH:mm:ss')}
           </span>
@@ -164,9 +166,9 @@ const RegistrationsModal = (props) => {
   };
 
   const RegsInfoMsges = () => {
-    return regsMsges.slice(1).map((message, index) => {
+    return regsMsges.slice(1).map((message) => {
       return (
-        <p key={index} className={'modal-message message-' + message.type}>
+        <p key={message.slice(0, 9)} className={`modal-message message-${message.type}`}>
           <span className="modal-message-time" title={message.time.fromNow()}>
             {message.time.format('HH:mm:ss')}
           </span>

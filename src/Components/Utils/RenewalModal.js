@@ -100,7 +100,8 @@ const RenewalModal = (props) => {
           />
         </span>
       );
-    } else if (renewAction === 'renewFailed') {
+    }
+    if (renewAction === 'renewFailed') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -109,7 +110,8 @@ const RenewalModal = (props) => {
           />
         </span>
       );
-    } else if (renewAction === 'renewSuspended') {
+    }
+    if (renewAction === 'renewSuspended') {
       return (
         <span className="modal-message-text">
           <FontAwesomeIcon
@@ -118,9 +120,8 @@ const RenewalModal = (props) => {
           />
         </span>
       );
-    } else {
-      return null;
     }
+    return null;
   };
 
   const RenewActionMsg = () => {
@@ -142,9 +143,9 @@ const RenewalModal = (props) => {
   };
 
   const RenewInfoMsges = () => {
-    return renewMsges.slice(1).map((message, index) => {
+    return renewMsges.slice(1).map((message) => {
       return (
-        <p key={index} className={'modal-message message-' + message.type}>
+        <p key={message.slice(0, 9)} className={`modal-message message-${message.type}`}>
           <span className="modal-message-time" title={message.time.fromNow()}>
             {message.time.format('HH:mm:ss')}
           </span>
@@ -175,7 +176,7 @@ const RenewalModal = (props) => {
                 <InputGroup.Text>{t('c.name')}: </InputGroup.Text>
                 <FormControl
                   className="modal-name-label"
-                  value={label + '.eth'}
+                  value={`${label}.eth`}
                   disabled
                 />
               </InputGroup>

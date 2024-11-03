@@ -24,7 +24,7 @@ class ErrorBoundary extends React.Component {
   }
 
   logErrorToMyService = (error, errorInfo) => {
-    this.setState({ errorMessage: 'Error Message: ' + error.message });
+    this.setState({ errorMessage: `Error Message: ${error.message}` });
     console.log('ErrorInfo: ');
     console.log(errorInfo);
   };
