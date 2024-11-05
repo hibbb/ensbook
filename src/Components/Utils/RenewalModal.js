@@ -145,7 +145,7 @@ const RenewalModal = (props) => {
   const RenewInfoMsges = () => {
     return renewMsges.slice(1).map((message) => {
       return (
-        <p key={message.slice(0, 9)} className={`modal-message message-${message.type}`}>
+        <p key={message.time.format('HH:mm:ss')} className={`modal-message message-${message.type}`}>
           <span className="modal-message-time" title={message.time.fromNow()}>
             {message.time.format('HH:mm:ss')}
           </span>
