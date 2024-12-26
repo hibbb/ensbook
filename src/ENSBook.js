@@ -136,18 +136,26 @@ class ENSBook extends React.Component {
   };
 
   updateNames = async (_labels, messageShowFlag = true) => {
-    let { nameInfo, provider, network } = this.state;
-    const labels = _labels ?? nameInfo.map((item) => item.label);
-    const labelsGroupsCount = Math.ceil(labels.length / 100);
+    const { nameInfo, provider, network } = this.state;
+    const labels = _labels ?? nameInfo.map(item => item.label);
+    
+    // 批量处理优化
+    const batchSize = 100;
+    const batches = [];
+    for (let i = 0; i < labels.length; i += batchSize) {
+      batches.push(labels.slice(i, i + batchSize));
+    }
 
     this.setState({ fetching: true });
-
-    for (let n = 0; n < labelsGroupsCount; n++) {
-      const labelsGroup = labels.slice(n * 100, n * 100 + 100);
-      nameInfo = await queryNameInfo(labelsGroup, nameInfo, provider, network);
-      this.setAndStoreNameInfo(nameInfo, messageShowFlag);
+    try {
+      const results = await Promise.all(
+        batches.map(batch => queryNameInfo(batch, nameInfo, provider, network))
+      );
+      const updatedNameInfo = results.flat();
+      this.setAndStoreNameInfo(updatedNameInfo, messageShowFlag);
+    } finally {
+      this.setState({ fetching: false });
     }
-    this.setState({ fetching: false });
   };
 
   updateBalance = async () => {

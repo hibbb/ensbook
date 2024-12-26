@@ -69,6 +69,7 @@
       }
     },
     "lookup": {
+      "Web3bio": "Web3.bio",
       "EtherScan": "EtherScan",
       "CheckTool": "官方查询工具",
       "Opensea": "Opensea",
