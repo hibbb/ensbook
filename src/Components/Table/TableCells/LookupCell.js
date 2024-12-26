@@ -34,6 +34,11 @@ export const LookupCell = (props) => {
   // 1. the custom.display.lookup field of conf.json
   // 2. the tb.lookup field of en.json and cn.json
   const lookupLinks = {
+    Web3bio: {
+      precondition:
+        isRenewable(status) && isMainnet(network),
+      link: `https://web3.bio/${label}.eth`
+    },
     EtherScan: {
       precondition:
         isRenewable(status) || (isMainnet(network) && !isOpen(status)),

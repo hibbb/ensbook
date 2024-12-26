@@ -69,6 +69,7 @@
       }
     },
     "lookup": {
+      "Web3bio": "Web3.bio",
       "EtherScan": "EtherScan",
       "CheckTool": "Check the Name",
       "Opensea": "Opensea",

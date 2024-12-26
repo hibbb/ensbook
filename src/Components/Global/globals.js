@@ -68,16 +68,20 @@ export function isCustomWallet(_conf) {
   return conf.custom.wallet.switch;
 }
 
+// 缓存常用值
+const CHAIN_IDS = {
+  MAINNET: 1,
+  SEPOLIA: 11155111
+};
+
 export function isSupportedChain(key) {
   if (typeof key === 'string') {
-    return (
-      ['homestead', 'mainnet', 'sepolia'].findIndex((item) => item === key) > -1
-    );
+    return new Set(['homestead', 'mainnet', 'sepolia']).has(key);
   }
   if (typeof key === 'number') {
-    // ChainId: 1 for Mainnet, 3 for Ropsten, 11155111 for Sepolia
-    return [1, 11155111].findIndex((item) => item === key) > -1;
+    return new Set([CHAIN_IDS.MAINNET, CHAIN_IDS.SEPOLIA]).has(key);
   }
+  return false;
 }
 
 export function isMainnet(key) {
@@ -107,9 +111,18 @@ export function isSepolia(key) {
   }
 }
 
+// 将状态相关的常量提取出来
+const NAME_STATUSES = {
+  OPEN: 'Open',
+  NORMAL: 'Normal',
+  GRACE: 'Grace',
+  PREMIUM: 'Premium',
+  REOPEN: 'Reopen',
+  UNKNOWN: 'Unknown'
+};
+
 export function isStatus(flag) {
-  const statuses = ['Open', 'Normal', 'Grace', 'Premium', 'Reopen', 'Unknown'];
-  return statuses.findIndex((item) => item === flag) > -1;
+  return Object.values(NAME_STATUSES).includes(flag);
 }
 
 export function isOpen(status) {
@@ -231,22 +244,26 @@ export function removeRegInfo(label) {
 }
 
 export async function queryData(queryCode, network) {
-  const subgraphUri =
-    network === 'sepolia'
+  try {
+    const subgraphUri = network === 'sepolia' 
       ? 'https://api.studio.thegraph.com/query/49574/enssepolia/version/latest'
       : 'https://gateway-arbitrum.network.thegraph.com/api/9380cc86a43a0042d692548c3b0bd9e2/subgraphs/id/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH';
 
-  const client = new ApolloClient({
-    uri: subgraphUri,
-    cache: new InMemoryCache(),
-  });
+    const client = new ApolloClient({
+      uri: subgraphUri,
+      cache: new InMemoryCache(),
+    });
 
-  const queryResult = await client.query({
-    query: gql(queryCode.str),
-    variables: queryCode.vars,
-  });
+    const queryResult = await client.query({
+      query: gql(queryCode.str),
+      variables: queryCode.vars,
+    });
 
-  return queryResult.data;
+    return queryResult.data;
+  } catch (error) {
+    console.error('GraphQL query failed:', error);
+    throw new Error('Failed to fetch data from subgraph');
+  }
 }
 
 // entering @ in front of an ENS name or an address can be used to query its names

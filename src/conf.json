@@ -9,6 +9,7 @@
     "infuraID": "45b0d177f87e4b50b11d38070bcc6a23",
     "display": {
       "lookup": {
+        "Web3bio": true,
         "EtherScan": true,
         "CheckTool": true,
         "Opensea": true,
