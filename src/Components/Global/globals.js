@@ -297,10 +297,12 @@ export async function isForAccount(_str, network) {
 
     const { domain } = await queryData(queryCode, network);
     
-    if (from === 'fromOwner') {
-      owner = domain.wrappedOwner ? domain?.wrappedOwner?.id : domain?.registrant?.id;
+    if (from === 'fromOwner' && domain?.registrant?.id) {
+      const regid = domain.wrappedOwner.id.toLowerCase()
+      const nw = confFixed.contract.addr[network].NameWrapper.toLowerCase()
+      owner =  regid === nw ? domain?.wrappedOwner?.id : regid
     }
-    if (from === 'fromAddr') {
+    if (from === 'fromAddr' && domain.resolver?.addr?.id) {
       owner = domain.resolver?.addr?.id;
     }
   }
@@ -369,7 +371,7 @@ export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
     );
     const ni = nameInfo.findIndex((item) => item.label === labelsGroup[i]);
     const wi = wrappedDomains.findIndex((item) => item.name === `${labelsGroup[i]}.eth`);
-    const isWrappedName = wi > -1
+    const isWrappedName = registrations[ri]?.registrant.id.toLowerCase() === confFixed.contract.addr[network].NameWrapper.toLowerCase()
 
     const actualOwner = isWrappedName ? wrappedDomains[wi].owner.id : registrations[ri]?.registrant.id
 
