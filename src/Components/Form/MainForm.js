@@ -24,10 +24,12 @@ class MainForm extends React.Component {
         try {
           labelsArr[index] = namehash.normalize(label);
         } catch (err) {
+          console.log('Error from: namehash.normalize()')
           delete labelsArr[index];
         } //!!!!
         return null;
       });
+      console.log('Normalized labels:', labelsArr)
 
       return labelsArr;
     }
@@ -49,6 +51,7 @@ class MainForm extends React.Component {
     console.log(labelsArr)
 
     if (labelsArr.length < 1) {
+      console.log('Warning: No eligible label to add.')
       return false;
     }
 
@@ -59,6 +62,12 @@ class MainForm extends React.Component {
     const diffLabelsArr = [
       ...new Set(labelsArr.filter((x) => !originLabelsSet.has(x))),
     ];
+
+    if (diffLabelsArr.length < 1) {
+      console.log('Warning: No new label to add.')
+      return false;
+    }
+
     diffLabelsArr.map((label) =>
       nameInfo.push({
         label: label,
