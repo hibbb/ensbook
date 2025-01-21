@@ -298,7 +298,7 @@ export async function isForAccount(_str, network) {
     const { domain } = await queryData(queryCode, network);
     
     if (from === 'fromOwner' && domain?.registrant?.id) {
-      const regid = domain.wrappedOwner.id.toLowerCase()
+      const regid = domain.registrant.id.toLowerCase()
       const nw = confFixed.contract.addr[network].NameWrapper.toLowerCase()
       owner =  regid === nw ? domain?.wrappedOwner?.id : regid
     }
