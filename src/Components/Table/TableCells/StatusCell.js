@@ -93,7 +93,11 @@ export const StatusCell = (props) => {
     }
 
     return (
-      <span className={statusClass} onClick={() => updateNames([label])}>
+      <span 
+        className={statusClass} 
+        onClick={() => updateNames([label])}
+        onKeyDown={(e) => e.key === 'Enter' && updateNames([label])}
+      >
         {text}
       </span>
     );

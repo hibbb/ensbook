@@ -11,6 +11,7 @@ class MainForm extends React.Component {
     adding: false,
   };
 
+  // 处理在文本框中输入的内容
   handleLabels = (_labels) => {
     const labels = _labels.replace(/[,.'"?!@#$%^&*()+=/\\\\]/g, ' ').trim();
 
@@ -36,6 +37,7 @@ class MainForm extends React.Component {
     return [];
   };
 
+  // 向 nameInfo 中添加名称并更新名称信息
   addNames = async (labels) => {
     const { nameInfo, setAndStoreNameInfo, updateNames, network } =
       this.props;
@@ -48,7 +50,7 @@ class MainForm extends React.Component {
     } else {
       labelsArr = this.handleLabels(labels)
     }
-    console.log(labelsArr)
+    console.log("labelsArr: ", labelsArr)
 
     if (labelsArr.length < 1) {
       console.log('Warning: No eligible label to add.')
