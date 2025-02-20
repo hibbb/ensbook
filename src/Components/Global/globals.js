@@ -346,7 +346,7 @@ export async function getNamesOfOwner(owner, network) {
 }
 
 export async function queryNameInfo(labelsGroup, nameInfo, provider, network) {
-  if (labelsGroup.length > 100) {
+  if (labelsGroup.length > 500) {
     return nameInfo;
   }
   const namesGroup = labelsGroup.map(label => `${label}.eth`)

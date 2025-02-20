@@ -48,10 +48,9 @@ export const RegisterCell = (props) => {
 
   if (isRegistrable(status)) {
     return (
-      <div
+      <fieldset
         id={`registerName-${label}`}
         className="btn-group"
-        role="group"
         aria-label="RegisterName or Estimate Price"
       >
         <OverlayTrigger
@@ -125,19 +124,19 @@ export const RegisterCell = (props) => {
           getDefaultNameReceiver={getDefaultNameReceiver}
           t={t}
         />
-      </div>
+      </fieldset>
     );
   }
 
   if (status === 'Unknown') {
     return (
-      <div
+      <fieldset
         id={`trigger-unknown-${label}`}
         className="btn-group"
-        role="group"
         aria-label="Unknown"
       >
         <input
+          id={`unknown-checkbox-${label}`}
           className="form-check-input reg-checkbox"
           type="checkbox"
           disabled
@@ -145,18 +144,18 @@ export const RegisterCell = (props) => {
         <button type="button" className="btn-plain ms-2" disabled>
           {t('nm.sta.Unknown')}
         </button>
-      </div>
+      </fieldset>
     );
   }
 
   return (
-    <div
+    <fieldset
       id={`trigger-reged-${label}`}
       className="btn-group"
-      role="group"
       aria-label="RegisterName"
     >
       <input
+        id={`reged-checkbox-${label}`}
         className="form-check-input reg-checkbox"
         type="checkbox"
         disabled
@@ -164,6 +163,6 @@ export const RegisterCell = (props) => {
       <button type="button" className="btn-plain ms-2" disabled>
         {t('tb.td.reged')}
       </button>
-    </div>
+    </fieldset>
   );
 };
