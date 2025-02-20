@@ -118,6 +118,7 @@ class ENSBook extends React.Component {
         t('msg.setAndStoreNameInfo')
       );
     }
+    console.log('NameInfo stored!')
   };
 
   getExpiresTimeStamp = async (label) => {
@@ -138,21 +139,11 @@ class ENSBook extends React.Component {
   updateNames = async (_labels, messageShowFlag = true) => {
     const { nameInfo, provider, network } = this.state;
     const labels = _labels ?? nameInfo.map(item => item.label);
-    
-    // 批量处理优化
-    const batchSize = 100;
-    const batches = [];
-    for (let i = 0; i < labels.length; i += batchSize) {
-      batches.push(labels.slice(i, i + batchSize));
-    }
 
     this.setState({ fetching: true });
     try {
-      const results = await Promise.all(
-        batches.map(batch => queryNameInfo(batch, nameInfo, provider, network))
-      );
-      const updatedNameInfo = results.flat();
-      this.setAndStoreNameInfo(updatedNameInfo, messageShowFlag);
+      const results = await queryNameInfo(labels, nameInfo, provider, network);
+      this.setAndStoreNameInfo(results, messageShowFlag);
     } finally {
       this.setState({ fetching: false });
     }

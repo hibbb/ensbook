@@ -231,11 +231,12 @@ class ConfigureForm extends React.Component {
                       <input
                         className="form-check-input lookup-check-input"
                         type="checkbox"
+                        id={`lookup-${item}`}
                         name={item}
                         checked={this.state.displayLookup[item] ?? false}
                         onChange={this.handleDisplayLookupChange}
                       />
-                      <label className="form-check-label">
+                      <label className="form-check-label" htmlFor={`lookup-${item}`}>
                         {t(`tb.lookup.${item}`, { label: '' })}
                       </label>
                     </div>
