@@ -119,7 +119,7 @@ class ENSBook extends React.Component {
         t('msg.setAndStoreNameInfo')
       );
     }
-    console.log('stored!...')
+    console.log('NameInfo stored!')
   };
 
   getExpiresTimeStamp = async (label) => {
@@ -144,8 +144,6 @@ class ENSBook extends React.Component {
     this.setState({ fetching: true });
     try {
       const results = await queryNameInfo(labels, nameInfo, provider, network);
-
-      console.log("results: ", results);
       this.setAndStoreNameInfo(results, messageShowFlag);
     } finally {
       this.setState({ fetching: false });

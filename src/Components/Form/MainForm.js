@@ -50,7 +50,6 @@ class MainForm extends React.Component {
     } else {
       labelsArr = this.handleLabels(labels)
     }
-    console.log("labelsArr: ", labelsArr)
 
     if (labelsArr.length < 1) {
       console.log('Warning: No eligible label to add.')
