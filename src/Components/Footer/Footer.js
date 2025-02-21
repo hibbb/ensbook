@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faXTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { getConf } from '../Global/globals';
 import packageJson from '../../../package.json';
 
@@ -9,8 +9,8 @@ export default function Footer() {
     <div className="row">
       <div className="footnode-left align-self-center col-6">
         <div className="footnotes px-2">
-          <a href="https://twitter.com/forlbb" target="_blank" rel="noreferrer">
-            <FontAwesomeIcon icon={faTwitter} />
+          <a href="https://x.com/forlbb" target="_blank" rel="noreferrer">
+            <FontAwesomeIcon icon={faXTwitter} />
           </a>
         </div>
       </div>
