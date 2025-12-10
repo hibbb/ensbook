@@ -1,6 +1,7 @@
 // src/App.tsx
 import { ConnectKitButton } from 'connectkit'
 import { useAccount, useBalance } from 'wagmi'
+import { formatEther } from 'viem'
 
 export default function App() {
   const { address, isConnected } = useAccount()
@@ -20,7 +21,7 @@ export default function App() {
       {isConnected && (
         <>
           <div>Address: {address}</div>
-          <div>Balance: {balance?.formatted} ETH</div>
+          <div>Balance: {formatEther(balance?.value ?? 0n)} ETH</div>
         </>
       )}
     </div>
