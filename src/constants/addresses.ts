@@ -2,7 +2,6 @@ import { type Address } from "viem";
 
 // 定义主网 (Mainnet) 上的核心地址
 export const MAINNET_ADDRESSES = {
-  ENS_REGISTRY: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1E" as Address,
   ENS_REGISTRAR: "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" as Address,
   ENS_PUBLIC_RESOLVER: "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63" as Address,
   ENS_BULK_RENEWAL: "0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035" as Address,
@@ -12,9 +11,6 @@ export const MAINNET_ADDRESSES = {
 
   // ETH/USD 价格喂价合约地址
   ETH_USD_PRICE_FEED: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419" as Address,
-
-  // WETH 合约地址
-  WETH: "0xC02aaA39b223FE8D0A0e5C4F27EAD9083C756Cc2" as Address,
 };
 
 // 如果你支持其他链，可以创建另一个对象

@@ -1,4 +1,22 @@
 [
-  "function nameExpires(uint256 id) view returns (uint256)",
-  "function ownerOf(uint256 tokenId) view returns (address owner)"
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
+    "name": "nameExpires",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "name": "ownerOf",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
 ]

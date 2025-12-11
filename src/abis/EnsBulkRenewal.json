@@ -1,4 +1,22 @@
 [
-  "function rentPrice(string[] names, uint duration) view returns (uint)",
-  "function renewAll(string[] names, uint duration) payable"
+  {
+    "inputs": [
+      { "internalType": "string[]", "name": "names", "type": "string[]" },
+      { "internalType": "uint256", "name": "duration", "type": "uint256" }
+    ],
+    "name": "rentPrice",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string[]", "name": "names", "type": "string[]" },
+      { "internalType": "uint256", "name": "duration", "type": "uint256" }
+    ],
+    "name": "renewAll",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
 ]
