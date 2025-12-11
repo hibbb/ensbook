@@ -1,0 +1,103 @@
+[
+  "function available(string label) view returns (bool)",
+  "function commit(bytes32 commitment) nonpayable",
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "label",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "secret",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "resolver",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes[]",
+            "name": "data",
+            "type": "bytes[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "reverseRecord",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "referrer",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct IETHRegistrarController.Registration",
+        "name": "registration",
+        "type": "tuple"
+      }
+    ],
+    "name": "makeCommitment",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "commitment",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  "function register((string label,address owner,uint256 duration,bytes32 secret,address resolver,bytes[] data,uint8 reverseRecord,bytes32 referrer) registration) payable",
+  "function renew(string label, uint256 duration, bytes32 referrer) payable",
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "label",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "duration",
+        "type": "uint256"
+      }
+    ],
+    "name": "rentPrice",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "base",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "premium",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IPriceOracle.Price",
+        "name": "price",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
