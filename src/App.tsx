@@ -2,6 +2,8 @@
 import { ConnectKitButton } from "connectkit";
 import { useAccount, useBalance } from "wagmi";
 import { formatEther } from "viem";
+import { Toaster } from "react-hot-toast";
+
 import { TestBox } from "./TestBox";
 
 export default function App() {
@@ -27,6 +29,18 @@ export default function App() {
       )}
 
       <hr />
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        toastOptions={{
+          // 全局默认样式设置
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+      />
       <TestBox />
     </div>
   );
