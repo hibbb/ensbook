@@ -16,7 +16,7 @@ export default function App() {
 
   return (
     <div style={{ padding: 24, fontFamily: "monospace" }}>
-      <h2>⚡ Web3 + React + Vite + ConnectKit Template</h2>
+      <h2>Web3 + React + Vite + ConnectKit Template</h2>
 
       {/* Connect / Disconnect 按钮 */}
       <ConnectKitButton />
