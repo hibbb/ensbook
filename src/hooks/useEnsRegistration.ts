@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useWriteContract, usePublicClient, useAccount } from "wagmi";
 import { type Hex, toHex, pad } from "viem";
+import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
 import { MAINNET_ADDRESSES } from "../constants/addresses"; // 假设你有这个常量文件
 // 导入生成的 ABI (确保路径正确)
@@ -34,8 +35,20 @@ export function useEnsRegistration() {
 
   // 核心函数：开始注册流程
   const startRegistration = useCallback(
-    async (label: string, duration: bigint) => {
+    async (rawLabel: string, duration: bigint) => {
       if (!address || !publicClient) return;
+
+      let label: string;
+
+      try {
+        // 使用原始输入 (rawLabel)
+        label = normalize(rawLabel);
+      } catch (e: unknown) {
+        setStatus("error");
+        const normalizationError = e as Error;
+        toast.error(`名称不合法，无法注册: ${normalizationError.message}`);
+        return;
+      }
 
       setStatus("committing");
       const secret = generateSecret();
