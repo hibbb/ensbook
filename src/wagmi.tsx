@@ -1,7 +1,7 @@
 // src/wagmi.ts
 
 import { createConfig, http } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
+import { mainnet } from "wagmi/chains";
 import { getDefaultConfig } from "connectkit";
 
 // 安全地从环境变量中读取密钥
@@ -28,8 +28,7 @@ export const config = createConfig(
     // 使用新的大写常量名
     walletConnectProjectId: WALLET_CONNECT_PROJECT_ID,
 
-    // 明确列出你希望应用支持的所有链 (尽管你只支持 mainnet，但 connectkit 默认配置了 sepolia，这里保持原样)
-    chains: [mainnet, sepolia],
+    chains: [mainnet],
 
     // 配置 transports
     transports: {
@@ -37,9 +36,9 @@ export const config = createConfig(
       [mainnet.id]: infuraTransport,
 
       // 测试网 Sepolia 的配置
-      [sepolia.id]: INFURA_API_KEY
-        ? http(`https://sepolia.infura.io/v3/${INFURA_API_KEY}`)
-        : http(),
+      // [sepolia.id]: INFURA_API_KEY
+      //   ? http(`https://sepolia.infura.io/v3/${INFURA_API_KEY}`)
+      //   : http(),
 
       // 其他链如果有，也在这里配置
     },

@@ -1,6 +1,6 @@
 // TestBox.tsx - 修正后
 
-import EthUsdPriceFeedAbi from "./abis/EthUsdPriceFeed.json";
+import EthPriceFeedAbi from "./abis/EthPriceFeed.json";
 import { useReadContract } from "wagmi";
 import { mainnet } from "wagmi/chains";
 // 确保导入的 MAINNET_ADDRESSES 是正确的
@@ -10,9 +10,9 @@ import { MAINNET_ADDRESSES } from "./constants/addresses";
 function useGetEthPrice() {
   return useReadContract({
     // 1. 传入合约地址
-    address: MAINNET_ADDRESSES.ETH_USD_PRICE_FEED,
+    address: MAINNET_ADDRESSES.ETH_PRICE_FEED,
     // 2. 传入 ABI
-    abi: EthUsdPriceFeedAbi,
+    abi: EthPriceFeedAbi,
     // 3. 传入函数名
     functionName: "latestAnswer",
     // 4. 确保参数列表是正确的，如果 latestAnswer 不需要参数，则删除 args
