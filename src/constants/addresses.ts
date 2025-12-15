@@ -16,7 +16,6 @@ export const MAINNET_ADDRESSES = {
 // 如果你支持其他链，可以创建另一个对象
 export const SEPOLIA_ADDRESSES = {
   ENS_REGISTRY: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1E" as Address, // 通常与主网不同，需要查证
-  // ...
 };
 
 // 统一导出方便访问
