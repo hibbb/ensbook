@@ -3,6 +3,7 @@ import { ConnectKitButton } from "connectkit";
 import { useAccount, useBalance } from "wagmi";
 import { formatEther } from "viem";
 import { Toaster } from "react-hot-toast";
+import { TestBox } from "./TestBox";
 
 export default function App() {
   const { address, isConnected } = useAccount();
@@ -27,6 +28,7 @@ export default function App() {
       )}
 
       <hr />
+      <TestBox />
       <Toaster
         position="bottom-right"
         reverseOrder={false}
