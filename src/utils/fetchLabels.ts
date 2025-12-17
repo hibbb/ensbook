@@ -2,7 +2,8 @@
 
 import { namehash } from "viem/ens";
 import { queryData, type GraphQLQueryCode } from "./globals";
-import type { ClassifiedLabels } from "./parseLabels";
+import type { ClassifiedInputs } from "./parseInputs";
+import { GRAPHQL_CONFIG } from "../constants/config";
 
 // ============================================================================
 // 1. 常量定义
@@ -38,7 +39,7 @@ interface OwnerDomainsResponse {
 // ============================================================================
 
 export async function fetchLabels(
-  classified: ClassifiedLabels,
+  classified: ClassifiedInputs,
 ): Promise<string[]> {
   // 🛡️ 防御性编程
   if (!classified) return [];
@@ -76,7 +77,7 @@ async function fetchDomainsByAddresses(
     str: `query getLabelsByOwners($owners: [String!]!, $ethParent: String!) {
       # 1. 查询 Wrapped Domains (且父级是 .eth)
       wrappedDomains: domains(
-        first: 1000,
+        first: ${GRAPHQL_CONFIG.FETCH_LIMIT},
         where: {
           wrappedOwner_in: $owners,
           parent: $ethParent,     # <--- 核心修改：限定父节点
@@ -88,7 +89,7 @@ async function fetchDomainsByAddresses(
 
       # 2. 查询 Legacy Domains (且父级是 .eth)
       legacyDomains: domains(
-        first: 1000,
+        first: ${GRAPHQL_CONFIG.FETCH_LIMIT},
         where: {
           registrant_in: $owners,
           parent: $ethParent,     # <--- 核心修改：限定父节点

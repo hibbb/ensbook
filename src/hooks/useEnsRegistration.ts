@@ -103,7 +103,7 @@ export function useEnsRegistration() {
 
         // --- 3. 倒计时 60秒 (ENS 最小等待时间) ---
         setStatus("counting_down");
-        let left = 60; // 建议设置为 65秒 以防区块时间偏差
+        let left = 65; // 建议设置为 65秒 以防区块时间偏差
         setSecondsLeft(left);
 
         await new Promise<void>((resolve) => {

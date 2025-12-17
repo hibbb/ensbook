@@ -1,20 +1,41 @@
-// src/utils/parseLabels.ts
+// src/utils/parseInputs.ts
 
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
 
 // ============================================================================
-// 1. 常量定义
+// 1. 常量与配置
 // ============================================================================
+
 const LIMITS = {
   SAME: 5,
   LINK: 5,
-  PURE: 50,
+  PURE: 500,
 };
-const ETH_SUFFIX_REGEX = /\.eth$/i;
-const SPLIT_REGEX = /[,，\n\s]+/; // 优化：加入 \s 以支持空格分隔
 
-export interface ClassifiedLabels {
+const ETH_SUFFIX_REGEX = /\.eth$/i;
+
+/**
+ * ✅ 分隔符配置
+ * 定义用于拆分输入字符串的符号。
+ * * ⚠️ 注意：
+ * 1. 数组中的字符会直接拼接到正则的 [] 中。
+ * 2. 如果需要添加减号 "-", 请务必将其放在数组的最后一位，或写成 "\\-"。
+ * 3. "\\s" 代表所有空白字符（空格、换行、Tab等）。
+ */
+const SEPARATORS = [
+  ",", // 英文逗号
+  "，", // 中文逗号
+  "\\s", // 空白字符
+  // ";", // 可选：分号
+];
+
+// ⚡️ 自动构建拆分正则
+// 结果类似于: /[,，\s]+/
+const SPLIT_REGEX = new RegExp(`[${SEPARATORS.join("")}]+`);
+
+// 类型定义
+export interface ClassifiedInputs {
   sameOwners: string[];
   linkOwners: string[];
   pureLabels: string[];
@@ -24,27 +45,25 @@ export interface ClassifiedLabels {
 // 2. 独立辅助函数
 // ============================================================================
 
-/**
- * 核心验证器：长度、标准化、层级结构
- */
 const validateAndNormalize = (
   rawInput: string,
   hasSuffix: boolean,
 ): string | null => {
-  // A. 长度检查 (Length Check)
-  // 如果是 .eth 后缀模式，有效长度需减去 4 (".eth")
+  // 长度检查
   const effectiveLength = hasSuffix ? rawInput.length - 4 : rawInput.length;
   if (effectiveLength < 3) return null;
 
-  // B. ENS 标准化 (Normalization)
+  // 标准化
   let normalizedName: string;
   try {
     normalizedName = normalize(rawInput);
   } catch (error) {
-    // 仅在控制台记录错误，Toast 提示
-    console.log(error);
-    const toastId = `norm-error-${rawInput.slice(0, 20)}`;
-    toast(`"${rawInput}" 包含非法字符，已自动排除。`, {
+    console.error("规范化失败:", error);
+    // 优化：处理 Emoji 截断问题，并移除可能破坏 ID 的特殊符号
+    const safeIdSnippet = Array.from(rawInput).slice(0, 10).join("");
+    const toastId = `norm-error-${safeIdSnippet.replace(/[^a-zA-Z0-9]/g, "")}`;
+
+    toast(`"${safeIdSnippet}..." 包含非法字符，已自动排除。`, {
       icon: "ℹ️",
       id: toastId,
       duration: 3000,
@@ -52,22 +71,16 @@ const validateAndNormalize = (
     return null;
   }
 
-  // C. 结构/层级检查 (Structure Check)
+  // 结构检查 (禁止非法子域名)
   if (hasSuffix) {
-    // 情况 1: Owner 类型 (必须是二级域名，如 "abc.eth")
-    // 逻辑：标准化后，必须包含 ".eth"，且不应有额外的点号 (即总共只能有 1 个点)
-    // 优化：直接检查是否包含子域名的点号
     const firstDotIndex = normalizedName.indexOf(".");
     const lastDotIndex = normalizedName.lastIndexOf(".");
-
-    // 如果第一个点就是最后一个点 (只有一个点)，且它存在 -> 合法
-    // 如果有多个点 (first !== last) -> 非法子域名
+    // 必须有且只有一个点，且该点不能是第一个字符
     if (firstDotIndex === -1 || firstDotIndex !== lastDotIndex) {
       return null;
     }
   } else {
-    // 情况 2: 纯 Label 类型 (如 "abc")
-    // 逻辑：不能包含任何点号
+    // 纯 Label 不能包含任何点
     if (normalizedName.includes(".")) {
       return null;
     }
@@ -77,75 +90,64 @@ const validateAndNormalize = (
 };
 
 // ============================================================================
-// 3. 主函数
+// 3. 主函数：parseAndClassifyInputs
 // ============================================================================
 
-export function parseAndClassifyLabels(rawInput: string): ClassifiedLabels {
-  // 初始化结果容器
-  const result: ClassifiedLabels = {
+export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
+  const result: ClassifiedInputs = {
     sameOwners: [],
     linkOwners: [],
     pureLabels: [],
   };
 
-  // 1. 基础边界检查
   if (!rawInput || rawInput.length > 10000) {
     return result;
   }
 
-  // 2. 分割字符串
+  // 使用动态生成的正则进行分割
   const parts = rawInput.split(SPLIT_REGEX);
 
-  // 3. 循环处理 (使用 for...of 以支持 early break)
   for (const rawPart of parts) {
     const part = rawPart.trim();
     if (!part) continue;
 
-    // ⚡️ 性能优化：如果所有桶都满了，提前终止循环
-    const isSameFull = result.sameOwners.length >= LIMITS.SAME;
-    const isLinkFull = result.linkOwners.length >= LIMITS.LINK;
-    const isPureFull = result.pureLabels.length >= LIMITS.PURE;
-
-    if (isSameFull && isLinkFull && isPureFull) {
+    // 性能优化：检查桶是否已满
+    if (
+      result.sameOwners.length >= LIMITS.SAME &&
+      result.linkOwners.length >= LIMITS.LINK &&
+      result.pureLabels.length >= LIMITS.PURE
+    ) {
       break;
     }
 
-    // --- 分类与处理逻辑 ---
-
-    // 内部帮助函数：减少重复代码，处理添加/尝试逻辑
+    // 内部处理函数
     const tryAdd = (
       targetArr: string[],
       name: string,
       limit: number,
       expectSuffix: boolean,
     ) => {
-      if (targetArr.length >= limit) return; // 单个桶满检查
-
+      if (targetArr.length >= limit) return;
       const validName = validateAndNormalize(name, expectSuffix);
       if (validName && !targetArr.includes(validName)) {
         targetArr.push(validName);
       }
     };
 
-    // A: @sameOwners
+    // 分类逻辑
     if (part.startsWith("@")) {
       let name = part.slice(1);
       if (name) {
         if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
         tryAdd(result.sameOwners, name, LIMITS.SAME, true);
       }
-    }
-    // B: #linkOwners
-    else if (part.startsWith("#")) {
+    } else if (part.startsWith("#")) {
       let name = part.slice(1);
       if (name) {
         if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
         tryAdd(result.linkOwners, name, LIMITS.LINK, true);
       }
-    }
-    // C: pureLabels
-    else {
-      // 移除 .eth 后缀 (如果用户手误输入了 .eth 但没加前缀，视为 pureLabel 提取)
+    } else {
       const label = part.replace(ETH_SUFFIX_REGEX, "");
       if (label) {
         tryAdd(result.pureLabels, label, LIMITS.PURE, false);

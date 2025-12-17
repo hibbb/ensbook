@@ -3,8 +3,9 @@
 import { mainnet } from "wagmi/chains";
 import { createPublicClient, http } from "viem";
 import { normalize } from "viem/ens";
-import { parseAndClassifyLabels } from "./utils/parseLabels";
+import { parseAndClassifyInputs } from "./utils/parseInputs";
 import { fetchLabels } from "./utils/fetchLabels";
+import { fetchNameRecords } from "./utils/fetchNameRecords";
 
 const publicClient = createPublicClient({
   chain: mainnet,
@@ -21,9 +22,11 @@ async function fetchEnsAddress() {
 
 async function handleInputs() {
   // Add your logic here
-  const parsedLabels = parseAndClassifyLabels("@ens.eth");
-  const labelResults = await fetchLabels(parsedLabels);
-  console.log(labelResults);
+  const parsedInputs = parseAndClassifyInputs("@ens.eth");
+  const labelResults = await fetchLabels(parsedInputs);
+  const nameRecords = await fetchNameRecords(labelResults);
+
+  console.log(nameRecords);
 }
 
 export const TestBox = () => {

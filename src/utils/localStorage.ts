@@ -1,56 +1,40 @@
 // src/utils/localStorage.ts
 
-import { type EnsNameList } from "../types/ens"; // 确保路径正确
+import { type NameRecords } from "../types/ens";
 
-// 定义 LocalStorage 中存储 ENS 列表的键名
-const ENS_LIST_STORAGE_KEY = "ens_name_list";
+// 追求极致简洁，假设在本项目命名空间内是唯一的
+const NAME_RECORDS_STORAGE_KEY = "ens_name_records";
 
 /**
- * 1. 从 LocalStorage 中读取并解析用户的 ENS 名称列表。
- * @returns EnsNameList | null 如果存在有效的列表则返回，否则返回 null。
+ * 1. 从浏览器本地存储加载名称记录
  */
-export function loadEnsNameList(): EnsNameList | null {
+export function loadNameRecords(): NameRecords | null {
+  if (typeof window === "undefined") return null;
+
   try {
-    if (typeof window === "undefined") {
-      return null; // 确保在服务端渲染 (SSR) 环境下不报错
-    }
+    const serialized = localStorage.getItem(NAME_RECORDS_STORAGE_KEY);
+    if (!serialized) return null;
 
-    const serializedList = localStorage.getItem(ENS_LIST_STORAGE_KEY);
+    const parsed = JSON.parse(serialized);
 
-    if (serializedList === null) {
-      return null; // 键不存在
-    }
-
-    // 解析 JSON 字符串，并断言类型
-    const parsedList = JSON.parse(serializedList);
-
-    // 简单的类型检查：确保它是一个数组
-    if (Array.isArray(parsedList)) {
-      return parsedList as EnsNameList;
-    }
-
-    return null; // 解析后不是数组
+    // 检查是否为数组，以确保数据格式正确
+    return Array.isArray(parsed) ? (parsed as NameRecords) : null;
   } catch (error) {
-    console.error("Error loading ENS name list from LocalStorage:", error);
-    return null; // 发生解析错误时返回 null
+    console.error("从本地存储加载名称记录时发生错误:", error);
+    return null;
   }
 }
 
 /**
- * 2. 将最新的 ENS 名称列表存储到 LocalStorage 中。
- * @param list 要存储的 EnsNameList 数组。
+ * 2. 将名称记录保存到浏览器本地存储
  */
-export function saveEnsNameList(list: EnsNameList): void {
-  try {
-    if (typeof window === "undefined") {
-      return;
-    }
+export function saveNameRecords(records: NameRecords): void {
+  if (typeof window === "undefined") return;
 
-    const serializedList = JSON.stringify(list);
-    localStorage.setItem(ENS_LIST_STORAGE_KEY, serializedList);
+  try {
+    localStorage.setItem(NAME_RECORDS_STORAGE_KEY, JSON.stringify(records));
   } catch (error) {
-    // 可能是 Quota Exceeded Error (存储空间不足，尽管不太可能)
-    console.error("Error saving ENS name list to LocalStorage:", error);
+    console.error("保存名称记录到本地存储时发生错误:", error);
   }
 }
 
