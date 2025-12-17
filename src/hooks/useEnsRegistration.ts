@@ -5,20 +5,26 @@ import { useWriteContract, usePublicClient, useAccount } from "wagmi";
 import { type Hex, toHex, pad } from "viem";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
-import { MAINNET_ADDRESSES } from "../constants/addresses"; // 假设你有这个常量文件
-// 导入生成的 ABI (确保路径正确)
+import { MAINNET_ADDRESSES } from "../constants/addresses";
 import EthControllerV3ABI from "../abis/EthControllerV3.json";
 
-// 定义清晰的状态机
 export type RegistrationStatus =
   | "idle"
-  | "committing" // 正在等待钱包确认 Commit 交易
-  | "waiting_commit" // Commit 交易已发出，等待上链
-  | "counting_down" // ENS 强制等待期 (60s)
-  | "registering" // 正在等待钱包确认 Register 交易
-  | "waiting_register" // Register 交易已发出，等待上链
+  | "committing" // 等待钱包确认 Commit
+  | "waiting_commit" // Commit 上链中
+  | "counting_down" // 60秒倒计时
+  | "registering" // 等待钱包确认 Register
+  | "waiting_register" // Register 上链中
   | "success"
   | "error";
+
+// ⚡️ 优化1：提取 Referrer 逻辑到 Hook 外部
+const getFormattedReferrer = (): Hex => {
+  const rawReferrer =
+    import.meta.env.VITE_ENS_REFERRER_HASH ||
+    "0x0000000000000000000000000000000000000000";
+  return pad(rawReferrer.toLowerCase() as Hex, { size: 32 });
+};
 
 export function useEnsRegistration() {
   const [status, setStatus] = useState<RegistrationStatus>("idle");
@@ -27,55 +33,58 @@ export function useEnsRegistration() {
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
 
-  // 辅助：生成随机 Secret (bytes32)
+  // ⚡️ 优化2：提供状态重置方法
+  const resetStatus = useCallback(() => {
+    setStatus("idle");
+    setSecondsLeft(0);
+  }, []);
+
+  // 辅助：生成随机 Secret
   const generateSecret = (): Hex => {
     const randomValues = crypto.getRandomValues(new Uint8Array(32));
-    return toHex(randomValues) as unknown as Hex; // 简单转换为 Hex
+    return toHex(randomValues) as unknown as Hex;
   };
 
-  // 核心函数：开始注册流程
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint) => {
-      if (!address || !publicClient) return;
+      // ⚡️ 优化3：增加钱包连接检查和友好提示
+      if (!address || !publicClient) {
+        toast.error("请先连接钱包");
+        return;
+      }
 
       let label: string;
-
       try {
-        // 使用原始输入 (rawLabel)
-        label = normalize(rawLabel);
+        // ⚡️ 优化4：移除 .eth 后缀，防止注册成 "name.eth.eth"
+        label = normalize(rawLabel).replace(/\.eth$/, "");
       } catch (e: unknown) {
         setStatus("error");
         const normalizationError = e as Error;
-        toast.error(`名称不合法，无法注册: ${normalizationError.message}`);
+        toast.error(`名称不合法: ${normalizationError.message}`);
         return;
       }
 
       setStatus("committing");
       const secret = generateSecret();
-      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3; // 你的合约地址
-
-      const rawReferrer =
-        import.meta.env.VITE_ENS_REFERRER_HASH ||
-        "0x0000000000000000000000000000000000000000";
-
-      // 生成准确的 referrer 参数，pad(string, { size: 32 }) 确保字符串是 32 字节长
-      const REFERRER_HASH: Hex = pad(rawReferrer as Hex, { size: 32 });
+      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3;
+      const referrer = getFormattedReferrer();
 
       try {
-        // --- 1. 准备数据 & 计算 Commitment ---
-        // 构建 Registration 结构体参数 (根据你的 ABI 调整)
+        // 1. 准备数据
         const registrationParams = {
           label,
           owner: address,
           duration,
           secret,
-          resolver: MAINNET_ADDRESSES.ENS_PUBLIC_RESOLVER, // 使用默认 Resolver
+          resolver: MAINNET_ADDRESSES.ENS_PUBLIC_RESOLVER,
           data: [],
           reverseRecord: false,
-          referrer: REFERRER_HASH, // 你的 referrer
+          referrer: referrer,
         };
 
-        // 从合约读取 commitment hash (或者使用 viem 本地计算，这里为了稳健调用合约)
+        // 2. Commit 阶段
+        // 注意：如果遇到 AbiEncodingLengthMismatchError，尝试将 args 改为:
+        // args: [[label, address, duration, secret, ...]] (数组嵌套数组)
         const commitment = (await publicClient.readContract({
           address: contractAddress,
           abi: EthControllerV3ABI,
@@ -83,7 +92,6 @@ export function useEnsRegistration() {
           args: [registrationParams],
         })) as Hex;
 
-        // --- 2. 发送 Commit 交易 ---
         const commitHash = await writeContractAsync({
           address: contractAddress,
           abi: EthControllerV3ABI,
@@ -92,19 +100,19 @@ export function useEnsRegistration() {
         });
 
         setStatus("waiting_commit");
-        // 使用 toast.promise 给用户即时反馈
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: commitHash }),
           {
             loading: "Commit 交易确认中...",
-            success: "Commit 已上链！开始 60秒 倒计时...",
+            success: "Commit 已上链！开始倒计时...",
             error: "Commit 交易失败",
           },
         );
 
-        // --- 3. 倒计时 60秒 (ENS 最小等待时间) ---
+        // 3. 倒计时阶段
         setStatus("counting_down");
-        let left = 65; // 建议设置为 65秒 以防区块时间偏差
+        // 使用 65秒 缓冲
+        let left = 65;
         setSecondsLeft(left);
 
         await new Promise<void>((resolve) => {
@@ -118,10 +126,9 @@ export function useEnsRegistration() {
           }, 1000);
         });
 
-        // --- 4. 发送 Register 交易 ---
+        // 4. Register 阶段
         setStatus("registering");
 
-        // 获取当前租金价格 (为了计算 msg.value)
         const priceData = (await publicClient.readContract({
           address: contractAddress,
           abi: EthControllerV3ABI,
@@ -129,7 +136,6 @@ export function useEnsRegistration() {
           args: [label, duration],
         })) as { base: bigint; premium: bigint };
 
-        // 加上 10% 缓冲以防价格波动
         const priceWithBuffer =
           ((priceData.base + priceData.premium) * 110n) / 100n;
 
@@ -153,16 +159,10 @@ export function useEnsRegistration() {
 
         setStatus("success");
       } catch (err: unknown) {
-        // 1. 将 error 改名为 err，并标记为 unknown (或省略类型)
         console.error(err);
         setStatus("error");
-
-        // 2. 在这里进行类型断言
-        // 我们告诉 TS：这个错误是一个标准 Error，且可能包含 viem 的 shortMessage 属性
         const error = err as Error & { shortMessage?: string };
-
-        // 3. 现在可以安全地访问属性了，linter 也不会报错
-        toast.error(`注册流程中断: ${error.shortMessage || error.message}`);
+        toast.error(`流程中断: ${error.shortMessage || error.message}`);
       }
     },
     [address, publicClient, writeContractAsync],
@@ -172,6 +172,7 @@ export function useEnsRegistration() {
     status,
     secondsLeft,
     startRegistration,
+    resetStatus, // ⚡️ 导出重置方法
     isBusy: status !== "idle" && status !== "success" && status !== "error",
   };
 }
