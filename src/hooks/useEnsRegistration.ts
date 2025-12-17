@@ -7,7 +7,7 @@ import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
 import { MAINNET_ADDRESSES } from "../constants/addresses"; // 假设你有这个常量文件
 // 导入生成的 ABI (确保路径正确)
-import EnsControllerV3ABI from "../abis/EnsControllerV3.json";
+import EthControllerV3ABI from "../abis/EthControllerV3.json";
 
 // 定义清晰的状态机
 export type RegistrationStatus =
@@ -52,13 +52,14 @@ export function useEnsRegistration() {
 
       setStatus("committing");
       const secret = generateSecret();
-      const contractAddress = MAINNET_ADDRESSES.ENS_CONTROLLER_V3; // 你的合约地址
+      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3; // 你的合约地址
+
+      const rawReferrer =
+        import.meta.env.VITE_ENS_REFERRER_HASH ||
+        "0x0000000000000000000000000000000000000000";
 
       // 生成准确的 referrer 参数，pad(string, { size: 32 }) 确保字符串是 32 字节长
-      const REFERRER_HASH: Hex = pad(
-        toHex(import.meta.env.VITE_ENS_REFERRER_HASH || "0x0"),
-        { size: 32 },
-      );
+      const REFERRER_HASH: Hex = pad(rawReferrer as Hex, { size: 32 });
 
       try {
         // --- 1. 准备数据 & 计算 Commitment ---
@@ -77,7 +78,7 @@ export function useEnsRegistration() {
         // 从合约读取 commitment hash (或者使用 viem 本地计算，这里为了稳健调用合约)
         const commitment = (await publicClient.readContract({
           address: contractAddress,
-          abi: EnsControllerV3ABI,
+          abi: EthControllerV3ABI,
           functionName: "makeCommitment",
           args: [registrationParams],
         })) as Hex;
@@ -85,7 +86,7 @@ export function useEnsRegistration() {
         // --- 2. 发送 Commit 交易 ---
         const commitHash = await writeContractAsync({
           address: contractAddress,
-          abi: EnsControllerV3ABI,
+          abi: EthControllerV3ABI,
           functionName: "commit",
           args: [commitment],
         });
@@ -123,7 +124,7 @@ export function useEnsRegistration() {
         // 获取当前租金价格 (为了计算 msg.value)
         const priceData = (await publicClient.readContract({
           address: contractAddress,
-          abi: EnsControllerV3ABI,
+          abi: EthControllerV3ABI,
           functionName: "rentPrice",
           args: [label, duration],
         })) as { base: bigint; premium: bigint };
@@ -134,10 +135,10 @@ export function useEnsRegistration() {
 
         const registerHash = await writeContractAsync({
           address: contractAddress,
-          abi: EnsControllerV3ABI,
+          abi: EthControllerV3ABI,
           functionName: "register",
           args: [registrationParams],
-          value: priceWithBuffer, // 必须带上 ETH
+          value: priceWithBuffer,
         });
 
         setStatus("waiting_register");

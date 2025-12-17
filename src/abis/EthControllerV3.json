@@ -95,44 +95,51 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "label",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "duration",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "secret",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "resolver",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes[]",
-        "name": "data",
-        "type": "bytes[]"
-      },
-      {
-        "internalType": "uint8",
-        "name": "reverseRecord",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "referrer",
-        "type": "bytes32"
+        "components": [
+          {
+            "internalType": "string",
+            "name": "label",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "secret",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "resolver",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes[]",
+            "name": "data",
+            "type": "bytes[]"
+          },
+          {
+            "internalType": "uint8",
+            "name": "reverseRecord",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "referrer",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct IETHRegistrarController.Registration",
+        "name": "registration",
+        "type": "tuple"
       }
     ],
     "name": "register",
