@@ -5,21 +5,14 @@ import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
 import { MAINNET_ADDRESSES } from "../constants/addresses";
 import EthControllerV3ABI from "../abis/EthControllerV3.json";
-import { type RegistrationStruct } from "../types/ens";
+import {
+  type RegistrationStruct,
+  type RegistrationStatus,
+} from "../types/ensRegistration";
 import {
   saveRegistrationState,
   removeRegistrationState,
 } from "../utils/storage";
-
-export type RegistrationStatus =
-  | "idle"
-  | "committing"
-  | "waiting_commit"
-  | "counting_down"
-  | "registering"
-  | "waiting_register"
-  | "success"
-  | "error";
 
 // 提取 Referrer 逻辑 (静态)
 const getFormattedReferrer = (): Hex => {

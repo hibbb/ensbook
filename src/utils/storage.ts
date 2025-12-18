@@ -1,4 +1,5 @@
-import { type RegistrationState, type NameRecords } from "../types/ens";
+import { type RegistrationState } from "../types/ensRegistration";
+import { type NameRecord } from "../types/ensNames";
 
 // ============================================================================
 // 1. 常量与配置
@@ -117,7 +118,7 @@ export function removeRegistrationState(label: string) {
 /**
  * 获取名称记录列表
  */
-export function getNameRecords(): NameRecords | null {
+export function getNameRecords(): NameRecord[] | null {
   if (!isBrowser()) return null;
 
   try {
@@ -127,7 +128,7 @@ export function getNameRecords(): NameRecords | null {
     const parsed = JSON.parse(serialized);
 
     // 简单校验格式
-    return Array.isArray(parsed) ? (parsed as NameRecords) : null;
+    return Array.isArray(parsed) ? (parsed as NameRecord[]) : null;
   } catch (error) {
     console.warn("[Storage] 读取名称列表失败:", error);
     return null;
@@ -137,11 +138,11 @@ export function getNameRecords(): NameRecords | null {
 /**
  * 保存名称记录列表
  */
-export function saveNameRecords(records: NameRecords): void {
+export function saveNameRecords(records: NameRecord[]): void {
   if (!isBrowser()) return;
 
   try {
-    // 即使 NameRecords 目前可能不包含 bigint，使用 replacer 也是一种面向未来的安全习惯
+    // 即使 NameRecord[] 目前可能不包含 bigint，使用 replacer 也是一种面向未来的安全习惯
     localStorage.setItem(
       STORAGE_KEY_NAME_RECORDS,
       JSON.stringify(records, bigIntReplacer),

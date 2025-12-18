@@ -2,7 +2,7 @@
 
 import { labelhash } from "viem";
 import { queryData, type GraphQLQueryCode } from "./globals";
-import type { NameRecord } from "../types/ens";
+import type { NameRecord } from "../types/ensNames";
 import { MAINNET_ADDRESSES } from "../constants/addresses";
 import { GRAPHQL_CONFIG } from "../constants/config";
 
