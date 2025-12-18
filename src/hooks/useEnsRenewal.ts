@@ -1,13 +1,17 @@
 // src/hooks/useEnsRenewal.ts
 
 import { useState, useCallback } from "react";
-import { useWriteContract, usePublicClient, useAccount } from "wagmi";
-import { type Hex, pad } from "viem";
+import { usePublicClient, useAccount, useChainId } from "wagmi";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
-import { MAINNET_ADDRESSES } from "../constants/addresses";
-import EthControllerV3ABI from "../abis/EthControllerV3.json";
-import BulkRenewalABI from "../abis/BulkRenewal.json";
+import { REFERRER_ADDRESS_HASH } from "../config/env";
+import {
+  useWriteEthControllerV3,
+  useWriteBulkRenewal,
+  ethControllerV3Abi,
+  bulkRenewalAbi,
+} from "../wagmi-generated";
+import { getContracts } from "../config/contracts";
 
 export type RenewalStatus =
   | "idle"
@@ -16,21 +20,16 @@ export type RenewalStatus =
   | "success"
   | "error";
 
-// ⚡️ 优化1：将静态逻辑移至 Hook 外部，避免重复创建，保持依赖稳定
-const getFormattedReferrer = (): Hex => {
-  const rawReferrer =
-    import.meta.env.VITE_ENS_REFERRER_HASH ||
-    "0x0000000000000000000000000000000000000000";
-
-  // 确保转换为小写并填充到 32 字节 (bytes32)
-  return pad(rawReferrer.toLowerCase() as Hex, { size: 32 });
-};
-
 export function useEnsRenewal() {
   const [status, setStatus] = useState<RenewalStatus>("idle");
   const publicClient = usePublicClient();
-  const { writeContractAsync } = useWriteContract();
   const { address } = useAccount(); // ⚡️ 优化2：获取当前用户地址
+  const chainId = useChainId();
+  const contracts = getContracts(chainId);
+
+  // 使用生成的 Write Hooks
+  const { writeContractAsync: writeEthController } = useWriteEthControllerV3();
+  const { writeContractAsync: writeBulkRenewal } = useWriteBulkRenewal();
 
   // ⚡️ 优化3：提供重置状态的方法，方便 UI 重试
   const resetStatus = useCallback(() => {
@@ -49,16 +48,16 @@ export function useEnsRenewal() {
       }
 
       setStatus("loading");
-      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3;
+      const contractAddress = contracts.ETH_CONTROLLER_V3;
 
       try {
         const label = normalize(rawLabel).replace(/\.eth$/, "");
-        const referrer = getFormattedReferrer();
+        const referrer = REFERRER_ADDRESS_HASH;
 
         // 估价
         const priceData = (await publicClient.readContract({
           address: contractAddress,
-          abi: EthControllerV3ABI,
+          abi: ethControllerV3Abi,
           functionName: "rentPrice",
           args: [label, duration],
         })) as { base: bigint; premium: bigint };
@@ -67,9 +66,7 @@ export function useEnsRenewal() {
         const valueWithBuffer = (totalPrice * 110n) / 100n; // +10% 缓冲
 
         // 发送交易
-        const hash = await writeContractAsync({
-          address: contractAddress,
-          abi: EthControllerV3ABI,
+        const hash = await writeEthController({
           functionName: "renew",
           args: [label, duration, referrer],
           value: valueWithBuffer,
@@ -90,7 +87,7 @@ export function useEnsRenewal() {
         toast.error(error.shortMessage || error.message || "续费发生未知错误");
       }
     },
-    [publicClient, address, writeContractAsync], // 依赖列表现在是准确的
+    [publicClient, address, writeEthController, contracts], // 依赖列表现在是准确的
   );
 
   /**
@@ -108,7 +105,7 @@ export function useEnsRenewal() {
       }
 
       setStatus("loading");
-      const contractAddress = MAINNET_ADDRESSES.BULK_RENEWAL;
+      const contractAddress = contracts.BULK_RENEWAL;
 
       try {
         const labels = rawLabels.map((l) => normalize(l).replace(/\.eth$/, ""));
@@ -116,7 +113,7 @@ export function useEnsRenewal() {
         // 估价 (BulkRenewal 直接返回总价)
         const totalPrice = (await publicClient.readContract({
           address: contractAddress,
-          abi: BulkRenewalABI,
+          abi: bulkRenewalAbi,
           functionName: "rentPrice",
           args: [labels, duration],
         })) as bigint;
@@ -124,9 +121,7 @@ export function useEnsRenewal() {
         const valueWithBuffer = (totalPrice * 110n) / 100n;
 
         // 发送交易
-        const hash = await writeContractAsync({
-          address: contractAddress,
-          abi: BulkRenewalABI,
+        const hash = await writeBulkRenewal({
           functionName: "renewAll",
           args: [labels, duration],
           value: valueWithBuffer,
@@ -149,7 +144,7 @@ export function useEnsRenewal() {
         );
       }
     },
-    [publicClient, address, writeContractAsync],
+    [publicClient, address, writeBulkRenewal, contracts],
   );
 
   return {

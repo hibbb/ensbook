@@ -1,10 +1,10 @@
 // src/utils/fetchNameRecords.ts
 
 import { labelhash } from "viem";
-import { queryData, type GraphQLQueryCode } from "./globals";
-import type { NameRecord } from "../types/ensNames";
-import { MAINNET_ADDRESSES } from "../constants/addresses";
-import { GRAPHQL_CONFIG } from "../constants/config";
+import { queryData, type GraphQLQueryCode } from "./client";
+import type { NameRecord } from "../../types/ensNames";
+import { getContracts } from "../../config/contracts";
+import { GRAPHQL_CONFIG } from "../../config/constants";
 
 // ============================================================================
 // 1. 内部逻辑常量
@@ -12,6 +12,9 @@ import { GRAPHQL_CONFIG } from "../constants/config";
 
 const DURATION_GRACE_PERIOD = 90 * 24 * 60 * 60; // 90天宽限期
 const DURATION_PREMIUM_PERIOD = 21 * 24 * 60 * 60; // 21天溢价期
+
+const contracts = getContracts(1);
+const WRAPPER_ADDRESS = contracts.ENS_NAME_WRAPPER.toLowerCase();
 
 // ============================================================================
 // 2. 类型定义 (GraphQL 响应)
@@ -149,10 +152,9 @@ export async function fetchNameRecords(
       const releaseTime = expiryTime + DURATION_GRACE_PERIOD;
 
       const registrantId = registration.registrant.id.toLowerCase();
-      const wrapperAddress = MAINNET_ADDRESSES.ENS_NAME_WRAPPER.toLowerCase();
 
       // 判断 Wrap 状态
-      const isWrapped = registrantId === wrapperAddress;
+      const isWrapped = registrantId === WRAPPER_ADDRESS;
 
       // 确定所有者
       // 逻辑：如果 Wrap 了，尝试取 wrappedOwner，取不到回退 registrant (Wrapper合约地址)

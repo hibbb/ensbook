@@ -1,8 +1,7 @@
-// src/constants/config.ts
-
 /**
- * GraphQL 查询相关的全局配置
+ * 全局应用常量配置
  */
+
 export const GRAPHQL_CONFIG = {
   /**
    * 每次从 Subgraph 获取数据的最大数量限制

@@ -11,8 +11,8 @@ export interface RegistrationStruct {
   duration: bigint;
   secret: Hex;
   resolver: Address;
-  data: Hex[];
-  reverseRecord: boolean;
+  data: readonly Hex[]; // 建议加上 readonly 以完美匹配生成的类型
+  reverseRecord: number;
   referrer: Hex;
 }
 

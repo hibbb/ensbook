@@ -1,10 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useWriteContract, usePublicClient, useAccount } from "wagmi";
-import { type Hex, toHex, pad, type Address } from "viem";
+import { usePublicClient, useAccount } from "wagmi";
+import { type Hex, type Address } from "viem";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
-import { MAINNET_ADDRESSES } from "../constants/addresses";
-import EthControllerV3ABI from "../abis/EthControllerV3.json";
 import {
   type RegistrationStruct,
   type RegistrationStatus,
@@ -12,26 +10,35 @@ import {
 import {
   saveRegistrationState,
   removeRegistrationState,
-} from "../utils/storage";
-
-// 提取 Referrer 逻辑 (静态)
-const getFormattedReferrer = (): Hex => {
-  const rawReferrer =
-    import.meta.env.VITE_ENS_REFERRER_HASH ||
-    "0x0000000000000000000000000000000000000000";
-  return pad(rawReferrer.toLowerCase() as Hex, { size: 32 });
-};
+} from "../services/storage/registration";
+import { checkRegStatus } from "../services/blockchain/recovery";
+import { useChainId } from "wagmi";
+import {
+  useWriteEthControllerV3,
+  ethControllerV3Abi,
+} from "../wagmi-generated";
+import { REFERRER_ADDRESS_HASH } from "../config/env";
+import { getContracts } from "../config/contracts";
+import { parseLabel, generateSecret } from "../utils/ens";
+import { validateLabel } from "../utils/validate";
 
 export function useEnsRegistration() {
   const [status, setStatus] = useState<RegistrationStatus>("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
+
+  // Ref: 存储注册参数，保证跨渲染周期的数据一致性
+  const registrationDataRef = useRef<RegistrationStruct | null>(null);
+
   const { address } = useAccount();
   const publicClient = usePublicClient();
-  const { writeContractAsync } = useWriteContract();
+  const { writeContractAsync } = useWriteEthControllerV3();
+  const chainId = useChainId(); // 获取当前链ID
+  const contracts = getContracts(chainId); // 获取对应合约地址
 
-  // 组件挂载状态追踪 (防止卸载后状态更新报错)
+  // Ref: 追踪组件挂载状态
   const isMounted = useRef(true);
   useEffect(() => {
+    isMounted.current = true;
     return () => {
       isMounted.current = false;
     };
@@ -40,16 +47,141 @@ export function useEnsRegistration() {
   const resetStatus = useCallback(() => {
     setStatus("idle");
     setSecondsLeft(0);
+    registrationDataRef.current = null;
   }, []);
 
-  const generateSecret = (): Hex => {
-    const randomValues = crypto.getRandomValues(new Uint8Array(32));
-    return toHex(randomValues) as unknown as Hex;
-  };
+  // ----------------------------------------------------------------
+  // 核心逻辑：执行注册 (Register)
+  // ----------------------------------------------------------------
+  const executeRegister = useCallback(
+    async (params: RegistrationStruct) => {
+      if (!publicClient || !address) return;
 
+      // 🛡️ 防御：如果已经在处理中，忽略调用 (防止重复点击)
+      // 注意：这里需要配合 UI 的 disabled 状态，但 Ref 检查是最后一道防线
+      // (由于 setStatus 是异步的，这里其实主要靠 status 状态机和 UI 禁用)
+
+      setStatus("registering");
+      const contractAddress = contracts.ETH_CONTROLLER_V3;
+
+      try {
+        // 1. 重新估价 (确保金额准确)
+        const priceData = (await publicClient.readContract({
+          address: contractAddress,
+          abi: ethControllerV3Abi,
+          functionName: "rentPrice",
+          args: [params.label, params.duration],
+        })) as { base: bigint; premium: bigint };
+
+        const priceWithBuffer =
+          ((priceData.base + priceData.premium) * 110n) / 100n;
+
+        // 2. 发起交易
+        const registerHash = await writeContractAsync({
+          functionName: "register",
+          args: [params],
+          value: priceWithBuffer,
+        });
+
+        // 💾 Storage Update: 记录 regTxHash
+        saveRegistrationState(params.label, { regTxHash: registerHash });
+
+        setStatus("waiting_register");
+        await toast.promise(
+          publicClient.waitForTransactionReceipt({ hash: registerHash }),
+          {
+            loading: "最终注册交易确认中...",
+            success: `恭喜！${params.label}.eth 注册成功！`,
+            error: "注册交易失败",
+          },
+        );
+
+        // 🧹 Cleanup: 成功后彻底清除本地数据
+        removeRegistrationState(params.label);
+        setStatus("success");
+      } catch (err: unknown) {
+        console.error("Register Error:", err);
+        if (isMounted.current) {
+          setStatus("error"); // 保持 error 状态，允许重试
+          const error = err as Error & { shortMessage?: string };
+
+          // 友好提示：如果是用户拒绝，提示手动重试
+          if (error.shortMessage?.includes("User rejected")) {
+            toast.error("您取消了交易，请点击按钮重试");
+          } else {
+            toast.error(`注册失败: ${error.shortMessage || error.message}`);
+          }
+        }
+      }
+    },
+    [address, publicClient, writeContractAsync, contracts],
+  );
+
+  // ----------------------------------------------------------------
+  // 功能：检查并恢复 (Resume)
+  // ----------------------------------------------------------------
+  const checkAndResume = useCallback(
+    async (rawLabel: string) => {
+      if (!publicClient) return;
+
+      try {
+        const label = normalize(rawLabel).replace(/\.eth$/, "");
+        const result = await checkRegStatus(publicClient, label);
+
+        // 🛡️ 优化：如果检测到状态是 idle 且有 errorMessage (说明过期了)，主动清理脏数据
+        if (result.status === "idle" && result.errorMessage) {
+          removeRegistrationState(label);
+          toast.error(result.errorMessage); // 提示用户“Commit 已过期”
+          return;
+        }
+
+        if (result.localState && result.localState.registration) {
+          console.log("🔍 恢复状态:", result.status);
+
+          // 恢复内存数据
+          registrationDataRef.current = result.localState.registration;
+          setStatus(result.status);
+
+          if (result.errorMessage && result.status !== "idle") {
+            toast.error(result.errorMessage);
+          }
+
+          // 处理倒计时
+          if (result.status === "counting_down") {
+            setSecondsLeft(result.secondsLeft);
+            startCountdown(result.secondsLeft, () => {
+              // 倒计时结束，自动触发
+              if (registrationDataRef.current && isMounted.current) {
+                executeRegister(registrationDataRef.current);
+              }
+            });
+          }
+          // 如果是 'registering'，不做自动操作，等待用户点击 UI 按钮
+        }
+      } catch (e) {
+        console.error("恢复检查失败", e);
+      }
+    },
+    [publicClient, executeRegister],
+  );
+
+  // ----------------------------------------------------------------
+  // 功能：手动继续 (Continue)
+  // ----------------------------------------------------------------
+  const continueRegistration = useCallback(() => {
+    if (registrationDataRef.current) {
+      executeRegister(registrationDataRef.current);
+    } else {
+      toast.error("无法恢复注册数据，请重新开始");
+      resetStatus();
+    }
+  }, [executeRegister, resetStatus]);
+
+  // ----------------------------------------------------------------
+  // 功能：全新开始 (Start)
+  // ----------------------------------------------------------------
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint) => {
-      // 0. 基础环境检查
       if (!address || !publicClient) {
         toast.error("请先连接钱包");
         return;
@@ -57,168 +189,110 @@ export function useEnsRegistration() {
 
       let label: string;
       try {
-        // 1. Label 标准化与校验
-        label = normalize(rawLabel).replace(/\.eth$/, "");
-        if (label.includes(".")) throw new Error("不支持子域名");
-        if (label.length < 3) throw new Error("长度至少 3 字符");
+        label = parseLabel(rawLabel);
+        validateLabel(label);
       } catch (e: unknown) {
         setStatus("error");
-        const err = e as Error;
-        toast.error(`名称格式错误: ${err.message}`);
+        toast.error((e as Error).message);
         return;
       }
 
       setStatus("committing");
-
-      // 2. 初始化注册参数
       const secret = generateSecret();
-      const referrer = getFormattedReferrer();
+      const referrer = REFERRER_ADDRESS_HASH;
 
-      // 构建 RegistrationStruct
-      const registrationParams: RegistrationStruct = {
+      const params: RegistrationStruct = {
         label,
         owner: address as Address,
         duration,
         secret,
-        resolver: MAINNET_ADDRESSES.ENS_PUBLIC_RESOLVER,
+        resolver: contracts.ENS_PUBLIC_RESOLVER,
         data: [],
-        reverseRecord: false,
+        reverseRecord: 0,
         referrer,
       };
 
-      // 💾 [Storage] 保存初始状态 (包含 Secret)
-      saveRegistrationState(label, { registration: registrationParams });
+      // 初始化状态
+      registrationDataRef.current = params;
+      saveRegistrationState(label, { registration: params });
 
-      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3;
+      const contractAddress = contracts.ETH_CONTROLLER_V3;
 
       try {
-        // 准备合约调用参数 (将 Struct 展平为数组，避免 ABI 编码错误)
-        const paramsArray = [
-          registrationParams.label,
-          registrationParams.owner,
-          registrationParams.duration,
-          registrationParams.secret,
-          registrationParams.resolver,
-          registrationParams.data,
-          registrationParams.reverseRecord,
-          registrationParams.referrer,
-        ];
-
-        // --- Commit 阶段 ---
-
-        // 计算 Commitment Hash
+        // 1. Commit
         const commitment = (await publicClient.readContract({
           address: contractAddress,
-          abi: EthControllerV3ABI,
+          abi: ethControllerV3Abi,
           functionName: "makeCommitment",
-          args: [paramsArray],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          args: [params as any],
         })) as Hex;
-
-        // 💾 [Storage] 更新 Commitment
         saveRegistrationState(label, { commitment });
 
-        // 发起 Commit 交易
         const commitHash = await writeContractAsync({
-          address: contractAddress,
-          abi: EthControllerV3ABI,
           functionName: "commit",
           args: [commitment],
         });
-
-        // 💾 [Storage] 更新 Commit Tx Hash
         saveRegistrationState(label, { commitTxHash: commitHash });
 
         setStatus("waiting_commit");
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: commitHash }),
           {
-            loading: "Commit 交易确认中...",
-            success: "Commit 已上链！请保持页面开启...",
-            error: "Commit 交易失败",
+            loading: "Commit 确认中...",
+            success: "Commit 已上链",
+            error: "Commit 失败",
           },
         );
 
-        // --- 倒计时阶段 ---
+        // 2. Countdown
         setStatus("counting_down");
         const WAIT_SECONDS = 65;
         setSecondsLeft(WAIT_SECONDS);
 
-        await new Promise<void>((resolve, reject) => {
-          let left = WAIT_SECONDS;
-          const timer = setInterval(() => {
-            if (!isMounted.current) {
-              clearInterval(timer);
-              reject(new Error("Component unmounted"));
-              return;
-            }
-            left -= 1;
-            setSecondsLeft(left);
-            if (left <= 0) {
-              clearInterval(timer);
-              resolve();
-            }
-          }, 1000);
+        startCountdown(WAIT_SECONDS, () => {
+          if (isMounted.current) executeRegister(params);
         });
-
-        // --- Register 阶段 ---
-        if (!isMounted.current) return;
-        setStatus("registering");
-
-        // 重新获取价格
-        const priceData = (await publicClient.readContract({
-          address: contractAddress,
-          abi: EthControllerV3ABI,
-          functionName: "rentPrice",
-          args: [label, duration],
-        })) as { base: bigint; premium: bigint };
-
-        // 10% 缓冲
-        const priceWithBuffer =
-          ((priceData.base + priceData.premium) * 110n) / 100n;
-
-        // 发起 Register 交易
-        const registerHash = await writeContractAsync({
-          address: contractAddress,
-          abi: EthControllerV3ABI,
-          functionName: "register",
-          args: [paramsArray], // 使用之前保存的相同参数
-          value: priceWithBuffer,
-        });
-
-        // 💾 [Storage] 更新 Register Tx Hash (防止最后一步页面崩溃找不到交易)
-        saveRegistrationState(label, { regTxHash: registerHash });
-
-        setStatus("waiting_register");
-        await toast.promise(
-          publicClient.waitForTransactionReceipt({ hash: registerHash }),
-          {
-            loading: "最终注册交易确认中...",
-            success: `恭喜！${label}.eth 注册成功！`,
-            error: "注册交易失败",
-          },
-        );
-
-        // 💾 [Storage] 成功清理：删除本地存储
-        removeRegistrationState(label);
-
-        setStatus("success");
       } catch (err: unknown) {
         console.error(err);
         if (isMounted.current) {
           setStatus("error");
-          const error = err as Error & { shortMessage?: string };
-          toast.error(`流程中断: ${error.shortMessage || error.message}`);
+          toast.error("流程中断，请检查控制台");
         }
       }
     },
-    [address, publicClient, writeContractAsync],
+    [address, publicClient, writeContractAsync, executeRegister, contracts],
   );
+
+  // 辅助：倒计时 (独立出来，避免闭包陷阱)
+  const startCountdown = (seconds: number, onFinish: () => void) => {
+    let left = seconds;
+    setSecondsLeft(left);
+    const timer = setInterval(() => {
+      if (!isMounted.current) {
+        clearInterval(timer);
+        return;
+      }
+      left -= 1;
+      setSecondsLeft(left);
+      if (left <= 0) {
+        clearInterval(timer);
+        onFinish();
+      }
+    }, 1000);
+  };
 
   return {
     status,
     secondsLeft,
     startRegistration,
+    checkAndResume,
+    continueRegistration,
     resetStatus,
-    isBusy: status !== "idle" && status !== "success" && status !== "error",
+    isBusy:
+      status !== "idle" &&
+      status !== "success" &&
+      status !== "error" &&
+      status !== "registering",
   };
 }

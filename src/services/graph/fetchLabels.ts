@@ -1,9 +1,9 @@
 // src/utils/fetchLabels.ts
 
 import { namehash } from "viem/ens";
-import { queryData, type GraphQLQueryCode } from "./globals";
-import type { ClassifiedInputs } from "./parseInputs";
-import { GRAPHQL_CONFIG } from "../constants/config";
+import { queryData, type GraphQLQueryCode } from "./client";
+import { GRAPHQL_CONFIG } from "../../config/constants";
+import type { ClassifiedInputs } from "../../utils/parseInputs";
 
 // ============================================================================
 // 1. 常量定义
