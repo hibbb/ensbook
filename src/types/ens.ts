@@ -1,4 +1,36 @@
-// src/utils/ens.ts
+// src/types/ens.ts
+
+import { type Address, type Hex } from "viem";
+
+/**
+ * 对应 EthControllerV3 合约的 Registration 结构体
+ */
+export interface RegistrationStruct {
+  label: string;
+  owner: Address;
+  duration: bigint;
+  secret: Hex;
+  resolver: Address;
+  data: Hex[];
+  reverseRecord: boolean;
+  referrer: Hex;
+}
+
+/**
+ * 保存在本地存储中的完整注册状态
+ */
+export interface RegistrationState {
+  // 核心注册参数
+  registration: RegistrationStruct;
+
+  // 流程中间状态
+  commitment?: Hex; // 计算出的承诺哈希
+  commitTxHash?: Hex; // 第一步 Commit 的交易哈希
+  regTxHash?: Hex; // 第二步 Register 的交易哈希
+
+  // 元数据
+  timestamp: number; // 创建时间，用于判断数据是否过期
+}
 
 export interface NameRecord {
   readonly label: string;

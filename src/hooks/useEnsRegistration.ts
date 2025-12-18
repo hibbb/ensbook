@@ -1,24 +1,27 @@
-// src/hooks/useEnsRegistration.ts
-
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useWriteContract, usePublicClient, useAccount } from "wagmi";
-import { type Hex, toHex, pad } from "viem";
+import { type Hex, toHex, pad, type Address } from "viem";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
 import { MAINNET_ADDRESSES } from "../constants/addresses";
 import EthControllerV3ABI from "../abis/EthControllerV3.json";
+import { type RegistrationStruct } from "../types/ens";
+import {
+  saveRegistrationState,
+  removeRegistrationState,
+} from "../utils/storage";
 
 export type RegistrationStatus =
   | "idle"
-  | "committing" // 等待钱包确认 Commit
-  | "waiting_commit" // Commit 上链中
-  | "counting_down" // 60秒倒计时
-  | "registering" // 等待钱包确认 Register
-  | "waiting_register" // Register 上链中
+  | "committing"
+  | "waiting_commit"
+  | "counting_down"
+  | "registering"
+  | "waiting_register"
   | "success"
   | "error";
 
-// ⚡️ 优化1：提取 Referrer 逻辑到 Hook 外部
+// 提取 Referrer 逻辑 (静态)
 const getFormattedReferrer = (): Hex => {
   const rawReferrer =
     import.meta.env.VITE_ENS_REFERRER_HASH ||
@@ -33,13 +36,19 @@ export function useEnsRegistration() {
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
 
-  // ⚡️ 优化2：提供状态重置方法
+  // 组件挂载状态追踪 (防止卸载后状态更新报错)
+  const isMounted = useRef(true);
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
   const resetStatus = useCallback(() => {
     setStatus("idle");
     setSecondsLeft(0);
   }, []);
 
-  // 辅助：生成随机 Secret
   const generateSecret = (): Hex => {
     const randomValues = crypto.getRandomValues(new Uint8Array(32));
     return toHex(randomValues) as unknown as Hex;
@@ -47,7 +56,7 @@ export function useEnsRegistration() {
 
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint) => {
-      // ⚡️ 优化3：增加钱包连接检查和友好提示
+      // 0. 基础环境检查
       if (!address || !publicClient) {
         toast.error("请先连接钱包");
         return;
@@ -55,43 +64,67 @@ export function useEnsRegistration() {
 
       let label: string;
       try {
-        // ⚡️ 优化4：移除 .eth 后缀，防止注册成 "name.eth.eth"
+        // 1. Label 标准化与校验
         label = normalize(rawLabel).replace(/\.eth$/, "");
+        if (label.includes(".")) throw new Error("不支持子域名");
+        if (label.length < 3) throw new Error("长度至少 3 字符");
       } catch (e: unknown) {
         setStatus("error");
-        const normalizationError = e as Error;
-        toast.error(`名称不合法: ${normalizationError.message}`);
+        const err = e as Error;
+        toast.error(`名称格式错误: ${err.message}`);
         return;
       }
 
       setStatus("committing");
+
+      // 2. 初始化注册参数
       const secret = generateSecret();
-      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3;
       const referrer = getFormattedReferrer();
 
-      try {
-        // 1. 准备数据
-        const registrationParams = {
-          label,
-          owner: address,
-          duration,
-          secret,
-          resolver: MAINNET_ADDRESSES.ENS_PUBLIC_RESOLVER,
-          data: [],
-          reverseRecord: false,
-          referrer: referrer,
-        };
+      // 构建 RegistrationStruct
+      const registrationParams: RegistrationStruct = {
+        label,
+        owner: address as Address,
+        duration,
+        secret,
+        resolver: MAINNET_ADDRESSES.ENS_PUBLIC_RESOLVER,
+        data: [],
+        reverseRecord: false,
+        referrer,
+      };
 
-        // 2. Commit 阶段
-        // 注意：如果遇到 AbiEncodingLengthMismatchError，尝试将 args 改为:
-        // args: [[label, address, duration, secret, ...]] (数组嵌套数组)
+      // 💾 [Storage] 保存初始状态 (包含 Secret)
+      saveRegistrationState(label, { registration: registrationParams });
+
+      const contractAddress = MAINNET_ADDRESSES.ETH_CONTROLLER_V3;
+
+      try {
+        // 准备合约调用参数 (将 Struct 展平为数组，避免 ABI 编码错误)
+        const paramsArray = [
+          registrationParams.label,
+          registrationParams.owner,
+          registrationParams.duration,
+          registrationParams.secret,
+          registrationParams.resolver,
+          registrationParams.data,
+          registrationParams.reverseRecord,
+          registrationParams.referrer,
+        ];
+
+        // --- Commit 阶段 ---
+
+        // 计算 Commitment Hash
         const commitment = (await publicClient.readContract({
           address: contractAddress,
           abi: EthControllerV3ABI,
           functionName: "makeCommitment",
-          args: [registrationParams],
+          args: [paramsArray],
         })) as Hex;
 
+        // 💾 [Storage] 更新 Commitment
+        saveRegistrationState(label, { commitment });
+
+        // 发起 Commit 交易
         const commitHash = await writeContractAsync({
           address: contractAddress,
           abi: EthControllerV3ABI,
@@ -99,24 +132,32 @@ export function useEnsRegistration() {
           args: [commitment],
         });
 
+        // 💾 [Storage] 更新 Commit Tx Hash
+        saveRegistrationState(label, { commitTxHash: commitHash });
+
         setStatus("waiting_commit");
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: commitHash }),
           {
             loading: "Commit 交易确认中...",
-            success: "Commit 已上链！开始倒计时...",
+            success: "Commit 已上链！请保持页面开启...",
             error: "Commit 交易失败",
           },
         );
 
-        // 3. 倒计时阶段
+        // --- 倒计时阶段 ---
         setStatus("counting_down");
-        // 使用 65秒 缓冲
-        let left = 65;
-        setSecondsLeft(left);
+        const WAIT_SECONDS = 65;
+        setSecondsLeft(WAIT_SECONDS);
 
-        await new Promise<void>((resolve) => {
+        await new Promise<void>((resolve, reject) => {
+          let left = WAIT_SECONDS;
           const timer = setInterval(() => {
+            if (!isMounted.current) {
+              clearInterval(timer);
+              reject(new Error("Component unmounted"));
+              return;
+            }
             left -= 1;
             setSecondsLeft(left);
             if (left <= 0) {
@@ -126,9 +167,11 @@ export function useEnsRegistration() {
           }, 1000);
         });
 
-        // 4. Register 阶段
+        // --- Register 阶段 ---
+        if (!isMounted.current) return;
         setStatus("registering");
 
+        // 重新获取价格
         const priceData = (await publicClient.readContract({
           address: contractAddress,
           abi: EthControllerV3ABI,
@@ -136,16 +179,21 @@ export function useEnsRegistration() {
           args: [label, duration],
         })) as { base: bigint; premium: bigint };
 
+        // 10% 缓冲
         const priceWithBuffer =
           ((priceData.base + priceData.premium) * 110n) / 100n;
 
+        // 发起 Register 交易
         const registerHash = await writeContractAsync({
           address: contractAddress,
           abi: EthControllerV3ABI,
           functionName: "register",
-          args: [registrationParams],
+          args: [paramsArray], // 使用之前保存的相同参数
           value: priceWithBuffer,
         });
+
+        // 💾 [Storage] 更新 Register Tx Hash (防止最后一步页面崩溃找不到交易)
+        saveRegistrationState(label, { regTxHash: registerHash });
 
         setStatus("waiting_register");
         await toast.promise(
@@ -157,12 +205,17 @@ export function useEnsRegistration() {
           },
         );
 
+        // 💾 [Storage] 成功清理：删除本地存储
+        removeRegistrationState(label);
+
         setStatus("success");
       } catch (err: unknown) {
         console.error(err);
-        setStatus("error");
-        const error = err as Error & { shortMessage?: string };
-        toast.error(`流程中断: ${error.shortMessage || error.message}`);
+        if (isMounted.current) {
+          setStatus("error");
+          const error = err as Error & { shortMessage?: string };
+          toast.error(`流程中断: ${error.shortMessage || error.message}`);
+        }
       }
     },
     [address, publicClient, writeContractAsync],
@@ -172,7 +225,7 @@ export function useEnsRegistration() {
     status,
     secondsLeft,
     startRegistration,
-    resetStatus, // ⚡️ 导出重置方法
+    resetStatus,
     isBusy: status !== "idle" && status !== "success" && status !== "error",
   };
 }
