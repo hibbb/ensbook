@@ -2,8 +2,10 @@
 
 export interface NameRecord {
   readonly label: string;
-  readonly tokenId: string;
-  length: number;
+  readonly namehash: string; // 通常为域名全称的节点哈希，如 namehash('alice.eth')
+  readonly labelhash: string; // 该 label 对应的哈希值，如 keccak256(toUtf8Bytes('alice'))
+  readonly length: number; // 域名长度，如 'alice.eth' 的长度为 5
+
   level: number; // 用户标记等级，默认 1
   /**
    * 域名状态：
