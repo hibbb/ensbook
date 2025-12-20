@@ -1,46 +1,40 @@
 // src/App.tsx
-import { ConnectKitButton } from "connectkit";
-import { useAccount, useBalance } from "wagmi";
-import { formatEther } from "viem";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { TestBox } from "./TestBox";
+import { NavBar } from "./components/NavBar"; // 引入提取后的组件
+import { Home } from "./pages/Home";
+import { CollectionDetail } from "./pages/CollectionDetail";
 
 export default function App() {
-  const { address, isConnected } = useAccount();
-
-  const { data: balance } = useBalance({
-    address,
-    query: { enabled: !!address },
-  });
-
   return (
-    <div style={{ padding: 24, fontFamily: "monospace" }}>
-      <h2>Web3 + React + Vite + ConnectKit Template</h2>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans selection:bg-blue-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* 使用提取后的 NavBar 组件 */}
+          <NavBar />
 
-      {/* Connect / Disconnect 按钮 */}
-      <ConnectKitButton />
+          {/* 主内容路由区 */}
+          <main className="animate-in fade-in duration-500">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/collection/:id" element={<CollectionDetail />} />
+              <Route
+                path="*"
+                element={
+                  <div className="text-center py-20 text-gray-400">
+                    404 | 页面不存在
+                  </div>
+                }
+              />
+            </Routes>
+          </main>
+        </div>
 
-      {isConnected && (
-        <>
-          <div>Address: {address}</div>
-          <div>Balance: {formatEther(balance?.value ?? 0n)} ETH</div>
-        </>
-      )}
-
-      <hr />
-      <TestBox />
-      <Toaster
-        position="bottom-right"
-        reverseOrder={false}
-        toastOptions={{
-          // 全局默认样式设置
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        }}
-      />
-    </div>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{ className: "!bg-gray-800 !text-white !rounded-lg" }}
+        />
+      </div>
+    </BrowserRouter>
   );
 }
