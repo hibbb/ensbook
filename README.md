@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+# ENSBook
 
 ## TODO
 
