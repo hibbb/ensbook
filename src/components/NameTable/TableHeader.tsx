@@ -27,7 +27,7 @@ interface TableHeaderProps {
   showDelete?: boolean;
 }
 
-// 🚀 修复问题 2：将辅助组件移出渲染函数外部
+// 🚀 修复 1：将 SortIndicator 保持在组件外部
 const SortIndicator = ({
   field,
   sortConfig,
@@ -37,17 +37,41 @@ const SortIndicator = ({
 }) => {
   const isActive = sortConfig.field === field;
   return (
-    <span className="ml-1 inline-flex flex-col justify-center h-4 w-2 text-[10px] opacity-50">
-      {!isActive && <FontAwesomeIcon icon={faSort} className="text-gray-300" />}
+    <span className="ml-1.5 inline-flex flex-col justify-center h-3 w-2 text-[8px] opacity-40">
+      {!isActive && (
+        <FontAwesomeIcon icon={faSort} className="text-slate-400" />
+      )}
       {isActive &&
         (sortConfig.direction === "asc" ? (
-          <FontAwesomeIcon icon={faSortUp} className="text-blue-600" />
+          <FontAwesomeIcon
+            icon={faSortUp}
+            className="text-blue-600 opacity-100"
+          />
         ) : (
-          <FontAwesomeIcon icon={faSortDown} className="text-blue-600" />
+          <FontAwesomeIcon
+            icon={faSortDown}
+            className="text-blue-600 opacity-100"
+          />
         ))}
     </span>
   );
 };
+
+// 🚀 修复 2：将 ThWrapper 移到组件外部定义
+// 遵循您的 UI 要求：内部 div 使用 px-3 py-2
+const ThWrapper = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <div
+    className={`px-3 py-2 h-full flex items-center text-xs font-bold text-slate-500 uppercase tracking-wider ${className}`}
+  >
+    {children}
+  </div>
+);
 
 export const TableHeader = ({
   sortConfig,
@@ -58,127 +82,150 @@ export const TableHeader = ({
   showDelete,
 }: TableHeaderProps) => {
   return (
-    <thead className="sticky top-0 z-20 shadow-sm select-none bg-gray-50">
-      <tr className="text-left text-xs font-bold text-gray-500 uppercase bg-gray-50">
-        <th className="px-6 py-4 w-16 first:rounded-tl-xl">序号</th>
+    <thead className="sticky top-0 z-20 shadow-sm bg-slate-50/95 backdrop-blur-sm border-b border-slate-200">
+      <tr className="text-left">
+        {/* 序号 */}
+        <th className="p-0 w-14 first:rounded-tl-xl">
+          <ThWrapper className="justify-center">序号</ThWrapper>
+        </th>
 
         {/* 名称列 */}
-        <th className="px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span>名称</span>
-            <div className="flex gap-2 border-l pl-2 border-gray-200">
-              <button
-                onClick={() => onSort("label")}
-                className={`transition-colors ${sortConfig.field === "label" ? "text-blue-600" : "text-gray-300 hover:text-blue-400"}`}
-              >
-                <FontAwesomeIcon icon={faSortAlphaDown} />
-              </button>
-              <button
-                onClick={() => onSort("length")}
-                className={`transition-colors ${sortConfig.field === "length" ? "text-blue-600" : "text-gray-300 hover:text-blue-400"}`}
-              >
-                <FontAwesomeIcon icon={faSortAmountDown} />
-              </button>
+        <th className="p-0">
+          <ThWrapper>
+            <div className="flex items-center gap-3">
+              <span>名称</span>
+              <div className="flex gap-1 pl-2 border-l border-slate-200/60">
+                <button
+                  onClick={() => onSort("label")}
+                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "label" ? "text-blue-600 bg-white shadow-sm" : "text-slate-400"}`}
+                  title="字母排序"
+                >
+                  <FontAwesomeIcon icon={faSortAlphaDown} size="sm" />
+                </button>
+                <button
+                  onClick={() => onSort("length")}
+                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "length" ? "text-blue-600 bg-white shadow-sm" : "text-slate-400"}`}
+                  title="长度排序"
+                >
+                  <FontAwesomeIcon icon={faSortAmountDown} size="sm" />
+                </button>
+              </div>
             </div>
-          </div>
+          </ThWrapper>
         </th>
 
         {/* 状态列 */}
-        <th className="px-6 py-4 relative">
-          <div className="flex items-center gap-2">
-            <span
-              onClick={() => onSort("status")}
-              className="cursor-pointer hover:text-gray-700"
-            >
-              状态 <SortIndicator field="status" sortConfig={sortConfig} />
-            </span>
-            <FilterDropdown isActive={filterConfig.statusList.length > 0}>
-              <div
-                className={`px-4 py-2 text-xs cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-gray-700"}`}
-                onClick={() =>
-                  onFilterChange({ ...filterConfig, statusList: [] })
-                }
+        <th className="p-0">
+          <ThWrapper>
+            <div className="flex items-center gap-2">
+              <span
+                onClick={() => onSort("status")}
+                className="cursor-pointer hover:text-slate-700 flex items-center transition-colors"
               >
-                全部显示{" "}
-                {filterConfig.statusList.length === 0 && (
-                  <FontAwesomeIcon icon={faCheck} />
-                )}
-              </div>
-              {STATUS_OPTIONS.map((s) => (
+                状态 <SortIndicator field="status" sortConfig={sortConfig} />
+              </span>
+              <FilterDropdown isActive={filterConfig.statusList.length > 0}>
                 <div
-                  key={s}
-                  className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-700 text-[11px]"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newList = filterConfig.statusList.includes(s)
-                      ? filterConfig.statusList.filter((i) => i !== s)
-                      : [...filterConfig.statusList, s];
-                    onFilterChange({ ...filterConfig, statusList: newList });
-                  }}
+                  className={`px-4 py-2 text-xs cursor-pointer hover:bg-slate-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-slate-700"}`}
+                  onClick={() =>
+                    onFilterChange({ ...filterConfig, statusList: [] })
+                  }
                 >
-                  {s}{" "}
-                  {filterConfig.statusList.includes(s) && (
-                    <FontAwesomeIcon icon={faCheck} className="text-blue-600" />
+                  全部显示
+                  {filterConfig.statusList.length === 0 && (
+                    <FontAwesomeIcon icon={faCheck} />
                   )}
                 </div>
-              ))}
-            </FilterDropdown>
-          </div>
+                {STATUS_OPTIONS.map((s) => (
+                  <div
+                    key={s}
+                    className="px-4 py-2 hover:bg-slate-50 cursor-pointer flex justify-between items-center text-slate-700 text-[11px]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const newList = filterConfig.statusList.includes(s)
+                        ? filterConfig.statusList.filter((i) => i !== s)
+                        : [...filterConfig.statusList, s];
+                      onFilterChange({ ...filterConfig, statusList: newList });
+                    }}
+                  >
+                    {s}
+                    {filterConfig.statusList.includes(s) && (
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-blue-600"
+                      />
+                    )}
+                  </div>
+                ))}
+              </FilterDropdown>
+            </div>
+          </ThWrapper>
         </th>
 
         {/* 所有者列 */}
-        <th className="bg-gray-50 px-6 py-4">
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faWallet} className="opacity-30" />
-            {/* 🚀 修改：移除 onClick 和 SortIndicator */}
-            <span className="text-gray-500">所有者</span>
-            <button
-              onClick={() =>
-                isConnected &&
-                onFilterChange({
-                  ...filterConfig,
-                  onlyMe: !filterConfig.onlyMe,
-                })
-              }
-              className={`w-6 h-6 rounded flex items-center justify-center transition-all ${filterConfig.onlyMe ? "bg-blue-100 text-blue-600 shadow-inner" : "text-gray-300 hover:text-blue-400"}`}
-              title={isConnected ? "仅显示我的域名" : "请先连接钱包"}
-            >
-              <FontAwesomeIcon icon={faUser} size="sm" />
-            </button>
-          </div>
+        <th className="p-0">
+          <ThWrapper>
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faWallet} className="text-slate-300" />
+              <span>所有者</span>
+              <button
+                onClick={() =>
+                  isConnected &&
+                  onFilterChange({
+                    ...filterConfig,
+                    onlyMe: !filterConfig.onlyMe,
+                  })
+                }
+                className={`w-5 h-5 rounded flex items-center justify-center transition-all ${filterConfig.onlyMe ? "bg-blue-600 text-white shadow-sm" : "text-slate-300 hover:text-blue-500 hover:bg-blue-50"}`}
+                title={isConnected ? "仅显示我的" : "请先连接钱包"}
+              >
+                <FontAwesomeIcon icon={faUser} size="xs" />
+              </button>
+            </div>
+          </ThWrapper>
         </th>
 
-        <th className="px-6 py-4">元数据</th>
-        <th className="px-6 py-4">相关信息</th>
+        <th className="p-0">
+          <ThWrapper>元数据</ThWrapper>
+        </th>
+        <th className="p-0 text-center">
+          <ThWrapper className="justify-center">信息</ThWrapper>
+        </th>
 
         {/* 操作列 */}
-        <th className="px-6 py-4 text-right relative last:rounded-tr-xl">
-          <div className="flex items-center justify-end gap-2">
-            <span>操作</span>
-            <FilterDropdown
-              isActive={filterConfig.actionType !== "all"}
-              menuWidth="w-32 right-0"
-            >
-              {(["all", "register", "renew"] as const).map((type) => (
-                <div
-                  key={type}
-                  className={`px-4 py-2 text-[11px] hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-blue-600 font-bold bg-blue-50/30" : "text-gray-600"}`}
-                  onClick={() =>
-                    onFilterChange({ ...filterConfig, actionType: type })
-                  }
-                >
-                  {type === "all"
-                    ? "全部"
-                    : type === "register"
-                      ? "注册"
-                      : "更新"}
-                </div>
-              ))}
-            </FilterDropdown>
-          </div>
+        <th className="p-0 last:rounded-tr-xl">
+          <ThWrapper className="justify-end">
+            <div className="flex items-center gap-2">
+              <span>操作</span>
+              <FilterDropdown
+                isActive={filterConfig.actionType !== "all"}
+                menuWidth="w-32 right-0"
+              >
+                {(["all", "register", "renew"] as const).map((type) => (
+                  <div
+                    key={type}
+                    className={`px-4 py-2 text-[11px] hover:bg-slate-50 cursor-pointer ${filterConfig.actionType === type ? "text-blue-600 font-bold bg-blue-50/50" : "text-slate-600"}`}
+                    onClick={() =>
+                      onFilterChange({ ...filterConfig, actionType: type })
+                    }
+                  >
+                    {type === "all"
+                      ? "全部"
+                      : type === "register"
+                        ? "注册"
+                        : "更新"}
+                  </div>
+                ))}
+              </FilterDropdown>
+            </div>
+          </ThWrapper>
         </th>
 
-        {showDelete && <th className="px-6 py-4 text-center">删除</th>}
+        {showDelete && (
+          <th className="p-0 text-center">
+            <ThWrapper>删除</ThWrapper>
+          </th>
+        )}
       </tr>
     </thead>
   );

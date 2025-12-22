@@ -1,3 +1,95 @@
+/* ===== ebr-normal: Quicksand ===== */
+@font-face {
+    font-family: "qs-light";
+    src: url("./assets/fonts/Quicksand-Light.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "qs-regular";
+    src: url("./assets/fonts/Quicksand-Regular.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "qs-medium";
+    src: url("./assets/fonts/Quicksand-Medium.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "qs-semibold";
+    src: url("./assets/fonts/Quicksand-SemiBold.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "qs-bold";
+    src: url("./assets/fonts/Quicksand-Bold.ttf") format("truetype");
+    font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+- 可点击的文字颜色，如链接：#0dcaf0
+- 可点击的文字辅助颜色，如链接悬浮：#0aa2c0
+- 主题背景色，不需要在 table 中体现：#f5f5f5
+- 文字颜色：#483c32
+- 表格行的背景色：#eaeaea
+- 表格行上边框颜色：#dddddd
+*/
+
+body {
+    background-color: #f5f5f5;
+    font-family: "qs-regular";
+}
+h1 {
+    padding: 0 0.5rem;
+}
+h1 a {
+    text-decoration: none;
+}
+
+/* === table styles === */
+
+.ebr-tb {
+    border-collapse: separate;
+    border-spacing: 0 0.25rem;
+}
+.ebr-tb-row td:first-child,
+.ebr-tb-row th:first-child {
+    padding-left: 1.25rem;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+.ebr-tb-row td:last-child,
+.ebr-tb-row th:last-child {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+.ebr-tb-row td {
+    background-color: #ffffff;
+    border: 0;
+}
+.ebr-tb-row th {
+    font-weight: 400;
+    background-color: #eaeaea;
+    border-bottom: 1px solid #dddddd;
+}
+
+/* ==== color model ==== */
+body {
+    color: #483c32;
+    font-weight: 300;
+}
+a {
+    color: #0dcaf0;
+}
+a:hover {
+    color: #0aa2c0;
+}
+h1 a .title-ens {
+    color: #483c32;
+}
+.error-boundary {
+    color: indianred;
+}

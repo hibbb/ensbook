@@ -27,7 +27,7 @@ export const CollectionDetail = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <header className="mb-10">
-        <h1 className="text-4xl font-black">{collection.displayName}</h1>
+        <h1 className="text-4xl font-qsBold">{collection.displayName}</h1>
         <p className="text-gray-500">{collection.description}</p>
       </header>
 

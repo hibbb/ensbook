@@ -1,16 +1,16 @@
 import { toast } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
-import { isRenewable } from "../../utils/ens"; //
-import type { NameRecord } from "../../types/ensNames"; //
+import { isRenewable } from "../../utils/ens";
+import type { NameRecord } from "../../types/ensNames";
 
-// 将样式映射移出组件，提升性能
-const STATUS_CLASSES: Record<string, string> = {
-  Available: "bg-green-50 text-green-700 border-green-200",
+// 🎨 颜色配置：请在此处替换为您模板中的颜色
+const STATUS_STYLES: Record<string, string> = {
+  Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
   Active: "bg-blue-50 text-blue-700 border-blue-200",
-  GracePeriod: "bg-orange-50 text-orange-700 border-orange-200",
+  GracePeriod: "bg-amber-50 text-amber-700 border-amber-200",
   PremiumPeriod: "bg-purple-50 text-purple-700 border-purple-200",
-  Released: "bg-red-50 text-red-700 border-red-200",
+  Released: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 interface TableRowProps {
@@ -31,65 +31,90 @@ export const TableRow = ({
     record.owner?.toLowerCase() === currentAddress.toLowerCase();
   const renewable = isRenewable(record);
 
+  // 状态样式回退处理
+  const statusClass =
+    STATUS_STYLES[record.status] ||
+    "bg-slate-50 text-slate-600 border-slate-200";
+
   const handleCopy = (label: string, value: string) => {
     navigator.clipboard.writeText(value);
-    toast.success(`${label} 已复制`);
+    toast.success(`${label} 已复制`, {
+      style: { fontSize: "12px", fontWeight: 500 },
+    });
   };
 
   return (
     <tr
-      className={`hover:bg-gray-50 transition-colors ${isMe ? "bg-amber-50" : "even:bg-slate-50/50"}`}
+      className={`group transition-colors duration-200 border-b border-gray-100 last:border-0 ${
+        isMe ? "bg-blue-50/30 hover:bg-blue-50/60" : "hover:bg-gray-50/50"
+      }`}
     >
-      {/* 序号 */}
-      <td className="px-6 py-4 text-sm text-gray-400 font-mono">{index + 1}</td>
+      {/* 1. 序号 */}
+      <td className="p-0 text-center w-14">
+        <div className="px-3 py-2 h-14 flex items-center justify-center text-xs text-gray-400 font-mono">
+          {index + 1}
+        </div>
+      </td>
 
-      {/* 名称 */}
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center gap-2">
-          <span
-            className={`text-sm font-bold ${record.wrapped ? "text-purple-600" : "text-gray-900"}`}
+      {/* 2. 名称 */}
+      <td className="p-0">
+        <div className="px-3 py-2 h-14 flex items-center">
+          <div className="flex flex-col justify-center">
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`text-sm font-bold tracking-tight ${record.wrapped ? "text-violet-700" : "text-slate-900"}`}
+              >
+                {record.label}
+              </span>
+              <span className="text-gray-400 text-xs font-medium">.eth</span>
+            </div>
+            {record.wrapped && (
+              <span className="mt-0.5 inline-flex text-[9px] font-bold uppercase tracking-wider text-violet-500 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-100 w-fit">
+                Wrapped
+              </span>
+            )}
+          </div>
+        </div>
+      </td>
+
+      {/* 3. 状态 */}
+      <td className="p-0">
+        <div className="px-3 py-2 h-14 flex items-center">
+          <div
+            className={`inline-flex items-center px-2.5 py-1 rounded-md border text-[11px] font-bold uppercase tracking-wide shadow-sm ${statusClass}`}
           >
-            {record.label}
-            <span className="text-gray-400 font-normal">.eth</span>
-          </span>
-          {record.wrapped && (
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-600 border border-purple-200">
-              Wrapped
-            </span>
+            <span
+              className={`w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-60`}
+            />
+            {record.status}
+          </div>
+        </div>
+      </td>
+
+      {/* 4. 所有者 */}
+      <td className="p-0">
+        <div className="px-3 py-2 h-14 flex items-center">
+          {record.owner ? (
+            <div
+              className={`flex items-center gap-2 font-mono text-xs ${isMe ? "text-blue-600 font-bold" : "text-slate-500"}`}
+            >
+              {`${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
+              {isMe && (
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className="text-gray-300 text-xs">—</span>
           )}
         </div>
       </td>
 
-      {/* 状态 */}
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${STATUS_CLASSES[record.status] || "bg-gray-50 text-gray-700 border-gray-200"}`}
-        >
-          {record.status}
-        </span>
-      </td>
-
-      {/* 所有者 */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-mono">
-        {record.owner ? (
-          <div
-            className={`flex items-center gap-2 ${isMe ? "text-amber-600 font-bold" : "text-gray-500"}`}
-          >
-            {`${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
-            {isMe && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-100 text-amber-700 border border-amber-200">
-                ME
-              </span>
-            )}
-          </div>
-        ) : (
-          "-"
-        )}
-      </td>
-
-      {/* 元数据 */}
-      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-400">
-        <div className="flex flex-col gap-1">
+      {/* 5. 元数据 */}
+      <td className="p-0">
+        <div className="px-3 py-2 h-14 flex flex-col justify-center gap-1">
           {["Label", "Name"].map((type) => (
             <button
               key={type}
@@ -99,48 +124,55 @@ export const TableRow = ({
                   type === "Label" ? record.labelhash : record.namehash,
                 )
               }
-              className="flex items-center gap-2 hover:text-blue-600 transition-colors text-left group w-fit"
+              className="flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-blue-600 transition-colors group/btn text-left w-fit"
             >
-              <FontAwesomeIcon
-                icon={faCopy}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              <span className="bg-gray-100 px-1.5 py-0.5 rounded uppercase text-[10px] group-hover:bg-blue-50 group-hover:text-blue-600">
-                {type}:{" "}
+              <span className="font-mono bg-gray-50 border border-gray-100 px-1 py-0.5 rounded text-gray-500 group-hover/btn:border-blue-200 group-hover/btn:bg-blue-50 group-hover/btn:text-blue-700">
+                {type[0]}H:{" "}
                 {record[type === "Label" ? "labelhash" : "namehash"].slice(
                   0,
                   4,
                 )}
                 ...
               </span>
+              <FontAwesomeIcon
+                icon={faCopy}
+                className="opacity-0 group-hover/btn:opacity-100 transition-opacity"
+              />
             </button>
           ))}
         </div>
       </td>
 
-      {/* 相关信息 */}
-      <td className="px-6 py-4 text-gray-300">
-        <FontAwesomeIcon
-          icon={faExternalLinkAlt}
-          size="xs"
-          className="hover:text-blue-500 cursor-pointer transition-colors"
-        />
+      {/* 6. 相关信息 */}
+      <td className="p-0 text-center">
+        <div className="px-3 py-2 h-14 flex items-center justify-center">
+          <a
+            href={`https://app.ens.domains/${record.label}.eth`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-300 hover:text-blue-600 hover:bg-blue-50 transition-all"
+          >
+            <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
+          </a>
+        </div>
       </td>
 
-      {/* 操作 */}
-      <td className="px-6 py-4 text-right">
-        <button
-          disabled={!isConnected}
-          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
-            !isConnected
-              ? "bg-gray-100 text-gray-400 border shadow-none cursor-not-allowed"
-              : renewable
-                ? "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200 hover:-translate-y-0.5"
-                : "bg-white border border-green-500 text-green-600 hover:bg-green-50 hover:-translate-y-0.5"
-          }`}
-        >
-          {isConnected ? (renewable ? "续费" : "注册") : "连接钱包"}
-        </button>
+      {/* 7. 操作 */}
+      <td className="p-0 text-right">
+        <div className="px-3 py-2 h-14 flex items-center justify-end">
+          <button
+            disabled={!isConnected}
+            className={`px-4 py-1.5 rounded-lg text-[11px] font-black tracking-wide transition-all shadow-sm active:scale-95 ${
+              !isConnected
+                ? "bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed"
+                : renewable
+                  ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-100 hover:shadow-md border border-transparent"
+                  : "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300"
+            }`}
+          >
+            {isConnected ? (renewable ? "续费" : "注册") : "连接"}
+          </button>
+        </div>
       </td>
     </tr>
   );
