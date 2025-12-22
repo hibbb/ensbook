@@ -27,7 +27,6 @@ interface TableHeaderProps {
   showDelete?: boolean;
 }
 
-// 🚀 修复 1：将 SortIndicator 保持在组件外部
 const SortIndicator = ({
   field,
   sortConfig,
@@ -38,9 +37,7 @@ const SortIndicator = ({
   const isActive = sortConfig.field === field;
   return (
     <span className="ml-1.5 inline-flex flex-col justify-center h-3 w-2 text-[8px] opacity-40">
-      {!isActive && (
-        <FontAwesomeIcon icon={faSort} className="text-slate-400" />
-      )}
+      {!isActive && <FontAwesomeIcon icon={faSort} className="text-gray-400" />}
       {isActive &&
         (sortConfig.direction === "asc" ? (
           <FontAwesomeIcon
@@ -57,8 +54,7 @@ const SortIndicator = ({
   );
 };
 
-// 🚀 修复 2：将 ThWrapper 移到组件外部定义
-// 遵循您的 UI 要求：内部 div 使用 px-3 py-2
+// 🚀 样式简化：内边距由父级 table 控制，此处只负责布局对齐和字体样式
 const ThWrapper = ({
   children,
   className = "",
@@ -67,7 +63,7 @@ const ThWrapper = ({
   className?: string;
 }) => (
   <div
-    className={`px-3 py-2 h-full flex items-center text-xs font-bold text-slate-500 uppercase tracking-wider ${className}`}
+    className={`h-full flex items-center text-xs font-bold text-gray-500 uppercase tracking-wider ${className}`}
   >
     {children}
   </div>
@@ -82,29 +78,27 @@ export const TableHeader = ({
   showDelete,
 }: TableHeaderProps) => {
   return (
-    <thead className="sticky top-0 z-20 shadow-sm bg-slate-50/95 backdrop-blur-sm border-b border-slate-200">
+    <thead className="sticky top-0 z-20 shadow-sm bg-table-header/95 backdrop-blur-sm border-b border-table-border">
       <tr className="text-left">
-        {/* 序号 */}
-        <th className="p-0 w-14 first:rounded-tl-xl">
+        <th className="w-14">
           <ThWrapper className="justify-center">序号</ThWrapper>
         </th>
 
-        {/* 名称列 */}
-        <th className="p-0">
+        <th>
           <ThWrapper>
             <div className="flex items-center gap-3">
               <span>名称</span>
-              <div className="flex gap-1 pl-2 border-l border-slate-200/60">
+              <div className="flex gap-1 pl-2 border-l border-gray-300/50">
                 <button
                   onClick={() => onSort("label")}
-                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "label" ? "text-blue-600 bg-white shadow-sm" : "text-slate-400"}`}
+                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "label" ? "text-blue-600 bg-white shadow-sm" : "text-gray-400"}`}
                   title="字母排序"
                 >
                   <FontAwesomeIcon icon={faSortAlphaDown} size="sm" />
                 </button>
                 <button
                   onClick={() => onSort("length")}
-                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "length" ? "text-blue-600 bg-white shadow-sm" : "text-slate-400"}`}
+                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "length" ? "text-blue-600 bg-white shadow-sm" : "text-gray-400"}`}
                   title="长度排序"
                 >
                   <FontAwesomeIcon icon={faSortAmountDown} size="sm" />
@@ -114,19 +108,18 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 状态列 */}
-        <th className="p-0">
+        <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
               <span
                 onClick={() => onSort("status")}
-                className="cursor-pointer hover:text-slate-700 flex items-center transition-colors"
+                className="cursor-pointer hover:text-gray-700 flex items-center transition-colors"
               >
                 状态 <SortIndicator field="status" sortConfig={sortConfig} />
               </span>
               <FilterDropdown isActive={filterConfig.statusList.length > 0}>
                 <div
-                  className={`px-4 py-2 text-xs cursor-pointer hover:bg-slate-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-slate-700"}`}
+                  className={`px-4 py-2 text-xs cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-gray-700"}`}
                   onClick={() =>
                     onFilterChange({ ...filterConfig, statusList: [] })
                   }
@@ -139,7 +132,7 @@ export const TableHeader = ({
                 {STATUS_OPTIONS.map((s) => (
                   <div
                     key={s}
-                    className="px-4 py-2 hover:bg-slate-50 cursor-pointer flex justify-between items-center text-slate-700 text-[11px]"
+                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-700 text-[11px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       const newList = filterConfig.statusList.includes(s)
@@ -162,11 +155,10 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 所有者列 */}
-        <th className="p-0">
+        <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faWallet} className="text-slate-300" />
+              <FontAwesomeIcon icon={faWallet} className="text-gray-300" />
               <span>所有者</span>
               <button
                 onClick={() =>
@@ -176,7 +168,7 @@ export const TableHeader = ({
                     onlyMe: !filterConfig.onlyMe,
                   })
                 }
-                className={`w-5 h-5 rounded flex items-center justify-center transition-all ${filterConfig.onlyMe ? "bg-blue-600 text-white shadow-sm" : "text-slate-300 hover:text-blue-500 hover:bg-blue-50"}`}
+                className={`w-5 h-5 rounded flex items-center justify-center transition-all ${filterConfig.onlyMe ? "bg-blue-600 text-white shadow-sm" : "text-gray-300 hover:text-blue-500 hover:bg-blue-50"}`}
                 title={isConnected ? "仅显示我的" : "请先连接钱包"}
               >
                 <FontAwesomeIcon icon={faUser} size="xs" />
@@ -185,15 +177,14 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        <th className="p-0">
+        <th>
           <ThWrapper>元数据</ThWrapper>
         </th>
-        <th className="p-0 text-center">
+        <th className="text-center">
           <ThWrapper className="justify-center">信息</ThWrapper>
         </th>
 
-        {/* 操作列 */}
-        <th className="p-0 last:rounded-tr-xl">
+        <th>
           <ThWrapper className="justify-end">
             <div className="flex items-center gap-2">
               <span>操作</span>
@@ -204,7 +195,7 @@ export const TableHeader = ({
                 {(["all", "register", "renew"] as const).map((type) => (
                   <div
                     key={type}
-                    className={`px-4 py-2 text-[11px] hover:bg-slate-50 cursor-pointer ${filterConfig.actionType === type ? "text-blue-600 font-bold bg-blue-50/50" : "text-slate-600"}`}
+                    className={`px-4 py-2 text-[11px] hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-blue-600 font-bold bg-blue-50/50" : "text-gray-600"}`}
                     onClick={() =>
                       onFilterChange({ ...filterConfig, actionType: type })
                     }
@@ -222,7 +213,7 @@ export const TableHeader = ({
         </th>
 
         {showDelete && (
-          <th className="p-0 text-center">
+          <th className="text-center">
             <ThWrapper>删除</ThWrapper>
           </th>
         )}

@@ -24,10 +24,20 @@ interface NameTableProps {
 
 export const NameTable = (props: NameTableProps) => {
   return (
-    // 外层容器：控制圆角和边框颜色
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden ring-1 ring-slate-100">
+    <div className="bg-table-row overflow-hidden ring-1 ring-black/5">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-100">
+        {/* 🚀 样式注入：在此处统一管理单元格内边距
+            [&_td]:p-0 -> 所有 td padding 为 0
+            [&_th]:p-0 -> 所有 th padding 为 0
+            [&_td>div]:px-3 -> 所有 td 下的第一层 div 水平内边距 3
+            ...以此类推
+        */}
+        <table
+          className="min-w-full divide-y divide-table-border
+          [&_td]:p-0 [&_th]:p-0
+          [&_td>div]:px-3 [&_td>div]:py-2
+          [&_th>div]:px-3 [&_th>div]:py-2"
+        >
           <TableHeader
             sortConfig={props.sortConfig}
             onSort={props.onSort}
@@ -36,7 +46,7 @@ export const NameTable = (props: NameTableProps) => {
             isConnected={props.isConnected}
             showDelete={props.showDelete}
           />
-          <tbody className="bg-white divide-y divide-slate-50">
+          <tbody className="bg-table-row divide-y divide-gray-50">
             {props.isLoading ? (
               Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
             ) : props.records.length > 0 ? (
@@ -51,10 +61,10 @@ export const NameTable = (props: NameTableProps) => {
               ))
             ) : (
               <tr>
-                <td colSpan={props.showDelete ? 8 : 7} className="p-0">
+                <td colSpan={props.showDelete ? 8 : 7}>
                   <div className="px-6 py-24 text-center">
-                    <div className="text-slate-300 text-4xl mb-3">∅</div>
-                    <p className="text-slate-400 text-sm font-medium">
+                    <div className="text-gray-300 text-4xl mb-3">∅</div>
+                    <p className="text-gray-400 text-sm font-medium">
                       没有找到符合当前筛选条件的域名
                     </p>
                   </div>
@@ -69,41 +79,41 @@ export const NameTable = (props: NameTableProps) => {
 };
 
 const SkeletonRow = () => (
-  <tr className="animate-pulse border-b border-slate-50 last:border-0">
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex items-center justify-center">
-        <div className="h-3 w-4 bg-slate-100 rounded"></div>
+  <tr className="animate-pulse border-b border-gray-50 last:border-0">
+    <td>
+      <div className="h-14 flex items-center justify-center">
+        <div className="h-3 w-4 bg-gray-100 rounded"></div>
       </div>
     </td>
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex items-center">
-        <div className="h-4 w-24 bg-slate-100 rounded"></div>
+    <td>
+      <div className="h-14 flex items-center">
+        <div className="h-4 w-24 bg-gray-100 rounded"></div>
       </div>
     </td>
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex items-center">
-        <div className="h-5 w-16 bg-slate-100 rounded-full"></div>
+    <td>
+      <div className="h-14 flex items-center">
+        <div className="h-5 w-16 bg-gray-100 rounded-full"></div>
       </div>
     </td>
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex items-center">
-        <div className="h-3 w-20 bg-slate-100 rounded"></div>
+    <td>
+      <div className="h-14 flex items-center">
+        <div className="h-3 w-20 bg-gray-100 rounded"></div>
       </div>
     </td>
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex flex-col justify-center gap-2">
-        <div className="h-3 w-24 bg-slate-100 rounded"></div>
-        <div className="h-3 w-24 bg-slate-100 rounded"></div>
+    <td>
+      <div className="h-14 flex flex-col justify-center gap-2">
+        <div className="h-3 w-24 bg-gray-100 rounded"></div>
+        <div className="h-3 w-24 bg-gray-100 rounded"></div>
       </div>
     </td>
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex items-center justify-center">
-        <div className="h-4 w-4 bg-slate-100 rounded"></div>
+    <td>
+      <div className="h-14 flex items-center justify-center">
+        <div className="h-4 w-4 bg-gray-100 rounded"></div>
       </div>
     </td>
-    <td className="p-0">
-      <div className="px-3 py-2 h-14 flex items-center justify-end">
-        <div className="h-7 w-16 bg-slate-100 rounded-lg"></div>
+    <td>
+      <div className="h-14 flex items-center justify-end">
+        <div className="h-7 w-16 bg-gray-100 rounded-lg"></div>
       </div>
     </td>
   </tr>

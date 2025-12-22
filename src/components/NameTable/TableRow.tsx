@@ -4,7 +4,6 @@ import { faCopy, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 
-// 🎨 颜色配置：请在此处替换为您模板中的颜色
 const STATUS_STYLES: Record<string, string> = {
   Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
   Active: "bg-blue-50 text-blue-700 border-blue-200",
@@ -31,10 +30,8 @@ export const TableRow = ({
     record.owner?.toLowerCase() === currentAddress.toLowerCase();
   const renewable = isRenewable(record);
 
-  // 状态样式回退处理
   const statusClass =
-    STATUS_STYLES[record.status] ||
-    "bg-slate-50 text-slate-600 border-slate-200";
+    STATUS_STYLES[record.status] || "bg-gray-50 text-gray-600 border-gray-200";
 
   const handleCopy = (label: string, value: string) => {
     navigator.clipboard.writeText(value);
@@ -45,24 +42,24 @@ export const TableRow = ({
 
   return (
     <tr
-      className={`group transition-colors duration-200 border-b border-gray-100 last:border-0 ${
+      className={`group transition-colors duration-200 last:border-0 ${
         isMe ? "bg-blue-50/30 hover:bg-blue-50/60" : "hover:bg-gray-50/50"
       }`}
     >
-      {/* 1. 序号 */}
-      <td className="p-0 text-center w-14">
-        <div className="px-3 py-2 h-14 flex items-center justify-center text-xs text-gray-400 font-mono">
+      {/* 序号：样式由外层控制，此处仅保留布局 */}
+      <td className="w-14 text-center">
+        <div className="h-14 flex items-center justify-center text-xs text-gray-400 font-mono">
           {index + 1}
         </div>
       </td>
 
-      {/* 2. 名称 */}
-      <td className="p-0">
-        <div className="px-3 py-2 h-14 flex items-center">
+      {/* 名称 */}
+      <td>
+        <div className="h-14 flex items-center">
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-1.5">
               <span
-                className={`text-sm font-bold tracking-tight ${record.wrapped ? "text-violet-700" : "text-slate-900"}`}
+                className={`text-sm font-bold tracking-tight ${record.wrapped ? "text-violet-700" : ""}`}
               >
                 {record.label}
               </span>
@@ -77,9 +74,9 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 3. 状态 */}
-      <td className="p-0">
-        <div className="px-3 py-2 h-14 flex items-center">
+      {/* 状态 */}
+      <td>
+        <div className="h-14 flex items-center">
           <div
             className={`inline-flex items-center px-2.5 py-1 rounded-md border text-[11px] font-bold uppercase tracking-wide shadow-sm ${statusClass}`}
           >
@@ -91,12 +88,12 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 4. 所有者 */}
-      <td className="p-0">
-        <div className="px-3 py-2 h-14 flex items-center">
+      {/* 所有者 */}
+      <td>
+        <div className="h-14 flex items-center">
           {record.owner ? (
             <div
-              className={`flex items-center gap-2 font-mono text-xs ${isMe ? "text-blue-600 font-bold" : "text-slate-500"}`}
+              className={`flex items-center gap-2 font-mono text-xs ${isMe ? "text-blue-600 font-bold" : "text-gray-500"}`}
             >
               {`${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
               {isMe && (
@@ -112,9 +109,9 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 5. 元数据 */}
-      <td className="p-0">
-        <div className="px-3 py-2 h-14 flex flex-col justify-center gap-1">
+      {/* 元数据 */}
+      <td>
+        <div className="h-14 flex flex-col justify-center gap-1">
           {["Label", "Name"].map((type) => (
             <button
               key={type}
@@ -124,7 +121,7 @@ export const TableRow = ({
                   type === "Label" ? record.labelhash : record.namehash,
                 )
               }
-              className="flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-blue-600 transition-colors group/btn text-left w-fit"
+              className="flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-link transition-colors group/btn text-left w-fit"
             >
               <span className="font-mono bg-gray-50 border border-gray-100 px-1 py-0.5 rounded text-gray-500 group-hover/btn:border-blue-200 group-hover/btn:bg-blue-50 group-hover/btn:text-blue-700">
                 {type[0]}H:{" "}
@@ -143,23 +140,23 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 6. 相关信息 */}
-      <td className="p-0 text-center">
-        <div className="px-3 py-2 h-14 flex items-center justify-center">
+      {/* 相关信息 */}
+      <td className="text-center">
+        <div className="h-14 flex items-center justify-center">
           <a
             href={`https://app.ens.domains/${record.label}.eth`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-300 hover:text-blue-600 hover:bg-blue-50 transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-300 hover:text-link hover:bg-blue-50 transition-all"
           >
             <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
           </a>
         </div>
       </td>
 
-      {/* 7. 操作 */}
-      <td className="p-0 text-right">
-        <div className="px-3 py-2 h-14 flex items-center justify-end">
+      {/* 操作 */}
+      <td className="text-right">
+        <div className="h-14 flex items-center justify-end">
           <button
             disabled={!isConnected}
             className={`px-4 py-1.5 rounded-lg text-[11px] font-black tracking-wide transition-all shadow-sm active:scale-95 ${
