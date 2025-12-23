@@ -16,8 +16,8 @@ export interface FilterConfig {
 
 export const STATUS_OPTIONS = [
   "Available",
-  "PremiumPeriod",
-  "GracePeriod",
+  "Premium",
+  "Grace",
   "Active",
   "Released",
 ] as const;

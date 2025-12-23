@@ -63,7 +63,7 @@ const ThWrapper = ({
   className?: string;
 }) => (
   <div
-    className={`h-full flex items-center text-xs font-bold text-gray-500 uppercase tracking-wider ${className}`}
+    className={`h-full flex items-center text-sm font-qs-regular text-gray-500 uppercase tracking-wider ${className}`}
   >
     {children}
   </div>
@@ -78,7 +78,7 @@ export const TableHeader = ({
   showDelete,
 }: TableHeaderProps) => {
   return (
-    <thead className="sticky top-0 z-20 shadow-sm bg-table-header/95 backdrop-blur-sm border-b border-table-border">
+    <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm">
       <tr className="text-left">
         <th className="w-14">
           <ThWrapper className="justify-center">序号</ThWrapper>
@@ -119,7 +119,7 @@ export const TableHeader = ({
               </span>
               <FilterDropdown isActive={filterConfig.statusList.length > 0}>
                 <div
-                  className={`px-4 py-2 text-xs cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-gray-700"}`}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-gray-700"}`}
                   onClick={() =>
                     onFilterChange({ ...filterConfig, statusList: [] })
                   }

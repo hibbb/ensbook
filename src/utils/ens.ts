@@ -28,8 +28,8 @@ export function generateSecret(): Hex {
  * 判断当前用户是否应该看到“更新/续费”按钮
  * * 逻辑：
  * 1. Active: 正常使用中，可以续费以延长租期
- * 2. GracePeriod: 已过期但处于宽限期，原主人仍可续费挽回
+ * 2. Grace: 已过期但处于宽限期，原主人仍可续费挽回
  */
 export function isRenewable(record: NameRecord): boolean {
-  return record.status === "Active" || record.status === "GracePeriod";
+  return record.status === "Active" || record.status === "Grace";
 }

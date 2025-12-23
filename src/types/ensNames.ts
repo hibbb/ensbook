@@ -10,12 +10,12 @@ export interface NameRecord {
   /**
    * 域名状态：
    * - Active: 正常使用中
-   * - GracePeriod: 宽限期
-   * - PremiumPeriod: 溢价期
+   * - Grace: 宽限期
+   * - Premium: 溢价期
    * - Released: 已被释放
    * - Available: 未注册
    */
-  status: "Active" | "GracePeriod" | "PremiumPeriod" | "Released" | "Available";
+  status: "Active" | "Grace" | "Premium" | "Released" | "Available";
   wrapped: boolean;
   owner: string | null;
 

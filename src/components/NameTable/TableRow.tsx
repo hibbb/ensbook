@@ -5,11 +5,21 @@ import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 
 const STATUS_STYLES: Record<string, string> = {
-  Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Active: "bg-blue-50 text-blue-700 border-blue-200",
-  GracePeriod: "bg-amber-50 text-amber-700 border-amber-200",
-  PremiumPeriod: "bg-purple-50 text-purple-700 border-purple-200",
-  Released: "bg-rose-50 text-rose-700 border-rose-200",
+  Available: "bg-green-200",
+  Active: "bg-gray-200",
+  Grace: "bg-red-200",
+  Premium: "bg-yellow-200",
+  Released: "bg-green-200",
+};
+
+// 🚀 辅助函数：格式化剩余时间
+const formatRemainingTime = (seconds: number) => {
+  if (seconds <= 0) return "已结束";
+  const days = Math.floor(seconds / 86400);
+  if (days > 365) return `${(days / 365).toFixed(1)}y`;
+  if (days > 0) return `${days}d`;
+  const hours = Math.floor(seconds / 3600);
+  return `${hours}h`;
 };
 
 interface TableRowProps {
@@ -33,6 +43,25 @@ export const TableRow = ({
   const statusClass =
     STATUS_STYLES[record.status] || "bg-gray-50 text-gray-600 border-gray-200";
 
+  // 🚀 逻辑处理：根据状态计算目标剩余时间
+  const getTimeInfo = () => {
+    const now = Math.floor(Date.now() / 1000);
+    const PREMIUM_PERIOD = 21 * 24 * 60 * 60; // 90天宽限期
+
+    if (record.status === "Active" && record.expiryTime) {
+      return formatRemainingTime(record.expiryTime - now);
+    }
+    if (record.status === "Grace" && record.releaseTime) {
+      return formatRemainingTime(record.releaseTime - now);
+    }
+    if (record.status === "Premium" && record.releaseTime) {
+      return formatRemainingTime(record.releaseTime + PREMIUM_PERIOD - now);
+    }
+    return null;
+  };
+
+  const timeInfo = getTimeInfo();
+
   const handleCopy = (label: string, value: string) => {
     navigator.clipboard.writeText(value);
     toast.success(`${label} 已复制`, {
@@ -41,59 +70,51 @@ export const TableRow = ({
   };
 
   return (
-    <tr
-      className={`group transition-colors duration-200 last:border-0 ${
-        isMe ? "bg-blue-50/30 hover:bg-blue-50/60" : "hover:bg-gray-50/50"
-      }`}
-    >
-      {/* 序号：样式由外层控制，此处仅保留布局 */}
+    <tr className="group transition-colors bg-table-row duration-150 last:border-0 hover:bg-link/10">
       <td className="w-14 text-center">
-        <div className="h-14 flex items-center justify-center text-xs text-gray-400 font-mono">
+        <div className="h-14 flex items-center justify-center text-xs text-gray-400">
           {index + 1}
         </div>
       </td>
 
-      {/* 名称 */}
       <td>
         <div className="h-14 flex items-center">
-          <div className="flex flex-col justify-center">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={`text-sm font-bold tracking-tight ${record.wrapped ? "text-violet-700" : ""}`}
-              >
+          <div
+            className={`flex flex-col justify-center ${record.wrapped ? "px-1 rounded-md border border-link/30 bg-link/10" : ""}`}
+          >
+            <div className="flex items-center gap-1">
+              <span className="text-base font-qs-semibold tracking-tight">
                 {record.label}
               </span>
-              <span className="text-gray-400 text-xs font-medium">.eth</span>
+              <span className="text-sm font-qs-regular text-gray-400">
+                .eth
+              </span>
             </div>
-            {record.wrapped && (
-              <span className="mt-0.5 inline-flex text-[9px] font-bold uppercase tracking-wider text-violet-500 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-100 w-fit">
-                Wrapped
+          </div>
+        </div>
+      </td>
+
+      {/* 🚀 状态单元格：增加时间信息逻辑 */}
+      <td>
+        <div className="h-14 flex flex-col justify-center items-start">
+          <div
+            className={`inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-qs-regular uppercase tracking-wide ${statusClass}`}
+          >
+            <span>{record.status}</span>
+            {timeInfo && (
+              <span className="pl-1 text-[10px] text-gray-400 text-center font-qs-medium leading-none w-full">
+                {timeInfo}
               </span>
             )}
           </div>
         </div>
       </td>
 
-      {/* 状态 */}
-      <td>
-        <div className="h-14 flex items-center">
-          <div
-            className={`inline-flex items-center px-2.5 py-1 rounded-md border text-[11px] font-bold uppercase tracking-wide shadow-sm ${statusClass}`}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full mr-1.5 bg-current opacity-60`}
-            />
-            {record.status}
-          </div>
-        </div>
-      </td>
-
-      {/* 所有者 */}
       <td>
         <div className="h-14 flex items-center">
           {record.owner ? (
             <div
-              className={`flex items-center gap-2 font-mono text-xs ${isMe ? "text-blue-600 font-bold" : "text-gray-500"}`}
+              className={`flex items-center gap-2 text-xs ${isMe ? "text-blue-600 font-bold" : "text-gray-500"}`}
             >
               {`${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
               {isMe && (
@@ -109,7 +130,6 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 元数据 */}
       <td>
         <div className="h-14 flex flex-col justify-center gap-1">
           {["Label", "Name"].map((type) => (
@@ -123,7 +143,7 @@ export const TableRow = ({
               }
               className="flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-link transition-colors group/btn text-left w-fit"
             >
-              <span className="font-mono bg-gray-50 border border-gray-100 px-1 py-0.5 rounded text-gray-500 group-hover/btn:border-blue-200 group-hover/btn:bg-blue-50 group-hover/btn:text-blue-700">
+              <span className="bg-gray-50 border border-gray-100 px-1 py-0.5 rounded text-gray-500 group-hover/btn:border-blue-200 group-hover/btn:bg-blue-50 group-hover/btn:text-blue-700">
                 {type[0]}H:{" "}
                 {record[type === "Label" ? "labelhash" : "namehash"].slice(
                   0,
@@ -140,7 +160,6 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 相关信息 */}
       <td className="text-center">
         <div className="h-14 flex items-center justify-center">
           <a
@@ -154,7 +173,6 @@ export const TableRow = ({
         </div>
       </td>
 
-      {/* 操作 */}
       <td className="text-right">
         <div className="h-14 flex items-center justify-end">
           <button

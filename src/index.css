@@ -37,6 +37,13 @@
 - 表头行的背景色：#eaeaea
 - 表格行的背景色：#ffffff
 - 表格行上边框颜色：#dddddd
+- 表格行悬停时的背景色：cyan-50
+
+- Active: gray-200
+- Grace: red-200
+- Premium: yellow-200
+- Released: green-200
+- Available: green-200
 */
 
 body {

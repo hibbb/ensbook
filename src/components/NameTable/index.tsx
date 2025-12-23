@@ -24,7 +24,7 @@ interface NameTableProps {
 
 export const NameTable = (props: NameTableProps) => {
   return (
-    <div className="bg-table-row overflow-hidden ring-1 ring-black/5">
+    <div className="bg-table-row overflow-hidden">
       <div className="overflow-x-auto">
         {/* 🚀 样式注入：在此处统一管理单元格内边距
             [&_td]:p-0 -> 所有 td padding 为 0
@@ -33,10 +33,10 @@ export const NameTable = (props: NameTableProps) => {
             ...以此类推
         */}
         <table
-          className="min-w-full divide-y divide-table-border
+          className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background
           [&_td]:p-0 [&_th]:p-0
-          [&_td>div]:px-3 [&_td>div]:py-2
-          [&_th>div]:px-3 [&_th>div]:py-2"
+          [&_td>div]:px-2 [&_td>div]:py-1.5
+          [&_th>div]:px-2 [&_th>div]:py-1.5"
         >
           <TableHeader
             sortConfig={props.sortConfig}
@@ -46,7 +46,7 @@ export const NameTable = (props: NameTableProps) => {
             isConnected={props.isConnected}
             showDelete={props.showDelete}
           />
-          <tbody className="bg-table-row divide-y divide-gray-50">
+          <tbody>
             {props.isLoading ? (
               Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
             ) : props.records.length > 0 ? (

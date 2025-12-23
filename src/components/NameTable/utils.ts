@@ -5,8 +5,8 @@ import type { SortConfig, FilterConfig } from "./types";
 // 🚀 状态排序权重：统一管理，保证不同页面排序规则一致
 export const STATUS_WEIGHT: Record<string, number> = {
   Available: 1,
-  PremiumPeriod: 2,
-  GracePeriod: 3,
+  Premium: 2,
+  Grace: 3,
   Active: 4,
   Released: 5,
 };

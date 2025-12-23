@@ -40,8 +40,8 @@ export const Home = () => {
     const counts = {
       Available: 0,
       Active: 0,
-      GracePeriod: 0,
-      PremiumPeriod: 0,
+      Grace: 0,
+      Premium: 0,
     };
     validRecords.forEach((r) => {
       if (r.status in counts) counts[r.status as keyof typeof counts]++;
@@ -127,12 +127,12 @@ export const Home = () => {
             />
             <StatBadge
               label="可注册"
-              count={stats.Available + stats.PremiumPeriod}
+              count={stats.Available + stats.Premium}
               color="bg-green-100 text-green-600"
             />
             <StatBadge
               label="宽限期"
-              count={stats.GracePeriod}
+              count={stats.Grace}
               color="bg-orange-100 text-orange-600"
             />
             <StatBadge

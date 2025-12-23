@@ -7,9 +7,9 @@ export default {
         // 🚀 技巧：覆盖默认的 'sans'，这样整个项目默认就会用 qs-regular，无需处处指定
         sans: ["qs-regular", "Inter", "system-ui", "sans-serif"],
         // 保留这些变体以备特殊需求
-        qsLight: ["qs-light", "sans-serif"],
-        qsMedium: ["qs-medium", "sans-serif"],
-        qsBold: ["qs-bold", "sans-serif"],
+        "qs-light": ["qs-light", "sans-serif"],
+        "qs-medium": ["qs-medium", "sans-serif"],
+        "qs-semibold": ["qs-semibold", "sans-serif"],
       },
       colors: {
         background: "#f5f5f5",

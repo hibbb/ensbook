@@ -41,12 +41,12 @@ interface FetchResponse {
 
 function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
   const currentTimestamp = Math.floor(Date.now() / 1000);
-  const gracePeriodEnd = expiryTimestamp + DURATION_GRACE_PERIOD;
-  const premiumPeriodEnd = gracePeriodEnd + DURATION_PREMIUM_PERIOD;
+  const graceEnd = expiryTimestamp + DURATION_GRACE_PERIOD;
+  const premiumEnd = graceEnd + DURATION_PREMIUM_PERIOD;
 
   if (currentTimestamp <= expiryTimestamp) return "Active";
-  if (currentTimestamp <= gracePeriodEnd) return "GracePeriod";
-  if (currentTimestamp <= premiumPeriodEnd) return "PremiumPeriod";
+  if (currentTimestamp <= graceEnd) return "Grace";
+  if (currentTimestamp <= premiumEnd) return "Premium";
   return "Released";
 }
 
