@@ -59,6 +59,8 @@ export const processNameRecords = (
         return r.label.length;
       case "status":
         return r.expiryTime || r.releaseTime || 0;
+      case "owner":
+        return r.ownerPrimaryName || r.owner || "";
       default:
         return "";
     }

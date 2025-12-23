@@ -1,3 +1,4 @@
+import { useState } from "react"; // 🚀 移除 useEffect，只保留 useState
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import type { NameRecord } from "../../types/ensNames";
@@ -23,15 +24,15 @@ interface NameTableProps {
 }
 
 export const NameTable = (props: NameTableProps) => {
+  // 🚀 核心修复：使用 Lazy State Initialization (懒初始化)
+  // 1. 函数 () => Math.floor(...) 只在组件首次挂载时运行一次。
+  // 2. 初始值立即就绪，不需要 useEffect，因此没有级联渲染。
+  // 3. 后续重渲染不会再执行此函数，因此没有 Impure 警告。
+  const [now] = useState(() => Math.floor(Date.now() / 1000));
+
   return (
     <div className="bg-table-row overflow-hidden">
       <div className="overflow-x-auto">
-        {/* 🚀 样式注入：在此处统一管理单元格内边距
-            [&_td]:p-0 -> 所有 td padding 为 0
-            [&_th]:p-0 -> 所有 th padding 为 0
-            [&_td>div]:px-3 -> 所有 td 下的第一层 div 水平内边距 3
-            ...以此类推
-        */}
         <table
           className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background
           [&_td]:p-0 [&_th]:p-0
@@ -55,6 +56,7 @@ export const NameTable = (props: NameTableProps) => {
                   key={r.namehash}
                   record={r}
                   index={i}
+                  now={now} // 🚀 传递稳定的时间戳
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                 />

@@ -1,6 +1,6 @@
 // src/components/NameTable/types.ts
 
-export type SortField = "label" | "length" | "status" | null;
+export type SortField = "label" | "length" | "status" | "owner" | null;
 export type SortDirection = "asc" | "desc" | null;
 
 export interface SortConfig {

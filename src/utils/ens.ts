@@ -33,3 +33,37 @@ export function generateSecret(): Hex {
 export function isRenewable(record: NameRecord): boolean {
   return record.status === "Active" || record.status === "Grace";
 }
+
+/**
+ * 计算 ENS 域名的当前溢价 (Premium Price)
+ * @param releaseTime - 域名的释放时间 (Unix 时间戳，秒)
+ * @param decimals -保留的小数位数，默认为 0
+ * @returns 格式化后的价格字符串
+ */
+export const fetchPremiumPrice = (
+  releaseTime: number,
+  decimals: number = 0,
+): string => {
+  // 如果没有释放时间，直接返回 0
+  if (!releaseTime) return (0).toFixed(decimals);
+
+  const START_PRICE = 100_000_000; // 起始价格 1亿美元
+  const OFFSET = 47.6837158203125; // 偏移量，用于修正曲线
+  const FACTOR = 0.5; // 衰减因子
+
+  // 使用原生 Date.now() 替代 moment.now()
+  // releaseTime 通常是秒，需要转换为毫秒
+  const now = Date.now();
+  const releaseTimeMs = releaseTime * 1000;
+
+  // 计算距离释放时间过去的天数
+  const diffMs = now - releaseTimeMs;
+  const daysPassed = diffMs / (24 * 60 * 60 * 1000);
+
+  // 核心公式：Start * (0.5 ^ days) - Offset
+  // 使用 Math.max 确保价格不会跌破 0
+  const currentPremium = START_PRICE * Math.pow(FACTOR, daysPassed) - OFFSET;
+  const exactPrice = Math.max(currentPremium, 0);
+
+  return exactPrice.toFixed(decimals);
+};

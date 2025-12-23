@@ -18,6 +18,7 @@ export interface NameRecord {
   status: "Active" | "Grace" | "Premium" | "Released" | "Available";
   wrapped: boolean;
   owner: string | null;
+  ownerPrimaryName?: string;
 
   registeredTime: number; // 注册时间 (Unix)
   expiryTime: number; // 到期时间 (Unix)

@@ -54,7 +54,6 @@ const SortIndicator = ({
   );
 };
 
-// 🚀 样式简化：内边距由父级 table 控制，此处只负责布局对齐和字体样式
 const ThWrapper = ({
   children,
   className = "",
@@ -84,6 +83,7 @@ export const TableHeader = ({
           <ThWrapper className="justify-center">序号</ThWrapper>
         </th>
 
+        {/* 名称列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-3">
@@ -108,6 +108,7 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
+        {/* 状态列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -155,11 +156,19 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
+        {/* 🚀 重点修改：所有者列增加排序功能 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
               <FontAwesomeIcon icon={faWallet} className="text-gray-300" />
-              <span>所有者</span>
+              <span
+                onClick={() => onSort("owner")}
+                className="cursor-pointer hover:text-gray-700 flex items-center transition-colors"
+              >
+                所有者 <SortIndicator field="owner" sortConfig={sortConfig} />
+              </span>
+
+              {/* 仅显示我的（Filter） */}
               <button
                 onClick={() =>
                   isConnected &&
@@ -184,6 +193,7 @@ export const TableHeader = ({
           <ThWrapper className="justify-center">信息</ThWrapper>
         </th>
 
+        {/* 操作列 */}
         <th>
           <ThWrapper className="justify-end">
             <div className="flex items-center gap-2">
