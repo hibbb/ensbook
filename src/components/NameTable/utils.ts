@@ -40,7 +40,7 @@ export const processNameRecords = (
     }
 
     // C. 操作类型过滤
-    const renewable = isRenewable(r);
+    const renewable = isRenewable(r.status);
     if (filterConfig.actionType === "register" && renewable) return false;
     if (filterConfig.actionType === "renew" && !renewable) return false;
 

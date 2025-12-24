@@ -1,8 +1,9 @@
-import { memo } from "react"; // 🚀 引入 memo 进行性能优化
+import { memo } from "react";
 import { toast } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../utils/ens";
+import { getAvailableLookups } from "../../utils/lookupProvider";
 import type { NameRecord } from "../../types/ensNames";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -13,7 +14,6 @@ const STATUS_STYLES: Record<string, string> = {
   Released: "bg-green-200",
 };
 
-// 辅助函数：格式化剩余时间
 const formatRemainingTime = (seconds: number) => {
   if (seconds <= 0) return "已结束";
   const days = Math.floor(seconds / 86400);
@@ -26,39 +26,42 @@ const formatRemainingTime = (seconds: number) => {
 interface TableRowProps {
   record: NameRecord;
   index: number;
-  now: number; // 🚀 接收父组件传递的时间戳
+  now: number;
   currentAddress?: string;
   isConnected: boolean;
+  chainId?: number;
 }
 
-// 🚀 使用 memo 包裹组件，只有当 props 变化时才重新渲染
 export const TableRow = memo(
-  ({ record, index, now, currentAddress, isConnected }: TableRowProps) => {
+  ({
+    record,
+    index,
+    now,
+    currentAddress,
+    isConnected,
+    chainId,
+  }: TableRowProps) => {
     const isMe =
       currentAddress &&
       record.owner?.toLowerCase() === currentAddress.toLowerCase();
-    const renewable = isRenewable(record);
+
+    const renewable = isRenewable(record.status);
 
     const statusClass =
       STATUS_STYLES[record.status] ||
-      "bg-gray-50 text-gray-600 border-gray-200";
+      "bg-gray-50 text-text-main border-table-border";
 
-    // 逻辑处理：直接使用传入的 now
+    const availableLookups = getAvailableLookups(record, chainId);
+
     const getTimeInfo = () => {
-      // 如果 now 尚未初始化（为0），不显示时间，避免闪烁
       if (now === 0) return null;
-
       const PREMIUM_PERIOD = 21 * 24 * 60 * 60;
-
-      if (record.status === "Active" && record.expiryTime) {
+      if (record.status === "Active" && record.expiryTime)
         return formatRemainingTime(record.expiryTime - now);
-      }
-      if (record.status === "Grace" && record.releaseTime) {
+      if (record.status === "Grace" && record.releaseTime)
         return formatRemainingTime(record.releaseTime - now);
-      }
-      if (record.status === "Premium" && record.releaseTime) {
+      if (record.status === "Premium" && record.releaseTime)
         return formatRemainingTime(record.releaseTime + PREMIUM_PERIOD - now);
-      }
       return null;
     };
 
@@ -66,26 +69,26 @@ export const TableRow = memo(
 
     const handleCopy = (label: string, value: string) => {
       navigator.clipboard.writeText(value);
-      toast.success(`${label} 已复制`, {
-        style: { fontSize: "12px", fontWeight: 500 },
-      });
+      toast.success(`${label} 已复制`, { style: { fontSize: "12px" } });
     };
 
     return (
-      <tr className="group transition-colors bg-table-row duration-150 last:border-0 hover:bg-link/10">
+      <tr className="group transition-colors duration-150 border-t-[4px] border-transparent last:border-0 hover:bg-link/10 bg-table-row">
+        {/* 序号列：移除了 Checkbox 和 group-hover 隐藏逻辑 */}
         <td className="w-14 text-center">
-          <div className="h-14 flex items-center justify-center text-xs text-gray-400">
-            {index + 1}
+          <div className="h-14 flex items-center justify-center">
+            <span className="text-xs text-gray-400 font-mono">{index + 1}</span>
           </div>
         </td>
 
+        {/* 名称列 */}
         <td>
           <div className="h-14 flex items-center">
             <div
-              className={`flex flex-col justify-center ${record.wrapped ? "px-1 rounded-md border border-link/30 bg-link/10" : ""}`}
+              className={`flex flex-col justify-center ${record.wrapped ? "px-1 rounded-md border border-link/30 bg-link/5" : ""}`}
             >
               <div className="flex items-center gap-1">
-                <span className="text-base font-qs-semibold tracking-tight">
+                <span className="text-base font-qs-semibold tracking-tight text-text-main">
                   {record.label}
                 </span>
                 <span className="text-sm font-qs-regular text-gray-400">
@@ -96,6 +99,7 @@ export const TableRow = memo(
           </div>
         </td>
 
+        {/* 状态与时间 */}
         <td>
           <div className="h-14 flex flex-col justify-center items-start">
             <div
@@ -103,7 +107,7 @@ export const TableRow = memo(
             >
               <span>{record.status}</span>
               {timeInfo && (
-                <span className="pl-1 text-[10px] text-gray-400 text-center font-qs-medium leading-none w-full">
+                <span className="pl-1 text-[10px] text-gray-400 font-qs-medium leading-none">
                   {timeInfo}
                 </span>
               )}
@@ -111,13 +115,17 @@ export const TableRow = memo(
           </div>
         </td>
 
+        {/* 所有者列 */}
         <td>
           <div className="h-14 flex items-center">
             {record.owner ? (
               <div
                 className={`flex items-center gap-2 text-xs ${isMe ? "text-blue-600 font-bold" : "text-gray-500"}`}
               >
-                {`${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
+                <span title={record.owner}>
+                  {record.ownerPrimaryName ||
+                    `${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
+                </span>
                 {isMe && (
                   <span className="flex h-2 w-2 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -131,6 +139,7 @@ export const TableRow = memo(
           </div>
         </td>
 
+        {/* 元数据 */}
         <td>
           <div className="h-14 flex flex-col justify-center gap-1">
             {["Label", "Name"].map((type) => (
@@ -144,7 +153,7 @@ export const TableRow = memo(
                 }
                 className="flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-link transition-colors group/btn text-left w-fit"
               >
-                <span className="bg-gray-50 border border-gray-100 px-1 py-0.5 rounded text-gray-500 group-hover/btn:border-blue-200 group-hover/btn:bg-blue-50 group-hover/btn:text-blue-700">
+                <span className="bg-gray-50 border border-table-border px-1 py-0.5 rounded text-gray-500 group-hover/btn:border-link/30 group-hover/btn:bg-link/5 group-hover/btn:text-link-hover">
                   {type[0]}H:{" "}
                   {record[type === "Label" ? "labelhash" : "namehash"].slice(
                     0,
@@ -161,29 +170,35 @@ export const TableRow = memo(
           </div>
         </td>
 
+        {/* 信息与外部链接 */}
         <td className="text-center">
-          <div className="h-14 flex items-center justify-center">
-            <a
-              href={`https://app.ens.domains/${record.label}.eth`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-300 hover:text-link hover:bg-blue-50 transition-all"
-            >
-              <FontAwesomeIcon icon={faExternalLinkAlt} size="xs" />
-            </a>
+          <div className="h-14 flex items-center justify-center gap-1.5">
+            {availableLookups.map((item) => (
+              <a
+                key={item.key}
+                href={item.getLink(record, chainId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={item.label}
+                className="w-6 h-6 flex items-center justify-center rounded bg-table-header text-[10px] font-bold text-gray-400 hover:text-link hover:bg-link/10 transition-all uppercase"
+              >
+                {item.key.slice(0, 1)}
+              </a>
+            ))}
           </div>
         </td>
 
+        {/* 操作 */}
         <td className="text-right">
           <div className="h-14 flex items-center justify-end">
             <button
               disabled={!isConnected}
               className={`px-4 py-1.5 rounded-lg text-[11px] font-black tracking-wide transition-all shadow-sm active:scale-95 ${
                 !isConnected
-                  ? "bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed"
+                  ? "bg-gray-50 text-gray-300 border border-table-border cursor-not-allowed"
                   : renewable
-                    ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-100 hover:shadow-md border border-transparent"
-                    : "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300"
+                    ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-100 border border-transparent"
+                    : "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50"
               }`}
             >
               {isConnected ? (renewable ? "续费" : "注册") : "连接"}

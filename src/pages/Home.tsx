@@ -211,7 +211,7 @@ const StatusCard = ({
   record: NameRecord;
   onDelete: () => void;
 }) => {
-  const renewable = isRenewable(record); //
+  const renewable = isRenewable(record.status); //
 
   return (
     <div className="group relative flex justify-between items-center p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-100 transition-all">
