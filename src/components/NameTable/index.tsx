@@ -1,18 +1,13 @@
-import { useState } from "react"; // 🚀 移除 useEffect，只保留 useState
+import { useState } from "react";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import type { NameRecord } from "../../types/ensNames";
-import type {
-  SortField,
-  SortDirection,
-  SortConfig,
-  FilterConfig,
-} from "./types";
+import type { SortField, SortConfig, FilterConfig } from "./types";
 
-export type { SortField, SortDirection, SortConfig, FilterConfig };
+export type { SortField, SortConfig, FilterConfig };
 
 interface NameTableProps {
-  records: NameRecord[];
+  records: NameRecord[] | undefined | null; // 支持 undefined
   isLoading: boolean;
   currentAddress?: string;
   isConnected: boolean;
@@ -20,15 +15,20 @@ interface NameTableProps {
   onSort: (field: SortField) => void;
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
-  showDelete?: boolean;
+  canDelete?: boolean;
 }
 
 export const NameTable = (props: NameTableProps) => {
-  // 🚀 核心修复：使用 Lazy State Initialization (懒初始化)
-  // 1. 函数 () => Math.floor(...) 只在组件首次挂载时运行一次。
-  // 2. 初始值立即就绪，不需要 useEffect，因此没有级联渲染。
-  // 3. 后续重渲染不会再执行此函数，因此没有 Impure 警告。
   const [now] = useState(() => Math.floor(Date.now() / 1000));
+
+  // 🚀 核心逻辑修复：
+  // 只有当 records 确实有值（哪怕是空数组）时，才认为加载结束。
+  // 只要 records 是 undefined 或 null，就强制显示骨架屏。
+  // 这样即便 isLoading 状态有延迟，UI 也会稳健地停留在骨架屏状态。
+  const shouldShowSkeleton = props.isLoading || !props.records;
+
+  // 安全转换，仅用于渲染列表
+  const safeRecords = props.records || [];
 
   return (
     <div className="bg-table-row overflow-hidden">
@@ -45,25 +45,27 @@ export const NameTable = (props: NameTableProps) => {
             filterConfig={props.filterConfig}
             onFilterChange={props.onFilterChange}
             isConnected={props.isConnected}
-            showDelete={props.showDelete}
           />
+
           <tbody>
-            {props.isLoading ? (
+            {shouldShowSkeleton ? (
+              // 显示 8 行骨架屏
               Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
-            ) : props.records.length > 0 ? (
-              props.records.map((r, i) => (
+            ) : safeRecords.length > 0 ? (
+              safeRecords.map((r, i) => (
                 <TableRow
                   key={r.namehash}
                   record={r}
                   index={i}
-                  now={now} // 🚀 传递稳定的时间戳
+                  now={now}
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
+                  canDelete={props.canDelete}
                 />
               ))
             ) : (
               <tr>
-                <td colSpan={props.showDelete ? 8 : 7}>
+                <td colSpan={8}>
                   <div className="px-6 py-24 text-center">
                     <div className="text-gray-300 text-4xl mb-3">∅</div>
                     <p className="text-gray-400 text-sm font-medium">
@@ -80,42 +82,49 @@ export const NameTable = (props: NameTableProps) => {
   );
 };
 
+// 骨架屏组件：样式微调，确保可见性
 const SkeletonRow = () => (
-  <tr className="animate-pulse border-b border-gray-50 last:border-0">
+  <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>
       <div className="h-14 flex items-center justify-center">
-        <div className="h-3 w-4 bg-gray-100 rounded"></div>
+        <div className="h-3 w-4 bg-gray-200 rounded"></div>
       </div>
     </td>
     <td>
       <div className="h-14 flex items-center">
-        <div className="h-4 w-24 bg-gray-100 rounded"></div>
+        <div className="h-4 w-32 bg-gray-200 rounded"></div>
       </div>
     </td>
     <td>
       <div className="h-14 flex items-center">
-        <div className="h-5 w-16 bg-gray-100 rounded-full"></div>
+        <div className="h-5 w-16 bg-gray-200 rounded-full"></div>
       </div>
     </td>
     <td>
       <div className="h-14 flex items-center">
-        <div className="h-3 w-20 bg-gray-100 rounded"></div>
+        <div className="h-3 w-24 bg-gray-200 rounded"></div>
       </div>
     </td>
     <td>
       <div className="h-14 flex flex-col justify-center gap-2">
-        <div className="h-3 w-24 bg-gray-100 rounded"></div>
-        <div className="h-3 w-24 bg-gray-100 rounded"></div>
+        <div className="h-3 w-20 bg-gray-200 rounded"></div>
+        <div className="h-3 w-20 bg-gray-200 rounded"></div>
       </div>
     </td>
     <td>
-      <div className="h-14 flex items-center justify-center">
-        <div className="h-4 w-4 bg-gray-100 rounded"></div>
+      <div className="h-14 flex items-center justify-center gap-2">
+        <div className="h-5 w-5 bg-gray-200 rounded"></div>
+        <div className="h-5 w-5 bg-gray-200 rounded"></div>
       </div>
     </td>
     <td>
       <div className="h-14 flex items-center justify-end">
-        <div className="h-7 w-16 bg-gray-100 rounded-lg"></div>
+        <div className="h-7 w-16 bg-gray-200 rounded-lg"></div>
+      </div>
+    </td>
+    <td>
+      <div className="h-14 flex items-center justify-center">
+        <div className="h-4 w-4 bg-gray-200 rounded"></div>
       </div>
     </td>
   </tr>

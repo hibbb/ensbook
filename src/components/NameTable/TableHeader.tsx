@@ -74,7 +74,6 @@ export const TableHeader = ({
   filterConfig,
   onFilterChange,
   isConnected,
-  showDelete,
 }: TableHeaderProps) => {
   return (
     <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm">
@@ -222,11 +221,9 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {showDelete && (
-          <th className="text-center">
-            <ThWrapper>删除</ThWrapper>
-          </th>
-        )}
+        <th className="text-center">
+          <ThWrapper className="justify-center">删除</ThWrapper>
+        </th>
       </tr>
     </thead>
   );

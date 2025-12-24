@@ -4,10 +4,9 @@ import type { NameRecord } from "../../types/ensNames";
 import type { SortField, SortConfig, FilterConfig } from "./types";
 
 export const useNameTableLogic = (
-  records: NameRecord[] | undefined,
+  records: NameRecord[] | undefined | null, // 允许输入 undefined
   currentAddress?: string,
 ) => {
-  // 统一管理表格状态
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     field: null,
     direction: null,
@@ -18,7 +17,6 @@ export const useNameTableLogic = (
     actionType: "all",
   });
 
-  // 处理排序点击
   const handleSort = (field: SortField) => {
     setSortConfig((prev) => ({
       field,
@@ -31,11 +29,18 @@ export const useNameTableLogic = (
     }));
   };
 
-  // 使用计算函数
-  const processedRecords = useMemo(
-    () => processNameRecords(records, sortConfig, filterConfig, currentAddress),
-    [records, sortConfig, filterConfig, currentAddress],
-  );
+  const processedRecords = useMemo(() => {
+    // 🚀 核心修复：如果数据还没准备好，严格返回 undefined
+    // 不要让它变成空数组，否则 UI 会误以为是“没有数据的空列表”
+    if (!records) return undefined;
+
+    return processNameRecords(
+      records,
+      sortConfig,
+      filterConfig,
+      currentAddress,
+    );
+  }, [records, sortConfig, filterConfig, currentAddress]);
 
   return {
     processedRecords,

@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { toast } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../utils/ens";
 import { getAvailableLookups } from "../../utils/lookupProvider";
 import type { NameRecord } from "../../types/ensNames";
@@ -30,6 +30,7 @@ interface TableRowProps {
   currentAddress?: string;
   isConnected: boolean;
   chainId?: number;
+  canDelete?: boolean; // 新增：控制删除列
 }
 
 export const TableRow = memo(
@@ -40,6 +41,7 @@ export const TableRow = memo(
     currentAddress,
     isConnected,
     chainId,
+    canDelete = true,
   }: TableRowProps) => {
     const isMe =
       currentAddress &&
@@ -74,7 +76,7 @@ export const TableRow = memo(
 
     return (
       <tr className="group transition-colors duration-150 border-t-[4px] border-transparent last:border-0 hover:bg-link/10 bg-table-row">
-        {/* 序号列：移除了 Checkbox 和 group-hover 隐藏逻辑 */}
+        {/* 序号列 */}
         <td className="w-14 text-center">
           <div className="h-14 flex items-center justify-center">
             <span className="text-xs text-gray-400 font-mono">{index + 1}</span>
@@ -202,6 +204,23 @@ export const TableRow = memo(
               }`}
             >
               {isConnected ? (renewable ? "续费" : "注册") : "连接"}
+            </button>
+          </div>
+        </td>
+
+        {/* 删除列：功能保留，样式一致 */}
+        <td className="text-center">
+          <div className="h-14 flex items-center justify-center">
+            <button
+              disabled={!canDelete}
+              className={`transition-all duration-200 ${
+                canDelete
+                  ? "text-link hover:text-blue-700 active:scale-90"
+                  : "text-gray-400 cursor-not-allowed opacity-50"
+              }`}
+              title={canDelete ? "删除" : "不可用"}
+            >
+              <FontAwesomeIcon icon={faTrash} size="sm" />
             </button>
           </div>
         </td>
