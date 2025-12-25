@@ -90,7 +90,7 @@ export const CollectionDetail = () => {
             <button
               onClick={handleBatchRenewal}
               disabled={isBusy || !isConnected}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold transition-all shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-qs-semibold transition-all shadow-sm ${
                 isBusy || !isConnected
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"

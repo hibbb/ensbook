@@ -254,9 +254,9 @@ export const TableHeader = ({
                   <input
                     type="checkbox"
                     disabled={!hasRecords || !isConnected}
-                    className={`w-3.5 h-3.5 rounded border-gray-300 text-link focus:ring-link/20 transition-all ${
+                    className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
                       !hasRecords || !isConnected
-                        ? "cursor-not-allowed opacity-40 bg-gray-100"
+                        ? "cursor-not-allowed bg-gray-100"
                         : "cursor-pointer"
                     }`}
                     checked={isAllSelected}
