@@ -68,7 +68,7 @@ export const NameTable = (props: NameTableProps) => {
                 <td colSpan={8}>
                   <div className="px-6 py-24 text-center">
                     <div className="text-gray-300 text-4xl mb-3">∅</div>
-                    <p className="text-gray-400 text-sm font-medium">
+                    <p className="text-gray-400 text-sm">
                       没有找到符合当前筛选条件的域名
                     </p>
                   </div>

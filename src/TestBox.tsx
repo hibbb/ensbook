@@ -69,18 +69,13 @@ export const TestBox = () => {
       <div className="flex justify-between items-center border-b pb-4">
         <h2 className="text-2xl font-bold text-gray-800">🛠️ 续费功能测试台</h2>
         <div className="text-sm">
-          状态:{" "}
-          <span className={`font-mono font-bold ${getStatusColor(status)}`}>
-            {status}
-          </span>
+          状态: <span className={getStatusColor(status)}>{status}</span>
         </div>
       </div>
 
       {/* 1. 设置区域 */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">
-          ⚙️ 续费时长设置
-        </label>
+        <label className="block text-sm text-gray-700">⚙️ 续费时长设置</label>
         <div className="flex gap-4">
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -144,7 +139,7 @@ export const TestBox = () => {
           onChange={(e) => setBatchInput(e.target.value)}
           rows={4}
           placeholder={`alice\nbob\ncharlie, david`}
-          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-purple-500 outline-none font-mono text-sm"
+          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-purple-500 outline-none text-sm"
           disabled={isBusy}
         />
         <div className="flex justify-end gap-3">
@@ -169,7 +164,7 @@ export const TestBox = () => {
       </div>
 
       {/* 4. 调试信息区域 */}
-      <div className="bg-gray-900 text-gray-100 p-4 rounded-md text-xs font-mono overflow-auto">
+      <div className="bg-gray-900 text-gray-100 p-4 rounded-md text-xs overflow-auto">
         <p>当前账号: {address}</p>
         <p>选择时长: {duration.toString()} 秒</p>
         <p>当前状态: {status}</p>

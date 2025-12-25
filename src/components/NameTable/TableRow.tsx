@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { toast } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../utils/ens";
 import { getAvailableLookups } from "../../utils/lookupProvider";
 import type { NameRecord } from "../../types/ensNames";
@@ -79,7 +79,7 @@ export const TableRow = memo(
         {/* 序号列 */}
         <td className="w-14 text-center">
           <div className="h-14 flex items-center justify-center">
-            <span className="text-xs text-gray-400 font-mono">{index + 1}</span>
+            <span className="text-xs text-gray-400">{index + 1}</span>
           </div>
         </td>
 
@@ -90,7 +90,7 @@ export const TableRow = memo(
               className={`flex flex-col justify-center ${record.wrapped ? "px-1 rounded-md border border-link/30 bg-link/5" : ""}`}
             >
               <div className="flex items-center gap-1">
-                <span className="text-base font-qs-semibold tracking-tight text-text-main">
+                <span className="text-lg font-qs-medium tracking-tight text-text-main">
                   {record.label}
                 </span>
                 <span className="text-sm font-qs-regular text-gray-400">
@@ -192,18 +192,18 @@ export const TableRow = memo(
 
         {/* 操作 */}
         <td className="text-right">
-          <div className="h-14 flex items-center justify-end">
+          <div className="h-14 flex items-center">
             <button
               disabled={!isConnected}
-              className={`px-4 py-1.5 rounded-lg text-[11px] font-black tracking-wide transition-all shadow-sm active:scale-95 ${
+              className={`ml-2 rounded-sm text-sm tracking-wide transition-all active:scale-95 ${
                 !isConnected
-                  ? "bg-gray-50 text-gray-300 border border-table-border cursor-not-allowed"
+                  ? "bg-gray-50 text-gray-400 cursor-not-allowed"
                   : renewable
-                    ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-100 border border-transparent"
-                    : "bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50"
+                    ? "bg-inherit text-link hover:text-link-hover"
+                    : "bg-inherit text-gray-400"
               }`}
             >
-              {isConnected ? (renewable ? "续费" : "注册") : "连接"}
+              {isConnected ? (renewable ? "续费" : "注册") : "未连接"}
             </button>
           </div>
         </td>
@@ -215,12 +215,12 @@ export const TableRow = memo(
               disabled={!canDelete}
               className={`transition-all duration-200 ${
                 canDelete
-                  ? "text-link hover:text-blue-700 active:scale-90"
+                  ? "text-link hover:text-link-hover active:scale-90"
                   : "text-gray-400 cursor-not-allowed opacity-50"
               }`}
               title={canDelete ? "删除" : "不可用"}
             >
-              <FontAwesomeIcon icon={faTrash} size="sm" />
+              <FontAwesomeIcon icon={faCircleXmark} size="sm" />
             </button>
           </div>
         </td>

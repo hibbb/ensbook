@@ -1,13 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// 🚀 1. 引入 IconDefinition 类型定义
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
-  faSortAlphaDown,
   faSortAmountDown,
+  faSortAmountUp,
+  faSortAlphaDown,
+  faSortAlphaUp,
   faUser,
   faCheck,
   faWallet,
-  faSort,
-  faSortUp,
-  faSortDown,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FilterDropdown } from "./FilterDropdown";
@@ -27,33 +28,6 @@ interface TableHeaderProps {
   showDelete?: boolean;
 }
 
-const SortIndicator = ({
-  field,
-  sortConfig,
-}: {
-  field: SortField;
-  sortConfig: SortConfig;
-}) => {
-  const isActive = sortConfig.field === field;
-  return (
-    <span className="ml-1.5 inline-flex flex-col justify-center h-3 w-2 text-[8px] opacity-40">
-      {!isActive && <FontAwesomeIcon icon={faSort} className="text-gray-400" />}
-      {isActive &&
-        (sortConfig.direction === "asc" ? (
-          <FontAwesomeIcon
-            icon={faSortUp}
-            className="text-blue-600 opacity-100"
-          />
-        ) : (
-          <FontAwesomeIcon
-            icon={faSortDown}
-            className="text-blue-600 opacity-100"
-          />
-        ))}
-    </span>
-  );
-};
-
 const ThWrapper = ({
   children,
   className = "",
@@ -62,7 +36,7 @@ const ThWrapper = ({
   className?: string;
 }) => (
   <div
-    className={`h-full flex items-center text-sm font-qs-regular text-gray-500 uppercase tracking-wider ${className}`}
+    className={`h-full flex items-center text-sm font-qs-semibold font-normal text-gray-500 uppercase tracking-wider ${className}`}
   >
     {children}
   </div>
@@ -75,6 +49,30 @@ export const TableHeader = ({
   onFilterChange,
   isConnected,
 }: TableHeaderProps) => {
+  const buttonBaseClass =
+    "w-6 h-6 flex items-center justify-center rounded-md transition-all";
+  const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
+  const buttonInactiveClass = "text-link hover:bg-gray-50";
+
+  // 🚀 2. 修复：将 any 替换为 IconDefinition
+  const getSortButtonProps = (
+    field: SortField,
+    defaultIcon: IconDefinition, // fix: any -> IconDefinition
+    ascIcon: IconDefinition, // fix: any -> IconDefinition
+    descIcon: IconDefinition, // fix: any -> IconDefinition
+  ) => {
+    const isActive =
+      sortConfig.field === field && sortConfig.direction !== null;
+
+    const isAsc = isActive && sortConfig.direction === "asc";
+    const isDesc = isActive && sortConfig.direction === "desc";
+
+    return {
+      className: `${buttonBaseClass} ${isActive ? buttonActiveClass : buttonInactiveClass}`,
+      icon: isAsc ? ascIcon : isDesc ? descIcon : defaultIcon,
+    };
+  };
+
   return (
     <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm">
       <tr className="text-left">
@@ -85,23 +83,47 @@ export const TableHeader = ({
         {/* 名称列 */}
         <th>
           <ThWrapper>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <span>名称</span>
-              <div className="flex gap-1 pl-2 border-l border-gray-300/50">
-                <button
-                  onClick={() => onSort("label")}
-                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "label" ? "text-blue-600 bg-white shadow-sm" : "text-gray-400"}`}
-                  title="字母排序"
-                >
-                  <FontAwesomeIcon icon={faSortAlphaDown} size="sm" />
-                </button>
-                <button
-                  onClick={() => onSort("length")}
-                  className={`w-5 h-5 flex items-center justify-center rounded hover:bg-white transition-all ${sortConfig.field === "length" ? "text-blue-600 bg-white shadow-sm" : "text-gray-400"}`}
-                  title="长度排序"
-                >
-                  <FontAwesomeIcon icon={faSortAmountDown} size="sm" />
-                </button>
+
+              <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
+                {/* 1. 按字母排序 */}
+                {(() => {
+                  const props = getSortButtonProps(
+                    "label",
+                    faSortAlphaDown,
+                    faSortAlphaDown,
+                    faSortAlphaUp,
+                  );
+                  return (
+                    <button
+                      onClick={() => onSort("label")}
+                      className={props.className}
+                      title="按名称字母排序"
+                    >
+                      <FontAwesomeIcon icon={props.icon} size="sm" />
+                    </button>
+                  );
+                })()}
+
+                {/* 2. 按长度排序 */}
+                {(() => {
+                  const props = getSortButtonProps(
+                    "length",
+                    faSortAmountDown,
+                    faSortAmountUp,
+                    faSortAmountDown,
+                  );
+                  return (
+                    <button
+                      onClick={() => onSort("length")}
+                      className={props.className}
+                      title="按长度排序"
+                    >
+                      <FontAwesomeIcon icon={props.icon} size="sm" />
+                    </button>
+                  );
+                })()}
               </div>
             </div>
           </ThWrapper>
@@ -111,76 +133,116 @@ export const TableHeader = ({
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
-              <span
-                onClick={() => onSort("status")}
-                className="cursor-pointer hover:text-gray-700 flex items-center transition-colors"
-              >
-                状态 <SortIndicator field="status" sortConfig={sortConfig} />
-              </span>
-              <FilterDropdown isActive={filterConfig.statusList.length > 0}>
-                <div
-                  className={`px-4 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-blue-600 font-bold" : "text-gray-700"}`}
-                  onClick={() =>
-                    onFilterChange({ ...filterConfig, statusList: [] })
-                  }
-                >
-                  全部显示
-                  {filterConfig.statusList.length === 0 && (
-                    <FontAwesomeIcon icon={faCheck} />
-                  )}
-                </div>
-                {STATUS_OPTIONS.map((s) => (
+              <span>状态</span>
+
+              <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
+                {/* 1. 按过期时间排序 */}
+                {(() => {
+                  const props = getSortButtonProps(
+                    "status",
+                    faSortAmountDown,
+                    faSortAmountUp,
+                    faSortAmountDown,
+                  );
+                  return (
+                    <button
+                      onClick={() => onSort("status")}
+                      className={props.className}
+                      title="按过期时间排序"
+                    >
+                      <FontAwesomeIcon icon={props.icon} size="sm" />
+                    </button>
+                  );
+                })()}
+
+                {/* 2. 状态筛选 */}
+                <FilterDropdown isActive={filterConfig.statusList.length > 0}>
                   <div
-                    key={s}
-                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-700 text-[11px]"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const newList = filterConfig.statusList.includes(s)
-                        ? filterConfig.statusList.filter((i) => i !== s)
-                        : [...filterConfig.statusList, s];
-                      onFilterChange({ ...filterConfig, statusList: newList });
-                    }}
+                    className={`px-4 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-link" : "text-gray-500"}`}
+                    onClick={() =>
+                      onFilterChange({ ...filterConfig, statusList: [] })
+                    }
                   >
-                    {s}
-                    {filterConfig.statusList.includes(s) && (
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-blue-600"
-                      />
+                    全部显示
+                    {filterConfig.statusList.length === 0 && (
+                      <FontAwesomeIcon icon={faCheck} />
                     )}
                   </div>
-                ))}
-              </FilterDropdown>
+                  {STATUS_OPTIONS.map((s) => (
+                    <div
+                      key={s}
+                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-500 text-[11px]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newList = filterConfig.statusList.includes(s)
+                          ? filterConfig.statusList.filter((i) => i !== s)
+                          : [...filterConfig.statusList, s];
+                        onFilterChange({
+                          ...filterConfig,
+                          statusList: newList,
+                        });
+                      }}
+                    >
+                      {s}
+                      {filterConfig.statusList.includes(s) && (
+                        <FontAwesomeIcon icon={faCheck} className="text-link" />
+                      )}
+                    </div>
+                  ))}
+                </FilterDropdown>
+              </div>
             </div>
           </ThWrapper>
         </th>
 
-        {/* 🚀 重点修改：所有者列增加排序功能 */}
+        {/* 所有者列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
               <FontAwesomeIcon icon={faWallet} className="text-gray-300" />
-              <span
-                onClick={() => onSort("owner")}
-                className="cursor-pointer hover:text-gray-700 flex items-center transition-colors"
-              >
-                所有者 <SortIndicator field="owner" sortConfig={sortConfig} />
-              </span>
+              <span>所有者</span>
 
-              {/* 仅显示我的（Filter） */}
-              <button
-                onClick={() =>
-                  isConnected &&
-                  onFilterChange({
-                    ...filterConfig,
-                    onlyMe: !filterConfig.onlyMe,
-                  })
-                }
-                className={`w-5 h-5 rounded flex items-center justify-center transition-all ${filterConfig.onlyMe ? "bg-blue-600 text-white shadow-sm" : "text-gray-300 hover:text-blue-500 hover:bg-blue-50"}`}
-                title={isConnected ? "仅显示我的" : "请先连接钱包"}
-              >
-                <FontAwesomeIcon icon={faUser} size="xs" />
-              </button>
+              <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
+                {/* 1. 按所有者字母排序 */}
+                {(() => {
+                  const props = getSortButtonProps(
+                    "owner",
+                    faSortAlphaDown,
+                    faSortAlphaDown,
+                    faSortAlphaUp,
+                  );
+                  return (
+                    <button
+                      onClick={() => onSort("owner")}
+                      className={props.className}
+                      title="按所有者排序"
+                    >
+                      <FontAwesomeIcon icon={props.icon} size="sm" />
+                    </button>
+                  );
+                })()}
+
+                {/* 2. 仅显示我的筛选 */}
+                <button
+                  onClick={() =>
+                    isConnected &&
+                    onFilterChange({
+                      ...filterConfig,
+                      onlyMe: !filterConfig.onlyMe,
+                    })
+                  }
+                  className={`${buttonBaseClass} ${
+                    !isConnected
+                      ? "cursor-not-allowed opacity-50 text-gray-300"
+                      : filterConfig.onlyMe
+                        ? buttonActiveClass
+                        : buttonInactiveClass
+                  }`}
+                  title={isConnected ? "仅显示我的" : "请先连接钱包"}
+                >
+                  <FontAwesomeIcon icon={faUser} size="xs" />
+                </button>
+              </div>
             </div>
           </ThWrapper>
         </th>
@@ -204,7 +266,7 @@ export const TableHeader = ({
                 {(["all", "register", "renew"] as const).map((type) => (
                   <div
                     key={type}
-                    className={`px-4 py-2 text-[11px] hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-blue-600 font-bold bg-blue-50/50" : "text-gray-600"}`}
+                    className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-link bg-blue-50/50" : "text-gray-500"}`}
                     onClick={() =>
                       onFilterChange({ ...filterConfig, actionType: type })
                     }

@@ -34,10 +34,10 @@ export const FilterDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 ${
+        className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-150 ${
           isActive || isOpen
-            ? "bg-blue-600 text-white shadow-sm ring-4 ring-blue-50"
-            : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            ? "bg-link text-white"
+            : "text-link hover:bg-gray-100"
         }`}
       >
         <FontAwesomeIcon icon={faFilter} size="xs" />
