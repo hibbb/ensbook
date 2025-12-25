@@ -142,12 +142,12 @@ export const TestBox = () => {
           className="w-full p-2 border rounded-md focus:ring-2 focus:ring-purple-500 outline-none text-sm"
           disabled={isBusy}
         />
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-2">
           {/* 重置状态按钮，方便失败后重试 */}
           {status === "error" && (
             <button
               onClick={resetStatus}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 underline"
+              className="px-4 py-2 text-text-main hover:text-gray-800 underline"
             >
               重置状态
             </button>

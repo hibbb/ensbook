@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// 🚀 1. 引入 IconDefinition 类型定义
+// 引入 IconDefinition 类型定义
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faSortAmountDown,
@@ -8,7 +8,6 @@ import {
   faSortAlphaUp,
   faUser,
   faCheck,
-  faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FilterDropdown } from "./FilterDropdown";
@@ -26,6 +25,9 @@ interface TableHeaderProps {
   onFilterChange: (config: FilterConfig) => void;
   isConnected: boolean;
   showDelete?: boolean;
+  isAllSelected?: boolean;
+  onToggleSelectAll?: () => void;
+  hasRecords?: boolean;
 }
 
 const ThWrapper = ({
@@ -36,7 +38,7 @@ const ThWrapper = ({
   className?: string;
 }) => (
   <div
-    className={`h-full flex items-center text-sm font-qs-semibold font-normal text-gray-500 uppercase tracking-wider ${className}`}
+    className={`h-full flex items-center text-sm font-qs-semibold font-normal text-text-main uppercase tracking-wider ${className}`}
   >
     {children}
   </div>
@@ -48,18 +50,20 @@ export const TableHeader = ({
   filterConfig,
   onFilterChange,
   isConnected,
+  isAllSelected,
+  onToggleSelectAll,
+  hasRecords,
 }: TableHeaderProps) => {
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
   const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
   const buttonInactiveClass = "text-link hover:bg-gray-50";
 
-  // 🚀 2. 修复：将 any 替换为 IconDefinition
   const getSortButtonProps = (
     field: SortField,
-    defaultIcon: IconDefinition, // fix: any -> IconDefinition
-    ascIcon: IconDefinition, // fix: any -> IconDefinition
-    descIcon: IconDefinition, // fix: any -> IconDefinition
+    defaultIcon: IconDefinition,
+    ascIcon: IconDefinition,
+    descIcon: IconDefinition,
   ) => {
     const isActive =
       sortConfig.field === field && sortConfig.direction !== null;
@@ -77,7 +81,7 @@ export const TableHeader = ({
     <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm">
       <tr className="text-left">
         <th className="w-14">
-          <ThWrapper className="justify-center">序号</ThWrapper>
+          <ThWrapper className="justify-center">#</ThWrapper>
         </th>
 
         {/* 名称列 */}
@@ -85,9 +89,7 @@ export const TableHeader = ({
           <ThWrapper>
             <div className="flex items-center gap-2">
               <span>名称</span>
-
               <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
-                {/* 1. 按字母排序 */}
                 {(() => {
                   const props = getSortButtonProps(
                     "label",
@@ -105,8 +107,6 @@ export const TableHeader = ({
                     </button>
                   );
                 })()}
-
-                {/* 2. 按长度排序 */}
                 {(() => {
                   const props = getSortButtonProps(
                     "length",
@@ -134,9 +134,7 @@ export const TableHeader = ({
           <ThWrapper>
             <div className="flex items-center gap-2">
               <span>状态</span>
-
               <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
-                {/* 1. 按过期时间排序 */}
                 {(() => {
                   const props = getSortButtonProps(
                     "status",
@@ -154,8 +152,6 @@ export const TableHeader = ({
                     </button>
                   );
                 })()}
-
-                {/* 2. 状态筛选 */}
                 <FilterDropdown isActive={filterConfig.statusList.length > 0}>
                   <div
                     className={`px-4 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-link" : "text-gray-500"}`}
@@ -171,7 +167,7 @@ export const TableHeader = ({
                   {STATUS_OPTIONS.map((s) => (
                     <div
                       key={s}
-                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-500 text-[11px]"
+                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-text-main text-[11px]"
                       onClick={(e) => {
                         e.stopPropagation();
                         const newList = filterConfig.statusList.includes(s)
@@ -199,11 +195,8 @@ export const TableHeader = ({
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faWallet} className="text-gray-300" />
               <span>所有者</span>
-
               <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
-                {/* 1. 按所有者字母排序 */}
                 {(() => {
                   const props = getSortButtonProps(
                     "owner",
@@ -221,8 +214,6 @@ export const TableHeader = ({
                     </button>
                   );
                 })()}
-
-                {/* 2. 仅显示我的筛选 */}
                 <button
                   onClick={() =>
                     isConnected &&
@@ -247,38 +238,57 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        <th>
-          <ThWrapper>元数据</ThWrapper>
-        </th>
+        {/* 🚀 已删除元数据列 */}
+
         <th className="text-center">
-          <ThWrapper className="justify-center">信息</ThWrapper>
+          <ThWrapper>信息</ThWrapper>
         </th>
 
         {/* 操作列 */}
         <th>
-          <ThWrapper className="justify-end">
+          <ThWrapper>
             <div className="flex items-center gap-2">
-              <span>操作</span>
-              <FilterDropdown
-                isActive={filterConfig.actionType !== "all"}
-                menuWidth="w-32 right-0"
-              >
-                {(["all", "register", "renew"] as const).map((type) => (
-                  <div
-                    key={type}
-                    className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-link bg-blue-50/50" : "text-gray-500"}`}
-                    onClick={() =>
-                      onFilterChange({ ...filterConfig, actionType: type })
-                    }
-                  >
-                    {type === "all"
-                      ? "全部"
-                      : type === "register"
-                        ? "注册"
-                        : "更新"}
-                  </div>
-                ))}
-              </FilterDropdown>
+              {/* 全选复选框 */}
+              {onToggleSelectAll && (
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    disabled={!hasRecords || !isConnected}
+                    className={`w-3.5 h-3.5 rounded border-gray-300 text-link focus:ring-link/20 transition-all ${
+                      !hasRecords || !isConnected
+                        ? "cursor-not-allowed opacity-40 bg-gray-100"
+                        : "cursor-pointer"
+                    }`}
+                    checked={isAllSelected}
+                    onChange={onToggleSelectAll}
+                    title={!isConnected ? "请先连接钱包" : "全选当前页"}
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <span>操作</span>
+                <FilterDropdown
+                  isActive={filterConfig.actionType !== "all"}
+                  menuWidth="w-32 right-0"
+                >
+                  {(["all", "register", "renew"] as const).map((type) => (
+                    <div
+                      key={type}
+                      className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-link bg-blue-50/50" : "text-gray-500"}`}
+                      onClick={() =>
+                        onFilterChange({ ...filterConfig, actionType: type })
+                      }
+                    >
+                      {type === "all"
+                        ? "全部"
+                        : type === "register"
+                          ? "注册"
+                          : "更新"}
+                    </div>
+                  ))}
+                </FilterDropdown>
+              </div>
             </div>
           </ThWrapper>
         </th>

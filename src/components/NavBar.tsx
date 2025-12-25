@@ -15,7 +15,7 @@ export const NavBar = () => {
     return `text-sm font-qs-semibold transition-all py-1 border-b-2 ${
       isActive
         ? "text-link border-link" // 激活状态：高亮颜色 + 实色边框
-        : "text-gray-500 border-transparent hover:text-link hover:border-link/30" // 未激活：灰色 + 透明边框 (hover时浅色边框)
+        : "text-text-main border-transparent hover:text-link hover:border-link/30" // 未激活：灰色 + 透明边框 (hover时浅色边框)
     }`;
   };
 

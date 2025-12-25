@@ -7,7 +7,7 @@ import type { SortField, SortConfig, FilterConfig } from "./types";
 export type { SortField, SortConfig, FilterConfig };
 
 interface NameTableProps {
-  records: NameRecord[] | undefined | null; // 支持 undefined
+  records: NameRecord[] | undefined | null;
   isLoading: boolean;
   currentAddress?: string;
   isConnected: boolean;
@@ -16,19 +16,21 @@ interface NameTableProps {
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
   canDelete?: boolean;
+  selectedLabels?: Set<string>;
+  onToggleSelection?: (label: string) => void;
+  onToggleSelectAll?: () => void;
 }
 
 export const NameTable = (props: NameTableProps) => {
   const [now] = useState(() => Math.floor(Date.now() / 1000));
 
-  // 🚀 核心逻辑修复：
-  // 只有当 records 确实有值（哪怕是空数组）时，才认为加载结束。
-  // 只要 records 是 undefined 或 null，就强制显示骨架屏。
-  // 这样即便 isLoading 状态有延迟，UI 也会稳健地停留在骨架屏状态。
   const shouldShowSkeleton = props.isLoading || !props.records;
-
-  // 安全转换，仅用于渲染列表
   const safeRecords = props.records || [];
+
+  const isAllSelected =
+    safeRecords.length > 0 &&
+    props.selectedLabels &&
+    safeRecords.every((r) => props.selectedLabels?.has(r.label));
 
   return (
     <div className="bg-table-row overflow-hidden">
@@ -36,8 +38,8 @@ export const NameTable = (props: NameTableProps) => {
         <table
           className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background
           [&_td]:p-0 [&_th]:p-0
-          [&_td>div]:px-2 [&_td>div]:py-1.5
-          [&_th>div]:px-2 [&_th>div]:py-1.5"
+          [&_td>div]:px-2 [&_td>div]:py-2
+          [&_th>div]:px-2 [&_th>div]:py-2.5"
         >
           <TableHeader
             sortConfig={props.sortConfig}
@@ -45,11 +47,15 @@ export const NameTable = (props: NameTableProps) => {
             filterConfig={props.filterConfig}
             onFilterChange={props.onFilterChange}
             isConnected={props.isConnected}
+            isAllSelected={!!isAllSelected}
+            onToggleSelectAll={props.onToggleSelectAll}
+            hasRecords={safeRecords.length > 0}
+            // 确保 canDelete 透传给 Header 如果有需要（目前 Header 没直接用到删除显示逻辑，但为了接口完整性）
+            showDelete={props.canDelete}
           />
 
           <tbody>
             {shouldShowSkeleton ? (
-              // 显示 8 行骨架屏
               Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
             ) : safeRecords.length > 0 ? (
               safeRecords.map((r, i) => (
@@ -61,11 +67,14 @@ export const NameTable = (props: NameTableProps) => {
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}
+                  isSelected={props.selectedLabels?.has(r.label)}
+                  onToggleSelection={props.onToggleSelection}
                 />
               ))
             ) : (
               <tr>
-                <td colSpan={8}>
+                {/* 🚀 colSpan 调整为 7 */}
+                <td colSpan={7}>
                   <div className="px-6 py-24 text-center">
                     <div className="text-gray-300 text-4xl mb-3">∅</div>
                     <p className="text-gray-400 text-sm">
@@ -82,7 +91,7 @@ export const NameTable = (props: NameTableProps) => {
   );
 };
 
-// 骨架屏组件：样式微调，确保可见性
+// 骨架屏组件：移除了第5列（元数据）
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>
@@ -105,12 +114,7 @@ const SkeletonRow = () => (
         <div className="h-3 w-24 bg-gray-200 rounded"></div>
       </div>
     </td>
-    <td>
-      <div className="h-14 flex flex-col justify-center gap-2">
-        <div className="h-3 w-20 bg-gray-200 rounded"></div>
-        <div className="h-3 w-20 bg-gray-200 rounded"></div>
-      </div>
-    </td>
+    {/* 🚀 元数据列已移除 */}
     <td>
       <div className="h-14 flex items-center justify-center gap-2">
         <div className="h-5 w-5 bg-gray-200 rounded"></div>

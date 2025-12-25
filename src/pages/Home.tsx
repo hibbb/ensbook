@@ -123,7 +123,7 @@ export const Home = () => {
             <StatBadge
               label="全部"
               count={resolvedLabels.length}
-              color="bg-gray-100 text-gray-600"
+              color="bg-gray-100 text-text-main"
             />
             <StatBadge
               label="可注册"
