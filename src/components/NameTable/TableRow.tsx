@@ -2,44 +2,47 @@
 
 import { memo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleXmark,
+  faPlus,
+  faWallet, // 🚀 1. Import Wallet Icon
+} from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../utils/ens";
 import { getAvailableLookups } from "../../utils/lookupProvider";
 import type { NameRecord } from "../../types/ensNames";
 
 // ============================================================================
-// 1. 样式常量与生成器 (Style Constants & Generators)
-//    将复杂的 Tailwind 类名提取到此处，让 JSX 保持清爽
+// 1. Style Constants
 // ============================================================================
 
 const STYLES = {
-  // 单元格内部容器：标准高度 56px (h-12)
+  // Cell container: Standard height 56px (h-12)
   cell: "h-12 flex items-center",
 };
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   Available: "bg-green-200",
-  Active: "bg-gray-200",
-  Grace: "bg-red-200",
-  Premium: "bg-yellow-200",
+  Active: "bg-cyan-200",
+  Grace: "bg-yellow-200",
+  Premium: "bg-purple-200",
   Released: "bg-green-200",
 };
 
 // ============================================================================
-// 2. 辅助函数
+// 2. Helper Functions
 // ============================================================================
 
 const formatRemainingTime = (seconds: number) => {
   if (seconds <= 0) return "已结束";
   const days = Math.floor(seconds / 86400);
-  if (days > 365) return `${(days / 365).toFixed(1)}y`;
-  if (days > 0) return `${days}d`;
+  if (days > 365) return `${(days / 365).toFixed(1)}年`;
+  if (days > 0) return `${days}天`;
   const hours = Math.floor(seconds / 3600);
-  return `${hours}h`;
+  return `${hours}小时`;
 };
 
 // ============================================================================
-// 3. 组件定义
+// 3. Component Definition
 // ============================================================================
 
 interface TableRowProps {
@@ -52,6 +55,7 @@ interface TableRowProps {
   canDelete?: boolean;
   isSelected?: boolean;
   onToggleSelection?: (label: string) => void;
+  onDelete?: (record: NameRecord) => void;
 }
 
 export const TableRow = memo(
@@ -63,10 +67,10 @@ export const TableRow = memo(
     isConnected,
     chainId,
     canDelete = true,
+    onDelete,
     isSelected,
     onToggleSelection,
   }: TableRowProps) => {
-    // 逻辑层保持不变
     const isMe =
       currentAddress &&
       record.owner?.toLowerCase() === currentAddress.toLowerCase();
@@ -92,14 +96,14 @@ export const TableRow = memo(
 
     return (
       <tr className="group transition-colors duration-150 last:border-0 hover:bg-link/20 bg-table-row">
-        {/* 1. 序号列 */}
+        {/* 1. Index Column */}
         <td className="w-14 text-center">
           <div className="h-12 flex items-center justify-center">
             <span className="text-xs text-gray-400">{index + 1}</span>
           </div>
         </td>
 
-        {/* 2. 名称列 */}
+        {/* 2. Name Column */}
         <td>
           <div className={STYLES.cell}>
             <div
@@ -121,7 +125,7 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 3. 状态与时间 */}
+        {/* 3. Status & Time */}
         <td>
           <div className="h-12 flex flex-col justify-center items-start">
             <div
@@ -137,13 +141,13 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 4. 所有者列 */}
+        {/* 4. Owner Column */}
         <td>
           <div className={STYLES.cell}>
             {record.owner ? (
               <div
                 className={`flex items-center gap-2 text-sm ${
-                  isMe ? "underline" : "text-text-main"
+                  isMe ? "" : "text-text-main"
                 }`}
               >
                 <span
@@ -166,7 +170,7 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 5. 信息与外部链接 */}
+        {/* 5. Info & Links */}
         <td className="text-center">
           <div className={`${STYLES.cell} gap-1.5`}>
             {availableLookups.map((item) => (
@@ -184,10 +188,11 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 6. 操作 (Checkbox + 按钮) */}
+        {/* 6. Action Column (Checkbox + Button) */}
         <td className="text-right">
           <div className={`${STYLES.cell} gap-2`}>
-            {onToggleSelection && (
+            {/* Logic 1: Connected + Renewable = Checkbox */}
+            {onToggleSelection && isConnected && renewable && (
               <input
                 type="checkbox"
                 disabled={!isConnected}
@@ -195,8 +200,28 @@ export const TableRow = memo(
                 checked={isSelected}
                 onChange={() => onToggleSelection(record.label)}
                 onClick={(e) => e.stopPropagation()}
-                title={!isConnected ? "请先连接钱包" : "选择续费"}
+                title="Select to renew"
               />
+            )}
+
+            {/* Logic 2: Connected + NOT Renewable (Register) = Plus Icon */}
+            {onToggleSelection && isConnected && !renewable && (
+              <div
+                className="w-4 h-4 flex items-center justify-center text-gray-400 select-none"
+                title="Registrable"
+              >
+                <FontAwesomeIcon icon={faPlus} size="2xs" />
+              </div>
+            )}
+
+            {/* 🚀 Logic 3: Not Connected = Wallet Icon (Placeholder) */}
+            {!isConnected && (
+              <div
+                className="w-4 h-4 flex items-center justify-center text-gray-400 select-none"
+                title="Connect Wallet"
+              >
+                <FontAwesomeIcon icon={faWallet} size="2xs" />
+              </div>
             )}
 
             <button
@@ -206,7 +231,7 @@ export const TableRow = memo(
                 ${
                   isConnected
                     ? "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover"
-                    : "bg-gray-50 text-gray-400 cursor-not-allowed"
+                    : "text-gray-400 cursor-not-allowed"
                 }
               `}
             >
@@ -215,11 +240,12 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 7. 删除列 */}
+        {/* 7. Delete Column */}
         <td className="text-center">
           <div className="h-12 flex items-center justify-center">
             <button
               disabled={!canDelete}
+              onClick={() => onDelete?.(record)}
               className={`
                 transition-all duration-200
                 ${
@@ -228,7 +254,7 @@ export const TableRow = memo(
                     : "text-gray-400 cursor-not-allowed opacity-50"
                 }
               `}
-              title={canDelete ? "删除" : "不可用"}
+              title={canDelete ? "Delete" : "Unavailable"}
             >
               <FontAwesomeIcon icon={faCircleXmark} size="sm" />
             </button>

@@ -1,21 +1,37 @@
+// src/pages/Home.tsx
 import { useState, useEffect, useMemo } from "react";
-import { useQueryClient } from "@tanstack/react-query"; //
-import { parseAndClassifyInputs } from "../utils/parseInputs"; //
-import { fetchLabels } from "../services/graph/fetchLabels"; //
-import { useNameRecords } from "../hooks/useEnsData"; //
-import { isRenewable } from "../utils/ens"; //
-import { getStoredLabels, saveStoredLabels } from "../services/storage/labels"; //
-import type { NameRecord } from "../types/ensNames"; //
+// import { useQueryClient } from "@tanstack/react-query"; // 移除了未使用的引用
+import { useAccount } from "wagmi"; // 确保引入了 useAccount
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRight,
+  faRotate,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
+import toast from "react-hot-toast";
+
+// Components & Utils
+import { NameTable } from "../components/NameTable";
+import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
+import { parseAndClassifyInputs } from "../utils/parseInputs";
+import { fetchLabels } from "../services/graph/fetchLabels"; // 确认路径
+
+// Hooks
+import { useNameRecords } from "../hooks/useEnsData";
+import { usePrimaryNames } from "../hooks/usePrimaryNames";
+import { useEnsRenewal } from "../hooks/useEnsRenewal";
+import { getStoredLabels, saveStoredLabels } from "../services/storage/labels";
+import type { NameRecord } from "../types/ensNames";
 
 export const Home = () => {
-  const queryClient = useQueryClient();
+  const { address, isConnected } = useAccount();
 
-  // 1. 核心状态：使用延迟初始化确保同步加载本地存储
+  // 1. 核心状态
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getStoredLabels(),
   );
 
-  // 2. 持久化：当 labels 列表变化时同步写入
+  // 2. 持久化
   useEffect(() => {
     saveStoredLabels(resolvedLabels);
   }, [resolvedLabels]);
@@ -23,233 +39,229 @@ export const Home = () => {
   const [inputValue, setInputValue] = useState("");
   const [isResolving, setIsResolving] = useState(false);
 
-  // 3. 数据钩子：基于当前完整列表获取链上详情
+  // 3. 数据钩子 (应用了 O(N) 优化的 Hook)
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
-  // 4. 核心修复：白名单过滤，彻底杜绝缓存“诈尸”现象
+  // 4. 客户端过滤：防止缓存数据“诈尸” (Double Safety)
   const validRecords = useMemo(() => {
     if (!records || resolvedLabels.length === 0) return [];
-    const labelSet = new Set(resolvedLabels);
-    // 仅保留存在于当前 labels 列表中的记录
-    return records.filter((r) => labelSet.has(r.label));
+
+    // 优化：将 resolvedLabels 转为 Set 避免重复遍历
+    const currentLabelSet = new Set(resolvedLabels);
+
+    // 过滤掉不在当前列表中的旧缓存数据
+    return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
-  // 5. 统计逻辑：计算当前列表中各状态的数量
-  const stats = useMemo(() => {
-    const counts = {
-      Available: 0,
-      Active: 0,
-      Grace: 0,
-      Premium: 0,
-    };
-    validRecords.forEach((r) => {
-      if (r.status in counts) counts[r.status as keyof typeof counts]++;
-    });
-    return counts;
-  }, [validRecords]);
+  // 5. 渐进式加载主域名
+  const enrichedRecords = usePrimaryNames(validRecords);
 
-  // 处理提交：增量追加逻辑
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 6. 表格逻辑
+  const {
+    processedRecords,
+    sortConfig,
+    filterConfig,
+    handleSort,
+    setFilterConfig,
+    selectedLabels,
+    toggleSelection,
+    toggleSelectAll,
+    clearSelection,
+  } = useNameTableLogic(enrichedRecords, address);
+
+  const { renewBatch, isBusy: isRenewalBusy } = useEnsRenewal();
+  const hasContent = resolvedLabels.length > 0;
+
+  // --- 交互处理 ---
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!inputValue.trim()) return;
 
+    setIsResolving(true);
     try {
-      setIsResolving(true);
-      const classified = parseAndClassifyInputs(inputValue); //
-      const newLabels = await fetchLabels(classified); //
+      // Step 1: 解析输入
+      const classified = parseAndClassifyInputs(inputValue);
 
-      if (newLabels.length > 0) {
-        setResolvedLabels((prev) => {
-          // 追加并去重，保留原有顺序
-          const merged = new Set([...prev, ...newLabels]);
-          return Array.from(merged);
-        });
-        setInputValue(""); // 提交后清空输入框
+      // Step 2: 链上反查获取 labels
+      const fetchedLabels = await fetchLabels(classified);
+
+      if (fetchedLabels.length > 0) {
+        // 🚀 修复：在更新状态前，先利用当前的 resolvedLabels 计算新增项
+        // 这样既避免了在 setState 中执行副作用，又解决了 StrictMode 下的双重触发问题
+        const currentSet = new Set(resolvedLabels);
+        const newUniqueLabels = fetchedLabels.filter((l) => !currentSet.has(l));
+
+        if (newUniqueLabels.length === 0) {
+          toast("所有域名已存在列表中", { icon: "👌" });
+          // 这里不需要更新状态，直接返回即可
+        } else {
+          // 执行状态更新
+          setResolvedLabels((prev) => [...prev, ...newUniqueLabels]);
+          // 执行副作用 (Toast)
+          toast.success(`成功添加 ${newUniqueLabels.length} 个域名`);
+          setInputValue("");
+        }
+      } else {
+        toast("未找到有效的 ENS 域名", { icon: "🤔" });
       }
     } catch (error) {
-      console.error("解析出错:", error);
+      console.error("解析失败:", error);
+      toast.error("解析输入时出错");
     } finally {
       setIsResolving(false);
     }
   };
 
-  // 个体删除逻辑
-  const handleDelete = (label: string) => {
-    setResolvedLabels((prev) => prev.filter((l) => l !== label));
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSubmit();
   };
 
-  // 完整清空逻辑
-  const handleClearAll = () => {
-    if (window.confirm("确定要清空所有记录吗？")) {
-      setResolvedLabels([]);
-      queryClient.removeQueries({ queryKey: ["name-records"] });
+  const handleDelete = (record: NameRecord) => {
+    setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
+    if (selectedLabels.has(record.label)) {
+      toggleSelection(record.label);
     }
   };
 
-  const isLoading = isResolving || isQuerying;
+  const handleClearAll = () => {
+    if (window.confirm("确定要清空所有历史记录吗？")) {
+      setResolvedLabels([]);
+      clearSelection();
+    }
+  };
+
+  const handleBatchRenewal = () => {
+    if (selectedLabels.size === 0) return;
+    renewBatch(Array.from(selectedLabels), 31536000n).then(() => {
+      // Optional: 清空选择或保留
+    });
+  };
+
+  // 骨架屏显示逻辑
+  const showSkeleton =
+    isQuerying && resolvedLabels.length > 0 && validRecords.length === 0;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* 搜索区域 */}
-      <section className="mb-8">
-        <form
-          onSubmit={handleSubmit}
-          className="relative flex items-center shadow-sm"
-        >
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="输入标签、@地址 或 #解析记录 追加查询..."
-            className="flex-1 block w-full h-14 pl-6 pr-4 rounded-l-2xl border border-gray-200 border-r-0 bg-white text-lg focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !inputValue.trim()}
-            className="h-14 px-10 rounded-r-2xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 transition-all flex items-center justify-center min-w-[120px]"
-          >
-            {isResolving ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              "追加查询"
-            )}
-          </button>
-        </form>
-
-        {/* 统计与清空工具栏 */}
-        <div className="mt-6 flex flex-wrap justify-between items-center gap-4 px-2">
-          <div className="flex flex-wrap gap-2">
-            <StatBadge
-              label="全部"
-              count={resolvedLabels.length}
-              color="bg-gray-100 text-text-main"
-            />
-            <StatBadge
-              label="可注册"
-              count={stats.Available + stats.Premium}
-              color="bg-green-100 text-green-600"
-            />
-            <StatBadge
-              label="宽限期"
-              count={stats.Grace}
-              color="bg-orange-100 text-orange-600"
-            />
-            <StatBadge
-              label="已占用"
-              count={stats.Active}
-              color="bg-blue-100 text-blue-600"
-            />
-          </div>
-
-          {resolvedLabels.length > 0 && (
-            <button
-              onClick={handleClearAll}
-              className="text-xs text-red-400 hover:text-red-600 transition-colors"
-            >
-              清空全部历史
-            </button>
-          )}
-        </div>
-      </section>
-
-      {/* 结果网格 */}
-      <section className="pb-20">
-        {isLoading && resolvedLabels.length > 0 && (
-          <div className="mb-4 text-center text-xs text-blue-500 animate-pulse">
-            正在同步最新链上状态...
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* 倒序排列：最新的查询显示在最前 */}
-          {validRecords
-            .slice()
-            .reverse()
-            .map((record) => (
-              <StatusCard
-                key={record.namehash}
-                record={record}
-                onDelete={() => handleDelete(record.label)}
-              />
-            ))}
-        </div>
-
-        {resolvedLabels.length === 0 && !isLoading && (
-          <div className="text-center py-20 bg-gray-50/50 border-2 border-dashed border-gray-100 rounded-3xl text-gray-300">
-            暂无解析记录，请在上方输入开始
-          </div>
-        )}
-      </section>
-    </div>
-  );
-};
-
-// 内部组件：统计标签
-const StatBadge = ({
-  label,
-  count,
-  color,
-}: {
-  label: string;
-  count: number;
-  color: string;
-}) => (
-  <div
-    className={`px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-2 ${color}`}
-  >
-    <span>{label}</span>
-    <span className="opacity-60">{count}</span>
-  </div>
-);
-
-// 内部组件：域名状态卡片
-const StatusCard = ({
-  record,
-  onDelete,
-}: {
-  record: NameRecord;
-  onDelete: () => void;
-}) => {
-  const renewable = isRenewable(record.status); //
-
-  return (
-    <div className="group relative flex justify-between items-center p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-100 transition-all">
-      {/* 删除按钮：仅在悬停时显示 */}
-      <button
-        onClick={onDelete}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-white border border-gray-100 rounded-full shadow-sm text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-500 hover:border-red-100 transition-all flex items-center justify-center z-10"
+    <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
+      {/* 输入区域 (保持之前的样式不变) */}
+      <div
+        className={`flex flex-col items-center transition-all duration-700 ease-in-out z-10 ${
+          hasContent ? "pt-8 mb-6" : "flex-1 justify-center -mt-20"
+        }`}
       >
-        ×
-      </button>
+        {!hasContent && (
+          <h1 className="text-4xl font-qs-bold text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
+            ENS <span className="text-link">Explorer</span>
+          </h1>
+        )}
 
-      <div className="truncate mr-4">
-        <div className="font-bold text-gray-800 truncate flex items-center gap-0.5">
-          <span className="truncate">{record.label}</span>
-          <span className="text-gray-300 font-normal">.eth</span>
-        </div>
         <div
-          className={`text-[10px] uppercase tracking-wider font-bold mt-1 ${
-            record.status === "Available"
-              ? "text-green-500"
-              : record.status === "Active"
-                ? "text-blue-500"
-                : "text-orange-500"
-          }`}
+          className={`relative w-full transition-all duration-500 ${hasContent ? "max-w-3xl" : "max-w-lg"}`}
         >
-          {record.status}
+          <div className="relative group">
+            <input
+              type="text"
+              className="w-full h-14 pl-6 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
+              placeholder={
+                hasContent
+                  ? "继续添加域名..."
+                  : "输入域名、地址(@0x...) 或 记录(#user)..."
+              }
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button
+              onClick={() => handleSubmit()}
+              disabled={!inputValue.trim() || isResolving}
+              className="absolute right-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-link text-white hover:bg-link-hover disabled:bg-gray-200 disabled:cursor-not-allowed transition-all active:scale-95 shadow-md"
+            >
+              {isResolving ? (
+                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <FontAwesomeIcon icon={faArrowRight} />
+              )}
+            </button>
+          </div>
+
+          {hasContent && (
+            <div className="absolute -right-24 top-1/2 -translate-y-1/2 hidden xl:block">
+              <button
+                onClick={handleClearAll}
+                className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 transition-colors px-3 py-2 rounded-lg hover:bg-red-50"
+              >
+                <FontAwesomeIcon icon={faTrash} /> 清空列表
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      <button
-        className={`shrink-0 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-          renewable
-            ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-100"
-            : "bg-white border border-green-500 text-green-600 hover:bg-green-50"
-        }`}
-      >
-        {renewable ? "续费" : "注册"}
-      </button>
+      {/* 结果展示区域 */}
+      {hasContent && (
+        <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
+          <div className="flex justify-end mb-2 xl:hidden">
+            <button
+              onClick={handleClearAll}
+              className="text-xs text-gray-400 hover:text-red-500"
+            >
+              清空历史
+            </button>
+          </div>
+
+          <NameTable
+            records={processedRecords}
+            isLoading={showSkeleton}
+            currentAddress={address}
+            isConnected={isConnected}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+            filterConfig={filterConfig}
+            onFilterChange={setFilterConfig}
+            canDelete={true}
+            onDelete={handleDelete}
+            selectedLabels={selectedLabels}
+            onToggleSelection={toggleSelection}
+            onToggleSelectAll={toggleSelectAll}
+            skeletonRows={5}
+          />
+        </div>
+      )}
+
+      {/* 批量续费 Bar (保持不变) */}
+      {selectedLabels.size > 0 && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
+            {/* ... 内容保持不变 ... */}
+            <span className="text-sm font-qs-medium text-gray-600">
+              已选择{" "}
+              <span className="text-link font-bold">{selectedLabels.size}</span>{" "}
+              个域名
+            </span>
+            <div className="h-4 w-px bg-gray-300 mx-1" />
+            <button
+              onClick={handleBatchRenewal}
+              disabled={isRenewalBusy || !isConnected}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold transition-all shadow-sm ${
+                isRenewalBusy || !isConnected
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"
+              }`}
+            >
+              <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
+              {isRenewalBusy ? "处理中..." : "批量续费 (1年)"}
+            </button>
+            <button
+              onClick={clearSelection}
+              className="ml-2 text-xs text-gray-400 hover:text-gray-600 underline decoration-gray-300 underline-offset-2"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

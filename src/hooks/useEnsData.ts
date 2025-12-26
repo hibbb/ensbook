@@ -1,22 +1,34 @@
 // src/hooks/useEnsData.ts
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { fetchNameRecords } from "../services/graph/fetchNameRecords";
+import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData } from "@tanstack/react-query";
+import { fetchNameRecords } from "../services/graph/fetchNameRecords"; // 确认路径
 import { fetchLabels } from "../services/graph/fetchLabels";
 import type { ClassifiedInputs } from "../utils/parseInputs";
-// ⚡️ 必须引入集合配置，以便根据 ID 获取 labels
 import { ENS_COLLECTIONS } from "../config/collections";
 
-/**
- * Hook 1: 获取域名详情列表
- * 用于基础的搜索和解析功能
- */
 export function useNameRecords(labels: string[]) {
   return useQuery({
     queryKey: ["name-records", labels],
     queryFn: () => fetchNameRecords(labels),
     enabled: labels.length > 0,
-    staleTime: 1000 * 30,
-    placeholderData: keepPreviousData, //
+    staleTime: 1000 * 30, // 数据新鲜度 30秒
+
+    // 🚀 性能优化：O(N) 复杂度的智能占位检测
+    placeholderData: (previousData, previousQuery) => {
+      if (!previousData) return undefined;
+
+      const previousLabels = previousQuery?.queryKey[1] as string[] | undefined;
+      if (!previousLabels || !Array.isArray(previousLabels)) return undefined;
+
+      // 优化点：使用 Set 进行 O(1) 查找
+      // 逻辑：如果 【新列表】 包含了 【旧列表】 的所有元素，则视为追加
+      const newLabelSet = new Set(labels);
+      const isAppending = previousLabels.every((label) =>
+        newLabelSet.has(label),
+      );
+
+      return isAppending ? previousData : undefined;
+    },
   });
 }
 

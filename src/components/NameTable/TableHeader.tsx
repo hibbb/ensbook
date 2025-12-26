@@ -1,5 +1,6 @@
+// src/components/NameTable/TableHeader.tsx
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// 引入 IconDefinition 类型定义
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faSortAmountDown,
@@ -80,11 +81,12 @@ export const TableHeader = ({
   return (
     <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm">
       <tr className="text-left">
+        {/* 1. 序号列 (居中) */}
         <th className="w-14">
           <ThWrapper className="justify-center">#</ThWrapper>
         </th>
 
-        {/* 名称列 */}
+        {/* 2. 名称列 (左对齐) */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -129,7 +131,7 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 状态列 */}
+        {/* 3. 状态列 (左对齐) */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -191,7 +193,7 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 所有者列 */}
+        {/* 4. 所有者列 (左对齐) */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -238,13 +240,12 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 🚀 已删除元数据列 */}
-
-        <th className="text-center">
+        {/* 5. 信息列 (修改：左对齐，移除 justify-center) */}
+        <th>
           <ThWrapper>信息</ThWrapper>
         </th>
 
-        {/* 操作列 */}
+        {/* 6. 操作列 (修改：左对齐，复选框和下拉菜单自然排列) */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -256,7 +257,7 @@ export const TableHeader = ({
                     disabled={!hasRecords || !isConnected}
                     className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
                       !hasRecords || !isConnected
-                        ? "cursor-not-allowed bg-gray-100"
+                        ? "cursor-not-allowed bg-gray-200"
                         : "cursor-pointer"
                     }`}
                     checked={isAllSelected}
@@ -293,6 +294,7 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
+        {/* 7. 删除列 (居中) */}
         <th className="text-center">
           <ThWrapper className="justify-center">删除</ThWrapper>
         </th>

@@ -16,11 +16,10 @@ const DURATION_PREMIUM_PERIOD = 21 * 24 * 60 * 60;
 const contracts = getContracts(1);
 const WRAPPER_ADDRESS = contracts.ENS_NAME_WRAPPER.toLowerCase();
 
-// 使用全局配置确定 Subgraph 分段长度 (用于规避 Subgraph 查询限制)
 const CHUNK_SIZE = GRAPHQL_CONFIG.FETCH_LIMIT;
 
 /**
- * 数组分段工具函数 (保留此函数用于 Subgraph 查询分段)
+ * 数组分段工具函数
  */
 const chunkArray = <T>(array: T[], size: number): T[][] => {
   const chunks: T[][] = [];
@@ -64,7 +63,7 @@ function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
 }
 
 // ============================================================================
-// 3. 主函数：只负责 Subgraph 基础数据查询 (轻量化版本)
+// 3. 主函数：只负责 Subgraph 基础数据查询 (优化后的版本)
 // ============================================================================
 
 export async function fetchNameRecords(
@@ -72,7 +71,6 @@ export async function fetchNameRecords(
 ): Promise<NameRecord[]> {
   if (!labels || labels.length === 0) return [];
 
-  // 1. 数据规范化清洗
   const validLabels = Array.from(
     new Set(
       labels
@@ -90,13 +88,10 @@ export async function fetchNameRecords(
 
   if (validLabels.length === 0) return [];
 
-  // 2. 将标签切分为配置定义的区块大小进行并发请求
   const labelChunks = chunkArray(validLabels, CHUNK_SIZE);
-  const allRegistrations: SubgraphRegistration[] = [];
-  const allWrappedDomains: SubgraphWrappedDomain[] = [];
 
-  // 3. 并发执行 GraphQL 请求
-  const fetchTasks = labelChunks.map(async (chunk) => {
+  // 🚀 优化建议应用：fetchTasks 返回各分段的响应数据，而不是直接 push 到外部变量
+  const fetchTasks = labelChunks.map(async (chunk): Promise<FetchResponse> => {
     const targetNames = chunk.map((label) => `${label}.eth`);
     const query: GraphQLQueryCode = {
       str: `query getNameRecords($labels: [String!]!, $names: [String!]!) {
@@ -116,22 +111,19 @@ export async function fetchNameRecords(
     };
 
     try {
-      const response = (await queryData(query)) as FetchResponse;
-      if (response && response.registrations) {
-        allRegistrations.push(...response.registrations);
-      }
-      if (response && response.wrappedDomains) {
-        allWrappedDomains.push(...response.wrappedDomains);
-      }
+      return (await queryData(query)) as FetchResponse;
     } catch (err) {
       console.warn("Subgraph chunk fetch error:", err);
+      return { registrations: [], wrappedDomains: [] }; // 失败返回空数据以防 Promise.all 崩溃
     }
   });
 
   try {
-    await Promise.all(fetchTasks);
+    // 🚀 优化建议应用：使用 Promise.all 获取所有结果，然后统一展平 (Flat)
+    const responses = await Promise.all(fetchTasks);
+    const allRegistrations = responses.flatMap((r) => r.registrations);
+    const allWrappedDomains = responses.flatMap((r) => r.wrappedDomains);
 
-    // 4. 数据映射
     const regMap = new Map(allRegistrations.map((r) => [r.labelName, r]));
     const wrapMap = new Map(allWrappedDomains.map((w) => [w.name, w]));
 
@@ -146,7 +138,6 @@ export async function fetchNameRecords(
         length: label.length,
       };
 
-      // 情况 A: 未注册
       if (!registration) {
         return {
           ...baseInfo,
@@ -157,11 +148,10 @@ export async function fetchNameRecords(
           expiryTime: 0,
           releaseTime: 0,
           owner: null,
-          ownerPrimaryName: undefined, // ⚡️ 暂不获取，后续由 Hook 异步填充
+          ownerPrimaryName: undefined,
         };
       }
 
-      // 情况 B: 已注册
       const expiryTime = parseInt(registration.expiryDate);
       const registrantId = registration.registrant.id.toLowerCase();
       const isWrapped = registrantId === WRAPPER_ADDRESS;
@@ -179,11 +169,10 @@ export async function fetchNameRecords(
         expiryTime,
         releaseTime: expiryTime + DURATION_GRACE_PERIOD,
         owner: currentOwner,
-        ownerPrimaryName: undefined, // ⚡️ 暂不获取，后续由 Hook 异步填充
+        ownerPrimaryName: undefined,
       };
     });
 
-    // 🚀 立即返回基础数据，不再等待 RPC 查询
     return records as NameRecord[];
   } catch (error) {
     console.error("获取域名记录失败:", error);

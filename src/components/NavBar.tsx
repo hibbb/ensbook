@@ -1,6 +1,8 @@
 // src/components/NavBar.tsx
 import { Link, useLocation } from "react-router-dom";
 import { ConnectKitButton } from "connectkit";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 export const NavBar = () => {
   const location = useLocation();
@@ -20,32 +22,33 @@ export const NavBar = () => {
   };
 
   return (
-    <nav className="flex justify-between items-center mb-10 pb-6 border-b border-table-border">
+    // 🚀 修复：添加 relative z-50 防止被 Home 页面的负边距容器遮挡
+    <nav className="relative z-50 flex justify-between items-center mb-5 pb-6 border-b border-table-border">
       {/* 左侧：Logo 与 页面链接 */}
       <div className="flex items-center gap-8">
         <Link
           to="/"
-          className="text-2xl font-bold tracking-tighter hover:text-link transition-colors"
+          className="text-3xl font-qs-regular transition-colors text-link hover:text-link-hover"
         >
-          eb <span className="text-gray-400 font-light text-base">ensbook</span>
+          <span className="text-text-main">ENS</span>Book
         </Link>
 
         {/* 导航链接区域 */}
         <div className="hidden md:flex gap-6">
           <Link to="/" className={getLinkClass("/")}>
-            解析器
+            <FontAwesomeIcon icon={faMagnifyingGlass} /> 查询页
           </Link>
           <Link
             to="/collection/999-club"
             className={getLinkClass("/collection/999-club")}
           >
-            999 俱乐部
+            <FontAwesomeIcon icon={faBars} /> 999
           </Link>
           <Link
             to="/collection/mnemonic-club"
             className={getLinkClass("/collection/mnemonic-club")}
           >
-            助记词集合
+            <FontAwesomeIcon icon={faBars} /> 助记词
           </Link>
         </div>
       </div>
