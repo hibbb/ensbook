@@ -5,10 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleXmark,
   faPlus,
-  faWallet, // 🚀 1. Import Wallet Icon
+  faWallet,
 } from "@fortawesome/free-solid-svg-icons";
-import { isRenewable } from "../../utils/ens";
+import { faEthereum } from "@fortawesome/free-brands-svg-icons";
+import { isRenewable } from "../../utils/ens"; // 引入 isPremium
 import { getAvailableLookups } from "../../utils/lookupProvider";
+import { usePremiumEthPrice } from "../../hooks/usePremiumEthPrice"; // 🚀 1. 引入新 Hook
 import type { NameRecord } from "../../types/ensNames";
 
 // ============================================================================
@@ -16,16 +18,15 @@ import type { NameRecord } from "../../types/ensNames";
 // ============================================================================
 
 const STYLES = {
-  // Cell container: Standard height 56px (h-12)
   cell: "h-12 flex items-center",
 };
 
 const STATUS_COLOR_MAP: Record<string, string> = {
-  Available: "bg-green-200",
-  Active: "bg-cyan-200",
-  Grace: "bg-yellow-200",
-  Premium: "bg-purple-200",
-  Released: "bg-green-200",
+  Available: "bg-green-200 text-green-700",
+  Active: "bg-cyan-200 text-cyan-700",
+  Grace: "bg-yellow-200 text-yellow-700",
+  Premium: "bg-purple-200 text-purple-700",
+  Released: "bg-green-200 text-green-700",
 };
 
 // ============================================================================
@@ -33,12 +34,12 @@ const STATUS_COLOR_MAP: Record<string, string> = {
 // ============================================================================
 
 const formatRemainingTime = (seconds: number) => {
-  if (seconds <= 0) return "已结束";
+  if (seconds <= 0) return "Over";
   const days = Math.floor(seconds / 86400);
-  if (days > 365) return `${(days / 365).toFixed(1)}年`;
-  if (days > 0) return `${days}天`;
+  if (days > 365) return `${(days / 365).toFixed(1)}Y`;
+  if (days > 0) return `${days}D`;
   const hours = Math.floor(seconds / 3600);
-  return `${hours}小时`;
+  return `${hours}H`;
 };
 
 // ============================================================================
@@ -74,25 +75,48 @@ export const TableRow = memo(
     const isMe =
       currentAddress &&
       record.owner?.toLowerCase() === currentAddress.toLowerCase();
+
     const renewable = isRenewable(record.status);
     const availableLookups = getAvailableLookups(record, chainId);
+
+    // 🚀 2. 使用 Hook 获取实时溢价 (内部已包含性能优化和空值处理)
+    const premiumEthPrice = usePremiumEthPrice(
+      record.status,
+      record.releaseTime || 0,
+    );
 
     const statusClass =
       STATUS_COLOR_MAP[record.status] ||
       "bg-gray-50 text-text-main border-table-border";
 
-    const getTimeInfo = () => {
+    // 🚀 3. 智能显示逻辑：优先显示价格，降级显示倒计时
+    const getStatusInfo = () => {
+      // A. 如果是 Premium 且价格计算成功，显示价格
+      if (record.status === "Premium" && premiumEthPrice) {
+        return (
+          <>
+            <FontAwesomeIcon icon={faEthereum} /> {premiumEthPrice}
+          </>
+        );
+      }
+
       if (now === 0) return null;
-      const PREMIUM_PERIOD = 21 * 24 * 60 * 60;
+
+      // B. 普通状态显示倒计时
       if (record.status === "Active" && record.expiryTime)
         return formatRemainingTime(record.expiryTime - now);
       if (record.status === "Grace" && record.releaseTime)
         return formatRemainingTime(record.releaseTime - now);
+
+      // C. Premium 状态但价格未就绪 (Loading)，显示溢价期剩余时间作为回退
+      const PREMIUM_PERIOD = 21 * 24 * 60 * 60;
       if (record.status === "Premium" && record.releaseTime)
         return formatRemainingTime(record.releaseTime + PREMIUM_PERIOD - now);
+
       return null;
     };
-    const timeInfo = getTimeInfo();
+
+    const displayInfo = getStatusInfo();
 
     return (
       <tr className="group transition-colors duration-150 last:border-0 hover:bg-link/10 bg-table-row">
@@ -123,17 +147,15 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 3. Status & Time */}
+        {/* 3. Status & Info */}
         <td>
           <div className="h-12 flex flex-col justify-center items-start">
             <div
               className={`inline-flex items-center px-2.5 py-1 text-xs uppercase tracking-wide ${statusClass}`}
             >
               <span>{record.status}</span>
-              {timeInfo && (
-                <span className="pl-1 text-[10px] text-gray-400 leading-none">
-                  {timeInfo}
-                </span>
+              {displayInfo && (
+                <span className="pl-1 leading-none">{displayInfo}</span>
               )}
             </div>
           </div>
@@ -186,10 +208,9 @@ export const TableRow = memo(
           </div>
         </td>
 
-        {/* 6. Action Column (Checkbox + Button) */}
+        {/* 6. Action Column */}
         <td className="text-right">
           <div className={`${STYLES.cell} gap-2`}>
-            {/* Logic 1: Connected + Renewable = Checkbox */}
             {onToggleSelection && isConnected && renewable && (
               <input
                 type="checkbox"
@@ -201,8 +222,6 @@ export const TableRow = memo(
                 title="Select to renew"
               />
             )}
-
-            {/* Logic 2: Connected + NOT Renewable (Register) = Plus Icon */}
             {onToggleSelection && isConnected && !renewable && (
               <div
                 className="w-4 h-4 flex items-center justify-center text-gray-400 select-none"
@@ -211,8 +230,6 @@ export const TableRow = memo(
                 <FontAwesomeIcon icon={faPlus} size="2xs" />
               </div>
             )}
-
-            {/* 🚀 Logic 3: Not Connected = Wallet Icon (Placeholder) */}
             {!isConnected && (
               <div
                 className="w-4 h-4 flex items-center justify-center text-gray-400 select-none"
@@ -221,7 +238,6 @@ export const TableRow = memo(
                 <FontAwesomeIcon icon={faWallet} size="2xs" />
               </div>
             )}
-
             <button
               disabled={!isConnected}
               className={`
