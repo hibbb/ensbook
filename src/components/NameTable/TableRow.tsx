@@ -95,7 +95,7 @@ export const TableRow = memo(
     const timeInfo = getTimeInfo();
 
     return (
-      <tr className="group transition-colors duration-150 last:border-0 hover:bg-link/20 bg-table-row">
+      <tr className="group transition-colors duration-150 last:border-0 hover:bg-link/10 bg-table-row">
         {/* 1. Index Column */}
         <td className="w-14 text-center">
           <div className="h-12 flex items-center justify-center">
@@ -108,13 +108,11 @@ export const TableRow = memo(
           <div className={STYLES.cell}>
             <div
               className={`flex flex-col justify-center ${
-                record.wrapped
-                  ? "px-1 rounded-md border border-link/70 bg-link/5"
-                  : ""
+                record.wrapped ? "px-1 border border-link/70 bg-link/5" : ""
               }`}
             >
               <div className="flex items-center gap-1">
-                <span className="text-lg font-qs-medium tracking-tight text-text-main">
+                <span className="text-base font-qs-medium tracking-tight text-text-main">
                   {record.label}
                 </span>
                 <span className="text-sm font-qs-regular text-gray-400">

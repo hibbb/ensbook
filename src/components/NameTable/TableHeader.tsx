@@ -28,6 +28,8 @@ interface TableHeaderProps {
   showDelete?: boolean;
   isAllSelected?: boolean;
   onToggleSelectAll?: () => void;
+  // 🚀 明确接收 hasRenewable 属性
+  hasRenewable?: boolean;
   hasRecords?: boolean;
 }
 
@@ -53,7 +55,7 @@ export const TableHeader = ({
   isConnected,
   isAllSelected,
   onToggleSelectAll,
-  hasRecords,
+  hasRenewable, // 🚀 使用该属性控制复选框逻辑
 }: TableHeaderProps) => {
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
@@ -240,12 +242,12 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 5. 信息列 (修改：左对齐，移除 justify-center) */}
+        {/* 5. 信息列 (左对齐) */}
         <th>
           <ThWrapper>信息</ThWrapper>
         </th>
 
-        {/* 6. 操作列 (修改：左对齐，复选框和下拉菜单自然排列) */}
+        {/* 6. 操作列 (左对齐) */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -254,15 +256,24 @@ export const TableHeader = ({
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    disabled={!hasRecords || !isConnected}
+                    // 🚀 核心逻辑修正：
+                    // 1. 如果未连接钱包，禁用
+                    // 2. 如果已连接但没有可续费的域名，禁用 (hasRenewable)
+                    disabled={!isConnected || !hasRenewable}
                     className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
-                      !hasRecords || !isConnected
+                      !isConnected || !hasRenewable
                         ? "cursor-not-allowed bg-gray-200"
                         : "cursor-pointer"
                     }`}
                     checked={isAllSelected}
                     onChange={onToggleSelectAll}
-                    title={!isConnected ? "请先连接钱包" : "全选当前页"}
+                    title={
+                      !isConnected
+                        ? "请先连接钱包"
+                        : !hasRenewable
+                          ? "无可续费域名"
+                          : "全选可续费域名"
+                    }
                   />
                 </div>
               )}

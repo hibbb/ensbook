@@ -1,33 +1,34 @@
+// src/pages/CollectionDetail.tsx
+
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { NameTable } from "../components/NameTable";
 import { useCollectionRecords } from "../hooks/useEnsData";
 import { ENS_COLLECTIONS } from "../config/collections";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
-// 🚀 1. 重新引入渐进式加载 Hook
 import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
+import { isRenewable } from "../utils/ens";
 
 export const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const collection = id ? ENS_COLLECTIONS[id] : null;
   const { address, isConnected } = useAccount();
 
-  // 🚀 2. 获取基础数据 (Subgraph 秒级返回，但 ownerPrimaryName 为空)
-  // 将原先的 records 重命名为 basicRecords
+  // 1. 获取基础数据
   const {
     data: basicRecords,
     isLoading,
     isError,
   } = useCollectionRecords(id || "");
 
-  // 🚀 3. 补全主域名信息 (关键修复！)
-  // 这会先返回 basicRecords，然后在后台异步加载域名，完成后自动刷新
+  // 2. 补全主域名信息
   const records = usePrimaryNames(basicRecords);
 
-  // 🚀 4. 使用补全后的 records 初始化表格逻辑
+  // 3. 表格逻辑 (包含筛选、排序、选择)
   const {
     processedRecords,
     sortConfig,
@@ -42,10 +43,31 @@ export const CollectionDetail = () => {
 
   const { renewBatch, isBusy } = useEnsRenewal();
 
+  // 🚀 核心逻辑：计算“有效选中项”
+  // 目的：过滤掉可能存在于 selectedLabels 中但实际上不可续费的域名
+  const validSelection = useMemo(() => {
+    // 性能优化：如果没有任何选中项或记录为空，直接返回空数组
+    if (!processedRecords || selectedLabels.size === 0) return [];
+
+    // 1. 获取当前列表中的所有可续费域名集合 (Set 查找 O(1))
+    const renewableSet = new Set(
+      processedRecords.filter((r) => isRenewable(r.status)).map((r) => r.label),
+    );
+
+    // 2. 取交集：Selected ∩ Renewable
+    return Array.from(selectedLabels).filter((label) =>
+      renewableSet.has(label),
+    );
+  }, [processedRecords, selectedLabels]);
+
+  const selectionCount = validSelection.length;
+
   const handleBatchRenewal = () => {
-    if (selectedLabels.size === 0) return;
-    renewBatch(Array.from(selectedLabels), 31536000n).then(() => {
-      // 交易提交后，可选操作：清空选中
+    // 安全检查：防止提交空数组
+    if (selectionCount === 0) return;
+
+    renewBatch(validSelection, 31536000n).then(() => {
+      // 成功后是否清空选择？根据需求，目前保留，若需清空可取消注释：
       // clearSelection();
     });
   };
@@ -76,12 +98,13 @@ export const CollectionDetail = () => {
         onToggleSelectAll={toggleSelectAll}
       />
 
-      {selectedLabels.size > 0 && (
+      {/* 底部悬浮操作栏 */}
+      {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
             <span className="text-sm font-qs-medium text-gray-600">
               已选择{" "}
-              <span className="text-link font-bold">{selectedLabels.size}</span>{" "}
+              <span className="text-link font-bold">{selectionCount}</span>{" "}
               个域名
             </span>
 

@@ -148,17 +148,17 @@ export const Home = () => {
       {/* 输入区域 (保持之前的样式不变) */}
       <div
         className={`flex flex-col items-center transition-all duration-700 ease-in-out z-10 ${
-          hasContent ? "pt-8 mb-6" : "flex-1 justify-center -mt-20"
+          hasContent ? "pt-8 mb-6" : "flex-1 justify-center -mt-60"
         }`}
       >
         {!hasContent && (
           <h1 className="text-4xl font-qs-bold text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
-            ENS <span className="text-link">Explorer</span>
+            ENS <span className="text-link">Search</span>
           </h1>
         )}
 
         <div
-          className={`relative w-full transition-all duration-500 ${hasContent ? "max-w-3xl" : "max-w-lg"}`}
+          className={`relative w-full transition-all duration-500 ${hasContent ? "max-w-3xl" : "max-w-2xl"}`}
         >
           <div className="relative group">
             <input

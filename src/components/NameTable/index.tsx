@@ -1,7 +1,9 @@
 // src/components/NameTable/index.tsx
-import { useState } from "react";
+
+import { useState, useMemo, memo } from "react"; // 🚀 引入 memo
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
+import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 import type { SortField, SortConfig, FilterConfig } from "./types";
 
@@ -14,26 +16,38 @@ interface NameTableProps {
   onSort: (field: SortField) => void;
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
-  // 删除相关
   canDelete?: boolean;
-  onDelete?: (record: NameRecord) => void; // 🚀 新增：删除回调
-  // 多选相关
+  onDelete?: (record: NameRecord) => void;
   selectedLabels?: Set<string>;
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
   skeletonRows?: number;
 }
 
-export const NameTable = (props: NameTableProps) => {
+// 🚀 使用 memo 包裹组件，避免父组件无关更新导致的重渲染
+export const NameTable = memo((props: NameTableProps) => {
+  // 计时器状态：每一秒更新一次，用于倒计时显示
+  // 注意：这会导致 TableRow 每秒重渲染，这是符合预期的，因为倒计时需要跳动
   const [now] = useState(() => Math.floor(Date.now() / 1000));
+
   const shouldShowSkeleton = props.isLoading || !props.records;
-  const safeRecords = props.records || [];
+
+  // 引用稳定性优化
+  const safeRecords = useMemo(() => props.records || [], [props.records]);
   const skeletonCount = props.skeletonRows || 8;
 
+  // 缓存可续费记录列表
+  const renewableRecords = useMemo(() => {
+    return safeRecords.filter((r) => isRenewable(r.status));
+  }, [safeRecords]);
+
+  const hasRenewableRecords = renewableRecords.length > 0;
+
+  // 全选状态计算
   const isAllSelected =
-    safeRecords.length > 0 &&
+    hasRenewableRecords &&
     props.selectedLabels &&
-    safeRecords.every((r) => props.selectedLabels?.has(r.label));
+    renewableRecords.every((r) => props.selectedLabels?.has(r.label));
 
   return (
     <div className="bg-table-row overflow-hidden rounded-xl border border-gray-100">
@@ -50,6 +64,7 @@ export const NameTable = (props: NameTableProps) => {
             isConnected={props.isConnected}
             isAllSelected={!!isAllSelected}
             onToggleSelectAll={props.onToggleSelectAll}
+            hasRenewable={hasRenewableRecords} // 控制复选框禁用
             hasRecords={safeRecords.length > 0}
             showDelete={props.canDelete}
           />
@@ -62,14 +77,14 @@ export const NameTable = (props: NameTableProps) => {
             ) : safeRecords.length > 0 ? (
               safeRecords.map((r, i) => (
                 <TableRow
-                  key={r.namehash}
+                  key={r.namehash} // 确保 namehash 唯一
                   record={r}
                   index={i}
                   now={now}
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}
-                  onDelete={props.onDelete} // 🚀 透传删除回调
+                  onDelete={props.onDelete}
                   isSelected={props.selectedLabels?.has(r.label)}
                   onToggleSelection={props.onToggleSelection}
                 />
@@ -89,9 +104,8 @@ export const NameTable = (props: NameTableProps) => {
       </div>
     </div>
   );
-};
+});
 
-// ... SkeletonRow 保持不变
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>

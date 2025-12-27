@@ -36,7 +36,7 @@ export const NavBar = () => {
         {/* 导航链接区域 */}
         <div className="hidden md:flex gap-6">
           <Link to="/" className={getLinkClass("/")}>
-            <FontAwesomeIcon icon={faMagnifyingGlass} /> 查询页
+            <FontAwesomeIcon icon={faMagnifyingGlass} /> Search
           </Link>
           <Link
             to="/collection/999-club"
@@ -48,7 +48,7 @@ export const NavBar = () => {
             to="/collection/mnemonic-club"
             className={getLinkClass("/collection/mnemonic-club")}
           >
-            <FontAwesomeIcon icon={faBars} /> 助记词
+            <FontAwesomeIcon icon={faBars} /> Mnemonic
           </Link>
         </div>
       </div>
