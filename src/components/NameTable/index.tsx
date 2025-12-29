@@ -1,6 +1,6 @@
 // src/components/NameTable/index.tsx
 
-import { useState, useMemo, memo, useEffect } from "react";
+import { useState, useEffect } from "react"; // 🚀 1. 移除 useMemo 引用
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import { isRenewable } from "../../utils/ens";
@@ -18,7 +18,6 @@ interface NameTableProps {
   onFilterChange: (config: FilterConfig) => void;
   canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
-  // 🚀 1. 新增：接收 Home 传来的清空回调
   onClearAll?: () => void;
   selectedLabels?: Set<string>;
   onToggleSelection?: (label: string) => void;
@@ -27,11 +26,10 @@ interface NameTableProps {
   headerTop?: string | number;
 }
 
-export const NameTable = memo((props: NameTableProps) => {
-  // 1. 初始化状态
+export const NameTable = (props: NameTableProps) => {
+  // 1. 计时器：每秒更新 now，这会强制组件重渲染
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
-  // 🚀 修复：添加定时器，每秒更新 now 状态，驱动倒计时跳动
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(Math.floor(Date.now() / 1000));
@@ -40,12 +38,20 @@ export const NameTable = memo((props: NameTableProps) => {
   }, []);
 
   const shouldShowSkeleton = props.isLoading || !props.records;
-  const safeRecords = useMemo(() => props.records || [], [props.records]);
   const skeletonCount = props.skeletonRows || 8;
-  const renewableRecords = useMemo(() => {
-    return safeRecords.filter((r) => isRenewable(r.status));
-  }, [safeRecords]);
+
+  // 🚀 核心修复：彻底移除 useMemo！
+  // 之前版本：const safeRecords = useMemo(() => props.records || [], [props.records]);
+  // 这会导致当 props.records 引用未变但内部对象属性（如 ownerPrimaryName）更新时，safeRecords 不更新。
+  // 修改后：直接赋值。配合上面的计时器重渲染，确保每一秒都能读取到对象的最新状态。
+  const safeRecords = props.records || [];
+
+  // 这里其实不需要 useMemo，因为 safeRecords 已经是新的了，filter 开销很小。
+  // 为了彻底防止缓存陷阱，直接计算。
+  const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
+
   const hasRenewableRecords = renewableRecords.length > 0;
+
   const isAllSelected =
     hasRenewableRecords &&
     props.selectedLabels &&
@@ -70,7 +76,7 @@ export const NameTable = memo((props: NameTableProps) => {
             hasRecords={safeRecords.length > 0}
             showDelete={props.canDelete}
             topOffset={props.headerTop}
-            onClearAll={props.onClearAll} // 🚀 2. 传递给 TableHeader (修复断链)
+            onClearAll={props.onClearAll}
           />
           <tbody>
             {shouldShowSkeleton ? (
@@ -80,6 +86,7 @@ export const NameTable = memo((props: NameTableProps) => {
             ) : safeRecords.length > 0 ? (
               safeRecords.map((r, i) => (
                 <TableRow
+                  // 使用 namehash 作为 key，确保 React 能正确追踪 DOM
                   key={r.namehash}
                   record={r}
                   index={i}
@@ -107,7 +114,7 @@ export const NameTable = memo((props: NameTableProps) => {
       </div>
     </div>
   );
-});
+};
 
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">

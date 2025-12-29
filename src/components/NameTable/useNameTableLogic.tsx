@@ -11,7 +11,7 @@ export const useNameTableLogic = (
 ) => {
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     field: "status",
-    direction: "asc",
+    direction: null,
   });
 
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({
@@ -23,6 +23,9 @@ export const useNameTableLogic = (
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
 
   // --- 1. 过滤逻辑 ---
+  // 🚀 核心修复：彻底移除 useMemo！
+  // 恢复为普通函数调用。这样只要组件重渲染（包括父组件传入了更新后的对象），
+  // 这里就会重新执行过滤，确保拿到最新的 ownerPrimaryName。
   const filteredRecords = useMemo(() => {
     if (!records) return [];
 
@@ -45,7 +48,9 @@ export const useNameTableLogic = (
   }, [records, filterConfig, currentAddress]);
 
   // --- 2. 排序逻辑 ---
+  // 🚀 核心修复：彻底移除 useMemo！
   const processedRecords = useMemo(() => {
+    // 如果没有排序方向，直接返回过滤后的结果（默认顺序）
     if (!sortConfig.direction || !sortConfig.field) {
       return filteredRecords;
     }
@@ -53,16 +58,13 @@ export const useNameTableLogic = (
     const sorted = [...filteredRecords];
     const { field, direction } = sortConfig;
 
-    // 🚀 修复：定义明确的返回值类型，避免使用 any
     const getValue = (item: NameRecord): string | number | undefined | null => {
       if (field === "length") return item.label.length;
       if (field === "status") return item.expiryTime;
 
-      // 使用类型收窄确保 field 是 NameRecord 的有效键
       const key = field as keyof NameRecord;
       const value = item[key];
 
-      // 仅允许 string 或 number 参与排序比较
       return typeof value === "string" || typeof value === "number"
         ? value
         : null;
@@ -72,7 +74,6 @@ export const useNameTableLogic = (
       const aValue = getValue(a);
       const bValue = getValue(b);
 
-      // 🚀 修复：为比较参数定义明确的联合类型
       const compare = (
         valA: string | number | undefined | null,
         valB: string | number | undefined | null,
@@ -100,10 +101,11 @@ export const useNameTableLogic = (
     return sorted;
   }, [filteredRecords, sortConfig]);
 
-  // --- Handlers ---
+  // --- Handlers (保持不变) ---
   const handleSort = useCallback((field: SortField) => {
     setSortConfig((prev) => {
       if (prev.field !== field) return { field, direction: "asc" };
+      if (prev.direction === null) return { field, direction: "asc" };
       if (prev.direction === "asc") return { field, direction: "desc" };
       if (prev.direction === "desc") return { field, direction: null };
       return { field, direction: "asc" };

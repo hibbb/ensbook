@@ -9,7 +9,7 @@ import {
   faSortAlphaUp,
   faUser,
   faCheck,
-  faTrash, // 🚀 1. 引入图标
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FilterDropdown } from "./FilterDropdown";
@@ -32,7 +32,7 @@ interface TableHeaderProps {
   hasRenewable?: boolean;
   hasRecords?: boolean;
   topOffset?: string | number;
-  onClearAll?: () => void; // 🚀 2. 接收回调
+  onClearAll?: () => void;
 }
 
 const ThWrapper = ({
@@ -60,7 +60,7 @@ export const TableHeader = ({
   hasRenewable,
   showDelete,
   topOffset = 0,
-  onClearAll, // 🚀 3. 解构
+  onClearAll,
 }: TableHeaderProps) => {
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
@@ -85,18 +85,22 @@ export const TableHeader = ({
     };
   };
 
+  // 🚀 修复：设置 CSS 变量，供 Tailwind 类使用
+  const headerStyle = {
+    "--header-offset":
+      typeof topOffset === "number" ? `${topOffset}px` : topOffset,
+  } as React.CSSProperties;
+
   return (
     <thead
-      className="sticky z-20 bg-table-header backdrop-blur-sm transition-all duration-300"
-      style={{ top: topOffset }}
+      // 🚀 修复：移动端默认 top-0，桌面端 (lg) 使用传入的 offset
+      className="sticky top-0 z-20 bg-table-header backdrop-blur-sm transition-all duration-300 lg:top-[var(--header-offset)]"
+      style={headerStyle}
     >
       <tr className="text-left">
-        {/* 1. 序号列 */}
         <th className="w-14">
           <ThWrapper className="justify-center">#</ThWrapper>
         </th>
-
-        {/* 2. 名称列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -140,8 +144,6 @@ export const TableHeader = ({
             </div>
           </ThWrapper>
         </th>
-
-        {/* 3. 状态列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -202,8 +204,6 @@ export const TableHeader = ({
             </div>
           </ThWrapper>
         </th>
-
-        {/* 4. 所有者列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -249,17 +249,12 @@ export const TableHeader = ({
             </div>
           </ThWrapper>
         </th>
-
-        {/* 5. 信息列 */}
         <th>
           <ThWrapper>信息</ThWrapper>
         </th>
-
-        {/* 6. 操作列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
-              {/* 全选复选框 */}
               {onToggleSelectAll && (
                 <div className="flex items-center">
                   <input
@@ -282,7 +277,6 @@ export const TableHeader = ({
                   />
                 </div>
               )}
-
               <div className="flex items-center gap-2">
                 <span>操作</span>
                 <FilterDropdown
@@ -309,8 +303,6 @@ export const TableHeader = ({
             </div>
           </ThWrapper>
         </th>
-
-        {/* 7. 删除列 (居中) - 🚀 4. 使用图标按钮并绑定清空事件 */}
         <th className="text-center w-14">
           <ThWrapper className="justify-center">
             <button
