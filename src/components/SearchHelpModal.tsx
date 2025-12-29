@@ -53,7 +53,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
         {/* 内容区域 */}
         <div className="p-6 space-y-6">
           <p className="text-sm text-gray-400">
-            ENSBook 支持多种高级搜索模式，助您快速批量发现域名。
+            ENSBook 支持多种高级模式，助您快速批量发现域名。
           </p>
 
           <div className="space-y-4">
@@ -63,7 +63,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} size="sm" />
               </div>
               <div>
-                <h4 className="font-qs-medium text-text-main text-sm">
+                <h4 className="font-qs-semibold text-text-main text-sm">
                   域名批量搜索
                 </h4>
                 <p className="text-xs text-gray-400 mt-1">
@@ -75,37 +75,38 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               </div>
             </div>
 
-            {/* 模式 2: 地址反查 */}
+            {/* 模式 2: 所有者持仓查询 */}
             <div className="flex gap-4">
               <div className="w-10 h-10 shrink-0 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
                 <FontAwesomeIcon icon={faAt} size="sm" />
               </div>
               <div>
-                <h4 className="font-qs-medium text-text-main text-sm">
-                  地址反查 (Reverse Record)
+                <h4 className="font-qs-semibold text-text-main text-sm">
+                  名称所有者持仓查询
                 </h4>
                 <p className="text-xs text-gray-400 mt-1">
-                  使用 <span className="text-purple-500 font-bold">@</span>{" "}
-                  前缀。
+                  使用 “<span className="text-purple-500 font-bold">@</span> +
+                  ENS（或以太坊地址）” 的格式查询某个 ENS
+                  所有者（或某个以太坊地址）持有的全部名称。
                 </p>
                 <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-gray-600">
-                  @0xd8dA6...
+                  @vitalik.eth @0xd8dA6...
                 </div>
               </div>
             </div>
 
-            {/* 模式 3: 持有者查询 */}
+            {/* 模式 3: 绑定地址持仓查询 */}
             <div className="flex gap-4">
               <div className="w-10 h-10 shrink-0 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
                 <FontAwesomeIcon icon={faHashtag} size="sm" />
               </div>
               <div>
-                <h4 className="font-qs-medium text-text-main text-sm">
-                  持有者查询 (Portfolio)
+                <h4 className="font-qs-semibold text-text-main text-sm">
+                  名称绑定地址持仓查询
                 </h4>
                 <p className="text-xs text-gray-400 mt-1">
-                  使用 <span className="text-orange-500 font-bold">#</span>{" "}
-                  前缀。
+                  使用 “<span className="text-orange-500 font-bold">#</span> +
+                  ENS” 的格式查询某个 ENS 绑定的以太坊地址持有的全部名称。
                 </p>
                 <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-gray-600">
                   #vitalik.eth
@@ -119,7 +120,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 <FontAwesomeIcon icon={faLayerGroup} size="sm" />
               </div>
               <div>
-                <h4 className="font-qs-medium text-text-main text-sm">
+                <h4 className="font-qs-semibold text-text-main text-sm">
                   混合模式
                 </h4>
                 <p className="text-xs text-gray-400 mt-1">

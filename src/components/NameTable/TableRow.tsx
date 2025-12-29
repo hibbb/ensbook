@@ -5,6 +5,7 @@ import {
   faCircleXmark,
   faPlus,
   faWallet,
+  faUpRightFromSquare, // 🚀 1. 引入跳转图标
 } from "@fortawesome/free-solid-svg-icons";
 import { faEthereum } from "@fortawesome/free-brands-svg-icons";
 import { isRenewable } from "../../utils/ens";
@@ -104,6 +105,7 @@ export const TableRow = ({
           <span className="text-xs text-gray-400">{index + 1}</span>
         </div>
       </td>
+      {/* 2. 名称列 - 改良后的交互逻辑 */}
       <td>
         <div className={STYLES.cell}>
           <div
@@ -111,14 +113,28 @@ export const TableRow = ({
               record.wrapped ? "px-1 border border-link/70 bg-link/5" : ""
             }`}
           >
-            <div className="flex items-center gap-1">
+            {/* 🚀 2. 将名称包装为链接，并设置局部 group 触发器 */}
+            <a
+              href={`https://app.ens.domains/${record.label}.eth`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 group/name"
+              title="在 ENS 官网查看详情"
+            >
+              {/* 保持文字颜色不变 */}
               <span className="text-base font-qs-medium tracking-tight text-text-main">
                 {record.label}
               </span>
               <span className="text-sm font-qs-regular text-gray-400">
                 .eth
               </span>
-            </div>
+
+              {/* 🚀 3. 悬停时渐现的图标 */}
+              <FontAwesomeIcon
+                icon={faUpRightFromSquare}
+                className="text-[10px] text-link opacity-0 group-hover/name:opacity-100 transition-opacity duration-200"
+              />
+            </a>
           </div>
         </div>
       </td>
