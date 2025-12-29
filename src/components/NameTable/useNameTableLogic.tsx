@@ -10,7 +10,7 @@ export const useNameTableLogic = (
   currentAddress?: string,
 ) => {
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    field: "status", // 默认排序字段
+    field: "status",
     direction: "asc",
   });
 
@@ -22,40 +22,29 @@ export const useNameTableLogic = (
 
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
 
-  // --- 1. 过滤逻辑 (Filtering) ---
+  // --- 1. 过滤逻辑 ---
   const filteredRecords = useMemo(() => {
     if (!records) return [];
 
-    // 预先处理 filterConfig 以避免在循环中重复检查
     const { statusList, onlyMe, actionType } = filterConfig;
     const hasStatusFilter = statusList.length > 0;
     const lowerCurrentAddress = currentAddress?.toLowerCase();
 
     return records.filter((record) => {
-      // 1. 状态筛选
-      if (hasStatusFilter && !statusList.includes(record.status)) {
-        return false;
-      }
-
-      // 2. "只看我的"筛选
+      if (hasStatusFilter && !statusList.includes(record.status)) return false;
       if (onlyMe && lowerCurrentAddress) {
-        if (record.owner?.toLowerCase() !== lowerCurrentAddress) {
-          return false;
-        }
+        if (record.owner?.toLowerCase() !== lowerCurrentAddress) return false;
       }
-
-      // 3. 操作类型筛选
       if (actionType !== "all") {
         const renewable = isRenewable(record.status);
         if (actionType === "renew" && !renewable) return false;
         if (actionType === "register" && renewable) return false;
       }
-
       return true;
     });
   }, [records, filterConfig, currentAddress]);
 
-  // --- 2. 排序逻辑 (Sorting) ---
+  // --- 2. 排序逻辑 ---
   const processedRecords = useMemo(() => {
     if (!sortConfig.direction || !sortConfig.field) {
       return filteredRecords;
@@ -64,25 +53,47 @@ export const useNameTableLogic = (
     const sorted = [...filteredRecords];
     const { field, direction } = sortConfig;
 
-    // 辅助函数：安全获取用于排序的值
-    const getValue = (item: NameRecord) => {
+    // 🚀 修复：定义明确的返回值类型，避免使用 any
+    const getValue = (item: NameRecord): string | number | undefined | null => {
       if (field === "length") return item.label.length;
-      // 此时 field 是 NameRecord 的键
-      return item[field as keyof NameRecord];
+      if (field === "status") return item.expiryTime;
+
+      // 使用类型收窄确保 field 是 NameRecord 的有效键
+      const key = field as keyof NameRecord;
+      const value = item[key];
+
+      // 仅允许 string 或 number 参与排序比较
+      return typeof value === "string" || typeof value === "number"
+        ? value
+        : null;
     };
 
     sorted.sort((a, b) => {
       const aValue = getValue(a);
       const bValue = getValue(b);
 
-      // 统一处理 Null/Undefined (始终排在最后)
-      if (aValue === bValue) return 0;
-      if (aValue === null || aValue === undefined) return 1;
-      if (bValue === null || bValue === undefined) return -1;
+      // 🚀 修复：为比较参数定义明确的联合类型
+      const compare = (
+        valA: string | number | undefined | null,
+        valB: string | number | undefined | null,
+      ): number => {
+        if (valA === valB) return 0;
+        if (valA === null || valA === undefined) return 1;
+        if (valB === null || valB === undefined) return -1;
+        return valA < valB ? -1 : 1;
+      };
 
-      // 标准比较
-      if (aValue < bValue) return direction === "asc" ? -1 : 1;
-      if (aValue > bValue) return direction === "asc" ? 1 : -1;
+      const primaryDiff = compare(aValue, bValue);
+
+      if (primaryDiff !== 0) {
+        return direction === "asc" ? primaryDiff : -primaryDiff;
+      }
+
+      if (field !== "label") {
+        const secondaryDiff = compare(a.label, b.label);
+        return direction === "asc" ? secondaryDiff : -secondaryDiff;
+      }
+
       return 0;
     });
 
@@ -90,13 +101,13 @@ export const useNameTableLogic = (
   }, [filteredRecords, sortConfig]);
 
   // --- Handlers ---
-
   const handleSort = useCallback((field: SortField) => {
-    setSortConfig((prev) => ({
-      field,
-      direction:
-        prev.field === field && prev.direction === "asc" ? "desc" : "asc",
-    }));
+    setSortConfig((prev) => {
+      if (prev.field !== field) return { field, direction: "asc" };
+      if (prev.direction === "asc") return { field, direction: "desc" };
+      if (prev.direction === "desc") return { field, direction: null };
+      return { field, direction: "asc" };
+    });
   }, []);
 
   const toggleSelection = useCallback((label: string) => {
@@ -116,11 +127,9 @@ export const useNameTableLogic = (
   }, []);
 
   const toggleSelectAll = useCallback(() => {
-    // 仅针对当前视图中“可续费”的记录进行全选操作
     const renewableInView = processedRecords.filter((r) =>
       isRenewable(r.status),
     );
-
     if (renewableInView.length === 0) return;
 
     const allSelected = renewableInView.every((r) =>

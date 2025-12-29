@@ -1,22 +1,19 @@
 // src/pages/Home.tsx
 import { useState, useEffect, useMemo } from "react";
-// import { useQueryClient } from "@tanstack/react-query"; // 移除了未使用的引用
-import { useAccount } from "wagmi"; // 确保引入了 useAccount
+import { useAccount } from "wagmi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
   faRotate,
-  faTrash,
+  faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 
-// Components & Utils
 import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
-import { fetchLabels } from "../services/graph/fetchLabels"; // 确认路径
-
-// Hooks
+import { fetchLabels } from "../services/graph/fetchLabels";
+import { SearchHelpModal } from "../components/SearchHelpModal";
 import { useNameRecords } from "../hooks/useEnsData";
 import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
@@ -26,12 +23,12 @@ import type { NameRecord } from "../types/ensNames";
 export const Home = () => {
   const { address, isConnected } = useAccount();
 
-  // 1. 核心状态
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getStoredLabels(),
   );
 
-  // 2. 持久化
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
   useEffect(() => {
     saveStoredLabels(resolvedLabels);
   }, [resolvedLabels]);
@@ -39,25 +36,17 @@ export const Home = () => {
   const [inputValue, setInputValue] = useState("");
   const [isResolving, setIsResolving] = useState(false);
 
-  // 3. 数据钩子 (应用了 O(N) 优化的 Hook)
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
-  // 4. 客户端过滤：防止缓存数据“诈尸” (Double Safety)
   const validRecords = useMemo(() => {
     if (!records || resolvedLabels.length === 0) return [];
-
-    // 优化：将 resolvedLabels 转为 Set 避免重复遍历
     const currentLabelSet = new Set(resolvedLabels);
-
-    // 过滤掉不在当前列表中的旧缓存数据
     return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
-  // 5. 渐进式加载主域名
   const enrichedRecords = usePrimaryNames(validRecords);
 
-  // 6. 表格逻辑
   const {
     processedRecords,
     sortConfig,
@@ -73,33 +62,23 @@ export const Home = () => {
   const { renewBatch, isBusy: isRenewalBusy } = useEnsRenewal();
   const hasContent = resolvedLabels.length > 0;
 
-  // --- 交互处理 ---
-
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!inputValue.trim()) return;
 
     setIsResolving(true);
     try {
-      // Step 1: 解析输入
       const classified = parseAndClassifyInputs(inputValue);
-
-      // Step 2: 链上反查获取 labels
       const fetchedLabels = await fetchLabels(classified);
 
       if (fetchedLabels.length > 0) {
-        // 🚀 修复：在更新状态前，先利用当前的 resolvedLabels 计算新增项
-        // 这样既避免了在 setState 中执行副作用，又解决了 StrictMode 下的双重触发问题
         const currentSet = new Set(resolvedLabels);
         const newUniqueLabels = fetchedLabels.filter((l) => !currentSet.has(l));
 
         if (newUniqueLabels.length === 0) {
           toast("所有域名已存在列表中", { icon: "👌" });
-          // 这里不需要更新状态，直接返回即可
         } else {
-          // 执行状态更新
           setResolvedLabels((prev) => [...prev, ...newUniqueLabels]);
-          // 执行副作用 (Toast)
           toast.success(`成功添加 ${newUniqueLabels.length} 个域名`);
           setInputValue("");
         }
@@ -135,20 +114,20 @@ export const Home = () => {
   const handleBatchRenewal = () => {
     if (selectedLabels.size === 0) return;
     renewBatch(Array.from(selectedLabels), 31536000n).then(() => {
-      // Optional: 清空选择或保留
+      // optional
     });
   };
 
-  // 骨架屏显示逻辑
   const showSkeleton =
     isQuerying && resolvedLabels.length > 0 && validRecords.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
-      {/* 输入区域 (保持之前的样式不变) */}
       <div
-        className={`flex flex-col items-center transition-all duration-700 ease-in-out z-10 ${
-          hasContent ? "pt-8 mb-6" : "flex-1 justify-center -mt-60"
+        className={`flex flex-col items-center transition-all duration-700 ease-in-out z-40 ${
+          hasContent
+            ? "sticky top-0 py-4 mb-6 bg-background/80 backdrop-blur-md"
+            : "flex-1 justify-center -mt-60"
         }`}
       >
         {!hasContent && (
@@ -161,9 +140,17 @@ export const Home = () => {
           className={`relative w-full transition-all duration-500 ${hasContent ? "max-w-3xl" : "max-w-2xl"}`}
         >
           <div className="relative group">
+            <button
+              onClick={() => setIsHelpOpen(true)}
+              className="absolute left-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-yellow-100 hover:text-yellow-400 transition-all active:scale-95 z-10"
+              title="搜索帮助"
+            >
+              <FontAwesomeIcon icon={faLightbulb} size="sm" />
+            </button>
+
             <input
               type="text"
-              className="w-full h-14 pl-6 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
+              className="w-full h-14 pl-14 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
               placeholder={
                 hasContent
                   ? "继续添加域名..."
@@ -173,10 +160,11 @@ export const Home = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+
             <button
               onClick={() => handleSubmit()}
               disabled={!inputValue.trim() || isResolving}
-              className="absolute right-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-link text-white hover:bg-link-hover disabled:bg-gray-200 disabled:cursor-not-allowed transition-all active:scale-95 shadow-md"
+              className="absolute right-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-link text-white hover:bg-link-hover disabled:bg-gray-200 disabled:cursor-not-allowed transition-all active:scale-95"
             >
               {isResolving ? (
                 <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -185,31 +173,13 @@ export const Home = () => {
               )}
             </button>
           </div>
-
-          {hasContent && (
-            <div className="absolute -right-24 top-1/2 -translate-y-1/2 hidden xl:block">
-              <button
-                onClick={handleClearAll}
-                className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 transition-colors px-3 py-2 rounded-lg hover:bg-red-50"
-              >
-                <FontAwesomeIcon icon={faTrash} /> 清空列表
-              </button>
-            </div>
-          )}
+          {/* 🚀 移除旧的 Desktop 清空按钮 */}
         </div>
       </div>
 
-      {/* 结果展示区域 */}
       {hasContent && (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
-          <div className="flex justify-end mb-2 xl:hidden">
-            <button
-              onClick={handleClearAll}
-              className="text-xs text-gray-400 hover:text-red-500"
-            >
-              清空历史
-            </button>
-          </div>
+          {/* 🚀 移除旧的 Mobile 清空按钮 */}
 
           <NameTable
             records={processedRecords}
@@ -222,19 +192,19 @@ export const Home = () => {
             onFilterChange={setFilterConfig}
             canDelete={true}
             onDelete={handleDelete}
+            onClearAll={handleClearAll} // 🚀 传递清空逻辑
             selectedLabels={selectedLabels}
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}
             skeletonRows={5}
+            headerTop="88px"
           />
         </div>
       )}
 
-      {/* 批量续费 Bar (保持不变) */}
       {selectedLabels.size > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
-            {/* ... 内容保持不变 ... */}
             <span className="text-sm font-qs-medium text-gray-600">
               已选择{" "}
               <span className="text-link font-bold">{selectedLabels.size}</span>{" "}
@@ -262,6 +232,11 @@ export const Home = () => {
           </div>
         </div>
       )}
+
+      <SearchHelpModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+      />
     </div>
   );
 };

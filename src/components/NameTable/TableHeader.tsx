@@ -9,6 +9,7 @@ import {
   faSortAlphaUp,
   faUser,
   faCheck,
+  faTrash, // 🚀 1. 引入图标
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FilterDropdown } from "./FilterDropdown";
@@ -28,9 +29,10 @@ interface TableHeaderProps {
   showDelete?: boolean;
   isAllSelected?: boolean;
   onToggleSelectAll?: () => void;
-  // 🚀 明确接收 hasRenewable 属性
   hasRenewable?: boolean;
   hasRecords?: boolean;
+  topOffset?: string | number;
+  onClearAll?: () => void; // 🚀 2. 接收回调
 }
 
 const ThWrapper = ({
@@ -55,7 +57,10 @@ export const TableHeader = ({
   isConnected,
   isAllSelected,
   onToggleSelectAll,
-  hasRenewable, // 🚀 使用该属性控制复选框逻辑
+  hasRenewable,
+  showDelete,
+  topOffset = 0,
+  onClearAll, // 🚀 3. 解构
 }: TableHeaderProps) => {
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
@@ -81,14 +86,17 @@ export const TableHeader = ({
   };
 
   return (
-    <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm">
+    <thead
+      className="sticky z-20 bg-table-header backdrop-blur-sm transition-all duration-300"
+      style={{ top: topOffset }}
+    >
       <tr className="text-left">
-        {/* 1. 序号列 (居中) */}
+        {/* 1. 序号列 */}
         <th className="w-14">
           <ThWrapper className="justify-center">#</ThWrapper>
         </th>
 
-        {/* 2. 名称列 (左对齐) */}
+        {/* 2. 名称列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -133,7 +141,7 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 3. 状态列 (左对齐) */}
+        {/* 3. 状态列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -195,7 +203,7 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 4. 所有者列 (左对齐) */}
+        {/* 4. 所有者列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -242,12 +250,12 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 5. 信息列 (左对齐) */}
+        {/* 5. 信息列 */}
         <th>
           <ThWrapper>信息</ThWrapper>
         </th>
 
-        {/* 6. 操作列 (左对齐) */}
+        {/* 6. 操作列 */}
         <th>
           <ThWrapper>
             <div className="flex items-center gap-2">
@@ -256,9 +264,6 @@ export const TableHeader = ({
                 <div className="flex items-center">
                   <input
                     type="checkbox"
-                    // 🚀 核心逻辑修正：
-                    // 1. 如果未连接钱包，禁用
-                    // 2. 如果已连接但没有可续费的域名，禁用 (hasRenewable)
                     disabled={!isConnected || !hasRenewable}
                     className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
                       !isConnected || !hasRenewable
@@ -305,9 +310,22 @@ export const TableHeader = ({
           </ThWrapper>
         </th>
 
-        {/* 7. 删除列 (居中) */}
-        <th className="text-center">
-          <ThWrapper className="justify-center">删除</ThWrapper>
+        {/* 7. 删除列 (居中) - 🚀 4. 使用图标按钮并绑定清空事件 */}
+        <th className="text-center w-14">
+          <ThWrapper className="justify-center">
+            <button
+              onClick={showDelete ? onClearAll : undefined}
+              disabled={!showDelete}
+              className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
+                showDelete
+                  ? "text-link hover:bg-gray-50 cursor-pointer"
+                  : "text-gray-300 cursor-not-allowed opacity-50"
+              }`}
+              title={showDelete ? "清空所有记录" : "不可用"}
+            >
+              <FontAwesomeIcon icon={faTrash} size="sm" />
+            </button>
+          </ThWrapper>
         </th>
       </tr>
     </thead>
