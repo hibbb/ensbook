@@ -43,22 +43,25 @@ export const CollectionDetail = () => {
 
   const { renewBatch, isBusy } = useEnsRenewal();
 
-  // 🚀 核心逻辑：计算“有效选中项”
   // 目的：过滤掉可能存在于 selectedLabels 中但实际上不可续费的域名
-  const validSelection = useMemo(() => {
-    // 性能优化：如果没有任何选中项或记录为空，直接返回空数组
-    if (!processedRecords || selectedLabels.size === 0) return [];
-
-    // 1. 获取当前列表中的所有可续费域名集合 (Set 查找 O(1))
-    const renewableSet = new Set(
+  // 🚀 优化 1: 独立缓存“可续费域名集合”
+  // 只有当列表数据变化时才重新计算，勾选操作不会触发此计算
+  const renewableLabelSet = useMemo(() => {
+    if (!processedRecords) return new Set<string>();
+    return new Set(
       processedRecords.filter((r) => isRenewable(r.status)).map((r) => r.label),
     );
+  }, [processedRecords]);
 
-    // 2. 取交集：Selected ∩ Renewable
+  // 🚀 优化 2: 计算有效选中项
+  // 依赖 renewableLabelSet，每次勾选通过 Set 查找，性能极快 (O(1))
+  const validSelection = useMemo(() => {
+    if (selectedLabels.size === 0) return [];
+
     return Array.from(selectedLabels).filter((label) =>
-      renewableSet.has(label),
+      renewableLabelSet.has(label),
     );
-  }, [processedRecords, selectedLabels]);
+  }, [selectedLabels, renewableLabelSet]); // 依赖关系更清晰
 
   const selectionCount = validSelection.length;
 

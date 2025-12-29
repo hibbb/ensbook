@@ -1,6 +1,6 @@
 // src/components/NameTable/index.tsx
 
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, memo, useEffect } from "react";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import { isRenewable } from "../../utils/ens";
@@ -28,7 +28,17 @@ interface NameTableProps {
 }
 
 export const NameTable = memo((props: NameTableProps) => {
-  const [now] = useState(() => Math.floor(Date.now() / 1000));
+  // 1. 初始化状态
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+
+  // 🚀 修复：添加定时器，每秒更新 now 状态，驱动倒计时跳动
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Math.floor(Date.now() / 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const shouldShowSkeleton = props.isLoading || !props.records;
   const safeRecords = useMemo(() => props.records || [], [props.records]);
   const skeletonCount = props.skeletonRows || 8;
