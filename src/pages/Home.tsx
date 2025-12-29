@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useAccount } from "wagmi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -39,11 +39,29 @@ export const Home = () => {
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
+  // 🚀 优化：缓存上一次的有效数据
+  // 当进行删除操作导致 records 暂时变为 undefined 时，使用此缓存防止骨架屏闪烁
+  const previousRecordsRef = useRef<NameRecord[]>([]);
+
+  useEffect(() => {
+    if (records) {
+      previousRecordsRef.current = records;
+    }
+  }, [records]);
+
+  // 使用当前数据，如果为空则回退到缓存数据
+  const effectiveRecords = records || previousRecordsRef.current;
+
+  // 4. 客户端过滤 (基于 effectiveRecords 计算)
   const validRecords = useMemo(() => {
-    if (!records || resolvedLabels.length === 0) return [];
+    // 这里使用 effectiveRecords 而不是 records
+    if (!effectiveRecords || resolvedLabels.length === 0) return [];
+
     const currentLabelSet = new Set(resolvedLabels);
-    return records.filter((r) => currentLabelSet.has(r.label));
-  }, [records, resolvedLabels]);
+    // 即使使用旧数据 (effectiveRecords)，过滤逻辑 (currentLabelSet) 是新的
+    // 所以被删除的条目会立即从列表中消失，而不会闪烁
+    return effectiveRecords.filter((r) => currentLabelSet.has(r.label));
+  }, [effectiveRecords, resolvedLabels]);
 
   const enrichedRecords = usePrimaryNames(validRecords);
 
@@ -118,6 +136,8 @@ export const Home = () => {
     });
   };
 
+  // 骨架屏显示逻辑
+  // 只有在真的没有数据可显示时（初始加载），才显示骨架屏
   const showSkeleton =
     isQuerying && resolvedLabels.length > 0 && validRecords.length === 0;
 
