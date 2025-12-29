@@ -292,10 +292,10 @@ export const TableHeader = ({
                       }
                     >
                       {type === "all"
-                        ? "全部"
+                        ? "全部显示"
                         : type === "register"
-                          ? "注册"
-                          : "更新"}
+                          ? "可注册"
+                          : "可续费"}
                     </div>
                   ))}
                 </FilterDropdown>

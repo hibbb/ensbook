@@ -11,17 +11,13 @@ const LIMITS = {
   SAME: 5,
   LINK: 5,
   PURE: 500,
+  ADDRESS: 10, // 🚀 新增：限制单次查询的地址数量
 };
 
 const ETH_SUFFIX_REGEX = /\.eth$/i;
+// 🚀 新增：以太坊地址正则 (0x开头，后跟40位16进制字符)
+const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
-/**
- * 分隔符配置，定义用于拆分输入字符串的符号。
- * * ⚠️ 注意：
- * 1. 数组中的字符会直接拼接到正则的 [] 中。
- * 2. 如果需要添加减号 "-", 请务必将其放在数组的最后一位，或写成 "\\-"。
- * 3. "\\s" 代表所有空白字符（空格、换行、Tab等）。
- */
 const SEPARATORS = [
   ",", // 英文逗号
   "，", // 中文逗号
@@ -29,8 +25,6 @@ const SEPARATORS = [
   // ";", // 可选：分号
 ];
 
-// ⚡️ 自动构建拆分正则
-// 结果类似于: /[,，\s]+/
 const SPLIT_REGEX = new RegExp(`[${SEPARATORS.join("")}]+`);
 
 // 类型定义
@@ -38,6 +32,7 @@ export interface ClassifiedInputs {
   sameOwners: string[];
   linkOwners: string[];
   pureLabels: string[];
+  ethAddresses: string[]; // 🚀 新增字段
 }
 
 // ============================================================================
@@ -48,17 +43,15 @@ const validateAndNormalize = (
   rawInput: string,
   hasSuffix: boolean,
 ): string | null => {
-  // 长度检查
+  // ... (保持原有 validateAndNormalize 逻辑不变)
   const effectiveLength = hasSuffix ? rawInput.length - 4 : rawInput.length;
   if (effectiveLength < 3) return null;
 
-  // 标准化
   let normalizedName: string;
   try {
     normalizedName = normalize(rawInput);
   } catch (error) {
     console.error("规范化失败:", error);
-    // 优化：处理 Emoji 截断问题，并移除可能破坏 ID 的特殊符号
     const safeIdSnippet = Array.from(rawInput).slice(0, 10).join("");
     const toastId = `norm-error-${safeIdSnippet.replace(/[^a-zA-Z0-9]/g, "")}`;
 
@@ -70,16 +63,13 @@ const validateAndNormalize = (
     return null;
   }
 
-  // 结构检查 (禁止非法子域名)
   if (hasSuffix) {
     const firstDotIndex = normalizedName.indexOf(".");
     const lastDotIndex = normalizedName.lastIndexOf(".");
-    // 必须有且只有一个点，且该点不能是第一个字符
     if (firstDotIndex === -1 || firstDotIndex !== lastDotIndex) {
       return null;
     }
   } else {
-    // 纯 Label 不能包含任何点
     if (normalizedName.includes(".")) {
       return null;
     }
@@ -97,30 +87,31 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
     sameOwners: [],
     linkOwners: [],
     pureLabels: [],
+    ethAddresses: [], // 🚀 初始化
   };
 
   if (!rawInput || rawInput.length > 10000) {
     return result;
   }
 
-  // 使用动态生成的正则进行分割
   const parts = rawInput.split(SPLIT_REGEX);
 
   for (const rawPart of parts) {
     const part = rawPart.trim();
     if (!part) continue;
 
-    // 性能优化：检查桶是否已满
+    // 性能优化：检查所有桶是否已满
     if (
       result.sameOwners.length >= LIMITS.SAME &&
       result.linkOwners.length >= LIMITS.LINK &&
-      result.pureLabels.length >= LIMITS.PURE
+      result.pureLabels.length >= LIMITS.PURE &&
+      result.ethAddresses.length >= LIMITS.ADDRESS // 🚀 检查地址桶
     ) {
       break;
     }
 
-    // 内部处理函数
-    const tryAdd = (
+    // 辅助：添加普通 ENS 名称
+    const tryAddName = (
       targetArr: string[],
       name: string,
       limit: number,
@@ -133,23 +124,45 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
       }
     };
 
+    // 🚀 辅助：添加以太坊地址
+    const tryAddAddress = (address: string) => {
+      if (result.ethAddresses.length >= LIMITS.ADDRESS) return;
+      // 统一转小写以匹配 Graph 索引
+      const lowerAddr = address.toLowerCase();
+      if (!result.ethAddresses.includes(lowerAddr)) {
+        result.ethAddresses.push(lowerAddr);
+      }
+    };
+
     // 分类逻辑
     if (part.startsWith("@")) {
       let name = part.slice(1);
       if (name) {
-        if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
-        tryAdd(result.sameOwners, name, LIMITS.SAME, true);
+        // 🚀 优先检查是否为地址
+        if (ETH_ADDRESS_REGEX.test(name)) {
+          tryAddAddress(name);
+        } else {
+          // 不是地址，按原有 ENS 逻辑处理
+          if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
+          tryAddName(result.sameOwners, name, LIMITS.SAME, true);
+        }
       }
     } else if (part.startsWith("#")) {
       let name = part.slice(1);
       if (name) {
-        if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
-        tryAdd(result.linkOwners, name, LIMITS.LINK, true);
+        // 🚀 优先检查是否为地址
+        if (ETH_ADDRESS_REGEX.test(name)) {
+          tryAddAddress(name);
+        } else {
+          if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
+          tryAddName(result.linkOwners, name, LIMITS.LINK, true);
+        }
       }
     } else {
+      // 普通 Label
       const label = part.replace(ETH_SUFFIX_REGEX, "");
       if (label) {
-        tryAdd(result.pureLabels, label, LIMITS.PURE, false);
+        tryAddName(result.pureLabels, label, LIMITS.PURE, false);
       }
     }
   }

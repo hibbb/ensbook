@@ -40,7 +40,7 @@ export const isReleased = (status: NameRecord["status"]) =>
   status === "Released";
 export const isAvailable = (status: NameRecord["status"]) =>
   status === "Available";
-// isRenewable 判断当前用户是否应该看到“更新/续费”按钮
+// isRenewable 判断当前用户是否应该看到“续费”按钮
 export const isRenewable = (status: NameRecord["status"]) =>
   status === "Active" || status === "Grace";
 

@@ -75,7 +75,7 @@ export function useEnsRenewal() {
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
           loading: "续费交易确认中...",
-          success: `续费成功！${label}.eth 已更新`,
+          success: `续费成功！${label}.eth 已续费。`,
           error: "续费交易失败",
         });
 
