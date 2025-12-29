@@ -18,7 +18,7 @@ interface NameTableProps {
   onFilterChange: (config: FilterConfig) => void;
   canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
-  onClearAll?: () => void;
+  onBatchDelete?: (status?: string) => void;
   selectedLabels?: Set<string>;
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
@@ -40,17 +40,19 @@ export const NameTable = (props: NameTableProps) => {
   const shouldShowSkeleton = props.isLoading || !props.records;
   const skeletonCount = props.skeletonRows || 8;
 
-  // 🚀 核心修复：彻底移除 useMemo！
-  // 之前版本：const safeRecords = useMemo(() => props.records || [], [props.records]);
-  // 这会导致当 props.records 引用未变但内部对象属性（如 ownerPrimaryName）更新时，safeRecords 不更新。
-  // 修改后：直接赋值。配合上面的计时器重渲染，确保每一秒都能读取到对象的最新状态。
+  // 🚀 核心修复：直接赋值，不使用 useMemo
   const safeRecords = props.records || [];
 
-  // 这里其实不需要 useMemo，因为 safeRecords 已经是新的了，filter 开销很小。
-  // 为了彻底防止缓存陷阱，直接计算。
+  // 🚀 2. 移除 renewableRecords 的 useMemo
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
 
   const hasRenewableRecords = renewableRecords.length > 0;
+
+  // 🚀 3. 移除 uniqueStatuses 的 useMemo，改为直接计算
+  // 由于列表通常只有几百条，直接计算的开销极低，且能保证绝对的准确性
+  const statusSet = new Set<string>();
+  safeRecords.forEach((r) => statusSet.add(r.status));
+  const uniqueStatuses = Array.from(statusSet).sort();
 
   const isAllSelected =
     hasRenewableRecords &&
@@ -76,9 +78,11 @@ export const NameTable = (props: NameTableProps) => {
             hasRecords={safeRecords.length > 0}
             showDelete={props.canDelete}
             topOffset={props.headerTop}
-            onClearAll={props.onClearAll}
+            onBatchDelete={props.onBatchDelete}
+            uniqueStatuses={uniqueStatuses}
           />
           <tbody>
+            {/* ... 渲染逻辑保持不变 ... */}
             {shouldShowSkeleton ? (
               Array.from({ length: skeletonCount }).map((_, i) => (
                 <SkeletonRow key={i} />
@@ -86,7 +90,6 @@ export const NameTable = (props: NameTableProps) => {
             ) : safeRecords.length > 0 ? (
               safeRecords.map((r, i) => (
                 <TableRow
-                  // 使用 namehash 作为 key，确保 React 能正确追踪 DOM
                   key={r.namehash}
                   record={r}
                   index={i}
@@ -115,6 +118,8 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
+
+// ... SkeletonRow 保持不变
 
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">

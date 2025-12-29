@@ -19,6 +19,10 @@ import {
   type SortConfig,
   type FilterConfig,
 } from "./types";
+import {
+  STATUS_COLOR_BG_HOVER,
+  STATUS_COLOR_TEXT,
+} from "../../config/constants";
 
 interface TableHeaderProps {
   sortConfig: SortConfig;
@@ -32,7 +36,9 @@ interface TableHeaderProps {
   hasRenewable?: boolean;
   hasRecords?: boolean;
   topOffset?: string | number;
-  onClearAll?: () => void;
+  // 🚀 1. 更新接口定义
+  onBatchDelete?: (status?: string) => void;
+  uniqueStatuses?: string[]; // 接收计算好的状态列表
 }
 
 const ThWrapper = ({
@@ -60,7 +66,8 @@ export const TableHeader = ({
   hasRenewable,
   showDelete,
   topOffset = 0,
-  onClearAll,
+  onBatchDelete, // 🚀 2. 解构新 props
+  uniqueStatuses = [],
 }: TableHeaderProps) => {
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
@@ -168,7 +175,7 @@ export const TableHeader = ({
                 })()}
                 <FilterDropdown isActive={filterConfig.statusList.length > 0}>
                   <div
-                    className={`px-4 py-2 cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-link" : "text-gray-500"}`}
+                    className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 flex justify-between items-center ${filterConfig.statusList.length === 0 ? "text-link" : "text-gray-500"}`}
                     onClick={() =>
                       onFilterChange({ ...filterConfig, statusList: [] })
                     }
@@ -181,7 +188,7 @@ export const TableHeader = ({
                   {STATUS_OPTIONS.map((s) => (
                     <div
                       key={s}
-                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center text-text-main text-[11px]"
+                      className={`px-4 py-2 ${STATUS_COLOR_TEXT[s]} ${STATUS_COLOR_BG_HOVER[s]} cursor-pointer flex justify-between items-center text-sm`}
                       onClick={(e) => {
                         e.stopPropagation();
                         const newList = filterConfig.statusList.includes(s)
@@ -286,7 +293,7 @@ export const TableHeader = ({
                   {(["all", "register", "renew"] as const).map((type) => (
                     <div
                       key={type}
-                      className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-link bg-blue-50/50" : "text-gray-500"}`}
+                      className={`px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer ${filterConfig.actionType === type ? "text-link bg-blue-50/50" : "text-gray-500"}`}
                       onClick={() =>
                         onFilterChange({ ...filterConfig, actionType: type })
                       }
@@ -303,20 +310,59 @@ export const TableHeader = ({
             </div>
           </ThWrapper>
         </th>
-        <th className="text-center w-14">
+        {/* 7. 删除列 - 改造为悬停下拉菜单 */}
+        <th className="text-center w-14 relative">
           <ThWrapper className="justify-center">
-            <button
-              onClick={showDelete ? onClearAll : undefined}
-              disabled={!showDelete}
-              className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
-                showDelete
-                  ? "text-link hover:bg-gray-50 cursor-pointer"
-                  : "text-gray-300 cursor-not-allowed opacity-50"
-              }`}
-              title={showDelete ? "清空所有记录" : "不可用"}
-            >
-              <FontAwesomeIcon icon={faTrash} size="sm" />
-            </button>
+            {/* 使用 group/delete 控制下拉菜单的显示
+                      只有当 showDelete 为 true 时才启用交互
+                    */}
+            <div className={`relative ${showDelete ? "group/delete" : ""}`}>
+              {/* 触发器：垃圾桶图标 */}
+              <button
+                disabled={!showDelete}
+                className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
+                  showDelete
+                    ? "text-link hover:bg-gray-50 cursor-pointer" // 默认灰色，悬停变红
+                    : "text-gray-300 cursor-not-allowed opacity-50"
+                }`}
+              >
+                <FontAwesomeIcon icon={faTrash} size="sm" />
+              </button>
+
+              {/* 下拉菜单：悬停时显示 */}
+              {showDelete && onBatchDelete && (
+                <div className="absolute right-0 top-full mt-2 w-32 text-sm font-qs-regular bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 opacity-0 invisible group-hover/delete:opacity-100 group-hover/delete:visible transition-all duration-200 transform origin-top-right">
+                  {/* 列表项：按状态删除 */}
+                  {uniqueStatuses.length > 0 && (
+                    <>
+                      {uniqueStatuses.map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => onBatchDelete(status)}
+                          className={`w-full text-left px-4 py-2 transition-colors flex items-center justify-between group/item ${STATUS_COLOR_TEXT[status]} ${STATUS_COLOR_BG_HOVER[status]}`}
+                        >
+                          <span>{status}</span>
+                          {/* 悬停时显示小垃圾桶图标增强暗示 */}
+                          <FontAwesomeIcon
+                            icon={faTrash}
+                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                          />
+                        </button>
+                      ))}
+                      <div className="h-px bg-gray-100 my-1" />
+                    </>
+                  )}
+
+                  {/* 列表项：全部删除 */}
+                  <button
+                    onClick={() => onBatchDelete()} // 不传参表示全部删除
+                    className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
+                  >
+                    <span>全部清空</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </ThWrapper>
         </th>
       </tr>

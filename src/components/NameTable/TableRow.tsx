@@ -12,17 +12,10 @@ import { isRenewable } from "../../utils/ens";
 import { getAvailableLookups } from "../../utils/lookupProvider";
 import { usePremiumEthPrice } from "../../hooks/usePremiumEthPrice";
 import type { NameRecord } from "../../types/ensNames";
+import { STATUS_COLOR_BG, STATUS_COLOR_TEXT } from "../../config/constants";
 
 const STYLES = {
   cell: "h-12 flex items-center",
-};
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  Available: "bg-green-200 text-green-700",
-  Active: "bg-cyan-200 text-cyan-700",
-  Grace: "bg-yellow-200 text-yellow-700",
-  Premium: "bg-purple-200 text-purple-700",
-  Released: "bg-green-200 text-green-700",
 };
 
 const formatRemainingTime = (seconds: number) => {
@@ -72,7 +65,7 @@ export const TableRow = ({
   );
 
   const statusClass =
-    STATUS_COLOR_MAP[record.status] ||
+    STATUS_COLOR_BG[record.status] + " " + STATUS_COLOR_TEXT[record.status] ||
     "bg-gray-50 text-text-main border-table-border";
 
   const getStatusInfo = () => {

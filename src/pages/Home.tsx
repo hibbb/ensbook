@@ -122,10 +122,45 @@ export const Home = () => {
     }
   };
 
-  const handleClearAll = () => {
-    if (window.confirm("确定要清空所有历史记录吗？")) {
-      setResolvedLabels([]);
-      clearSelection();
+  // 🚀 1. 新增：批量删除处理函数
+  // status 参数：如果为空则为清空所有；如果有值则删除特定状态
+  const handleBatchDelete = (status?: string) => {
+    // 情况 A: 清空所有 (原 handleClearAll 逻辑)
+    if (!status) {
+      if (window.confirm("确定要清空所有历史记录吗？")) {
+        setResolvedLabels([]);
+        clearSelection();
+      }
+      return;
+    }
+
+    // 情况 B: 按状态删除
+    // 这里的 records 是 useNameRecords 返回的原始数据，包含了状态信息
+    if (!records) return;
+
+    if (window.confirm(`确定要删除所有状态为“${status}”的域名吗？`)) {
+      // 1. 找出所有匹配该状态的 label
+      const labelsToDelete = new Set(
+        records.filter((r) => r.status === status).map((r) => r.label),
+      );
+
+      // 2. 更新列表：保留不在删除集合中的域名
+      setResolvedLabels((prev) =>
+        prev.filter((label) => !labelsToDelete.has(label)),
+      );
+
+      // 3. 同步更新选中状态：如果被选中的域名被删除了，也要从选中集合中移除
+      if (selectedLabels.size > 0) {
+        // 这里可以直接调用 clearSelection 简单处理，或者精细化移除
+        // 为了体验平滑，我们精细化移除
+        labelsToDelete.forEach((label) => {
+          if (selectedLabels.has(label)) {
+            toggleSelection(label);
+          }
+        });
+      }
+
+      toast.success(`已删除所有 ${status} 域名`);
     }
   };
 
@@ -212,7 +247,7 @@ export const Home = () => {
             onFilterChange={setFilterConfig}
             canDelete={true}
             onDelete={handleDelete}
-            onClearAll={handleClearAll} // 🚀 传递清空逻辑
+            onBatchDelete={handleBatchDelete} // 🚀 传递新的批量删除回调 (替代原来的 onClearAll)
             selectedLabels={selectedLabels}
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}

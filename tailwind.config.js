@@ -8,6 +8,7 @@ export default {
         sans: ["qs-regular", "Inter", "system-ui", "sans-serif"],
         // 保留这些变体以备特殊需求
         "qs-light": ["qs-light", "sans-serif"],
+        "qs-regular": ["qs-regular", "sans-serif"],
         "qs-medium": ["qs-medium", "sans-serif"],
         "qs-semibold": ["qs-semibold", "sans-serif"],
       },
