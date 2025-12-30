@@ -7,13 +7,11 @@ import {
 
 const STORAGE_KEY_REG_PREFIX = "ens-reg-state-";
 const EXPIRATION_MS = 24 * 60 * 60 * 1000; // 24小时过期
-
 const isBrowser = () => typeof window !== "undefined";
+const getRegKey = (label: string) => `${STORAGE_KEY_REG_PREFIX}${label}`;
 
 const bigIntReplacer = (_: string, v: unknown) =>
   typeof v === "bigint" ? v.toString() : v;
-
-const getRegKey = (label: string) => `${STORAGE_KEY_REG_PREFIX}${label}`;
 
 /**
  * 🚀 修复 any：定义一个内部接口来描述序列化后的结构
@@ -120,6 +118,14 @@ export function removeRegistrationState(label: string) {
   }
 }
 
+/**
+ * 获取所有挂起的注册标签
+ * 🚀 优化：增加有效性检查
+ * 1. 必须未过期
+ * 2. 必须包含 commitTxHash 或 regTxHash (证明交易已发出)
+ * 如果只有 registration 参数但没有 Hash，说明用户在钱包签名阶段取消了，
+ * 这种状态无法“继续”，只能“重来”，因此不应视为 Pending。
+ */
 export function getAllPendingLabels(): Set<string> {
   if (!isBrowser()) return new Set();
   const pending = new Set<string>();
@@ -129,13 +135,23 @@ export function getAllPendingLabels(): Set<string> {
       const key = localStorage.key(i);
       if (key && key.startsWith(STORAGE_KEY_REG_PREFIX)) {
         const label = key.replace(STORAGE_KEY_REG_PREFIX, "");
-        if (getRegistrationState(label)) {
-          pending.add(label);
+        const state = getRegistrationState(label);
+
+        // 🚀 核心过滤逻辑
+        if (state) {
+          // 只有当存在链上交易哈希时，才认为是有效的“断点”
+          const hasChainInteraction = !!state.commitTxHash || !!state.regTxHash;
+
+          if (hasChainInteraction) {
+            pending.add(label);
+          } else {
+            // 可选：如果发现是无效的死数据（比如 create 了一半），可以在这里静默清理
+            // removeRegistrationState(label);
+          }
         }
       }
     }
   } catch (e) {
-    // 🚀 修复 any：明确捕获错误类型
     const error = e instanceof Error ? e.message : String(e);
     console.error("获取挂起任务失败:", error);
   }

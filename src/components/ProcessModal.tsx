@@ -9,7 +9,6 @@ import {
   faCircleNotch,
   faCheckCircle,
   faExclamationCircle,
-  faPersonRunning,
   faExternalLinkAlt,
   faWallet,
 } from "@fortawesome/free-solid-svg-icons";
