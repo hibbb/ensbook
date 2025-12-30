@@ -19,6 +19,9 @@ interface NameTableProps {
   canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
   onBatchDelete?: (status?: string) => void;
+  // 🚀 新增：透传回调接口
+  onRegister?: (record: NameRecord) => void;
+  onRenew?: (record: NameRecord) => void;
   selectedLabels?: Set<string>;
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
@@ -100,6 +103,9 @@ export const NameTable = (props: NameTableProps) => {
                   onDelete={props.onDelete}
                   isSelected={props.selectedLabels?.has(r.label)}
                   onToggleSelection={props.onToggleSelection}
+                  // 🚀 透传 props
+                  onRegister={props.onRegister}
+                  onRenew={props.onRenew}
                 />
               ))
             ) : (

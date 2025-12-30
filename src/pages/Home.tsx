@@ -17,6 +17,7 @@ import { SearchHelpModal } from "../components/SearchHelpModal";
 import { useNameRecords } from "../hooks/useEnsData";
 import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
+import { useEnsRegistration } from "../hooks/useEnsRegistration"; // 确保引入
 import { getStoredLabels, saveStoredLabels } from "../services/storage/labels";
 import type { NameRecord } from "../types/ensNames";
 
@@ -77,7 +78,9 @@ export const Home = () => {
     clearSelection,
   } = useNameTableLogic(enrichedRecords, address);
 
-  const { renewBatch, isBusy: isRenewalBusy } = useEnsRenewal();
+  // 1. 获取注册和续费的 Hook 方法
+  const { renewSingle, renewBatch, isBusy: isRenewalBusy } = useEnsRenewal();
+  const { startRegistration } = useEnsRegistration(); // 获取注册方法
   const hasContent = resolvedLabels.length > 0;
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -164,6 +167,19 @@ export const Home = () => {
     }
   };
 
+  // 🚀 新增：处理单个续费
+  const handleSingleRenew = (record: NameRecord) => {
+    // 默认续费 1 年 (31536000 秒)
+    // 如果未来有弹窗选择时长的需求，可以在这里唤起 Modal
+    renewSingle(record.label, 31536000n);
+  };
+
+  // 🚀 新增：处理单个注册
+  const handleSingleRegister = (record: NameRecord) => {
+    // 默认注册 1 年
+    startRegistration(record.label, 31536000n);
+  };
+
   const handleBatchRenewal = () => {
     if (selectedLabels.size === 0) return;
     renewBatch(Array.from(selectedLabels), 31536000n).then(() => {
@@ -248,6 +264,9 @@ export const Home = () => {
             canDelete={true}
             onDelete={handleDelete}
             onBatchDelete={handleBatchDelete} // 🚀 传递新的批量删除回调 (替代原来的 onClearAll)
+            // 🚀 传入新增的处理函数
+            onRegister={handleSingleRegister}
+            onRenew={handleSingleRenew}
             selectedLabels={selectedLabels}
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}

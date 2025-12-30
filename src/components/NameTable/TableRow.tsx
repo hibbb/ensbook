@@ -38,6 +38,9 @@ interface TableRowProps {
   isSelected?: boolean;
   onToggleSelection?: (label: string) => void;
   onDelete?: (record: NameRecord) => void;
+  // 🚀 新增：注册和续费的回调接口
+  onRegister?: (record: NameRecord) => void;
+  onRenew?: (record: NameRecord) => void;
 }
 
 // 🚀 修复：移除 memo，确保异步数据（如 ENS 名称）更新时组件能及时重渲染
@@ -52,6 +55,9 @@ export const TableRow = ({
   onDelete,
   isSelected,
   onToggleSelection,
+  // 🚀 解构新增的 props
+  onRegister,
+  onRenew,
 }: TableRowProps) => {
   const isMe =
     currentAddress &&
@@ -87,6 +93,18 @@ export const TableRow = ({
       return formatRemainingTime(record.releaseTime + PREMIUM_PERIOD - now);
 
     return null;
+  };
+
+  // 🚀 辅助：处理点击事件
+  const handleAction = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 防止触发行的点击事件（如果有的话）
+    if (!isConnected) return;
+
+    if (renewable) {
+      onRenew?.(record);
+    } else {
+      onRegister?.(record);
+    }
   };
 
   const displayInfo = getStatusInfo();
@@ -217,6 +235,7 @@ export const TableRow = ({
           )}
           <button
             disabled={!isConnected}
+            onClick={handleAction} // 🚀 绑定点击事件
             className={`
               text-sm tracking-wide transition-all active:scale-95
               ${

@@ -9,9 +9,11 @@ import { ENS_COLLECTIONS } from "../config/collections";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
 import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
+import { useEnsRegistration } from "../hooks/useEnsRegistration"; // 确保引入
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../utils/ens";
+import type { NameRecord } from "../types/ensNames";
 
 export const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +43,20 @@ export const CollectionDetail = () => {
     clearSelection,
   } = useNameTableLogic(records, address);
 
-  const { renewBatch, isBusy } = useEnsRenewal();
+  // 获取单个续费方法
+  const { renewBatch, renewSingle, isBusy } = useEnsRenewal();
+  const { startRegistration } = useEnsRegistration(); // 获取注册方法
+
+  // 🚀 新增：处理单个续费
+  const handleSingleRenew = (record: NameRecord) => {
+    renewSingle(record.label, 31536000n);
+  };
+
+  // 🚀 新增：处理单个注册
+  const handleSingleRegister = (record: NameRecord) => {
+    // 默认注册 1 年
+    startRegistration(record.label, 31536000n);
+  };
 
   // 目的：过滤掉可能存在于 selectedLabels 中但实际上不可续费的域名
   // 🚀 优化 1: 独立缓存“可续费域名集合”
@@ -99,6 +114,9 @@ export const CollectionDetail = () => {
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
+        // 🚀 传入新增的处理函数
+        onRegister={handleSingleRegister}
+        onRenew={handleSingleRenew}
       />
 
       {/* 底部悬浮操作栏 */}
