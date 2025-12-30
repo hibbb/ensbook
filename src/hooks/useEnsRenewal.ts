@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { usePublicClient, useAccount, useChainId } from "wagmi";
 import { normalize } from "viem/ens";
+import { type Hex } from "viem"; // 引入 Hex 类型
 import toast from "react-hot-toast";
 import { REFERRER_ADDRESS_HASH } from "../config/env";
 import {
@@ -22,6 +23,7 @@ export type RenewalStatus =
 
 export function useEnsRenewal() {
   const [status, setStatus] = useState<RenewalStatus>("idle");
+  const [txHash, setTxHash] = useState<Hex | null>(null); // 🚀 新增：交易哈希状态
   const publicClient = usePublicClient();
   const { address } = useAccount(); // ⚡️ 优化2：获取当前用户地址
   const chainId = useChainId();
@@ -34,6 +36,7 @@ export function useEnsRenewal() {
   // ⚡️ 优化3：提供重置状态的方法，方便 UI 重试
   const resetStatus = useCallback(() => {
     setStatus("idle");
+    setTxHash(null); // 重置哈希
   }, []);
 
   /**
@@ -48,6 +51,7 @@ export function useEnsRenewal() {
       }
 
       setStatus("loading");
+      setTxHash(null);
       const contractAddress = contracts.ETH_CONTROLLER_V3;
 
       try {
@@ -72,6 +76,7 @@ export function useEnsRenewal() {
           value: valueWithBuffer,
         });
 
+        setTxHash(hash); // 🚀 保存哈希
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
           loading: "续费交易确认中...",
@@ -149,6 +154,7 @@ export function useEnsRenewal() {
 
   return {
     status,
+    txHash, // 🚀 导出哈希
     renewSingle,
     renewBatch,
     resetStatus, // 导出重置方法

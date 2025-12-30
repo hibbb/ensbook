@@ -1,4 +1,5 @@
 // src/pages/Home.tsx
+
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useAccount } from "wagmi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,64 +9,79 @@ import {
   faLightbulb,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query"; // 🚀 1. 引入 QueryClient
 
+// Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
-import { parseAndClassifyInputs } from "../utils/parseInputs";
-import { fetchLabels } from "../services/graph/fetchLabels";
 import { SearchHelpModal } from "../components/SearchHelpModal";
+import { ProcessModal, type ProcessType } from "../components/ProcessModal";
+
+// Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
 import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
-import { useEnsRegistration } from "../hooks/useEnsRegistration"; // 确保引入
+import { useEnsRegistration } from "../hooks/useEnsRegistration";
+import { parseAndClassifyInputs } from "../utils/parseInputs";
+import { fetchLabels } from "../services/graph/fetchLabels";
 import { getStoredLabels, saveStoredLabels } from "../services/storage/labels";
+import { getAllPendingLabels } from "../services/storage/registration"; // 🚀 引入
+
+// Types
 import type { NameRecord } from "../types/ensNames";
 
 export const Home = () => {
   const { address, isConnected } = useAccount();
+  const queryClient = useQueryClient();
 
+  // ==========================================================================
+  // 1. 本地状态与存储
+  // ==========================================================================
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getStoredLabels(),
   );
-
+  const [inputValue, setInputValue] = useState("");
+  const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  // 流程控制状态：当前正在操作的目标（注册/续费/批量）
+  const [durationTarget, setDurationTarget] = useState<{
+    type: ProcessType;
+    record?: NameRecord;
+    labels?: string[];
+  } | null>(null);
 
   useEffect(() => {
     saveStoredLabels(resolvedLabels);
   }, [resolvedLabels]);
 
-  const [inputValue, setInputValue] = useState("");
-  const [isResolving, setIsResolving] = useState(false);
-
+  // ==========================================================================
+  // 2. 数据获取与处理
+  // ==========================================================================
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
-  // 🚀 优化：缓存上一次的有效数据
-  // 当进行删除操作导致 records 暂时变为 undefined 时，使用此缓存防止骨架屏闪烁
+  // 🚀 优化：防止删除时的骨架屏闪烁 (Keep Previous Data)
   const previousRecordsRef = useRef<NameRecord[]>([]);
-
   useEffect(() => {
     if (records) {
       previousRecordsRef.current = records;
     }
   }, [records]);
 
-  // 使用当前数据，如果为空则回退到缓存数据
   const effectiveRecords = records || previousRecordsRef.current;
 
-  // 4. 客户端过滤 (基于 effectiveRecords 计算)
+  // 客户端过滤：确保列表立即响应删除操作
   const validRecords = useMemo(() => {
-    // 这里使用 effectiveRecords 而不是 records
     if (!effectiveRecords || resolvedLabels.length === 0) return [];
-
     const currentLabelSet = new Set(resolvedLabels);
-    // 即使使用旧数据 (effectiveRecords)，过滤逻辑 (currentLabelSet) 是新的
-    // 所以被删除的条目会立即从列表中消失，而不会闪烁
     return effectiveRecords.filter((r) => currentLabelSet.has(r.label));
   }, [effectiveRecords, resolvedLabels]);
 
+  // 补全主域名信息
   const enrichedRecords = usePrimaryNames(validRecords);
 
+  // 表格逻辑 Hook (排序、过滤、多选)
   const {
     processedRecords,
     sortConfig,
@@ -78,11 +94,47 @@ export const Home = () => {
     clearSelection,
   } = useNameTableLogic(enrichedRecords, address);
 
-  // 1. 获取注册和续费的 Hook 方法
-  const { renewSingle, renewBatch, isBusy: isRenewalBusy } = useEnsRenewal();
-  const { startRegistration } = useEnsRegistration(); // 获取注册方法
+  // ==========================================================================
+  // 3. 区块链交互 Hooks
+  // ==========================================================================
+
+  // 续费 Hook
+  const {
+    renewSingle,
+    renewBatch,
+    status: renewalStatus,
+    txHash: renewalTxHash,
+    resetStatus: resetRenewal,
+    isBusy: isRenewalBusy,
+  } = useEnsRenewal();
+
+  // 注册 Hook
+  const {
+    startRegistration,
+    checkAndResume, // 🚀 确保解构出来
+    status: regStatus,
+    secondsLeft,
+    currentHash: regTxHash,
+    resetStatus: resetReg,
+    // 🚀 修复：移除未使用的 isRegBusy，解决 ESLint 警告
+  } = useEnsRegistration();
+
+  // 🚀 1. 管理挂起任务的状态
+  const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
+
+  // 🚀 2. 初始化和列表变化时，扫描本地存储
+  useEffect(() => {
+    // 每次 resolvedLabels 变化或完成一次注册后，都应该刷新一下
+    setPendingLabels(getAllPendingLabels());
+  }, [resolvedLabels, regStatus]); // 监听 regStatus，成功/失败后更新 UI
+
   const hasContent = resolvedLabels.length > 0;
 
+  // ==========================================================================
+  // 4. 事件处理函数
+  // ==========================================================================
+
+  // --- 搜索与添加 ---
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!inputValue.trim()) return;
@@ -118,6 +170,7 @@ export const Home = () => {
     if (e.key === "Enter") handleSubmit();
   };
 
+  // --- 删除操作 ---
   const handleDelete = (record: NameRecord) => {
     setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
     if (selectedLabels.has(record.label)) {
@@ -125,10 +178,8 @@ export const Home = () => {
     }
   };
 
-  // 🚀 1. 新增：批量删除处理函数
-  // status 参数：如果为空则为清空所有；如果有值则删除特定状态
   const handleBatchDelete = (status?: string) => {
-    // 情况 A: 清空所有 (原 handleClearAll 逻辑)
+    // 1. 清空所有
     if (!status) {
       if (window.confirm("确定要清空所有历史记录吗？")) {
         setResolvedLabels([]);
@@ -137,63 +188,109 @@ export const Home = () => {
       return;
     }
 
-    // 情况 B: 按状态删除
-    // 这里的 records 是 useNameRecords 返回的原始数据，包含了状态信息
+    // 2. 按状态删除
     if (!records) return;
-
     if (window.confirm(`确定要删除所有状态为“${status}”的域名吗？`)) {
-      // 1. 找出所有匹配该状态的 label
       const labelsToDelete = new Set(
         records.filter((r) => r.status === status).map((r) => r.label),
       );
 
-      // 2. 更新列表：保留不在删除集合中的域名
       setResolvedLabels((prev) =>
         prev.filter((label) => !labelsToDelete.has(label)),
       );
 
-      // 3. 同步更新选中状态：如果被选中的域名被删除了，也要从选中集合中移除
+      // 同步清理选中状态
       if (selectedLabels.size > 0) {
-        // 这里可以直接调用 clearSelection 简单处理，或者精细化移除
-        // 为了体验平滑，我们精细化移除
         labelsToDelete.forEach((label) => {
           if (selectedLabels.has(label)) {
             toggleSelection(label);
           }
         });
       }
-
       toast.success(`已删除所有 ${status} 域名`);
     }
   };
 
-  // 🚀 新增：处理单个续费
+  // --- 流程触发 (打开 Modal) ---
+  // 🚀 3. 修改单个注册处理逻辑
+  const handleSingleRegister = async (record: NameRecord) => {
+    // 检查是否是断点续传
+    if (pendingLabels.has(record.label)) {
+      // A. 断点续传逻辑
+
+      // 1. 设置当前目标，这将打开 ProcessModal
+      setDurationTarget({ type: "register", record });
+
+      // 2. 立即触发恢复逻辑
+      // 注意：checkAndResume 会更新 status，导致 ProcessModal 直接显示处理界面
+      await checkAndResume(record.label);
+    } else {
+      // B. 全新注册逻辑 (打开 Modal 选时长)
+      setDurationTarget({ type: "register", record });
+    }
+  };
+
   const handleSingleRenew = (record: NameRecord) => {
-    // 默认续费 1 年 (31536000 秒)
-    // 如果未来有弹窗选择时长的需求，可以在这里唤起 Modal
-    renewSingle(record.label, 31536000n);
+    setDurationTarget({ type: "renew", record });
   };
 
-  // 🚀 新增：处理单个注册
-  const handleSingleRegister = (record: NameRecord) => {
-    // 默认注册 1 年
-    startRegistration(record.label, 31536000n);
-  };
-
-  const handleBatchRenewal = () => {
+  const handleBatchRenewalTrigger = () => {
     if (selectedLabels.size === 0) return;
-    renewBatch(Array.from(selectedLabels), 31536000n).then(() => {
-      // optional
-    });
+    setDurationTarget({ type: "batch", labels: Array.from(selectedLabels) });
   };
+
+  // --- 流程确认 (Modal 回调) ---
+  const onDurationConfirm = (duration: bigint) => {
+    if (!durationTarget) return;
+
+    if (durationTarget.type === "register" && durationTarget.record) {
+      startRegistration(durationTarget.record.label, duration);
+    } else if (durationTarget.type === "renew" && durationTarget.record) {
+      renewSingle(durationTarget.record.label, duration);
+    } else if (durationTarget.type === "batch" && durationTarget.labels) {
+      renewBatch(durationTarget.labels, duration);
+    }
+  };
+
+  // --- 流程关闭与清理 ---
+  const handleCloseModal = () => {
+    setDurationTarget(null);
+    resetRenewal();
+    resetReg();
+  };
+
+  // 🚀 2. 监听交易成功，触发数据刷新
+  useEffect(() => {
+    if (regStatus === "success" || renewalStatus === "success") {
+      // 为了应对 Subgraph 索引延迟，我们在 2 秒后尝试第一次刷新
+      const timer = setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["name-records"] });
+      }, 2000);
+
+      // 如果数据非常重要，可以设置一个 10 秒后的二次刷新作为兜底
+      const deepTimer = setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["name-records"] });
+      }, 10000);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(deepTimer);
+      };
+    }
+  }, [regStatus, renewalStatus, queryClient]);
+
+  // 计算 Modal 需要的动态状态
+  const activeType = durationTarget?.type || "renew";
+  const activeStatus = activeType === "register" ? regStatus : renewalStatus;
+  const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
   // 骨架屏显示逻辑
-  // 只有在真的没有数据可显示时（初始加载），才显示骨架屏
   const showSkeleton =
     isQuerying && resolvedLabels.length > 0 && validRecords.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
+      {/* ================= Header & Search ================= */}
       <div
         className={`flex flex-col items-center transition-all duration-700 ease-in-out z-40 ${
           hasContent
@@ -208,7 +305,9 @@ export const Home = () => {
         )}
 
         <div
-          className={`relative w-full transition-all duration-500 ${hasContent ? "max-w-3xl" : "max-w-2xl"}`}
+          className={`relative w-full transition-all duration-500 ${
+            hasContent ? "max-w-3xl" : "max-w-2xl"
+          }`}
         >
           <div className="relative group">
             <button
@@ -244,14 +343,12 @@ export const Home = () => {
               )}
             </button>
           </div>
-          {/* 🚀 移除旧的 Desktop 清空按钮 */}
         </div>
       </div>
 
+      {/* ================= Main Table ================= */}
       {hasContent && (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
-          {/* 🚀 移除旧的 Mobile 清空按钮 */}
-
           <NameTable
             records={processedRecords}
             isLoading={showSkeleton}
@@ -263,19 +360,20 @@ export const Home = () => {
             onFilterChange={setFilterConfig}
             canDelete={true}
             onDelete={handleDelete}
-            onBatchDelete={handleBatchDelete} // 🚀 传递新的批量删除回调 (替代原来的 onClearAll)
-            // 🚀 传入新增的处理函数
-            onRegister={handleSingleRegister}
-            onRenew={handleSingleRenew}
+            onBatchDelete={handleBatchDelete}
             selectedLabels={selectedLabels}
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}
+            pendingLabels={pendingLabels} // 🚀 传入集合
+            onRegister={handleSingleRegister}
+            onRenew={handleSingleRenew}
             skeletonRows={5}
             headerTop="88px"
           />
         </div>
       )}
 
+      {/* ================= Bottom Floating Bar ================= */}
       {selectedLabels.size > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
@@ -285,18 +383,20 @@ export const Home = () => {
               个域名
             </span>
             <div className="h-4 w-px bg-gray-300 mx-1" />
+
             <button
-              onClick={handleBatchRenewal}
-              disabled={isRenewalBusy || !isConnected}
+              onClick={handleBatchRenewalTrigger}
+              disabled={!isConnected || isRenewalBusy}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold transition-all shadow-sm ${
-                isRenewalBusy || !isConnected
+                !isConnected || isRenewalBusy
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"
               }`}
             >
               <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
-              {isRenewalBusy ? "处理中..." : "批量续费 (1年)"}
+              批量续费
             </button>
+
             <button
               onClick={clearSelection}
               className="ml-2 text-xs text-gray-400 hover:text-gray-600 underline decoration-gray-300 underline-offset-2"
@@ -307,9 +407,27 @@ export const Home = () => {
         </div>
       )}
 
+      {/* ================= Modals ================= */}
       <SearchHelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
+      />
+
+      <ProcessModal
+        isOpen={!!durationTarget}
+        type={activeType}
+        status={activeStatus}
+        txHash={activeTxHash}
+        secondsLeft={secondsLeft}
+        title={
+          activeType === "register"
+            ? "设置注册时长"
+            : activeType === "batch"
+              ? `批量续费 (${durationTarget?.labels?.length}个)`
+              : "设置续费时长"
+        }
+        onClose={handleCloseModal}
+        onConfirm={onDurationConfirm}
       />
     </div>
   );

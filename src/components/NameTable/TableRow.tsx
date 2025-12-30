@@ -41,6 +41,7 @@ interface TableRowProps {
   // 🚀 新增：注册和续费的回调接口
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
+  isPending?: boolean; // 🚀 新增：是否处于断点续传状态
 }
 
 // 🚀 修复：移除 memo，确保异步数据（如 ENS 名称）更新时组件能及时重渲染
@@ -58,6 +59,7 @@ export const TableRow = ({
   // 🚀 解构新增的 props
   onRegister,
   onRenew,
+  isPending = false, // 解构默认值
 }: TableRowProps) => {
   const isMe =
     currentAddress &&
@@ -235,17 +237,25 @@ export const TableRow = ({
           )}
           <button
             disabled={!isConnected}
-            onClick={handleAction} // 🚀 绑定点击事件
+            onClick={handleAction}
             className={`
-              text-sm tracking-wide transition-all active:scale-95
-              ${
-                isConnected
-                  ? "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover"
-                  : "text-gray-400 cursor-not-allowed"
-              }
-            `}
+                        text-sm tracking-wide transition-all active:scale-95 flex items-center gap-1.5
+                        ${
+                          isConnected
+                            ? isPending // 🚀 状态分支
+                              ? "bg-orange-50 text-orange-500 border border-orange-200 px-3 py-1 rounded-lg hover:bg-orange-100 font-qs-bold" // 挂起状态样式
+                              : "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover" // 普通样式
+                            : "text-gray-400 cursor-not-allowed"
+                        }
+                      `}
           >
-            {isConnected ? (renewable ? "续费" : "注册") : "未连接"}
+            {isConnected
+              ? renewable
+                ? "续费"
+                : isPending // 🚀 显示不同文案
+                  ? "继续"
+                  : "注册"
+              : "未连接"}
           </button>
         </div>
       </td>

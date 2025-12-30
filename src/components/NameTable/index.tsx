@@ -27,6 +27,7 @@ interface NameTableProps {
   onToggleSelectAll?: () => void;
   skeletonRows?: number;
   headerTop?: string | number;
+  pendingLabels?: Set<string>; // 🚀 新增 prop
 }
 
 export const NameTable = (props: NameTableProps) => {
@@ -106,6 +107,8 @@ export const NameTable = (props: NameTableProps) => {
                   // 🚀 透传 props
                   onRegister={props.onRegister}
                   onRenew={props.onRenew}
+                  // 🚀 传递状态：判断当前 label 是否在挂起集合中
+                  isPending={props.pendingLabels?.has(r.label)}
                 />
               ))
             ) : (

@@ -25,6 +25,7 @@ import { validateLabel } from "../utils/validate";
 export function useEnsRegistration() {
   const [status, setStatus] = useState<RegistrationStatus>("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [currentHash, setCurrentHash] = useState<Hex | null>(null); // 🚀 新增：当前活跃的交易哈希
 
   // Ref: 存储注册参数，保证跨渲染周期的数据一致性
   const registrationDataRef = useRef<RegistrationStruct | null>(null);
@@ -47,6 +48,7 @@ export function useEnsRegistration() {
   const resetStatus = useCallback(() => {
     setStatus("idle");
     setSecondsLeft(0);
+    setCurrentHash(null); // 重置
     registrationDataRef.current = null;
   }, []);
 
@@ -62,6 +64,7 @@ export function useEnsRegistration() {
       // (由于 setStatus 是异步的，这里其实主要靠 status 状态机和 UI 禁用)
 
       setStatus("registering");
+      setCurrentHash(null);
       const contractAddress = contracts.ETH_CONTROLLER_V3;
 
       try {
@@ -83,6 +86,7 @@ export function useEnsRegistration() {
           value: priceWithBuffer,
         });
 
+        setCurrentHash(registerHash); // 🚀 设置注册哈希
         // 💾 Storage Update: 记录 regTxHash
         saveRegistrationState(params.label, { regTxHash: registerHash });
 
@@ -128,35 +132,51 @@ export function useEnsRegistration() {
         const label = normalize(rawLabel).replace(/\.eth$/, "");
         const result = await checkRegStatus(publicClient, label);
 
-        // 🛡️ 优化：如果检测到状态是 idle 且有 errorMessage (说明过期了)，主动清理脏数据
         if (result.status === "idle" && result.errorMessage) {
           removeRegistrationState(label);
-          toast.error(result.errorMessage); // 提示用户“Commit 已过期”
+          toast.error(result.errorMessage);
           return;
         }
 
         if (result.localState && result.localState.registration) {
           console.log("🔍 恢复状态:", result.status);
 
-          // 恢复内存数据
+          // 1. 恢复内存数据 (关键：没有这个 executeRegister 会失败)
           registrationDataRef.current = result.localState.registration;
-          setStatus(result.status);
 
+          // 2. 恢复 Hash 以便 UI 显示链接
+          if (result.status === "waiting_commit") {
+            setCurrentHash(result.localState.commitTxHash as Hex);
+          } else if (result.status === "waiting_register") {
+            setCurrentHash(result.localState.regTxHash as Hex);
+          } else {
+            setCurrentHash(null);
+          }
+
+          // 3. 更新 UI 状态
+          setStatus(result.status);
           if (result.errorMessage && result.status !== "idle") {
             toast.error(result.errorMessage);
           }
 
-          // 处理倒计时
+          // 4. 根据状态执行自动逻辑
           if (result.status === "counting_down") {
+            // 情况 A: 还在倒计时，恢复计时器
             setSecondsLeft(result.secondsLeft);
             startCountdown(result.secondsLeft, () => {
-              // 倒计时结束，自动触发
               if (registrationDataRef.current && isMounted.current) {
                 executeRegister(registrationDataRef.current);
               }
             });
           }
-          // 如果是 'registering'，不做自动操作，等待用户点击 UI 按钮
+          // 🚀 核心修复：情况 B: 冷却已结束 (registering)，立即发起交易
+          else if (result.status === "registering") {
+            console.log("⚡️ 自动发起最终注册交易...");
+            executeRegister(registrationDataRef.current);
+          }
+
+          // 情况 C: waiting_commit / waiting_register
+          // 这些状态只需要恢复显示，等待链上确认即可，无需操作
         }
       } catch (e) {
         console.error("恢复检查失败", e);
@@ -198,6 +218,7 @@ export function useEnsRegistration() {
       }
 
       setStatus("committing");
+      setCurrentHash(null);
       const secret = generateSecret();
       const referrer = REFERRER_ADDRESS_HASH;
 
@@ -233,6 +254,8 @@ export function useEnsRegistration() {
           functionName: "commit",
           args: [commitment],
         });
+
+        setCurrentHash(commitHash); // 🚀 设置 Commit 哈希
         saveRegistrationState(label, { commitTxHash: commitHash });
 
         setStatus("waiting_commit");
@@ -247,6 +270,7 @@ export function useEnsRegistration() {
 
         // 2. Countdown
         setStatus("counting_down");
+        setCurrentHash(null); // 倒计时阶段没有交易哈希
         const WAIT_SECONDS = 65;
         setSecondsLeft(WAIT_SECONDS);
 
@@ -285,6 +309,7 @@ export function useEnsRegistration() {
   return {
     status,
     secondsLeft,
+    currentHash, // 🚀 导出当前哈希
     startRegistration,
     checkAndResume,
     continueRegistration,

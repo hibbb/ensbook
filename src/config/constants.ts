@@ -2,11 +2,12 @@
  * 全局应用常量配置
  */
 
+// 🚀 定义默认时长常量（1年 = 31536000秒）
+export const DEFAULT_DURATION_SECONDS = 2592000n;
+export const SECONDS_PER_YEAR = 31536000n; // 365 * 24 * 60 * 60
+
 export const GRAPHQL_CONFIG = {
-  /**
-   * 每次从 Subgraph 获取数据的最大数量限制
-   * 默认 1000 是 The Graph 节点的常见分页上限
-   */
+  // 每次从 Subgraph 获取数据的最大数量限制，默认 1000 是 The Graph 节点的常见分页上限
   FETCH_LIMIT: 1000,
 };
 
