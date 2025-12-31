@@ -369,6 +369,8 @@ export const Home = () => {
             onRenew={handleSingleRenew}
             skeletonRows={5}
             headerTop="88px"
+            // 🚀 传入未经过滤的原始总数
+            totalRecordsCount={enrichedRecords?.length || 0}
           />
         </div>
       )}

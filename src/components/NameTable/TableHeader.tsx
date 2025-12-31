@@ -3,7 +3,8 @@
 import type { SortField, SortConfig, FilterConfig } from "./types";
 import { ThWrapper } from "./headers/ThWrapper";
 
-// 引入拆分后的 Header 组件
+// 引入所有拆分后的 Header 组件
+import { IndexHeader } from "./headers/IndexHeader"; // 🚀 新引入
 import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
@@ -24,6 +25,8 @@ interface TableHeaderProps {
   topOffset?: string | number;
   onBatchDelete?: (status?: string) => void;
   uniqueStatuses?: string[];
+  totalCount?: number;
+  filteredCount?: number;
 }
 
 export const TableHeader = ({
@@ -39,6 +42,8 @@ export const TableHeader = ({
   topOffset = 0,
   onBatchDelete,
   uniqueStatuses,
+  totalCount = 0,
+  filteredCount = 0,
 }: TableHeaderProps) => {
   const headerStyle = {
     "--header-offset":
@@ -51,9 +56,9 @@ export const TableHeader = ({
       style={headerStyle}
     >
       <tr className="text-left">
-        {/* 1. 序号 */}
-        <th className="w-14">
-          <ThWrapper className="justify-center">#</ThWrapper>
+        {/* 1. 序号/计数列 */}
+        <th className="w-14 text-center">
+          <IndexHeader totalCount={totalCount} filteredCount={filteredCount} />
         </th>
 
         {/* 2. 名称列 */}

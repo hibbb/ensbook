@@ -1,6 +1,6 @@
 // src/components/NameTable/index.tsx
 
-import { useState, useEffect } from "react"; // 🚀 1. 移除 useMemo 引用
+import { useState, useEffect } from "react";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import { isRenewable } from "../../utils/ens";
@@ -19,7 +19,6 @@ interface NameTableProps {
   canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
   onBatchDelete?: (status?: string) => void;
-  // 🚀 新增：透传回调接口
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   selectedLabels?: Set<string>;
@@ -27,7 +26,9 @@ interface NameTableProps {
   onToggleSelectAll?: () => void;
   skeletonRows?: number;
   headerTop?: string | number;
-  pendingLabels?: Set<string>; // 🚀 新增 prop
+  pendingLabels?: Set<string>;
+  // 🚀 新增：接收从父组件传入的原始总数
+  totalRecordsCount?: number;
 }
 
 export const NameTable = (props: NameTableProps) => {
@@ -44,16 +45,13 @@ export const NameTable = (props: NameTableProps) => {
   const shouldShowSkeleton = props.isLoading || !props.records;
   const skeletonCount = props.skeletonRows || 8;
 
-  // 🚀 核心修复：直接赋值，不使用 useMemo
   const safeRecords = props.records || [];
 
-  // 🚀 2. 移除 renewableRecords 的 useMemo
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
 
   const hasRenewableRecords = renewableRecords.length > 0;
 
-  // 🚀 3. 移除 uniqueStatuses 的 useMemo，改为直接计算
-  // 由于列表通常只有几百条，直接计算的开销极低，且能保证绝对的准确性
+  // 计算唯一状态列表
   const statusSet = new Set<string>();
   safeRecords.forEach((r) => statusSet.add(r.status));
   const uniqueStatuses = Array.from(statusSet).sort();
@@ -68,7 +66,7 @@ export const NameTable = (props: NameTableProps) => {
       <div className="overflow-x-auto lg:overflow-visible">
         <table
           className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background
-          [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-2.5"
+          [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3.5"
         >
           <TableHeader
             sortConfig={props.sortConfig}
@@ -84,9 +82,13 @@ export const NameTable = (props: NameTableProps) => {
             topOffset={props.headerTop}
             onBatchDelete={props.onBatchDelete}
             uniqueStatuses={uniqueStatuses}
+            // 🚀 核心修改：传递计数信息给表头
+            // filteredCount: 当前表格实际渲染的行数 (safeRecords 是经过筛选后的)
+            filteredCount={safeRecords.length}
+            // totalCount: 优先使用父组件传来的原始总数，如果没有则回退到当前行数
+            totalCount={props.totalRecordsCount ?? safeRecords.length}
           />
           <tbody>
-            {/* ... 渲染逻辑保持不变 ... */}
             {shouldShowSkeleton ? (
               Array.from({ length: skeletonCount }).map((_, i) => (
                 <SkeletonRow key={i} />
@@ -104,10 +106,8 @@ export const NameTable = (props: NameTableProps) => {
                   onDelete={props.onDelete}
                   isSelected={props.selectedLabels?.has(r.label)}
                   onToggleSelection={props.onToggleSelection}
-                  // 🚀 透传 props
                   onRegister={props.onRegister}
                   onRenew={props.onRenew}
-                  // 🚀 传递状态：判断当前 label 是否在挂起集合中
                   isPending={props.pendingLabels?.has(r.label)}
                 />
               ))
@@ -127,8 +127,6 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
-
-// ... SkeletonRow 保持不变
 
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">

@@ -231,6 +231,8 @@ export const CollectionDetail = () => {
         onRenew={handleSingleRenew}
         // 🚀 传递断点续传状态
         pendingLabels={pendingLabels}
+        // 🚀 传入未经过滤的原始总数
+        totalRecordsCount={records?.length || 0}
       />
 
       {/* 底部悬浮操作栏 */}
