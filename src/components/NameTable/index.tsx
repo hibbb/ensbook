@@ -9,6 +9,7 @@ import type { SortField, SortConfig, FilterConfig } from "./types";
 
 interface NameTableProps {
   records: NameRecord[] | undefined | null;
+  // ... 其他 props 保持不变
   isLoading: boolean;
   currentAddress?: string;
   isConnected: boolean;
@@ -27,12 +28,13 @@ interface NameTableProps {
   skeletonRows?: number;
   headerTop?: string | number;
   pendingLabels?: Set<string>;
-  // 🚀 新增：接收从父组件传入的原始总数
   totalRecordsCount?: number;
+  // 🚀 新增：接收计数数据
+  statusCounts?: Record<string, number>;
+  actionCounts?: { all: number; register: number; renew: number };
 }
 
 export const NameTable = (props: NameTableProps) => {
-  // 1. 计时器：每秒更新 now，这会强制组件重渲染
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
   useEffect(() => {
@@ -44,14 +46,11 @@ export const NameTable = (props: NameTableProps) => {
 
   const shouldShowSkeleton = props.isLoading || !props.records;
   const skeletonCount = props.skeletonRows || 8;
-
   const safeRecords = props.records || [];
-
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
-
   const hasRenewableRecords = renewableRecords.length > 0;
 
-  // 计算唯一状态列表
+  // 状态集合计算保持不变 (用于 DeleteHeader 的可见性)
   const statusSet = new Set<string>();
   safeRecords.forEach((r) => statusSet.add(r.status));
   const uniqueStatuses = Array.from(statusSet).sort();
@@ -64,10 +63,7 @@ export const NameTable = (props: NameTableProps) => {
   return (
     <div className="bg-table-row rounded-xl border border-gray-100 relative">
       <div className="overflow-x-auto lg:overflow-visible">
-        <table
-          className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background
-          [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3.5"
-        >
+        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-2.5">
           <TableHeader
             sortConfig={props.sortConfig}
             onSort={props.onSort}
@@ -82,12 +78,13 @@ export const NameTable = (props: NameTableProps) => {
             topOffset={props.headerTop}
             onBatchDelete={props.onBatchDelete}
             uniqueStatuses={uniqueStatuses}
-            // 🚀 核心修改：传递计数信息给表头
-            // filteredCount: 当前表格实际渲染的行数 (safeRecords 是经过筛选后的)
             filteredCount={safeRecords.length}
-            // totalCount: 优先使用父组件传来的原始总数，如果没有则回退到当前行数
             totalCount={props.totalRecordsCount ?? safeRecords.length}
+            // 🚀 透传计数
+            statusCounts={props.statusCounts}
+            actionCounts={props.actionCounts}
           />
+          {/* tbody 保持不变 */}
           <tbody>
             {shouldShowSkeleton ? (
               Array.from({ length: skeletonCount }).map((_, i) => (
@@ -127,7 +124,7 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
-
+// ... SkeletonRow 略 ...
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>

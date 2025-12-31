@@ -92,6 +92,9 @@ export const Home = () => {
     toggleSelection,
     toggleSelectAll,
     clearSelection,
+    // 🚀 新增：解构出计数统计
+    statusCounts,
+    actionCounts,
   } = useNameTableLogic(enrichedRecords, address);
 
   // ==========================================================================
@@ -371,6 +374,9 @@ export const Home = () => {
             headerTop="88px"
             // 🚀 传入未经过滤的原始总数
             totalRecordsCount={enrichedRecords?.length || 0}
+            // 🚀 新增：透传计数数据
+            statusCounts={statusCounts}
+            actionCounts={actionCounts}
           />
         </div>
       )}

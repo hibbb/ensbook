@@ -5,6 +5,9 @@ import type { NameRecord } from "../../types/ensNames";
 import { isRenewable } from "../../utils/ens";
 import type { SortField, SortConfig, FilterConfig } from "./types";
 
+// 1. 定义排序值的联合类型
+type SortableValue = string | number | null | undefined;
+
 export const useNameTableLogic = (
   records: NameRecord[] | undefined,
   currentAddress?: string,
@@ -22,22 +25,64 @@ export const useNameTableLogic = (
 
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
 
-  // --- 1. 过滤逻辑 ---
-  // 🚀 核心修复：彻底移除 useMemo！
-  // 恢复为普通函数调用。这样只要组件重渲染（包括父组件传入了更新后的对象），
-  // 这里就会重新执行过滤，确保拿到最新的 ownerPrimaryName。
-  const filteredRecords = useMemo(() => {
-    if (!records) return [];
+  // 🚀 核心修复：在 useMemo 外部解构，确保依赖项精确且无 lint 警告
+  const { statusList, actionType, onlyMe } = filterConfig;
 
-    const { statusList, onlyMe, actionType } = filterConfig;
-    const hasStatusFilter = statusList.length > 0;
+  // --- 1. 基础过滤 (Base Filter) ---
+  const baseRecords = useMemo(() => {
+    if (!records) return [];
     const lowerCurrentAddress = currentAddress?.toLowerCase();
 
-    return records.filter((record) => {
-      if (hasStatusFilter && !statusList.includes(record.status)) return false;
-      if (onlyMe && lowerCurrentAddress) {
-        if (record.owner?.toLowerCase() !== lowerCurrentAddress) return false;
+    if (onlyMe && lowerCurrentAddress) {
+      return records.filter(
+        (r) => r.owner?.toLowerCase() === lowerCurrentAddress,
+      );
+    }
+    return records;
+  }, [records, onlyMe, currentAddress]);
+
+  // --- 2. 统计计数 (Counts Calculation) ---
+  const { statusCounts, actionCounts } = useMemo(() => {
+    // 2.1 计算状态计数
+    const statusCounts: Record<string, number> = {};
+    const recordsForStatus = baseRecords.filter((r) => {
+      if (actionType === "all") return true;
+      const renewable = isRenewable(r.status);
+      return actionType === "renew" ? renewable : !renewable;
+    });
+    recordsForStatus.forEach((r) => {
+      statusCounts[r.status] = (statusCounts[r.status] || 0) + 1;
+    });
+
+    // 2.2 计算操作计数
+    const recordsForAction = baseRecords.filter((r) => {
+      if (statusList.length === 0) return true;
+      return statusList.includes(r.status);
+    });
+    const registerCount = recordsForAction.filter(
+      (r) => !isRenewable(r.status),
+    ).length;
+    const renewCount = recordsForAction.filter((r) =>
+      isRenewable(r.status),
+    ).length;
+
+    const counts = {
+      all: recordsForAction.length,
+      register: registerCount,
+      renew: renewCount,
+    };
+
+    return { statusCounts, actionCounts: counts };
+  }, [baseRecords, statusList, actionType]);
+
+  // --- 3. 最终表格数据过滤 ---
+  const filteredRecords = useMemo(() => {
+    return baseRecords.filter((record) => {
+      // 状态过滤
+      if (statusList.length > 0 && !statusList.includes(record.status)) {
+        return false;
       }
+      // 操作类型过滤
       if (actionType !== "all") {
         const renewable = isRenewable(record.status);
         if (actionType === "renew" && !renewable) return false;
@@ -45,12 +90,10 @@ export const useNameTableLogic = (
       }
       return true;
     });
-  }, [records, filterConfig, currentAddress]);
+  }, [baseRecords, statusList, actionType]);
 
-  // --- 2. 排序逻辑 ---
-  // 🚀 核心修复：彻底移除 useMemo！
+  // --- 4. 排序逻辑 ---
   const processedRecords = useMemo(() => {
-    // 如果没有排序方向，直接返回过滤后的结果（默认顺序）
     if (!sortConfig.direction || !sortConfig.field) {
       return filteredRecords;
     }
@@ -58,7 +101,7 @@ export const useNameTableLogic = (
     const sorted = [...filteredRecords];
     const { field, direction } = sortConfig;
 
-    const getValue = (item: NameRecord): string | number | undefined | null => {
+    const getValue = (item: NameRecord): SortableValue => {
       if (field === "length") return item.label.length;
       if (field === "status") return item.expiryTime;
 
@@ -74,34 +117,21 @@ export const useNameTableLogic = (
       const aValue = getValue(a);
       const bValue = getValue(b);
 
-      const compare = (
-        valA: string | number | undefined | null,
-        valB: string | number | undefined | null,
-      ): number => {
+      const compare = (valA: SortableValue, valB: SortableValue) => {
         if (valA === valB) return 0;
-        if (valA === null || valA === undefined) return 1;
-        if (valB === null || valB === undefined) return -1;
+        if (valA == null) return 1;
+        if (valB == null) return -1;
         return valA < valB ? -1 : 1;
       };
 
-      const primaryDiff = compare(aValue, bValue);
-
-      if (primaryDiff !== 0) {
-        return direction === "asc" ? primaryDiff : -primaryDiff;
-      }
-
-      if (field !== "label") {
-        const secondaryDiff = compare(a.label, b.label);
-        return direction === "asc" ? secondaryDiff : -secondaryDiff;
-      }
-
-      return 0;
+      const diff = compare(aValue, bValue);
+      return direction === "asc" ? diff : -diff;
     });
 
     return sorted;
   }, [filteredRecords, sortConfig]);
 
-  // --- Handlers (保持不变) ---
+  // ... Handlers ...
   const handleSort = useCallback((field: SortField) => {
     setSortConfig((prev) => {
       if (prev.field !== field) return { field, direction: "asc" };
@@ -115,29 +145,22 @@ export const useNameTableLogic = (
   const toggleSelection = useCallback((label: string) => {
     setSelectedLabels((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(label)) {
-        newSet.delete(label);
-      } else {
-        newSet.add(label);
-      }
+      if (newSet.has(label)) newSet.delete(label);
+      else newSet.add(label);
       return newSet;
     });
   }, []);
 
-  const clearSelection = useCallback(() => {
-    setSelectedLabels(new Set());
-  }, []);
+  const clearSelection = useCallback(() => setSelectedLabels(new Set()), []);
 
   const toggleSelectAll = useCallback(() => {
     const renewableInView = processedRecords.filter((r) =>
       isRenewable(r.status),
     );
     if (renewableInView.length === 0) return;
-
     const allSelected = renewableInView.every((r) =>
       selectedLabels.has(r.label),
     );
-
     if (allSelected) {
       clearSelection();
     } else {
@@ -159,5 +182,7 @@ export const useNameTableLogic = (
     toggleSelection,
     toggleSelectAll,
     clearSelection,
+    statusCounts,
+    actionCounts,
   };
 };

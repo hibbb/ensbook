@@ -4,7 +4,7 @@ import type { SortField, SortConfig, FilterConfig } from "./types";
 import { ThWrapper } from "./headers/ThWrapper";
 
 // 引入所有拆分后的 Header 组件
-import { IndexHeader } from "./headers/IndexHeader"; // 🚀 新引入
+import { IndexHeader } from "./headers/IndexHeader";
 import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
@@ -27,6 +27,8 @@ interface TableHeaderProps {
   uniqueStatuses?: string[];
   totalCount?: number;
   filteredCount?: number;
+  statusCounts?: Record<string, number>;
+  actionCounts?: { all: number; register: number; renew: number };
 }
 
 export const TableHeader = ({
@@ -44,6 +46,8 @@ export const TableHeader = ({
   uniqueStatuses,
   totalCount = 0,
   filteredCount = 0,
+  statusCounts = {},
+  actionCounts = { all: 0, register: 0, renew: 0 },
 }: TableHeaderProps) => {
   const headerStyle = {
     "--header-offset":
@@ -56,27 +60,24 @@ export const TableHeader = ({
       style={headerStyle}
     >
       <tr className="text-left">
-        {/* 1. 序号/计数列 */}
         <th className="w-14 text-center">
           <IndexHeader totalCount={totalCount} filteredCount={filteredCount} />
         </th>
 
-        {/* 2. 名称列 */}
         <th>
           <NameHeader sortConfig={sortConfig} onSort={onSort} />
         </th>
 
-        {/* 3. 状态列 */}
         <th>
           <StatusHeader
             sortConfig={sortConfig}
             filterConfig={filterConfig}
             onSort={onSort}
             onFilterChange={onFilterChange}
+            statusCounts={statusCounts}
           />
         </th>
 
-        {/* 4. 所有者列 */}
         <th>
           <OwnerHeader
             sortConfig={sortConfig}
@@ -87,12 +88,10 @@ export const TableHeader = ({
           />
         </th>
 
-        {/* 5. 信息列 (静态) */}
         <th>
           <ThWrapper>信息</ThWrapper>
         </th>
 
-        {/* 6. 操作列 */}
         <th>
           <ActionHeader
             filterConfig={filterConfig}
@@ -101,15 +100,16 @@ export const TableHeader = ({
             isAllSelected={isAllSelected}
             hasRenewable={hasRenewable}
             onToggleSelectAll={onToggleSelectAll}
+            actionCounts={actionCounts}
           />
         </th>
 
-        {/* 7. 删除列 */}
         <th className="text-center w-14 relative">
           <DeleteHeader
             showDelete={showDelete}
             onBatchDelete={onBatchDelete}
             uniqueStatuses={uniqueStatuses}
+            statusCounts={statusCounts} // 🚀 透传 statusCounts
           />
         </th>
       </tr>

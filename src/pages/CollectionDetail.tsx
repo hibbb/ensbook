@@ -53,6 +53,9 @@ export const CollectionDetail = () => {
     toggleSelection,
     toggleSelectAll,
     clearSelection,
+    // 🚀 新增：解构出计数统计
+    statusCounts,
+    actionCounts,
   } = useNameTableLogic(records, address);
 
   // ==========================================================================
@@ -233,6 +236,9 @@ export const CollectionDetail = () => {
         pendingLabels={pendingLabels}
         // 🚀 传入未经过滤的原始总数
         totalRecordsCount={records?.length || 0}
+        // 🚀 新增：透传计数数据
+        statusCounts={statusCounts}
+        actionCounts={actionCounts}
       />
 
       {/* 底部悬浮操作栏 */}
