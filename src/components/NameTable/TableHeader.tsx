@@ -29,6 +29,12 @@ interface TableHeaderProps {
   filteredCount?: number;
   statusCounts?: Record<string, number>;
   actionCounts?: { all: number; register: number; renew: number };
+  // 🚀 新增
+  nameCounts?: {
+    lengthCounts: Record<number, number>;
+    availableLengths: number[];
+    wrappedCounts: { all: number; wrapped: number; unwrapped: number };
+  };
 }
 
 export const TableHeader = ({
@@ -48,6 +54,12 @@ export const TableHeader = ({
   filteredCount = 0,
   statusCounts = {},
   actionCounts = { all: 0, register: 0, renew: 0 },
+  // 🚀 默认值
+  nameCounts = {
+    lengthCounts: {},
+    availableLengths: [],
+    wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
+  },
 }: TableHeaderProps) => {
   const headerStyle = {
     "--header-offset":
@@ -65,7 +77,14 @@ export const TableHeader = ({
         </th>
 
         <th>
-          <NameHeader sortConfig={sortConfig} onSort={onSort} />
+          <NameHeader
+            sortConfig={sortConfig}
+            onSort={onSort}
+            // 🚀 透传配置
+            filterConfig={filterConfig}
+            onFilterChange={onFilterChange}
+            nameCounts={nameCounts}
+          />
         </th>
 
         <th>

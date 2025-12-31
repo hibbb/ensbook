@@ -32,6 +32,12 @@ interface NameTableProps {
   // 🚀 新增：接收计数数据
   statusCounts?: Record<string, number>;
   actionCounts?: { all: number; register: number; renew: number };
+  // 🚀 新增
+  nameCounts?: {
+    lengthCounts: Record<number, number>;
+    availableLengths: number[];
+    wrappedCounts: { all: number; wrapped: number; unwrapped: number };
+  };
 }
 
 export const NameTable = (props: NameTableProps) => {
@@ -83,6 +89,7 @@ export const NameTable = (props: NameTableProps) => {
             // 🚀 透传计数
             statusCounts={props.statusCounts}
             actionCounts={props.actionCounts}
+            nameCounts={props.nameCounts}
           />
           {/* tbody 保持不变 */}
           <tbody>

@@ -56,6 +56,7 @@ export const CollectionDetail = () => {
     // 🚀 新增：解构出计数统计
     statusCounts,
     actionCounts,
+    nameCounts, // 🚀 从 hook 解构
   } = useNameTableLogic(records, address);
 
   // ==========================================================================
@@ -239,6 +240,7 @@ export const CollectionDetail = () => {
         // 🚀 新增：透传计数数据
         statusCounts={statusCounts}
         actionCounts={actionCounts}
+        nameCounts={nameCounts} // 🚀 传入组件
       />
 
       {/* 底部悬浮操作栏 */}
