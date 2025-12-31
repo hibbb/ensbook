@@ -59,7 +59,7 @@ export const ActionCell = ({
       return {
         text: "继续",
         style:
-          "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-lg hover:bg-orange-100 font-qs-bold shadow-sm",
+          "bg-orange-50 text-orange-600 border border-orange-200 px-2 py-1 rounded-lg hover:bg-orange-100 font-qs-bold shadow-sm",
         icon: faClock,
         disabled: false,
         action: () => onRegister?.(record), // 继续注册也是调用的 register 接口，由父组件判断进入 resume 流程

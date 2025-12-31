@@ -9,11 +9,7 @@ interface NameCellProps {
 export const NameCell = ({ record }: NameCellProps) => {
   return (
     <div className="h-12 flex items-center">
-      <div
-        className={`flex flex-col justify-center ${
-          record.wrapped ? "px-1 border border-link/70 bg-link/5" : ""
-        }`}
-      >
+      <div className="flex flex-col justify-center">
         <a
           href={`https://app.ens.domains/${record.label}.eth`}
           target="_blank"
@@ -21,10 +17,16 @@ export const NameCell = ({ record }: NameCellProps) => {
           className="flex items-center gap-1 group/name"
           title="在 ENS 官网查看详情"
         >
+          {record.wrapped && (
+            <span className="text-xs font-qs-regular text-link">{"<"}</span>
+          )}
           <span className="text-base font-qs-medium tracking-tight text-text-main">
             {record.label}
           </span>
           <span className="text-sm font-qs-regular text-gray-400">.eth</span>
+          {record.wrapped && (
+            <span className="text-xs font-qs-regular text-link">{">"}</span>
+          )}
           <FontAwesomeIcon
             icon={faUpRightFromSquare}
             className="text-[10px] text-link opacity-0 group-hover/name:opacity-100 transition-opacity duration-200"

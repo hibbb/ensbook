@@ -73,7 +73,7 @@ export const ProcessModal = ({
   // 渲染内容：设置时长 (Step 1)
   const renderSettings = () => (
     <div className="animate-in slide-in-from-right-4 duration-300">
-      <div className="flex items-center justify-between bg-gray-50 rounded-2xl p-4 mb-8">
+      <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-8">
         <button
           onClick={() => setYears(Math.max(1, years - 1))}
           className="w-12 h-12 flex items-center justify-center rounded-xl bg-white shadow-sm text-link hover:bg-link hover:text-white transition-all active:scale-90"
@@ -164,7 +164,7 @@ export const ProcessModal = ({
           )}
         </div>
 
-        <h3 className="text-xl font-qs-bold text-gray-800 mb-2">{message}</h3>
+        <h3 className="text-xl font-qs-bold text-text-main mb-2">{message}</h3>
         <p className="text-sm text-gray-500 mb-6 max-w-[80%] mx-auto">
           {subMessage}
         </p>
@@ -175,7 +175,7 @@ export const ProcessModal = ({
             href={getExplorerLink(chainId, txHash)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg text-xs font-mono text-gray-600 hover:text-link hover:bg-blue-50 transition-colors border border-gray-100"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg text-xs text-link hover:text-link-hover hover:bg-cyan-50-50 transition-colors border border-gray-100"
           >
             <span>
               {txHash.slice(0, 10)}...{txHash.slice(-8)}
@@ -193,7 +193,7 @@ export const ProcessModal = ({
       <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-500 text-4xl mx-auto mb-6">
         <FontAwesomeIcon icon={faCheckCircle} />
       </div>
-      <h3 className="text-2xl font-qs-bold text-gray-800 mb-2">
+      <h3 className="text-2xl font-qs-bold text-text-main mb-2">
         {type === "register" ? "注册成功！" : "续费成功！"}
       </h3>
       <p className="text-gray-500 mb-8">
@@ -201,7 +201,7 @@ export const ProcessModal = ({
       </p>
       <button
         onClick={onClose}
-        className="w-full py-3.5 rounded-xl font-qs-semibold bg-gray-900 text-white hover:bg-black transition-all active:scale-95"
+        className="w-full py-3 rounded-xl font-qs-semibold bg-link text-white hover:bg-link-hover transition-all active:scale-95"
       >
         完成
       </button>
@@ -213,10 +213,10 @@ export const ProcessModal = ({
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-white/50 relative">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-white/50 relative">
         {/* 顶部标题栏 */}
         <div className="px-6 pt-6 pb-2 flex items-center justify-between">
-          <h3 className="text-lg font-qs-bold text-gray-800 flex items-center gap-2">
+          <h3 className="text-lg font-qs-bold text-text-main flex items-center gap-2">
             {!isProcessing && !isSuccess && (
               <FontAwesomeIcon icon={faCalendarAlt} className="text-link" />
             )}
@@ -226,7 +226,7 @@ export const ProcessModal = ({
           {isIdle && (
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-500 hover:text-text-main transition-colors"
             >
               ✕
             </button>
@@ -242,7 +242,7 @@ export const ProcessModal = ({
               <div className="text-red-500 text-4xl mb-4">
                 <FontAwesomeIcon icon={faExclamationCircle} />
               </div>
-              <p className="text-gray-800 font-bold mb-2">操作失败</p>
+              <p className="text-text-main font-bold mb-2">操作失败</p>
               <p className="text-sm text-gray-500 mb-6">
                 请检查网络连接或拒绝原因
               </p>
