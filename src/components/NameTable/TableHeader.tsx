@@ -11,6 +11,8 @@ import { OwnerHeader } from "./headers/OwnerHeader";
 import { ActionHeader } from "./headers/ActionHeader";
 import { DeleteHeader } from "./headers/DeleteHeader";
 
+import type { DeleteCriteria } from "./types"; // 🚀
+
 interface TableHeaderProps {
   sortConfig: SortConfig;
   onSort: (field: SortField) => void;
@@ -23,7 +25,7 @@ interface TableHeaderProps {
   hasRenewable?: boolean;
   hasRecords?: boolean;
   topOffset?: string | number;
-  onBatchDelete?: (status?: string) => void;
+  onBatchDelete?: (criteria: DeleteCriteria) => void;
   uniqueStatuses?: string[];
   totalCount?: number;
   filteredCount?: number;
@@ -129,6 +131,7 @@ export const TableHeader = ({
             onBatchDelete={onBatchDelete}
             uniqueStatuses={uniqueStatuses}
             statusCounts={statusCounts} // 🚀 透传 statusCounts
+            nameCounts={nameCounts} // 🚀 透传
           />
         </th>
       </tr>

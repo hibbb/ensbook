@@ -1,20 +1,25 @@
 // src/components/NameTable/headers/DeleteHeader.tsx
 
-import { useState, useRef, useEffect } from "react"; // 🚀 引入 hooks
-import { createPortal } from "react-dom"; // 🚀 引入 Portal (与 FilterDropdown 保持一致，防止被遮挡)
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ThWrapper } from "./ThWrapper";
-import {
-  STATUS_COLOR_BG_HOVER,
-  STATUS_COLOR_TEXT,
-} from "../../../config/constants";
+import { STATUS_COLOR_TEXT } from "../../../config/constants";
+import type { DeleteCriteria } from "../types"; // 假设您定义了类型，或者用 any 暂代
 
 interface DeleteHeaderProps {
   showDelete?: boolean;
-  onBatchDelete?: (status?: string) => void;
+  // 🚀 更新回调签名，支持更多删除类型
+  onBatchDelete?: (criteria: DeleteCriteria) => void;
   uniqueStatuses?: string[];
   statusCounts?: Record<string, number>;
+  // 🚀 新增：接收名称相关的计数
+  nameCounts?: {
+    lengthCounts: Record<number, number>;
+    availableLengths: number[];
+    wrappedCounts: { all: number; wrapped: number; unwrapped: number };
+  };
 }
 
 export const DeleteHeader = ({
@@ -22,18 +27,20 @@ export const DeleteHeader = ({
   onBatchDelete,
   uniqueStatuses = [],
   statusCounts = {},
+  nameCounts = {
+    lengthCounts: {},
+    availableLengths: [],
+    wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
+  },
 }: DeleteHeaderProps) => {
-  // 🚀 1. 状态管理：改为点击触发
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  // 🚀 2. 点击外部关闭逻辑 (保持交互的一致性)
   useEffect(() => {
     const handleScroll = () => {
       if (isOpen) setIsOpen(false);
     };
-
     const handleClickOutside = (e: MouseEvent) => {
       if (
         containerRef.current &&
@@ -42,83 +49,161 @@ export const DeleteHeader = ({
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       window.addEventListener("scroll", handleScroll, true);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [isOpen]);
 
-  // 🚀 3. 切换显示并计算位置
   const toggleOpen = () => {
     if (!showDelete) return;
-
     if (!isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       setPosition({
         top: rect.bottom + 8,
-        left: rect.right, // 右对齐
+        left: rect.right,
       });
     }
     setIsOpen(!isOpen);
   };
 
+  const handleItemClick = (criteria: DeleteCriteria) => {
+    onBatchDelete?.(criteria);
+    setIsOpen(false);
+  };
+
+  // 检查是否有任何按长度可删除的项
+  const hasDeletableLengths = nameCounts.availableLengths.some(
+    (len) => (nameCounts.lengthCounts[len] || 0) > 0,
+  );
+  // 检查是否有任何按包装可删除的项
+  const hasDeletableWrapped =
+    nameCounts.wrappedCounts.wrapped > 0 ||
+    nameCounts.wrappedCounts.unwrapped > 0;
+
   return (
     <ThWrapper className="justify-center">
       <div className="relative inline-block" ref={containerRef}>
-        {/* 触发器按钮 */}
         <button
           disabled={!showDelete}
-          onClick={toggleOpen} // 🚀 改为 onClick
+          onClick={toggleOpen}
           className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
             showDelete
-              ? isOpen // 激活状态样式
-                ? "bg-link text-white"
-                : "text-link hover:bg-gray-100 cursor-pointer"
-              : "text-gray-300 cursor-not-allowed"
+              ? isOpen
+                ? "bg-red-400 text-white"
+                : "text-red-400 hover:text-red-500 hover:bg-gray-50 cursor-pointer"
+              : "text-gray-200 cursor-not-allowed"
           }`}
           title="批量删除"
         >
           <FontAwesomeIcon icon={faTrash} size="sm" />
         </button>
 
-        {/* 下拉菜单 - 使用 Portal 渲染 (与 FilterDropdown 保持一致) */}
         {isOpen &&
           showDelete &&
           onBatchDelete &&
           createPortal(
             <div
-              className="fixed text-sm bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999] animate-in fade-in zoom-in duration-150 w-40 origin-top-right"
+              className="fixed text-sm bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999] animate-in fade-in zoom-in duration-150 w-48 origin-top-right overflow-hidden"
               style={{
                 top: position.top,
                 left: position.left,
-                transform: "translateX(-100%)", // 实现右对齐
+                transform: "translateX(-100%)",
               }}
-              onMouseDown={(e) => e.stopPropagation()} // 防止点击菜单内部触发关闭
+              onMouseDown={(e) => e.stopPropagation()}
             >
-              {/* 按状态删除 */}
-              {uniqueStatuses.length > 0 && (
-                <>
-                  {uniqueStatuses.map((status) => {
-                    const count = statusCounts[status] || 0;
-                    return (
+              <div className="max-h-[60vh] overflow-y-auto">
+                {/* 1. 按状态删除 */}
+                {uniqueStatuses.length > 0 && (
+                  <>
+                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      按状态
+                    </div>
+                    {uniqueStatuses.map((status) => {
+                      const count = statusCounts[status] || 0;
+                      if (count === 0) return null; // 不显示数量为0的
+
+                      return (
+                        <button
+                          key={status}
+                          onClick={() =>
+                            handleItemClick({ type: "status", value: status })
+                          }
+                          className={`w-full text-left px-4 py-2 transition-colors flex items-center justify-between group/item ${STATUS_COLOR_TEXT[status]} hover:bg-red-50 hover:text-red-500`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{status}</span>
+                            <span className="text-xs opacity-60 font-qs-regular">
+                              ({count})
+                            </span>
+                          </div>
+                          <FontAwesomeIcon
+                            icon={faTrash}
+                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                          />
+                        </button>
+                      );
+                    })}
+                    <div className="h-px bg-gray-100 my-1 mx-2" />
+                  </>
+                )}
+
+                {/* 2. 🚀 按长度删除 */}
+                {hasDeletableLengths && (
+                  <>
+                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      按长度
+                    </div>
+                    {nameCounts.availableLengths.map((len) => {
+                      const count = nameCounts.lengthCounts[len] || 0;
+                      if (count === 0) return null;
+
+                      return (
+                        <button
+                          key={len}
+                          onClick={() =>
+                            handleItemClick({ type: "length", value: len })
+                          }
+                          className="w-full text-left px-4 py-2 text-text-main hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-between group/item"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{len} 字符</span>
+                            <span className="text-xs opacity-60 font-qs-regular">
+                              ({count})
+                            </span>
+                          </div>
+                          <FontAwesomeIcon
+                            icon={faTrash}
+                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                          />
+                        </button>
+                      );
+                    })}
+                    <div className="h-px bg-gray-100 my-1 mx-2" />
+                  </>
+                )}
+
+                {/* 3. 🚀 按包装状态删除 */}
+                {hasDeletableWrapped && (
+                  <>
+                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      按包装
+                    </div>
+                    {nameCounts.wrappedCounts.wrapped > 0 && (
                       <button
-                        key={status}
-                        onClick={() => {
-                          onBatchDelete(status);
-                          setIsOpen(false); // 点击后关闭
-                        }}
-                        className={`w-full text-left px-4 py-2 transition-colors flex items-center justify-between group/item ${STATUS_COLOR_TEXT[status]} ${STATUS_COLOR_BG_HOVER[status]}`}
+                        onClick={() =>
+                          handleItemClick({ type: "wrapped", value: true })
+                        }
+                        className="w-full text-left px-4 py-2 text-text-main hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-between group/item"
                       >
                         <div className="flex items-center gap-2">
-                          <span>{status}</span>
+                          <span>Wrapped</span>
                           <span className="text-xs opacity-60 font-qs-regular">
-                            ({count})
+                            ({nameCounts.wrappedCounts.wrapped})
                           </span>
                         </div>
                         <FontAwesomeIcon
@@ -126,26 +211,42 @@ export const DeleteHeader = ({
                           className="opacity-0 group-hover/item:opacity-100 text-[10px]"
                         />
                       </button>
-                    );
-                  })}
-                  <div className="h-px bg-gray-100 my-1" />
-                </>
-              )}
+                    )}
+                    {nameCounts.wrappedCounts.unwrapped > 0 && (
+                      <button
+                        onClick={() =>
+                          handleItemClick({ type: "wrapped", value: false })
+                        }
+                        className="w-full text-left px-4 py-2 text-text-main hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-between group/item"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>Unwrapped</span>
+                          <span className="text-xs opacity-60 font-qs-regular">
+                            ({nameCounts.wrappedCounts.unwrapped})
+                          </span>
+                        </div>
+                        <FontAwesomeIcon
+                          icon={faTrash}
+                          className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                        />
+                      </button>
+                    )}
+                    <div className="h-px bg-gray-100 my-1 mx-2" />
+                  </>
+                )}
 
-              {/* 全部删除 */}
-              <button
-                onClick={() => {
-                  onBatchDelete();
-                  setIsOpen(false); // 点击后关闭
-                }}
-                className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 transition-colors flex items-center justify-between group/clear"
-              >
-                <span>全部清空</span>
-                <FontAwesomeIcon
-                  icon={faTrash}
-                  className="opacity-0 group-hover/clear:opacity-100 text-[10px]"
-                />
-              </button>
+                {/* 4. 全部删除 */}
+                <button
+                  onClick={() => handleItemClick({ type: "all" })}
+                  className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 transition-colors flex items-center justify-between group/clear font-medium"
+                >
+                  <span>全部清空</span>
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    className="opacity-0 group-hover/clear:opacity-100 text-[10px]"
+                  />
+                </button>
+              </div>
             </div>,
             document.body,
           )}

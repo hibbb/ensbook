@@ -29,6 +29,7 @@ import { getAllPendingLabels } from "../services/storage/registration"; // 🚀 
 
 // Types
 import type { NameRecord } from "../types/ensNames";
+import type { DeleteCriteria } from "../components/NameTable/types"; // 🚀
 
 export const Home = () => {
   const { address, isConnected } = useAccount();
@@ -182,9 +183,14 @@ export const Home = () => {
     }
   };
 
-  const handleBatchDelete = (status?: string) => {
-    // 1. 清空所有
-    if (!status) {
+  // 🚀 重构删除逻辑：仅 "all" 类型需要确认
+  const handleBatchDelete = (criteria: DeleteCriteria) => {
+    if (!records) return;
+
+    const { type, value } = criteria;
+
+    // 1. 全部删除 (保持确认弹窗，这是破坏性最大的操作)
+    if (type === "all") {
       if (window.confirm("确定要清空所有历史记录吗？")) {
         setResolvedLabels([]);
         clearSelection();
@@ -192,27 +198,47 @@ export const Home = () => {
       return;
     }
 
-    // 2. 按状态删除
-    if (!records) return;
-    if (window.confirm(`确定要删除所有状态为“${status}”的域名吗？`)) {
-      const labelsToDelete = new Set(
-        records.filter((r) => r.status === status).map((r) => r.label),
-      );
+    let labelsToDelete = new Set<string>();
 
-      setResolvedLabels((prev) =>
-        prev.filter((label) => !labelsToDelete.has(label)),
-      );
+    // 2. 根据类型筛选要删除的记录
+    switch (type) {
+      case "status":
+        labelsToDelete = new Set(
+          records.filter((r) => r.status === value).map((r) => r.label),
+        );
+        break;
 
-      // 同步清理选中状态
-      if (selectedLabels.size > 0) {
-        labelsToDelete.forEach((label) => {
-          if (selectedLabels.has(label)) {
-            toggleSelection(label);
-          }
-        });
+      case "length":
+        labelsToDelete = new Set(
+          records.filter((r) => r.label.length === value).map((r) => r.label),
+        );
+        break;
+
+      case "wrapped": {
+        const isWrapped = value as boolean;
+        labelsToDelete = new Set(
+          records.filter((r) => r.wrapped === isWrapped).map((r) => r.label),
+        );
+        break;
       }
-      toast.success(`已删除所有 ${status} 域名`);
     }
+
+    if (labelsToDelete.size === 0) return;
+
+    // 3. 直接执行删除 (移除 window.confirm 包裹)
+    setResolvedLabels((prev) =>
+      prev.filter((label) => !labelsToDelete.has(label)),
+    );
+
+    // 同步清理选中状态
+    if (selectedLabels.size > 0) {
+      labelsToDelete.forEach((label) => {
+        if (selectedLabels.has(label)) {
+          toggleSelection(label);
+        }
+      });
+    }
+    toast.success("删除成功");
   };
 
   // --- 流程触发 (打开 Modal) ---
@@ -387,7 +413,7 @@ export const Home = () => {
       {selectedLabels.size > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
-            <span className="text-sm font-qs-medium text-gray-600">
+            <span className="text-sm font-qs-medium text-text-main">
               已选择{" "}
               <span className="text-link font-bold">{selectedLabels.size}</span>{" "}
               个域名
@@ -409,7 +435,7 @@ export const Home = () => {
 
             <button
               onClick={clearSelection}
-              className="ml-2 text-xs text-gray-400 hover:text-gray-600 underline decoration-gray-300 underline-offset-2"
+              className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
             >
               取消
             </button>

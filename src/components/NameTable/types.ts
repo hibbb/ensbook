@@ -2,6 +2,12 @@
 
 export type SortField = "label" | "length" | "status" | "owner" | null;
 export type SortDirection = "asc" | "desc" | null;
+export type DeleteType = "all" | "status" | "length" | "wrapped";
+
+export interface DeleteCriteria {
+  type: DeleteType;
+  value?: string | number | boolean;
+}
 
 export interface SortConfig {
   field: SortField;

@@ -5,7 +5,12 @@ import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
-import type { SortField, SortConfig, FilterConfig } from "./types";
+import type {
+  SortField,
+  SortConfig,
+  FilterConfig,
+  DeleteCriteria,
+} from "./types";
 
 interface NameTableProps {
   records: NameRecord[] | undefined | null;
@@ -19,7 +24,6 @@ interface NameTableProps {
   onFilterChange: (config: FilterConfig) => void;
   canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
-  onBatchDelete?: (status?: string) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   selectedLabels?: Set<string>;
@@ -32,7 +36,7 @@ interface NameTableProps {
   // 🚀 新增：接收计数数据
   statusCounts?: Record<string, number>;
   actionCounts?: { all: number; register: number; renew: number };
-  // 🚀 新增
+  onBatchDelete?: (criteria: DeleteCriteria) => void;
   nameCounts?: {
     lengthCounts: Record<number, number>;
     availableLengths: number[];

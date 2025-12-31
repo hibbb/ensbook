@@ -44,7 +44,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
           </h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-text-main transition-colors"
           >
             <FontAwesomeIcon icon={faXmark} />
           </button>
@@ -69,7 +69,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 <p className="text-xs text-gray-400 mt-1">
                   输入任意名称，支持空格或逗号分隔多个名称。
                 </p>
-                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-gray-600">
+                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-text-main">
                   vitalik paradigm.eth 999
                 </div>
               </div>
@@ -89,7 +89,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                   ENS（或以太坊地址）” 的格式查询某个 ENS
                   所有者（或某个以太坊地址）持有的全部名称。
                 </p>
-                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-gray-600">
+                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-text-main">
                   @vitalik.eth @0xd8dA6...
                 </div>
               </div>
@@ -108,7 +108,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                   使用 “<span className="text-orange-500 font-bold">#</span> +
                   ENS” 的格式查询某个 ENS 绑定的以太坊地址持有的全部名称。
                 </p>
-                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-gray-600">
+                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-text-main">
                   #vitalik.eth
                 </div>
               </div>
@@ -126,7 +126,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 <p className="text-xs text-gray-400 mt-1">
                   同时支持上述所有格式的混合输入。
                 </p>
-                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-gray-600">
+                <div className="mt-2 text-xs bg-gray-50 px-3 py-2 rounded-md font-qs-medium text-text-main">
                   apple #vitalik.eth @0xd8...
                 </div>
               </div>

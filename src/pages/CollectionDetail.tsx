@@ -247,7 +247,7 @@ export const CollectionDetail = () => {
       {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
-            <span className="text-sm font-qs-medium text-gray-600">
+            <span className="text-sm font-qs-medium text-text-main">
               已选择{" "}
               <span className="text-link font-bold">{selectionCount}</span>{" "}
               个域名
@@ -271,7 +271,7 @@ export const CollectionDetail = () => {
 
             <button
               onClick={clearSelection}
-              className="ml-2 text-xs text-gray-400 hover:text-gray-600 underline decoration-gray-300 underline-offset-2"
+              className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
             >
               取消
             </button>
