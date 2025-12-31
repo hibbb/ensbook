@@ -166,7 +166,7 @@ export function useEnsRegistration() {
 
           // 3. 更新 UI 状态
           setStatus(result.status);
-          if (result.errorMessage && result.status !== "idle") {
+          if (result.errorMessage) {
             toast.error(result.errorMessage);
           }
 

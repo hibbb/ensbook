@@ -43,7 +43,7 @@
 
 ## Git commit message
 
-- git commit -m "feat: 在删除下拉框中增加按照名称长度和是否包装进行删除的选项"
+git commit -m "feat: 在删除下拉框中增加按照名称长度和是否包装进行删除的选项"
 
 ## Prompts
 

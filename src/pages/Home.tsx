@@ -2,12 +2,6 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useAccount } from "wagmi";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faRotate,
-  faLightbulb,
-} from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query"; // 🚀 1. 引入 QueryClient
 
@@ -16,6 +10,8 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
 import { SearchHelpModal } from "../components/SearchHelpModal";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
+import { HomeSearchSection } from "./Home/HomeSearchSection";
+import { HomeFloatingBar } from "./Home/HomeFloatingBar";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -171,10 +167,6 @@ export const Home = () => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSubmit();
-  };
-
   // --- 删除操作 ---
   const handleDelete = (record: NameRecord) => {
     setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
@@ -321,60 +313,15 @@ export const Home = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
       {/* ================= Header & Search ================= */}
-      <div
-        className={`flex flex-col items-center transition-all duration-700 ease-in-out z-40 ${
-          hasContent
-            ? "sticky top-0 py-4 mb-6 bg-background/80 backdrop-blur-md"
-            : "flex-1 justify-center -mt-60"
-        }`}
-      >
-        {!hasContent && (
-          <h1 className="text-4xl font-qs-bold text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
-            ENS <span className="text-link">Search</span>
-          </h1>
-        )}
-
-        <div
-          className={`relative w-full transition-all duration-500 ${
-            hasContent ? "max-w-3xl" : "max-w-2xl"
-          }`}
-        >
-          <div className="relative group">
-            <button
-              onClick={() => setIsHelpOpen(true)}
-              className="absolute left-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-yellow-100 hover:text-yellow-400 transition-all active:scale-95 z-10"
-              title="搜索帮助"
-            >
-              <FontAwesomeIcon icon={faLightbulb} size="sm" />
-            </button>
-
-            <input
-              type="text"
-              className="w-full h-14 pl-14 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
-              placeholder={
-                hasContent
-                  ? "继续添加域名..."
-                  : "输入域名、地址(@0x...) 或 记录(#user)..."
-              }
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-
-            <button
-              onClick={() => handleSubmit()}
-              disabled={!inputValue.trim() || isResolving}
-              className="absolute right-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-link text-white hover:bg-link-hover disabled:bg-gray-200 disabled:cursor-not-allowed transition-all active:scale-95"
-            >
-              {isResolving ? (
-                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              ) : (
-                <FontAwesomeIcon icon={faArrowRight} />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* 1. 搜索区域 (已拆分) */}
+      <HomeSearchSection
+        hasContent={hasContent}
+        inputValue={inputValue}
+        isResolving={isResolving}
+        onInputChange={setInputValue}
+        onSubmit={() => handleSubmit()}
+        onOpenHelp={() => setIsHelpOpen(true)}
+      />
 
       {/* ================= Main Table ================= */}
       {hasContent && (
@@ -410,38 +357,14 @@ export const Home = () => {
       )}
 
       {/* ================= Bottom Floating Bar ================= */}
-      {selectedLabels.size > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
-            <span className="text-sm font-qs-medium text-text-main">
-              已选择{" "}
-              <span className="text-link font-bold">{selectedLabels.size}</span>{" "}
-              个域名
-            </span>
-            <div className="h-4 w-px bg-gray-300 mx-1" />
-
-            <button
-              onClick={handleBatchRenewalTrigger}
-              disabled={!isConnected || isRenewalBusy}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold transition-all shadow-sm ${
-                !isConnected || isRenewalBusy
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"
-              }`}
-            >
-              <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
-              批量续费
-            </button>
-
-            <button
-              onClick={clearSelection}
-              className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
-            >
-              取消
-            </button>
-          </div>
-        </div>
-      )}
+      {/* 3. 底部悬浮栏 (已拆分) */}
+      <HomeFloatingBar
+        selectedCount={selectedLabels.size}
+        isBusy={isRenewalBusy}
+        isConnected={isConnected}
+        onBatchRenew={handleBatchRenewalTrigger}
+        onClearSelection={clearSelection}
+      />
 
       {/* ================= Modals ================= */}
       <SearchHelpModal

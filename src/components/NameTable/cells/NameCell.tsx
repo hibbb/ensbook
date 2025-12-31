@@ -18,14 +18,14 @@ export const NameCell = ({ record }: NameCellProps) => {
           title="在 ENS 官网查看详情"
         >
           {record.wrapped && (
-            <span className="text-xs font-qs-regular text-link">{"<"}</span>
+            <span className="text-sm font-qs-regular text-link">{"["}</span>
           )}
           <span className="text-base font-qs-medium tracking-tight text-text-main">
             {record.label}
           </span>
           <span className="text-sm font-qs-regular text-gray-400">.eth</span>
           {record.wrapped && (
-            <span className="text-xs font-qs-regular text-link">{">"}</span>
+            <span className="text-sm font-qs-regular text-link">{"]"}</span>
           )}
           <FontAwesomeIcon
             icon={faUpRightFromSquare}
