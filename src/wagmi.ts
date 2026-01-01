@@ -16,10 +16,20 @@ if (!WALLET_CONNECT_PROJECT_ID) {
   );
 }
 
-// 核心修改点：构建 Infura Transports
+// 核心修改点：配置 Transport 并启用 Batch Multicall
+const transportConfig = {
+  batch: {
+    multicall: true, // 🚀 关键：启用 Multicall 聚合请求
+    wait: 50, // 等待 50ms 收集请求（去抖动）
+  },
+};
+
 const alchemyTransport = ALCHEMY_API_KEY
-  ? http(`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`)
-  : http(); // 如果没有 Key，就使用默认的公共 RPC URL
+  ? http(
+      `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+      transportConfig, // 传入配置
+    )
+  : http(undefined, transportConfig); // 即使是公共节点也建议开启，虽然公共节点限制更严
 
 export const config = createConfig(
   getDefaultConfig({
@@ -32,15 +42,8 @@ export const config = createConfig(
 
     // 配置 transports
     transports: {
-      // **主网 (Mainnet) 必须使用 Infura URL**
+      // **主网 (Mainnet)
       [mainnet.id]: alchemyTransport,
-
-      // 测试网 Sepolia 的配置
-      // [sepolia.id]: INFURA_API_KEY
-      //   ? http(`https://sepolia.infura.io/v3/${INFURA_API_KEY}`)
-      //   : http(),
-
-      // 其他链如果有，也在这里配置
     },
   }),
 );
