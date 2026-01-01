@@ -12,6 +12,7 @@ import {
   getStoredLabels,
   saveStoredLabels,
 } from "../../services/storage/labels";
+import { getStoredMemos, saveStoredMemos } from "../../services/storage/memos"; // 🚀 引入
 import { exportBackup, validateBackup } from "../../utils/dataManagement";
 
 interface DataBackupViewProps {
@@ -50,10 +51,11 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
         }
 
         const newLabels = json.data.labels;
-        // 🚀 TODO: 这里未来处理 memos
-        // const newMemos = json.data.memos || {};
+        // 🚀 读取并合并备注
+        const newMemos = json.data.memos || {};
 
         const currentLabels = getStoredLabels();
+        const currentMemos = getStoredMemos();
 
         // 交互确认
         const mode = window.confirm(
@@ -64,6 +66,8 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
         if (mode) {
           // 合并模式
           finalLabels = Array.from(new Set([...currentLabels, ...newLabels]));
+          // 🚀 合并备注
+          saveStoredMemos({ ...currentMemos, ...newMemos });
         } else {
           // 覆盖模式 (再次确认)
           if (
@@ -72,11 +76,12 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             return;
           }
           finalLabels = newLabels;
+          // 🚀 覆盖备注
+          saveStoredMemos(newMemos);
         }
 
         // 保存并刷新
         saveStoredLabels(finalLabels);
-        // saveStoredMemos({...currentMemos, ...newMemos}); // 未来启用
 
         toast.success("导入成功！正在刷新...");
         setTimeout(() => window.location.reload(), 1000);
@@ -125,21 +130,17 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
       {/* 导入区块 */}
       <section>
         <h5 className="text-sm font-qs-bold text-gray-900 mb-3 flex items-center gap-2">
-          {/* 🚀 修改：orange-400 -> lime-400 */}
           <div className="w-1 h-4 bg-lime-400 rounded-full"></div>
           恢复数据
         </h5>
-        {/* 🚀 修改：orange-50/30 -> lime-50/30, orange-100 -> lime-100, orange-200 -> lime-200 */}
         <div className="bg-lime-50/30 rounded-xl p-4 border border-lime-100 transition-colors hover:border-lime-200">
           <div className="flex items-start gap-4">
-            {/* 🚀 修改：text-orange-500 -> text-lime-600 (lime-500 在白色背景上可能太亮，用 600 更清晰), border-orange-50 -> border-lime-50 */}
             <div className="bg-white p-3 rounded-lg shadow-sm text-lime-600 border border-lime-50">
               <FontAwesomeIcon icon={faUpload} size="lg" />
             </div>
             <div className="flex-1">
               <div className="text-sm text-gray-600 mb-3 leading-relaxed font-qs-medium">
                 恢复您的数据。支持与现有数据 <b>合并</b> 或 <b>完全覆盖</b>。
-                {/* 🚀 修改：text-orange-600/80 -> text-lime-700/80, bg-orange-50 -> bg-lime-50 */}
                 <div className="flex items-center gap-1.5 mt-2 text-xs text-lime-700/80 bg-lime-50 w-fit px-2 py-1 rounded font-qs-bold">
                   <FontAwesomeIcon icon={faTriangleExclamation} />
                   请确保导入的是合法的 EnsBook 备份文件
@@ -155,7 +156,6 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                // 🚀 修改：bg-orange-500 -> bg-lime-500, shadow-orange-200 -> shadow-lime-200, hover:bg-orange-600 -> hover:bg-lime-600
                 className="px-4 py-2 bg-lime-500 text-white text-sm font-qs-bold rounded-lg shadow-sm shadow-lime-200 hover:bg-lime-600 transition-all active:scale-95"
               >
                 选择备份文件

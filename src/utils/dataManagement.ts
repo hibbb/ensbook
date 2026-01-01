@@ -1,17 +1,17 @@
 // src/utils/dataManagement.ts
 
 import type { EnsBookBackup } from "../types/backup";
+import { getStoredMemos } from "../services/storage/memos"; // 🚀 引入
 
 // 导出功能
 export const exportBackup = (labels: string[]) => {
-  // 🚀 TODO: 等待备注功能开发完成后，在这里读取真实的备注数据
-  // const memos = getStoredMemos();
-  const memos = {};
+  // 🚀 获取真实的备注数据
+  const memos = getStoredMemos();
 
   const backup: EnsBookBackup = {
     version: 1,
     timestamp: Date.now(),
-    source: "EnsBook",
+    source: "ENSBook",
     data: {
       labels,
       memos,
