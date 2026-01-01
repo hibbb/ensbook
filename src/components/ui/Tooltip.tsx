@@ -1,0 +1,27 @@
+// src/components/ui/Tooltip.tsx
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+
+export function Tooltip({
+  children,
+  content,
+}: {
+  children: React.ReactNode;
+  content: string | React.ReactNode;
+}) {
+  return (
+    <TooltipPrimitive.Provider delayDuration={100}>
+      <TooltipPrimitive.Root>
+        <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
+
+        <TooltipPrimitive.Content
+          sideOffset={5}
+          // 🚀 修改：添加 whitespace-pre-wrap, break-words 和 max-w-[300px]
+          className="z-50 overflow-hidden rounded-md bg-text-main px-3 py-1.5 text-xs text-white shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 whitespace-pre-wrap break-words max-w-[300px]"
+        >
+          {content}
+          <TooltipPrimitive.Arrow className="fill-text-main" />
+        </TooltipPrimitive.Content>
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
+  );
+}
