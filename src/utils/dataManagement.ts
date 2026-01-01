@@ -41,7 +41,7 @@ export const exportBackup = (labels: string[]) => {
 export const validateBackup = (json: any): json is EnsBookBackup => {
   return (
     json &&
-    json.source === "EnsBook" &&
+    json.source === "ENSBook" &&
     json.version === 1 &&
     json.data &&
     Array.isArray(json.data.labels)

@@ -110,10 +110,6 @@ export const TableHeader = ({
         </th>
 
         <th>
-          <ThWrapper>信息</ThWrapper>
-        </th>
-
-        <th>
           <ActionHeader
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
@@ -123,6 +119,10 @@ export const TableHeader = ({
             onToggleSelectAll={onToggleSelectAll}
             actionCounts={actionCounts}
           />
+        </th>
+
+        <th>
+          <ThWrapper>信息</ThWrapper>
         </th>
 
         <th className="text-center w-14 relative">

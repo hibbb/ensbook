@@ -66,12 +66,7 @@ export const TableRow = ({
         <OwnerCell record={record} currentAddress={currentAddress} />
       </td>
 
-      {/* 5. 外部链接 */}
-      <td className="text-center">
-        <LookupsCell record={record} chainId={chainId} />
-      </td>
-
-      {/* 6. 操作 (注册/续费/选择) */}
+      {/* 5. 操作 (注册/续费/选择) */}
       <td className="text-right">
         <ActionCell
           record={record}
@@ -82,6 +77,11 @@ export const TableRow = ({
           onRegister={onRegister}
           onRenew={onRenew}
         />
+      </td>
+
+      {/* 6. 外部链接 */}
+      <td className="text-center">
+        <LookupsCell record={record} chainId={chainId} />
       </td>
 
       {/* 7. 删除按钮 (逻辑简单，暂不拆分，或可视需要拆分) */}

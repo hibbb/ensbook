@@ -1,6 +1,6 @@
 // src/services/storage/memos.ts
 
-const MEMO_STORAGE_KEY = "ensbook_memos";
+const MEMO_STORAGE_KEY = "eb_user_memos";
 
 export type MemoMap = Record<string, string>;
 

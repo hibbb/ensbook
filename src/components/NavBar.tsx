@@ -60,7 +60,7 @@ export const NavBar = () => {
           {/* 🚀 设置入口 - 紧邻 ConnectKitButton 左侧 */}
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-text-main hover:bg-gray-100 transition-all active:scale-95 group"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-gray-400 hover:text-text-main hover:bg-gray-100 transition-all active:scale-95 group"
             title="设置 / Settings"
           >
             <FontAwesomeIcon

@@ -90,8 +90,8 @@ export const DeleteHeader = ({
           className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
             showDelete
               ? isOpen
-                ? "bg-red-50 text-red-500"
-                : "text-gray-300 hover:text-red-400 hover:bg-gray-50 cursor-pointer"
+                ? "bg-red-500 text-white"
+                : "text-red-400 hover:text-red-500 hover:bg-gray-50 cursor-pointer"
               : "text-gray-200 cursor-not-allowed"
           }`}
           title="批量删除"

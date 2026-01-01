@@ -17,7 +17,7 @@ export const NameCell = ({ record }: NameCellProps) => {
           target="_blank"
           rel="noopener noreferrer"
           // 移除 gap-1 和 group/name，让文字紧凑排列，去除图标相关的样式
-          className="flex items-center"
+          className="flex items-center gap-0.5"
           title="在 ENS 官网查看详情"
         >
           {record.wrapped && (
