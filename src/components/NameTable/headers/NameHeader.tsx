@@ -10,13 +10,12 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
-import { FilterDropdown } from "../FilterDropdown"; // 引入 Dropdown
+import { FilterDropdown } from "../FilterDropdown";
 import type { SortConfig, SortField, FilterConfig } from "../types";
 
 interface NameHeaderProps {
   sortConfig: SortConfig;
   onSort: (field: SortField) => void;
-  // 🚀 新增 Props
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
   nameCounts?: {
@@ -39,6 +38,12 @@ export const NameHeader = ({
 }: NameHeaderProps) => {
   const isActive =
     filterConfig.lengthList.length > 0 || filterConfig.wrappedType !== "all";
+
+  // 🚀 计算长度总数
+  const totalLengthCount = Object.values(nameCounts.lengthCounts).reduce(
+    (a, b) => a + b,
+    0,
+  );
 
   return (
     <ThWrapper>
@@ -64,18 +69,17 @@ export const NameHeader = ({
             title="按长度排序"
           />
 
-          {/* 🚀 新增筛选下拉框 */}
           <FilterDropdown isActive={isActive} menuWidth="w-48">
-            {/* 1. 长度筛选部分 */}
+            {/* 1. 长度筛选 */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
               按长度
             </div>
 
             {/* 全部长度 */}
             <div
-              className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 flex justify-between items-center ${
+              className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
                 filterConfig.lengthList.length === 0
-                  ? "text-link"
+                  ? "text-link font-bold"
                   : "text-gray-500"
               }`}
               onClick={() =>
@@ -83,12 +87,17 @@ export const NameHeader = ({
               }
             >
               <span>全部长度</span>
-              {filterConfig.lengthList.length === 0 && (
-                <FontAwesomeIcon icon={faCheck} />
-              )}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-normal">
+                  ({totalLengthCount})
+                </span>
+                {filterConfig.lengthList.length === 0 && (
+                  <FontAwesomeIcon icon={faCheck} />
+                )}
+              </div>
             </div>
 
-            {/* 长度列表 (动态生成) */}
+            {/* 长度列表 */}
             {nameCounts.availableLengths.map((len) => {
               const count = nameCounts.lengthCounts[len] || 0;
               const isSelected = filterConfig.lengthList.includes(len);
@@ -98,8 +107,12 @@ export const NameHeader = ({
                 <div
                   key={len}
                   className={`px-4 py-2 text-sm flex justify-between items-center transition-colors
-                    ${isDisabled ? "opacity-40 cursor-not-allowed bg-gray-50" : "cursor-pointer hover:bg-gray-50"}
-                    ${isSelected ? "text-link bg-blue-50/50" : "text-gray-500"}
+                    ${
+                      isDisabled
+                        ? "opacity-40 cursor-not-allowed bg-gray-50"
+                        : "cursor-pointer hover:bg-gray-200" // 🚀 统一 Hover
+                    }
+                    ${isSelected ? "text-link font-bold" : "text-gray-500"}
                   `}
                   onClick={() => {
                     if (isDisabled) return;
@@ -111,9 +124,7 @@ export const NameHeader = ({
                 >
                   <span>{len} 字符</span>
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs ${isSelected ? "text-link/70" : "text-gray-300"}`}
-                    >
+                    <span className="text-xs text-gray-400 font-qs-regular">
                       ({count})
                     </span>
                     {isSelected && (
@@ -124,10 +135,9 @@ export const NameHeader = ({
               );
             })}
 
-            {/* 分割线 */}
             <div className="h-px bg-gray-100 my-1 mx-2" />
 
-            {/* 2. 包装状态筛选部分 */}
+            {/* 2. 包装状态 */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
               按包装
             </div>
@@ -140,9 +150,13 @@ export const NameHeader = ({
               return (
                 <div
                   key={type}
-                  className={`px-4 py-2 text-sm flex justify-between items-center
-                    ${isDisabled ? "opacity-40 cursor-not-allowed bg-gray-50" : "cursor-pointer hover:bg-gray-50"}
-                    ${isSelected ? "text-link bg-blue-50/50" : "text-gray-500"}
+                  className={`px-4 py-2 text-sm flex justify-between items-center transition-colors
+                    ${
+                      isDisabled
+                        ? "opacity-40 cursor-not-allowed bg-gray-50"
+                        : "cursor-pointer hover:bg-gray-200" // 🚀 统一 Hover
+                    }
+                    ${isSelected ? "text-link font-bold" : "text-gray-500"}
                   `}
                   onClick={() => {
                     if (!isDisabled)
@@ -156,11 +170,14 @@ export const NameHeader = ({
                         ? "Wrapped"
                         : "Unwrapped"}
                   </span>
-                  <span
-                    className={`text-xs ${isSelected ? "text-link/70" : "text-gray-300"}`}
-                  >
-                    ({count})
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-qs-regular">
+                      ({count})
+                    </span>
+                    {isSelected && (
+                      <FontAwesomeIcon icon={faCheck} className="text-link" />
+                    )}
+                  </div>
                 </div>
               );
             })}

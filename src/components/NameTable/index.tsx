@@ -73,7 +73,7 @@ export const NameTable = (props: NameTableProps) => {
   return (
     <div className="bg-table-row rounded-xl border border-gray-100 relative">
       <div className="overflow-x-auto lg:overflow-visible">
-        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-2.5">
+        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3">
           <TableHeader
             sortConfig={props.sortConfig}
             onSort={props.onSort}

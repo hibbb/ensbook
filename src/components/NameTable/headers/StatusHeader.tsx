@@ -25,7 +25,7 @@ interface StatusHeaderProps {
   filterConfig: FilterConfig;
   onSort: (field: SortField) => void;
   onFilterChange: (config: FilterConfig) => void;
-  statusCounts?: Record<string, number>; // 🚀 新增
+  statusCounts?: Record<string, number>;
 }
 
 export const StatusHeader = ({
@@ -35,6 +35,9 @@ export const StatusHeader = ({
   onFilterChange,
   statusCounts = {},
 }: StatusHeaderProps) => {
+  // 🚀 计算总数用于“全部显示”
+  const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+
   return (
     <ThWrapper>
       <div className="flex items-center gap-2">
@@ -51,25 +54,33 @@ export const StatusHeader = ({
           />
 
           <FilterDropdown isActive={filterConfig.statusList.length > 0}>
+            {/* 全部显示选项 */}
             <div
-              className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 flex justify-between items-center ${
+              className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
                 filterConfig.statusList.length === 0
-                  ? "text-link"
+                  ? "text-link font-bold"
                   : "text-gray-500"
               }`}
               onClick={() =>
                 onFilterChange({ ...filterConfig, statusList: [] })
               }
             >
-              全部显示
-              {filterConfig.statusList.length === 0 && (
-                <FontAwesomeIcon icon={faCheck} />
-              )}
+              <span>全部显示</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-normal">
+                  ({totalCount})
+                </span>
+                {filterConfig.statusList.length === 0 && (
+                  <FontAwesomeIcon icon={faCheck} />
+                )}
+              </div>
             </div>
+
+            {/* 状态列表 */}
             {STATUS_OPTIONS.map((s) => {
               const count = statusCounts[s] || 0;
               const isSelected = filterConfig.statusList.includes(s);
-              const isDisabled = count === 0 && !isSelected; // 如果未选中且数量为0，则视为禁用态
+              const isDisabled = count === 0 && !isSelected;
 
               return (
                 <div
@@ -77,12 +88,15 @@ export const StatusHeader = ({
                   className={`
                     px-4 py-2 text-sm flex justify-between items-center transition-colors
                     ${STATUS_COLOR_TEXT[s]}
-                    ${isDisabled ? "opacity-40 cursor-not-allowed bg-gray-50" : `cursor-pointer ${STATUS_COLOR_BG_HOVER[s]}`}
+                    ${
+                      isDisabled
+                        ? "opacity-40 cursor-not-allowed bg-gray-50"
+                        : `cursor-pointer ${STATUS_COLOR_BG_HOVER[s]}`
+                    }
                   `}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (isDisabled) return; // 阻止 0 数量的点击
-
+                    if (isDisabled) return;
                     const newList = isSelected
                       ? filterConfig.statusList.filter((i) => i !== s)
                       : [...filterConfig.statusList, s];
@@ -92,19 +106,15 @@ export const StatusHeader = ({
                     });
                   }}
                 >
+                  <span>{s}</span>
                   <div className="flex items-center gap-2">
-                    <span>{s}</span>
-                    {/* 显示数量 */}
-                    <span
-                      className={`text-xs ${isDisabled ? "text-gray-300" : "text-gray-400 font-qs-regular"}`}
-                    >
+                    <span className="text-xs text-gray-400 font-qs-regular">
                       ({count})
                     </span>
+                    {isSelected && (
+                      <FontAwesomeIcon icon={faCheck} className="text-link" />
+                    )}
                   </div>
-
-                  {isSelected && (
-                    <FontAwesomeIcon icon={faCheck} className="text-link" />
-                  )}
                 </div>
               );
             })}

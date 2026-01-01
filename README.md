@@ -43,7 +43,8 @@
 
 ## Git commit message
 
-git commit -m "feat: 在删除下拉框中增加按照名称长度和是否包装进行删除的选项"
+git add .
+git commit -m "impr: 改进批量请求的参数，保证并发请求获取数据的准确性"
 
 ## Prompts
 

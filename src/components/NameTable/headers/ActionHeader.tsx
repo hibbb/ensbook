@@ -3,6 +3,8 @@
 import { ThWrapper } from "./ThWrapper";
 import { FilterDropdown } from "../FilterDropdown";
 import type { FilterConfig } from "../types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons"; // 确保引入 Check 图标
 
 interface ActionHeaderProps {
   filterConfig: FilterConfig;
@@ -11,7 +13,7 @@ interface ActionHeaderProps {
   isAllSelected?: boolean;
   hasRenewable?: boolean;
   onToggleSelectAll?: () => void;
-  actionCounts?: { all: number; register: number; renew: number }; // 🚀 新增
+  actionCounts?: { all: number; register: number; renew: number };
 }
 
 export const ActionHeader = ({
@@ -52,22 +54,24 @@ export const ActionHeader = ({
           <span>操作</span>
           <FilterDropdown
             isActive={filterConfig.actionType !== "all"}
-            menuWidth="w-36 right-0" // 稍微加宽一点适应数字
+            menuWidth="w-40 right-0"
           >
             {(["all", "register", "renew"] as const).map((type) => {
               const count = actionCounts[type];
               const isSelected = filterConfig.actionType === type;
-              // 0 数量时，如果是 'all' 且列表为空，或者其他选项，是否禁用？
-              // 'all' 一般不禁用，其他如 register=0 可禁用
               const isDisabled = type !== "all" && count === 0;
 
               return (
                 <div
                   key={type}
                   className={`
-                    px-4 py-2 text-sm flex justify-between items-center
-                    ${isDisabled ? "opacity-50 cursor-not-allowed text-gray-400 bg-gray-50" : "cursor-pointer hover:bg-gray-50"}
-                    ${isSelected ? "text-link bg-blue-50/50" : !isDisabled ? "text-gray-500" : ""}
+                    px-4 py-2 text-sm flex justify-between items-center transition-colors
+                    ${
+                      isDisabled
+                        ? "opacity-50 cursor-not-allowed text-gray-400 bg-gray-50"
+                        : "cursor-pointer hover:bg-gray-200" // 🚀 统一 Hover
+                    }
+                    ${isSelected ? "text-link font-bold" : "text-gray-500"}
                   `}
                   onClick={() =>
                     !isDisabled &&
@@ -81,12 +85,14 @@ export const ActionHeader = ({
                         ? "可注册"
                         : "可续费"}
                   </span>
-                  {/* 显示数量 */}
-                  <span
-                    className={`text-xs ml-2 ${isSelected ? "text-link/70" : "text-gray-300"}`}
-                  >
-                    {count}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-qs-regular">
+                      ({count})
+                    </span>
+                    {isSelected && (
+                      <FontAwesomeIcon icon={faCheck} className="text-link" />
+                    )}
+                  </div>
                 </div>
               );
             })}

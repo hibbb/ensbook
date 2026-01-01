@@ -6,15 +6,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ThWrapper } from "./ThWrapper";
 import { STATUS_COLOR_TEXT } from "../../../config/constants";
-import type { DeleteCriteria } from "../types"; // 假设您定义了类型，或者用 any 暂代
+import type { DeleteCriteria } from "../types";
 
 interface DeleteHeaderProps {
   showDelete?: boolean;
-  // 🚀 更新回调签名，支持更多删除类型
   onBatchDelete?: (criteria: DeleteCriteria) => void;
   uniqueStatuses?: string[];
   statusCounts?: Record<string, number>;
-  // 🚀 新增：接收名称相关的计数
   nameCounts?: {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
@@ -76,11 +74,9 @@ export const DeleteHeader = ({
     setIsOpen(false);
   };
 
-  // 检查是否有任何按长度可删除的项
   const hasDeletableLengths = nameCounts.availableLengths.some(
     (len) => (nameCounts.lengthCounts[len] || 0) > 0,
   );
-  // 检查是否有任何按包装可删除的项
   const hasDeletableWrapped =
     nameCounts.wrappedCounts.wrapped > 0 ||
     nameCounts.wrappedCounts.unwrapped > 0;
@@ -94,8 +90,8 @@ export const DeleteHeader = ({
           className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
             showDelete
               ? isOpen
-                ? "bg-red-400 text-white"
-                : "text-red-400 hover:text-red-500 hover:bg-gray-50 cursor-pointer"
+                ? "bg-red-50 text-red-500"
+                : "text-gray-300 hover:text-red-400 hover:bg-gray-50 cursor-pointer"
               : "text-gray-200 cursor-not-allowed"
           }`}
           title="批量删除"
@@ -125,7 +121,7 @@ export const DeleteHeader = ({
                     </div>
                     {uniqueStatuses.map((status) => {
                       const count = statusCounts[status] || 0;
-                      if (count === 0) return null; // 不显示数量为0的
+                      if (count === 0) return null;
 
                       return (
                         <button
@@ -133,18 +129,19 @@ export const DeleteHeader = ({
                           onClick={() =>
                             handleItemClick({ type: "status", value: status })
                           }
-                          className={`w-full text-left px-4 py-2 transition-colors flex items-center justify-between group/item ${STATUS_COLOR_TEXT[status]} hover:bg-red-50 hover:text-red-500`}
+                          // 🚀 更新 Hover 颜色
+                          className={`w-full text-left px-4 py-2 transition-colors flex items-center justify-between group/item hover:bg-gray-200 ${STATUS_COLOR_TEXT[status]}`}
                         >
+                          <span>{status}</span>
                           <div className="flex items-center gap-2">
-                            <span>{status}</span>
                             <span className="text-xs opacity-60 font-qs-regular">
                               ({count})
                             </span>
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                            />
                           </div>
-                          <FontAwesomeIcon
-                            icon={faTrash}
-                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
-                          />
                         </button>
                       );
                     })}
@@ -152,7 +149,7 @@ export const DeleteHeader = ({
                   </>
                 )}
 
-                {/* 2. 🚀 按长度删除 */}
+                {/* 2. 按长度删除 */}
                 {hasDeletableLengths && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -168,18 +165,19 @@ export const DeleteHeader = ({
                           onClick={() =>
                             handleItemClick({ type: "length", value: len })
                           }
-                          className="w-full text-left px-4 py-2 text-text-main hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-between group/item"
+                          // 🚀 更新 Hover 颜色
+                          className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200 hover:text-red-500 transition-colors flex items-center justify-between group/item"
                         >
+                          <span>{len} 字符</span>
                           <div className="flex items-center gap-2">
-                            <span>{len} 字符</span>
                             <span className="text-xs opacity-60 font-qs-regular">
                               ({count})
                             </span>
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                            />
                           </div>
-                          <FontAwesomeIcon
-                            icon={faTrash}
-                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
-                          />
                         </button>
                       );
                     })}
@@ -187,7 +185,7 @@ export const DeleteHeader = ({
                   </>
                 )}
 
-                {/* 3. 🚀 按包装状态删除 */}
+                {/* 3. 按包装状态删除 */}
                 {hasDeletableWrapped && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -198,18 +196,18 @@ export const DeleteHeader = ({
                         onClick={() =>
                           handleItemClick({ type: "wrapped", value: true })
                         }
-                        className="w-full text-left px-4 py-2 text-text-main hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-between group/item"
+                        className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200 hover:text-red-500 transition-colors flex items-center justify-between group/item"
                       >
+                        <span>Wrapped</span>
                         <div className="flex items-center gap-2">
-                          <span>Wrapped</span>
                           <span className="text-xs opacity-60 font-qs-regular">
                             ({nameCounts.wrappedCounts.wrapped})
                           </span>
+                          <FontAwesomeIcon
+                            icon={faTrash}
+                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                          />
                         </div>
-                        <FontAwesomeIcon
-                          icon={faTrash}
-                          className="opacity-0 group-hover/item:opacity-100 text-[10px]"
-                        />
                       </button>
                     )}
                     {nameCounts.wrappedCounts.unwrapped > 0 && (
@@ -217,18 +215,18 @@ export const DeleteHeader = ({
                         onClick={() =>
                           handleItemClick({ type: "wrapped", value: false })
                         }
-                        className="w-full text-left px-4 py-2 text-text-main hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-between group/item"
+                        className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200 hover:text-red-500 transition-colors flex items-center justify-between group/item"
                       >
+                        <span>Unwrapped</span>
                         <div className="flex items-center gap-2">
-                          <span>Unwrapped</span>
                           <span className="text-xs opacity-60 font-qs-regular">
                             ({nameCounts.wrappedCounts.unwrapped})
                           </span>
+                          <FontAwesomeIcon
+                            icon={faTrash}
+                            className="opacity-0 group-hover/item:opacity-100 text-[10px]"
+                          />
                         </div>
-                        <FontAwesomeIcon
-                          icon={faTrash}
-                          className="opacity-0 group-hover/item:opacity-100 text-[10px]"
-                        />
                       </button>
                     )}
                     <div className="h-px bg-gray-100 my-1 mx-2" />
