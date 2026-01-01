@@ -57,34 +57,8 @@ h1 a {
     text-decoration: none;
 }
 
-/* === table styles === */
-
-.ebr-tb {
-    border-collapse: separate;
-    border-spacing: 0 0.25rem;
-}
-.ebr-tb-row td:first-child,
-.ebr-tb-row th:first-child {
-    padding-left: 1.25rem;
-    border-top-left-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-}
-.ebr-tb-row td:last-child,
-.ebr-tb-row th:last-child {
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-}
-.ebr-tb-row td {
-    background-color: #ffffff;
-    border: 0;
-}
-.ebr-tb-row th {
-    font-weight: 400;
-    background-color: #eaeaea;
-    border-bottom: 1px solid #dddddd;
-}
-
 /* ==== color model ==== */
+
 body {
     color: #483c32;
     font-weight: 300;
