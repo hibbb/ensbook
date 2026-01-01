@@ -10,6 +10,7 @@ import { StatusCell } from "./cells/StatusCell";
 import { OwnerCell } from "./cells/OwnerCell";
 import { LookupsCell } from "./cells/LookupsCell";
 import { ActionCell } from "./cells/ActionCell";
+import { Tooltip } from "../ui/Tooltip"; // 🚀 引入 Tooltip
 
 interface TableRowProps {
   record: NameRecord;
@@ -84,13 +85,17 @@ export const TableRow = ({
         <LookupsCell record={record} chainId={chainId} />
       </td>
 
-      {/* 7. 删除按钮 (逻辑简单，暂不拆分，或可视需要拆分) */}
+      {/* 7. 删除按钮 */}
       <td className="text-center">
         <div className="h-12 flex items-center justify-center">
-          <button
-            disabled={!canDelete}
-            onClick={() => onDelete?.(record)}
-            className={`
+          {/* 🚀 使用 Tooltip 包裹并移除 title */}
+          <Tooltip
+            content={canDelete ? `删除 ${record.label}.eth` : "Unavailable"}
+          >
+            <button
+              disabled={!canDelete}
+              onClick={() => onDelete?.(record)}
+              className={`
               transition-all duration-200
               ${
                 canDelete
@@ -98,10 +103,10 @@ export const TableRow = ({
                   : "text-gray-400 cursor-not-allowed opacity-50"
               }
             `}
-            title={canDelete ? "Delete" : "Unavailable"}
-          >
-            <FontAwesomeIcon icon={faCircleXmark} size="sm" />
-          </button>
+            >
+              <FontAwesomeIcon icon={faCircleXmark} size="sm" />
+            </button>
+          </Tooltip>
         </div>
       </td>
     </tr>

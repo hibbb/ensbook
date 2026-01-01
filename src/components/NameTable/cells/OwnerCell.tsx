@@ -1,4 +1,7 @@
+// src/components/NameTable/cells/OwnerCell.tsx
+
 import type { NameRecord } from "../../../types/ensNames";
+import { Tooltip } from "../../ui/Tooltip"; // 🚀 引入 Tooltip
 
 interface OwnerCellProps {
   record: NameRecord;
@@ -16,13 +19,13 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
         <div
           className={`flex items-center gap-2 text-sm ${isMe ? "" : "text-text-main"}`}
         >
-          <span
-            title={record.owner}
-            className={record.ownerPrimaryName ? "" : "text-gray-400"}
-          >
-            {record.ownerPrimaryName ||
-              `${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
-          </span>
+          {/* 🚀 使用 Tooltip 包裹并移除 title 属性 */}
+          <Tooltip content={record.owner}>
+            <span className={record.ownerPrimaryName ? "" : "text-gray-400"}>
+              {record.ownerPrimaryName ||
+                `${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
+            </span>
+          </Tooltip>
           {isMe && (
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-link opacity-75"></span>

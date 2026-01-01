@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
-import { faComment, faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPenToSquare,
+  faCommentDots,
+} from "@fortawesome/free-regular-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { getMemo, setMemo } from "../services/storage/memos";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover"; // 🚀 引入新组件
 import { Tooltip } from "./ui/Tooltip"; // 🚀 复用 Tooltip 显示简单提示
@@ -67,7 +70,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
             `}
           >
             <FontAwesomeIcon
-              icon={hasMemo ? faComment : faPenToSquare}
+              icon={hasMemo ? faCommentDots : faPenToSquare}
               size="xs"
               className={hasMemo ? "text-sm" : "text-xs"}
             />
