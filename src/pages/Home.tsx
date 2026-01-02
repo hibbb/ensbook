@@ -10,6 +10,7 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
 import { SearchHelpModal } from "../components/SearchHelpModal";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
+import { ReminderModal } from "../components/ReminderModal"; // 🚀 1. 引入提醒模态框
 import { HomeSearchSection } from "./Home/HomeSearchSection";
 import { HomeFloatingBar } from "./Home/HomeFloatingBar";
 
@@ -48,6 +49,9 @@ export const Home = () => {
     labels?: string[];
   } | null>(null);
 
+  // 🚀 2. 提醒功能状态：当前正在设置提醒的目标
+  const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
+
   useEffect(() => {
     saveStoredLabels(resolvedLabels);
   }, [resolvedLabels]);
@@ -58,7 +62,6 @@ export const Home = () => {
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
-  // 🚀 优化：防止删除时的骨架屏闪烁 (Keep Previous Data)
   const previousRecordsRef = useRef<NameRecord[]>([]);
   useEffect(() => {
     if (records) {
@@ -68,17 +71,14 @@ export const Home = () => {
 
   const effectiveRecords = records || previousRecordsRef.current;
 
-  // 客户端过滤：确保列表立即响应删除操作
   const validRecords = useMemo(() => {
     if (!effectiveRecords || resolvedLabels.length === 0) return [];
     const currentLabelSet = new Set(resolvedLabels);
     return effectiveRecords.filter((r) => currentLabelSet.has(r.label));
   }, [effectiveRecords, resolvedLabels]);
 
-  // 补全主域名信息
   const enrichedRecords = usePrimaryNames(validRecords);
 
-  // 表格逻辑 Hook (排序、过滤、多选)
   const {
     processedRecords,
     sortConfig,
@@ -89,17 +89,15 @@ export const Home = () => {
     toggleSelection,
     toggleSelectAll,
     clearSelection,
-    // 🚀 新增：解构出计数统计
     statusCounts,
     actionCounts,
-    nameCounts, // 🚀 从 hook 解构
+    nameCounts,
   } = useNameTableLogic(enrichedRecords, address);
 
   // ==========================================================================
   // 3. 区块链交互 Hooks
   // ==========================================================================
 
-  // 续费 Hook
   const {
     renewSingle,
     renewBatch,
@@ -109,7 +107,6 @@ export const Home = () => {
     isBusy: isRenewalBusy,
   } = useEnsRenewal();
 
-  // 注册 Hook
   const {
     startRegistration,
     checkAndResume,
@@ -119,10 +116,8 @@ export const Home = () => {
     resetStatus: resetReg,
   } = useEnsRegistration();
 
-  // 🚀 1. 管理挂起任务的状态
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
-  // 🚀 2. 初始化和列表变化时，扫描本地存储
   useEffect(() => {
     setPendingLabels(getAllPendingLabels());
   }, [resolvedLabels, regStatus]);
@@ -133,7 +128,6 @@ export const Home = () => {
   // 4. 事件处理函数
   // ==========================================================================
 
-  // --- 搜索与添加 ---
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!inputValue.trim()) return;
@@ -165,7 +159,6 @@ export const Home = () => {
     }
   };
 
-  // --- 删除操作 ---
   const handleDelete = (record: NameRecord) => {
     setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
     if (selectedLabels.has(record.label)) {
@@ -173,15 +166,12 @@ export const Home = () => {
     }
   };
 
-  // 🚀 重构删除逻辑：仅 "all" 类型需要确认
   const handleBatchDelete = (criteria: DeleteCriteria) => {
-    // 使用 effectiveRecords 确保在快速操作或数据刷新瞬间也有数据可用
     const targetRecords = records || effectiveRecords;
     if (!targetRecords) return;
 
     const { type, value } = criteria;
 
-    // 1. 全部删除 (保持确认弹窗，这是破坏性最大的操作)
     if (type === "all") {
       if (window.confirm("确定要清空所有历史记录吗？")) {
         setResolvedLabels([]);
@@ -192,7 +182,6 @@ export const Home = () => {
 
     let labelsToDelete = new Set<string>();
 
-    // 2. 根据类型筛选要删除的记录
     switch (type) {
       case "status":
         labelsToDelete = new Set(
@@ -218,7 +207,6 @@ export const Home = () => {
         break;
       }
 
-      // 🚀 新增：处理按所有者删除
       case "owner": {
         if (!address) {
           toast.error("请先连接钱包以识别所有权");
@@ -231,8 +219,6 @@ export const Home = () => {
               const recordOwner = r.owner?.toLowerCase();
               const myAddress = address.toLowerCase();
               const isOwner = recordOwner === myAddress;
-              // 如果要删我的：保留 isOwner 为 true 的
-              // 如果要删其他的：保留 isOwner 为 false 的
               return isDeletingMine ? isOwner : !isOwner;
             })
             .map((r) => r.label),
@@ -243,12 +229,10 @@ export const Home = () => {
 
     if (labelsToDelete.size === 0) return;
 
-    // 3. 直接执行删除 (移除 window.confirm 包裹)
     setResolvedLabels((prev) =>
       prev.filter((label) => !labelsToDelete.has(label)),
     );
 
-    // 同步清理选中状态
     if (selectedLabels.size > 0) {
       labelsToDelete.forEach((label) => {
         if (selectedLabels.has(label)) {
@@ -259,7 +243,6 @@ export const Home = () => {
     toast.success("删除成功");
   };
 
-  // --- 流程触发 (打开 Modal) ---
   const handleSingleRegister = async (record: NameRecord) => {
     if (pendingLabels.has(record.label)) {
       setDurationTarget({ type: "register", record });
@@ -273,12 +256,16 @@ export const Home = () => {
     setDurationTarget({ type: "renew", record });
   };
 
+  // 🚀 3. 处理打开提醒弹窗
+  const handleSetReminder = (record: NameRecord) => {
+    setReminderTarget(record);
+  };
+
   const handleBatchRenewalTrigger = () => {
     if (selectedLabels.size === 0) return;
     setDurationTarget({ type: "batch", labels: Array.from(selectedLabels) });
   };
 
-  // --- 流程确认 (Modal 回调) ---
   const onDurationConfirm = (duration: bigint) => {
     if (!durationTarget) return;
 
@@ -291,14 +278,12 @@ export const Home = () => {
     }
   };
 
-  // --- 流程关闭与清理 ---
   const handleCloseModal = () => {
     setDurationTarget(null);
     resetRenewal();
     resetReg();
   };
 
-  // 🚀 2. 监听交易成功，触发数据刷新
   useEffect(() => {
     if (regStatus === "success" || renewalStatus === "success") {
       const timer = setTimeout(() => {
@@ -316,18 +301,15 @@ export const Home = () => {
     }
   }, [regStatus, renewalStatus, queryClient]);
 
-  // 计算 Modal 需要的动态状态
   const activeType = durationTarget?.type || "renew";
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
-  // 骨架屏显示逻辑
   const showSkeleton =
     isQuerying && resolvedLabels.length > 0 && validRecords.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
-      {/* ================= Header & Search ================= */}
       <HomeSearchSection
         hasContent={hasContent}
         inputValue={inputValue}
@@ -337,7 +319,6 @@ export const Home = () => {
         onOpenHelp={() => setIsHelpOpen(true)}
       />
 
-      {/* ================= Main Table ================= */}
       {hasContent && (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
           <NameTable
@@ -358,6 +339,8 @@ export const Home = () => {
             pendingLabels={pendingLabels}
             onRegister={handleSingleRegister}
             onRenew={handleSingleRenew}
+            // 🚀 4. 传递 onReminder 回调
+            onReminder={handleSetReminder}
             skeletonRows={5}
             headerTop="88px"
             totalRecordsCount={enrichedRecords?.length || 0}
@@ -368,7 +351,6 @@ export const Home = () => {
         </div>
       )}
 
-      {/* ================= Bottom Floating Bar ================= */}
       <HomeFloatingBar
         selectedCount={selectedLabels.size}
         isBusy={isRenewalBusy}
@@ -377,7 +359,6 @@ export const Home = () => {
         onClearSelection={clearSelection}
       />
 
-      {/* ================= Modals ================= */}
       <SearchHelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
@@ -398,6 +379,13 @@ export const Home = () => {
         }
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
+      />
+
+      {/* 🚀 5. 渲染提醒模态框 */}
+      <ReminderModal
+        isOpen={!!reminderTarget}
+        onClose={() => setReminderTarget(null)}
+        record={reminderTarget}
       />
     </div>
   );

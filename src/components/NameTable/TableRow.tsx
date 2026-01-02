@@ -4,13 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import type { NameRecord } from "../../types/ensNames";
 
-// 引入拆分后的单元格组件
 import { NameCell } from "./cells/NameCell";
 import { StatusCell } from "./cells/StatusCell";
 import { OwnerCell } from "./cells/OwnerCell";
 import { LookupsCell } from "./cells/LookupsCell";
 import { ActionCell } from "./cells/ActionCell";
-import { Tooltip } from "../ui/Tooltip"; // 🚀 引入 Tooltip
+import { Tooltip } from "../ui/Tooltip";
 
 interface TableRowProps {
   record: NameRecord;
@@ -25,6 +24,7 @@ interface TableRowProps {
   onDelete?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
+  onReminder?: (record: NameRecord) => void; // 🚀 新增 prop
   isPending?: boolean;
 }
 
@@ -41,33 +41,29 @@ export const TableRow = ({
   onToggleSelection,
   onRegister,
   onRenew,
+  onReminder, // 🚀 解构
   isPending = false,
 }: TableRowProps) => {
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-link/10 bg-table-row">
-      {/* 1. 序号 */}
       <td className="w-14 text-center">
         <div className="h-12 flex items-center justify-center">
           <span className="text-xs text-gray-400">{index + 1}</span>
         </div>
       </td>
 
-      {/* 2. 名称 */}
       <td>
         <NameCell record={record} />
       </td>
 
-      {/* 3. 状态 (含时间与价格) */}
       <td>
         <StatusCell record={record} now={now} />
       </td>
 
-      {/* 4. 所有者 */}
       <td>
         <OwnerCell record={record} currentAddress={currentAddress} />
       </td>
 
-      {/* 5. 操作 (注册/续费/选择) */}
       <td className="text-right">
         <ActionCell
           record={record}
@@ -77,20 +73,18 @@ export const TableRow = ({
           onToggleSelection={onToggleSelection}
           onRegister={onRegister}
           onRenew={onRenew}
+          onReminder={onReminder} // 🚀 透传给 ActionCell
         />
       </td>
 
-      {/* 6. 外部链接 */}
       <td className="text-center">
         <LookupsCell record={record} chainId={chainId} />
       </td>
 
-      {/* 7. 删除按钮 */}
       <td className="text-center">
         <div className="h-12 flex items-center justify-center">
-          {/* 🚀 使用 Tooltip 包裹并移除 title */}
           <Tooltip
-            content={canDelete ? `删除 ${record.label}.eth` : "Unavailable"}
+            content={canDelete ? `删除 ${record.label}.eth` : "不可删除"}
           >
             <button
               disabled={!canDelete}
@@ -99,8 +93,8 @@ export const TableRow = ({
               transition-all duration-200
               ${
                 canDelete
-                  ? "text-link hover:text-link-hover active:scale-95"
-                  : "text-gray-400 cursor-not-allowed opacity-50"
+                  ? "text-gray-300 hover:text-link active:scale-95"
+                  : "text-gray-200 cursor-not-allowed"
               }
             `}
             >

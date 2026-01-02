@@ -89,7 +89,7 @@ export const NameCell = ({ record }: NameCellProps) => {
     <div className="h-12 flex items-center">
       <div className="flex items-center gap-2">
         {/* 1. 域名链接 */}
-        <Tooltip content="在 ENS 官网查看详情">
+        <Tooltip content="ENS APP">
           <a
             href={`https://app.ens.domains/${record.label}.eth`}
             target="_blank"
@@ -99,7 +99,7 @@ export const NameCell = ({ record }: NameCellProps) => {
             {record.wrapped && (
               <span className="text-sm font-qs-regular text-link">{"["}</span>
             )}
-            <span className="text-base font-qs-medium tracking-tight text-text-main group-hover:text-link transition-colors">
+            <span className="text-base font-qs-medium tracking-tight text-text-main transition-colors">
               {record.label}
             </span>
             <span className="text-sm font-qs-regular text-gray-400">.eth</span>
@@ -112,7 +112,7 @@ export const NameCell = ({ record }: NameCellProps) => {
         {/* 🚀 2. 元数据 Popover (新增) */}
         {metadata && (
           <Popover>
-            <Tooltip content="点击查看元数据">
+            <Tooltip content="元数据">
               <PopoverTrigger asChild>
                 <button className="text-gray-300 hover:text-link transition-colors outline-none">
                   <FontAwesomeIcon icon={faFileLines} size="xs" />

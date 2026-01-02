@@ -3,21 +3,22 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { useQueryClient } from "@tanstack/react-query"; // 🚀 1. 引入 QueryClient
+import { useQueryClient } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
-import { ProcessModal, type ProcessType } from "../components/ProcessModal"; // 🚀 引入流程组件
+import { ProcessModal, type ProcessType } from "../components/ProcessModal";
+import { ReminderModal } from "../components/ReminderModal"; // 🚀 1. 引入提醒模态框
 
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
 import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
-import { useEnsRegistration } from "../hooks/useEnsRegistration"; // 🚀 引入注册 Hook
-import { getAllPendingLabels } from "../services/storage/registration"; // 🚀 引入断点续传检查
+import { useEnsRegistration } from "../hooks/useEnsRegistration";
+import { getAllPendingLabels } from "../services/storage/registration";
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -39,10 +40,8 @@ export const CollectionDetail = () => {
     isError,
   } = useCollectionRecords(id || "");
 
-  // 补全主域名信息
   const records = usePrimaryNames(basicRecords);
 
-  // 表格逻辑 (包含筛选、排序、选择)
   const {
     processedRecords,
     sortConfig,
@@ -53,17 +52,15 @@ export const CollectionDetail = () => {
     toggleSelection,
     toggleSelectAll,
     clearSelection,
-    // 🚀 新增：解构出计数统计
     statusCounts,
     actionCounts,
-    nameCounts, // 🚀 从 hook 解构
+    nameCounts,
   } = useNameTableLogic(records, address);
 
   // ==========================================================================
   // 2. 区块链交互 Hooks
   // ==========================================================================
 
-  // 续费 Hook
   const {
     renewSingle,
     renewBatch,
@@ -73,7 +70,6 @@ export const CollectionDetail = () => {
     isBusy: isRenewalBusy,
   } = useEnsRenewal();
 
-  // 注册 Hook (🚀 新增支持)
   const {
     startRegistration,
     checkAndResume,
@@ -87,35 +83,28 @@ export const CollectionDetail = () => {
   // 3. 状态管理
   // ==========================================================================
 
-  // 流程控制：当前操作目标
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
     record?: NameRecord;
     labels?: string[];
   } | null>(null);
 
-  // 断点续传状态
+  // 🚀 2. 提醒功能状态
+  const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
+
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
-  // 🚀 最终修复：
-  // 1. 移除 basicRecords 依赖：挂起任务是全局的，不需要依赖当前页面数据。
-  // 2. 使用 setTimeout (0ms)：将 setState 推迟到渲染完成后执行。
-  //    这能彻底消除 "Calling setState synchronously within an effect" 错误。
   useEffect(() => {
     const timer = setTimeout(() => {
       setPendingLabels(getAllPendingLabels());
     }, 0);
     return () => clearTimeout(timer);
-  }, [regStatus]); // 仅监听注册状态变化
+  }, [regStatus]);
 
-  // 🚀 核心优化：监听交易成功，触发数据刷新
-  // 集合页面通常需要更及时的反馈，因此采用与 Home 相同的双重刷新策略
   useEffect(() => {
     if (regStatus === "success" || renewalStatus === "success") {
       const timer = setTimeout(() => {
-        // 刷新集合记录
         queryClient.invalidateQueries({ queryKey: ["collection-records"] });
-        // 同时刷新通用的名称记录，保证数据一致性
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 2000);
 
@@ -135,7 +124,6 @@ export const CollectionDetail = () => {
   // 4. 业务逻辑处理
   // ==========================================================================
 
-  // 计算可续费的选择项
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
     return new Set(
@@ -154,30 +142,29 @@ export const CollectionDetail = () => {
 
   // --- 触发器 ---
 
-  // 单个注册
   const handleSingleRegister = async (record: NameRecord) => {
     if (pendingLabels.has(record.label)) {
-      // 断点续传：直接进入处理流程
       setDurationTarget({ type: "register", record });
       await checkAndResume(record.label);
     } else {
-      // 新注册：打开时长选择
       setDurationTarget({ type: "register", record });
     }
   };
 
-  // 单个续费
   const handleSingleRenew = (record: NameRecord) => {
     setDurationTarget({ type: "renew", record });
   };
 
-  // 批量续费
+  // 🚀 3. 处理打开提醒弹窗
+  const handleSetReminder = (record: NameRecord) => {
+    setReminderTarget(record);
+  };
+
   const handleBatchRenewalTrigger = () => {
     if (selectionCount === 0) return;
     setDurationTarget({ type: "batch", labels: validSelection });
   };
 
-  // --- 确认回调 ---
   const onDurationConfirm = (duration: bigint) => {
     if (!durationTarget) return;
 
@@ -190,14 +177,12 @@ export const CollectionDetail = () => {
     }
   };
 
-  // --- 关闭回调 ---
   const handleCloseModal = () => {
     setDurationTarget(null);
     resetRenewal();
     resetReg();
   };
 
-  // 计算 Modal 动态状态
   const activeType = durationTarget?.type || "renew";
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
@@ -226,21 +211,19 @@ export const CollectionDetail = () => {
         onSort={handleSort}
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
-        canDelete={false} // 集合页面通常不支持删除列表项
+        canDelete={false}
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
-        // 🚀 传递功能回调
         onRegister={handleSingleRegister}
         onRenew={handleSingleRenew}
-        // 🚀 传递断点续传状态
+        // 🚀 4. 传递 onReminder 回调
+        onReminder={handleSetReminder}
         pendingLabels={pendingLabels}
-        // 🚀 传入未经过滤的原始总数
         totalRecordsCount={records?.length || 0}
-        // 🚀 新增：透传计数数据
         statusCounts={statusCounts}
         actionCounts={actionCounts}
-        nameCounts={nameCounts} // 🚀 传入组件
+        nameCounts={nameCounts}
       />
 
       {/* 底部悬浮操作栏 */}
@@ -255,7 +238,6 @@ export const CollectionDetail = () => {
 
             <div className="h-4 w-px bg-gray-300 mx-1" />
 
-            {/* 🚀 升级：改为触发 Modal */}
             <button
               onClick={handleBatchRenewalTrigger}
               disabled={isRenewalBusy || !isConnected}
@@ -279,7 +261,7 @@ export const CollectionDetail = () => {
         </div>
       )}
 
-      {/* 🚀 流程模态框 */}
+      {/* 流程模态框 */}
       <ProcessModal
         isOpen={!!durationTarget}
         type={activeType}
@@ -295,6 +277,13 @@ export const CollectionDetail = () => {
         }
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
+      />
+
+      {/* 🚀 5. 渲染提醒模态框 */}
+      <ReminderModal
+        isOpen={!!reminderTarget}
+        onClose={() => setReminderTarget(null)}
+        record={reminderTarget}
       />
     </div>
   );

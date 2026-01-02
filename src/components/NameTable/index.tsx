@@ -25,6 +25,7 @@ interface NameTableProps {
   onDelete?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
+  onReminder?: (record: NameRecord) => void; // 🚀 新增 prop
   selectedLabels?: Set<string>;
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
@@ -40,6 +41,8 @@ interface NameTableProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
   };
+  myCount?: number;
+  ownershipCounts?: { mine: number; others: number };
 }
 
 export const NameTable = (props: NameTableProps) => {
@@ -56,14 +59,12 @@ export const NameTable = (props: NameTableProps) => {
   const skeletonCount = props.skeletonRows || 8;
   const safeRecords = props.records || [];
 
-  // 计算属于当前用户的记录数量 (myCount)
   const myCount = safeRecords.filter(
     (r) =>
       props.currentAddress &&
       r.owner?.toLowerCase() === props.currentAddress.toLowerCase(),
   ).length;
 
-  // 🚀 新增：计算所有者统计信息
   const ownershipCounts = {
     mine: myCount,
     others: safeRecords.length - myCount,
@@ -105,7 +106,6 @@ export const NameTable = (props: NameTableProps) => {
             actionCounts={props.actionCounts}
             nameCounts={props.nameCounts}
             myCount={myCount}
-            // 🚀 传递 ownershipCounts
             ownershipCounts={ownershipCounts}
           />
           <tbody>
@@ -128,6 +128,7 @@ export const NameTable = (props: NameTableProps) => {
                   onToggleSelection={props.onToggleSelection}
                   onRegister={props.onRegister}
                   onRenew={props.onRenew}
+                  onReminder={props.onReminder} // 🚀 透传给 TableRow
                   isPending={props.pendingLabels?.has(r.label)}
                 />
               ))
@@ -147,7 +148,7 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
-
+// ... SkeletonRow 略 ...
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>
