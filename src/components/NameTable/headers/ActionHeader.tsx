@@ -4,7 +4,8 @@ import { ThWrapper } from "./ThWrapper";
 import { FilterDropdown } from "../FilterDropdown";
 import type { FilterConfig } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons"; // 确保引入 Check 图标
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "../../ui/Tooltip"; // 🚀 引入 Tooltip
 
 interface ActionHeaderProps {
   filterConfig: FilterConfig;
@@ -30,24 +31,29 @@ export const ActionHeader = ({
       <div className="flex items-center gap-2">
         {onToggleSelectAll && (
           <div className="flex items-center">
-            <input
-              type="checkbox"
-              disabled={!isConnected || !hasRenewable}
-              className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
-                !isConnected || !hasRenewable
-                  ? "cursor-not-allowed bg-gray-200"
-                  : "cursor-pointer"
-              }`}
-              checked={isAllSelected}
-              onChange={onToggleSelectAll}
-              title={
+            {/* 🚀 使用 Tooltip 包裹 */}
+            <Tooltip
+              content={
                 !isConnected
                   ? "请先连接钱包"
                   : !hasRenewable
                     ? "无可续费域名"
                     : "全选可续费域名"
               }
-            />
+            >
+              <input
+                type="checkbox"
+                disabled={!isConnected || !hasRenewable}
+                className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
+                  !isConnected || !hasRenewable
+                    ? "cursor-not-allowed bg-gray-200"
+                    : "cursor-pointer"
+                }`}
+                checked={isAllSelected}
+                onChange={onToggleSelectAll}
+                // ❌ 移除 title
+              />
+            </Tooltip>
           </div>
         )}
         <div className="flex items-center gap-2">
@@ -55,6 +61,7 @@ export const ActionHeader = ({
           <FilterDropdown
             isActive={filterConfig.actionType !== "all"}
             menuWidth="w-40 right-0"
+            title="按操作类型筛选"
           >
             {(["all", "register", "renew"] as const).map((type) => {
               const count = actionCounts[type];
@@ -69,7 +76,7 @@ export const ActionHeader = ({
                     ${
                       isDisabled
                         ? "opacity-50 cursor-not-allowed text-gray-400 bg-gray-50"
-                        : "cursor-pointer hover:bg-gray-200" // 🚀 统一 Hover
+                        : "cursor-pointer hover:bg-gray-200"
                     }
                     ${isSelected ? "text-link font-bold" : "text-gray-500"}
                   `}

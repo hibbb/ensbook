@@ -69,7 +69,11 @@ export const NameHeader = ({
             title="按长度排序"
           />
 
-          <FilterDropdown isActive={isActive} menuWidth="w-48">
+          <FilterDropdown
+            isActive={isActive}
+            menuWidth="w-48"
+            title="按长度或包装筛选"
+          >
             {/* 1. 长度筛选 */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
               按长度

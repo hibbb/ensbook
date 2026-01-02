@@ -2,8 +2,6 @@
 
 import type { SortField, SortConfig, FilterConfig } from "./types";
 import { ThWrapper } from "./headers/ThWrapper";
-
-// 引入所有拆分后的 Header 组件
 import { IndexHeader } from "./headers/IndexHeader";
 import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
@@ -11,7 +9,7 @@ import { OwnerHeader } from "./headers/OwnerHeader";
 import { ActionHeader } from "./headers/ActionHeader";
 import { DeleteHeader } from "./headers/DeleteHeader";
 
-import type { DeleteCriteria } from "./types"; // 🚀
+import type { DeleteCriteria } from "./types";
 
 interface TableHeaderProps {
   sortConfig: SortConfig;
@@ -31,12 +29,14 @@ interface TableHeaderProps {
   filteredCount?: number;
   statusCounts?: Record<string, number>;
   actionCounts?: { all: number; register: number; renew: number };
-  // 🚀 新增
   nameCounts?: {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
   };
+  myCount?: number;
+  // 🚀 新增 prop
+  ownershipCounts?: { mine: number; others: number };
 }
 
 export const TableHeader = ({
@@ -56,12 +56,14 @@ export const TableHeader = ({
   filteredCount = 0,
   statusCounts = {},
   actionCounts = { all: 0, register: 0, renew: 0 },
-  // 🚀 默认值
   nameCounts = {
     lengthCounts: {},
     availableLengths: [],
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
   },
+  myCount = 0,
+  // 🚀 默认值
+  ownershipCounts = { mine: 0, others: 0 },
 }: TableHeaderProps) => {
   const headerStyle = {
     "--header-offset":
@@ -82,7 +84,6 @@ export const TableHeader = ({
           <NameHeader
             sortConfig={sortConfig}
             onSort={onSort}
-            // 🚀 透传配置
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
             nameCounts={nameCounts}
@@ -106,6 +107,7 @@ export const TableHeader = ({
             isConnected={isConnected}
             onSort={onSort}
             onFilterChange={onFilterChange}
+            myCount={myCount}
           />
         </th>
 
@@ -130,8 +132,10 @@ export const TableHeader = ({
             showDelete={showDelete}
             onBatchDelete={onBatchDelete}
             uniqueStatuses={uniqueStatuses}
-            statusCounts={statusCounts} // 🚀 透传 statusCounts
-            nameCounts={nameCounts} // 🚀 透传
+            statusCounts={statusCounts}
+            nameCounts={nameCounts}
+            // 🚀 透传 ownershipCounts
+            ownershipCounts={ownershipCounts}
           />
         </th>
       </tr>

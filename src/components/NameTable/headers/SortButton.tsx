@@ -1,6 +1,9 @@
+// src/components/NameTable/headers/SortButton.tsx
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import type { SortField, SortConfig } from "../types";
+import { Tooltip } from "../../ui/Tooltip"; // 🚀 引入 Tooltip
 
 interface SortButtonProps {
   field: SortField;
@@ -31,13 +34,12 @@ export const SortButton = ({
   const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
   const buttonInactiveClass = "text-link hover:bg-gray-50";
 
-  return (
+  const buttonContent = (
     <button
       onClick={() => onSort(field)}
       className={`${buttonBaseClass} ${
         isActive ? buttonActiveClass : buttonInactiveClass
       }`}
-      title={title}
     >
       <FontAwesomeIcon
         icon={isAsc ? ascIcon : isDesc ? descIcon : defaultIcon}
@@ -45,4 +47,11 @@ export const SortButton = ({
       />
     </button>
   );
+
+  // 🚀 如果有 title，则包裹 Tooltip
+  if (title) {
+    return <Tooltip content={title}>{buttonContent}</Tooltip>;
+  }
+
+  return buttonContent;
 };

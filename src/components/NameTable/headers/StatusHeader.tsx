@@ -53,7 +53,10 @@ export const StatusHeader = ({
             title="按过期时间排序"
           />
 
-          <FilterDropdown isActive={filterConfig.statusList.length > 0}>
+          <FilterDropdown
+            isActive={filterConfig.statusList.length > 0}
+            title="按状态筛选"
+          >
             {/* 全部显示选项 */}
             <div
               className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${

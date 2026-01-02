@@ -14,7 +14,6 @@ import type {
 
 interface NameTableProps {
   records: NameRecord[] | undefined | null;
-  // ... 其他 props 保持不变
   isLoading: boolean;
   currentAddress?: string;
   isConnected: boolean;
@@ -33,7 +32,6 @@ interface NameTableProps {
   headerTop?: string | number;
   pendingLabels?: Set<string>;
   totalRecordsCount?: number;
-  // 🚀 新增：接收计数数据
   statusCounts?: Record<string, number>;
   actionCounts?: { all: number; register: number; renew: number };
   onBatchDelete?: (criteria: DeleteCriteria) => void;
@@ -57,10 +55,23 @@ export const NameTable = (props: NameTableProps) => {
   const shouldShowSkeleton = props.isLoading || !props.records;
   const skeletonCount = props.skeletonRows || 8;
   const safeRecords = props.records || [];
+
+  // 计算属于当前用户的记录数量 (myCount)
+  const myCount = safeRecords.filter(
+    (r) =>
+      props.currentAddress &&
+      r.owner?.toLowerCase() === props.currentAddress.toLowerCase(),
+  ).length;
+
+  // 🚀 新增：计算所有者统计信息
+  const ownershipCounts = {
+    mine: myCount,
+    others: safeRecords.length - myCount,
+  };
+
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
   const hasRenewableRecords = renewableRecords.length > 0;
 
-  // 状态集合计算保持不变 (用于 DeleteHeader 的可见性)
   const statusSet = new Set<string>();
   safeRecords.forEach((r) => statusSet.add(r.status));
   const uniqueStatuses = Array.from(statusSet).sort();
@@ -90,12 +101,13 @@ export const NameTable = (props: NameTableProps) => {
             uniqueStatuses={uniqueStatuses}
             filteredCount={safeRecords.length}
             totalCount={props.totalRecordsCount ?? safeRecords.length}
-            // 🚀 透传计数
             statusCounts={props.statusCounts}
             actionCounts={props.actionCounts}
             nameCounts={props.nameCounts}
+            myCount={myCount}
+            // 🚀 传递 ownershipCounts
+            ownershipCounts={ownershipCounts}
           />
-          {/* tbody 保持不变 */}
           <tbody>
             {shouldShowSkeleton ? (
               Array.from({ length: skeletonCount }).map((_, i) => (
@@ -135,7 +147,7 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
-// ... SkeletonRow 略 ...
+
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>

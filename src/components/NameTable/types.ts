@@ -1,8 +1,10 @@
 // src/components/NameTable/types.ts
 
+// 🚀 修改：增加 "owner" 类型
+export type DeleteType = "all" | "status" | "length" | "wrapped" | "owner";
+
 export type SortField = "label" | "length" | "status" | "owner" | null;
 export type SortDirection = "asc" | "desc" | null;
-export type DeleteType = "all" | "status" | "length" | "wrapped";
 
 export interface DeleteCriteria {
   type: DeleteType;
@@ -18,9 +20,8 @@ export interface FilterConfig {
   onlyMe: boolean;
   statusList: string[];
   actionType: "all" | "register" | "renew";
-  // 🚀 新增字段
-  lengthList: number[]; // 选中的长度列表 (空数组表示全选)
-  wrappedType: "all" | "wrapped" | "unwrapped"; // 包装状态
+  lengthList: number[];
+  wrappedType: "all" | "wrapped" | "unwrapped";
 }
 
 export const STATUS_OPTIONS = [
