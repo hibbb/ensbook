@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "../../components/ui/Tooltip";
 
 interface HomeSearchSectionProps {
   hasContent: boolean;
@@ -34,7 +35,7 @@ export const HomeSearchSection = ({
     >
       {!hasContent && (
         <h1 className="text-4xl font-qs-bold text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
-          ENS <span className="text-link">Search</span>
+          <span className="text-link">Search</span> ENS
         </h1>
       )}
 
@@ -44,14 +45,14 @@ export const HomeSearchSection = ({
         }`}
       >
         <div className="relative group">
-          <button
-            onClick={onOpenHelp}
-            className="absolute left-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-yellow-100 hover:text-yellow-400 transition-all active:scale-95 z-10"
-            title="搜索帮助"
-          >
-            <FontAwesomeIcon icon={faLightbulb} size="sm" />
-          </button>
-
+          <Tooltip content="搜索帮助">
+            <button
+              onClick={onOpenHelp}
+              className="absolute left-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-yellow-100 hover:text-yellow-400 transition-all active:scale-95 z-10"
+            >
+              <FontAwesomeIcon icon={faLightbulb} size="sm" />
+            </button>
+          </Tooltip>
           <input
             type="text"
             className="w-full h-14 pl-14 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
