@@ -1,9 +1,11 @@
 // src/components/NameTable/index.tsx
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
+import { Pagination } from "../ui/Pagination";
 import { isRenewable } from "../../utils/ens";
+import { usePrimaryNames } from "../../hooks/usePrimaryNames";
 import type { NameRecord } from "../../types/ensNames";
 import type {
   SortField,
@@ -25,7 +27,7 @@ interface NameTableProps {
   onDelete?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
-  onReminder?: (record: NameRecord) => void; // 🚀 新增 prop
+  onReminder?: (record: NameRecord) => void;
   selectedLabels?: Set<string>;
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
@@ -48,6 +50,10 @@ interface NameTableProps {
 export const NameTable = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 50;
+
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(Math.floor(Date.now() / 1000));
@@ -57,8 +63,33 @@ export const NameTable = (props: NameTableProps) => {
 
   const shouldShowSkeleton = props.isLoading || !props.records;
   const skeletonCount = props.skeletonRows || 8;
-  const safeRecords = props.records || [];
 
+  // 缓存全量数据引用
+  const safeRecords = useMemo(() => props.records || [], [props.records]);
+
+  // 状态镜像重置页码 (当筛选条件改变时，回到第一页)
+  const [prevFilterConfig, setPrevFilterConfig] = useState(props.filterConfig);
+  const [prevRecordsLen, setPrevRecordsLen] = useState(safeRecords.length);
+
+  if (
+    props.filterConfig !== prevFilterConfig ||
+    safeRecords.length !== prevRecordsLen
+  ) {
+    setPrevFilterConfig(props.filterConfig);
+    setPrevRecordsLen(safeRecords.length);
+    setCurrentPage(1);
+  }
+
+  // 核心步骤：先切片 (Slice First)
+  const paginatedBasicRecords = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return safeRecords.slice(startIndex, startIndex + pageSize);
+  }, [safeRecords, currentPage, pageSize]);
+
+  // 核心步骤：后解析 (Resolve Later)
+  const displayRecords = usePrimaryNames(paginatedBasicRecords);
+
+  // 统计逻辑
   const myCount = safeRecords.filter(
     (r) =>
       props.currentAddress &&
@@ -83,7 +114,7 @@ export const NameTable = (props: NameTableProps) => {
     renewableRecords.every((r) => props.selectedLabels?.has(r.label));
 
   return (
-    <div className="bg-table-row rounded-xl border border-gray-100 relative">
+    <div className="bg-table-row rounded-xl border border-gray-100 relative flex flex-col">
       <div className="overflow-x-auto lg:overflow-visible">
         <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3">
           <TableHeader
@@ -114,11 +145,13 @@ export const NameTable = (props: NameTableProps) => {
                 <SkeletonRow key={i} />
               ))
             ) : safeRecords.length > 0 ? (
-              safeRecords.map((r, i) => (
+              // 🚀 修复：使用 (displayRecords || paginatedBasicRecords) 处理 undefined
+              // 这样在主域名解析完成前，用户也能立即看到基础数据，体验更流畅
+              (displayRecords || paginatedBasicRecords).map((r, i) => (
                 <TableRow
                   key={r.namehash}
                   record={r}
-                  index={i}
+                  index={i + (currentPage - 1) * pageSize}
                   now={now}
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
@@ -128,7 +161,7 @@ export const NameTable = (props: NameTableProps) => {
                   onToggleSelection={props.onToggleSelection}
                   onRegister={props.onRegister}
                   onRenew={props.onRenew}
-                  onReminder={props.onReminder} // 🚀 透传给 TableRow
+                  onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
                 />
               ))
@@ -145,10 +178,19 @@ export const NameTable = (props: NameTableProps) => {
           </tbody>
         </table>
       </div>
+
+      {!shouldShowSkeleton && safeRecords.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalCount={safeRecords.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };
-// ... SkeletonRow 略 ...
+
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>

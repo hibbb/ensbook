@@ -10,13 +10,12 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
 import { SearchHelpModal } from "../components/SearchHelpModal";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
-import { ReminderModal } from "../components/ReminderModal"; // 🚀 1. 引入提醒模态框
+import { ReminderModal } from "../components/ReminderModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
 import { HomeFloatingBar } from "./Home/HomeFloatingBar";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
@@ -42,14 +41,14 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // 流程控制状态：当前正在操作的目标（注册/续费/批量）
+  // 流程控制状态
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
     record?: NameRecord;
     labels?: string[];
   } | null>(null);
 
-  // 🚀 2. 提醒功能状态：当前正在设置提醒的目标
+  // 提醒功能状态
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
 
   useEffect(() => {
@@ -71,16 +70,17 @@ export const Home = () => {
 
   const effectiveRecords = records || previousRecordsRef.current;
 
+  // 客户端过滤
   const validRecords = useMemo(() => {
     if (!effectiveRecords || resolvedLabels.length === 0) return [];
     const currentLabelSet = new Set(resolvedLabels);
     return effectiveRecords.filter((r) => currentLabelSet.has(r.label));
   }, [effectiveRecords, resolvedLabels]);
 
-  const enrichedRecords = usePrimaryNames(validRecords);
+  // 🚀 移除全量解析：const enrichedRecords = usePrimaryNames(validRecords);
 
   const {
-    processedRecords,
+    processedRecords, // 这里是排序/筛选后的基础数据（未解析主域名）
     sortConfig,
     filterConfig,
     handleSort,
@@ -92,7 +92,7 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-  } = useNameTableLogic(enrichedRecords, address);
+  } = useNameTableLogic(validRecords, address); // ✅ 直接使用 validRecords
 
   // ==========================================================================
   // 3. 区块链交互 Hooks
@@ -256,7 +256,6 @@ export const Home = () => {
     setDurationTarget({ type: "renew", record });
   };
 
-  // 🚀 3. 处理打开提醒弹窗
   const handleSetReminder = (record: NameRecord) => {
     setReminderTarget(record);
   };
@@ -339,11 +338,10 @@ export const Home = () => {
             pendingLabels={pendingLabels}
             onRegister={handleSingleRegister}
             onRenew={handleSingleRenew}
-            // 🚀 4. 传递 onReminder 回调
             onReminder={handleSetReminder}
             skeletonRows={5}
             headerTop="88px"
-            totalRecordsCount={enrichedRecords?.length || 0}
+            totalRecordsCount={validRecords?.length || 0} // ✅ 使用 validRecords
             statusCounts={statusCounts}
             actionCounts={actionCounts}
             nameCounts={nameCounts}
@@ -381,7 +379,6 @@ export const Home = () => {
         onConfirm={onDurationConfirm}
       />
 
-      {/* 🚀 5. 渲染提醒模态框 */}
       <ReminderModal
         isOpen={!!reminderTarget}
         onClose={() => setReminderTarget(null)}

@@ -11,11 +11,10 @@ import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { NameTable } from "../components/NameTable";
 import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
-import { ReminderModal } from "../components/ReminderModal"; // 🚀 1. 引入提醒模态框
+import { ReminderModal } from "../components/ReminderModal";
 
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
-import { usePrimaryNames } from "../hooks/usePrimaryNames";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
@@ -40,7 +39,8 @@ export const CollectionDetail = () => {
     isError,
   } = useCollectionRecords(id || "");
 
-  const records = usePrimaryNames(basicRecords);
+  // 🚀 移除全量解析: const records = usePrimaryNames(basicRecords);
+  const records = basicRecords; // ✅ 直接使用基础数据
 
   const {
     processedRecords,
@@ -89,7 +89,7 @@ export const CollectionDetail = () => {
     labels?: string[];
   } | null>(null);
 
-  // 🚀 2. 提醒功能状态
+  // 提醒功能状态
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
 
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
@@ -155,7 +155,6 @@ export const CollectionDetail = () => {
     setDurationTarget({ type: "renew", record });
   };
 
-  // 🚀 3. 处理打开提醒弹窗
   const handleSetReminder = (record: NameRecord) => {
     setReminderTarget(record);
   };
@@ -201,7 +200,6 @@ export const CollectionDetail = () => {
         <h1 className="text-4xl font-qs-semibold">{collection.displayName}</h1>
         <p className="text-gray-400 mt-2">{collection.description}</p>
       </header>
-
       <NameTable
         records={processedRecords}
         isLoading={isLoading}
@@ -217,7 +215,6 @@ export const CollectionDetail = () => {
         onToggleSelectAll={toggleSelectAll}
         onRegister={handleSingleRegister}
         onRenew={handleSingleRenew}
-        // 🚀 4. 传递 onReminder 回调
         onReminder={handleSetReminder}
         pendingLabels={pendingLabels}
         totalRecordsCount={records?.length || 0}
@@ -225,7 +222,6 @@ export const CollectionDetail = () => {
         actionCounts={actionCounts}
         nameCounts={nameCounts}
       />
-
       {/* 底部悬浮操作栏 */}
       {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
@@ -260,7 +256,6 @@ export const CollectionDetail = () => {
           </div>
         </div>
       )}
-
       {/* 流程模态框 */}
       <ProcessModal
         isOpen={!!durationTarget}
@@ -278,7 +273,6 @@ export const CollectionDetail = () => {
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
       />
-
       {/* 🚀 5. 渲染提醒模态框 */}
       <ReminderModal
         isOpen={!!reminderTarget}
