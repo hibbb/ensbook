@@ -7,7 +7,8 @@ import {
   faWallet,
   faClock,
   faBell,
-} from "@fortawesome/free-solid-svg-icons"; // 🚀 引入 faBell
+  type IconDefinition, // 引入类型
+} from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../../utils/ens";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
@@ -20,7 +21,19 @@ interface ActionCellProps {
   onToggleSelection?: (label: string) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
-  onReminder?: (record: NameRecord) => void; // 🚀 新增回调
+  onReminder?: (record: NameRecord) => void;
+}
+
+// 🚀 1. 定义统一的配置接口
+interface ActionConfig {
+  text: string;
+  style: string;
+  disabled: boolean;
+  action: () => void;
+  sideIcon?: IconDefinition;
+  sideIconClass?: string;
+  sideTooltip?: string;
+  sideAction?: () => void;
 }
 
 export const ActionCell = ({
@@ -31,12 +44,12 @@ export const ActionCell = ({
   onToggleSelection,
   onRegister,
   onRenew,
-  onReminder, // 🚀 解构
+  onReminder,
 }: ActionCellProps) => {
   const renewable = isRenewable(record.status);
 
-  // 配置对象
-  const config = useMemo(() => {
+  // 🚀 2. 显式指定返回类型为 ActionConfig
+  const config = useMemo<ActionConfig>(() => {
     // 1. 未连接
     if (!isConnected) {
       return {
@@ -55,12 +68,11 @@ export const ActionCell = ({
           "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover",
         disabled: false,
         action: () => onRenew?.(record),
-        // 🚀 配置铃铛图标
         sideIcon: faBell,
         sideIconClass:
           "text-gray-300 hover:text-link transition-colors cursor-pointer",
-        sideTooltip: "设置续费提醒",
-        sideAction: () => onReminder?.(record), // 绑定点击事件
+        sideTooltip: "设置防断供提醒",
+        sideAction: () => onReminder?.(record),
       };
     }
 
@@ -72,10 +84,10 @@ export const ActionCell = ({
           "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-0.5 rounded-lg hover:bg-orange-100 font-qs-bold shadow-sm transition-all active:scale-95",
         disabled: false,
         action: () => onRegister?.(record),
-        // 挂起状态的图标（纯展示，无额外点击动作）
         sideIcon: faClock,
         sideIconClass: "text-orange-400 animate-pulse cursor-help",
         sideTooltip: "注册未完成，点击继续",
+        // 这里没有 sideAction，类型定义中它是可选的，所以安全
       };
     }
 
@@ -106,7 +118,7 @@ export const ActionCell = ({
 
   return (
     <div className="h-12 flex items-center justify-start gap-3">
-      {/* Checkbox */}
+      {/* ... Checkbox 和图标部分保持不变 ... */}
       {onToggleSelection && isConnected && renewable && (
         <Tooltip content="Select to renew">
           <input
@@ -120,14 +132,12 @@ export const ActionCell = ({
         </Tooltip>
       )}
 
-      {/* 占位符 */}
       {onToggleSelection && isConnected && !renewable && (
         <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
           <FontAwesomeIcon icon={faPlus} size="2xs" />
         </div>
       )}
 
-      {/* 钱包图标 */}
       {!isConnected && (
         <Tooltip content="Connect Wallet">
           <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
@@ -136,7 +146,6 @@ export const ActionCell = ({
         </Tooltip>
       )}
 
-      {/* 主操作区 */}
       <div className="flex items-center gap-2">
         <button
           disabled={config.disabled}
@@ -146,12 +155,11 @@ export const ActionCell = ({
           {config.text}
         </button>
 
-        {/* 🚀 右侧独立图标入口 */}
         {config.sideIcon && (
           <Tooltip content={config.sideTooltip || ""}>
             <div
               className={config.sideIconClass}
-              // 🚀 如果配置了 sideAction，则绑定点击事件
+              // 🚀 3. 安全的点击事件处理，无需 @ts-ignore
               onClick={(e) => {
                 if (config.sideAction) {
                   e.stopPropagation();
