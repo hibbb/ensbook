@@ -102,7 +102,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
             }`}
           >
             <span>{point.label}</span>
-            <span className="tracking-tight opacity-90">
+            <span className="tracking-tight opacity-90 font-mono">
               {formatDate(point.time || 0)}
             </span>
           </div>

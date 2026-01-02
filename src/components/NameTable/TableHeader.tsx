@@ -108,6 +108,8 @@ export const TableHeader = ({
             onSort={onSort}
             onFilterChange={onFilterChange}
             myCount={myCount}
+            // 🚀 传递 listCount
+            listCount={filteredCount}
           />
         </th>
 
