@@ -166,7 +166,6 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
       }
     }
   }
-  console.log("Parsed inputs:", result);
 
   return result;
 }

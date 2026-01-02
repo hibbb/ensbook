@@ -13,7 +13,7 @@ import {
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { DataBackupView } from "./DataBackupView";
-import { AboutView } from "./AboutView"; // 🚀 引入拆分后的组件
+import { AboutView } from "./AboutView";
 import pkg from "../../../package.json";
 
 interface SettingsModalProps {
@@ -23,7 +23,6 @@ interface SettingsModalProps {
 
 type SettingsTab = "general" | "registration" | "data" | "about";
 
-// SidebarItem 接口
 interface SidebarItemProps {
   icon: IconDefinition;
   label: string;
@@ -32,7 +31,7 @@ interface SidebarItemProps {
   disabled?: boolean;
 }
 
-// 辅助组件：侧边栏按钮
+// 辅助组件：侧边栏按钮 (扁平化风格)
 const SidebarItem = ({
   icon,
   label,
@@ -43,12 +42,12 @@ const SidebarItem = ({
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-qs-medium rounded-xl transition-all duration-200 ${
+    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-qs-medium transition-colors duration-150 rounded-md ${
       active
-        ? "bg-white text-link shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] ring-1 ring-black/5"
+        ? "bg-gray-100 text-link font-qs-bold" // 扁平选中态：灰底蓝字，无阴影
         : disabled
-          ? "text-gray-300 cursor-not-allowed opacity-60"
-          : "text-gray-500 hover:bg-gray-200/50 hover:text-text-main"
+          ? "text-gray-300 cursor-not-allowed"
+          : "text-gray-500 hover:bg-gray-50 hover:text-text-main"
     }`}
   >
     <div
@@ -58,7 +57,7 @@ const SidebarItem = ({
     </div>
     <span>{label}</span>
     {disabled && (
-      <span className="ml-auto text-[10px] bg-gray-200/50 text-gray-400 px-1.5 py-0.5 rounded font-qs-bold">
+      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-qs-bold">
         Soon
       </span>
     )}
@@ -70,7 +69,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
   if (!isOpen) return null;
 
-  // 根据 Tab 计算标题
   const getTitle = () => {
     switch (activeTab) {
       case "data":
@@ -84,22 +82,21 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* 背景遮罩 */}
       <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* 模态框主体 */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl h-[600px] flex overflow-hidden animate-in zoom-in-95 duration-200">
-        {/* 左侧侧边栏 */}
-        <div className="w-56 bg-gray-50 border-r border-gray-100 flex flex-col shrink-0">
-          <div className="p-6 border-b border-gray-100/50">
+      {/* 模态框主体：减少圆角，去除多余装饰 */}
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl h-[600px] flex overflow-hidden animate-in zoom-in-95 duration-200">
+        {/* 左侧侧边栏：纯白背景，右侧细边框 */}
+        <div className="w-56 bg-white border-r border-gray-100 flex flex-col shrink-0">
+          <div className="p-6">
             <h3 className="text-xl font-qs-bold text-text-main tracking-tight">
               Settings
             </h3>
           </div>
-          <nav className="flex-1 p-3 space-y-1 overflow-y-auto flex flex-col">
+          <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto flex flex-col">
             <SidebarItem
               icon={faDatabase}
               label="数据管理"
@@ -108,7 +105,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             />
             <SidebarItem
               icon={faGlobe}
-              label="语言 / Language"
+              label="语言"
               active={activeTab === "general"}
               disabled
             />
@@ -121,7 +118,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             <SidebarItem icon={faPalette} label="外观" disabled />
 
             <div className="flex-1"></div>
-            {/* 关于按钮 */}
             <SidebarItem
               icon={faCircleInfo}
               label="关于"
@@ -130,15 +126,14 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             />
           </nav>
 
-          {/* 版本号 */}
-          <div className="p-4 text-xs text-gray-300 text-center border-t border-gray-100/50 font-qs-medium">
+          <div className="p-4 text-xs text-gray-300 text-center font-qs-medium">
             ENSBook v{pkg.version}
           </div>
         </div>
 
         {/* 右侧内容区 */}
         <div className="flex-1 flex flex-col min-w-0 bg-white">
-          <div className="flex justify-between items-center px-8 py-5 border-b border-gray-50">
+          <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100">
             <h4 className="text-lg font-qs-bold text-gray-800">{getTitle()}</h4>
             <button
               onClick={onClose}

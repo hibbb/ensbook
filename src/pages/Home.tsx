@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query"; // 🚀 1. 引入 QueryClient
+import { useQueryClient } from "@tanstack/react-query";
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -21,11 +21,11 @@ import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { getStoredLabels, saveStoredLabels } from "../services/storage/labels";
-import { getAllPendingLabels } from "../services/storage/registration"; // 🚀 引入
+import { getAllPendingLabels } from "../services/storage/registration";
 
 // Types
 import type { NameRecord } from "../types/ensNames";
-import type { DeleteCriteria } from "../components/NameTable/types"; // 🚀
+import type { DeleteCriteria } from "../components/NameTable/types";
 
 export const Home = () => {
   const { address, isConnected } = useAccount();
@@ -112,12 +112,11 @@ export const Home = () => {
   // 注册 Hook
   const {
     startRegistration,
-    checkAndResume, // 🚀 确保解构出来
+    checkAndResume,
     status: regStatus,
     secondsLeft,
     currentHash: regTxHash,
     resetStatus: resetReg,
-    // 🚀 修复：移除未使用的 isRegBusy，解决 ESLint 警告
   } = useEnsRegistration();
 
   // 🚀 1. 管理挂起任务的状态
@@ -125,9 +124,8 @@ export const Home = () => {
 
   // 🚀 2. 初始化和列表变化时，扫描本地存储
   useEffect(() => {
-    // 每次 resolvedLabels 变化或完成一次注册后，都应该刷新一下
     setPendingLabels(getAllPendingLabels());
-  }, [resolvedLabels, regStatus]); // 监听 regStatus，成功/失败后更新 UI
+  }, [resolvedLabels, regStatus]);
 
   const hasContent = resolvedLabels.length > 0;
 
@@ -177,7 +175,9 @@ export const Home = () => {
 
   // 🚀 重构删除逻辑：仅 "all" 类型需要确认
   const handleBatchDelete = (criteria: DeleteCriteria) => {
-    if (!records) return;
+    // 使用 effectiveRecords 确保在快速操作或数据刷新瞬间也有数据可用
+    const targetRecords = records || effectiveRecords;
+    if (!targetRecords) return;
 
     const { type, value } = criteria;
 
@@ -196,20 +196,46 @@ export const Home = () => {
     switch (type) {
       case "status":
         labelsToDelete = new Set(
-          records.filter((r) => r.status === value).map((r) => r.label),
+          targetRecords.filter((r) => r.status === value).map((r) => r.label),
         );
         break;
 
       case "length":
         labelsToDelete = new Set(
-          records.filter((r) => r.label.length === value).map((r) => r.label),
+          targetRecords
+            .filter((r) => r.label.length === value)
+            .map((r) => r.label),
         );
         break;
 
       case "wrapped": {
         const isWrapped = value as boolean;
         labelsToDelete = new Set(
-          records.filter((r) => r.wrapped === isWrapped).map((r) => r.label),
+          targetRecords
+            .filter((r) => r.wrapped === isWrapped)
+            .map((r) => r.label),
+        );
+        break;
+      }
+
+      // 🚀 新增：处理按所有者删除
+      case "owner": {
+        if (!address) {
+          toast.error("请先连接钱包以识别所有权");
+          return;
+        }
+        const isDeletingMine = value === "mine";
+        labelsToDelete = new Set(
+          targetRecords
+            .filter((r) => {
+              const recordOwner = r.owner?.toLowerCase();
+              const myAddress = address.toLowerCase();
+              const isOwner = recordOwner === myAddress;
+              // 如果要删我的：保留 isOwner 为 true 的
+              // 如果要删其他的：保留 isOwner 为 false 的
+              return isDeletingMine ? isOwner : !isOwner;
+            })
+            .map((r) => r.label),
         );
         break;
       }
@@ -234,20 +260,11 @@ export const Home = () => {
   };
 
   // --- 流程触发 (打开 Modal) ---
-  // 🚀 3. 修改单个注册处理逻辑
   const handleSingleRegister = async (record: NameRecord) => {
-    // 检查是否是断点续传
     if (pendingLabels.has(record.label)) {
-      // A. 断点续传逻辑
-
-      // 1. 设置当前目标，这将打开 ProcessModal
       setDurationTarget({ type: "register", record });
-
-      // 2. 立即触发恢复逻辑
-      // 注意：checkAndResume 会更新 status，导致 ProcessModal 直接显示处理界面
       await checkAndResume(record.label);
     } else {
-      // B. 全新注册逻辑 (打开 Modal 选时长)
       setDurationTarget({ type: "register", record });
     }
   };
@@ -284,12 +301,10 @@ export const Home = () => {
   // 🚀 2. 监听交易成功，触发数据刷新
   useEffect(() => {
     if (regStatus === "success" || renewalStatus === "success") {
-      // 为了应对 Subgraph 索引延迟，我们在 2 秒后尝试第一次刷新
       const timer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 2000);
 
-      // 如果数据非常重要，可以设置一个 10 秒后的二次刷新作为兜底
       const deepTimer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 10000);
@@ -313,7 +328,6 @@ export const Home = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
       {/* ================= Header & Search ================= */}
-      {/* 1. 搜索区域 (已拆分) */}
       <HomeSearchSection
         hasContent={hasContent}
         inputValue={inputValue}
@@ -341,23 +355,20 @@ export const Home = () => {
             selectedLabels={selectedLabels}
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}
-            pendingLabels={pendingLabels} // 🚀 传入集合
+            pendingLabels={pendingLabels}
             onRegister={handleSingleRegister}
             onRenew={handleSingleRenew}
             skeletonRows={5}
             headerTop="88px"
-            // 🚀 传入未经过滤的原始总数
             totalRecordsCount={enrichedRecords?.length || 0}
-            // 🚀 新增：透传计数数据
             statusCounts={statusCounts}
             actionCounts={actionCounts}
-            nameCounts={nameCounts} // 🚀 传入组件
+            nameCounts={nameCounts}
           />
         </div>
       )}
 
       {/* ================= Bottom Floating Bar ================= */}
-      {/* 3. 底部悬浮栏 (已拆分) */}
       <HomeFloatingBar
         selectedCount={selectedLabels.size}
         isBusy={isRenewalBusy}

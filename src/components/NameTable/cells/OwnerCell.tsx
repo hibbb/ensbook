@@ -2,6 +2,8 @@
 
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip"; // 🚀 引入 Tooltip
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleUser } from "@fortawesome/free-regular-svg-icons";
 
 interface OwnerCellProps {
   record: NameRecord;
@@ -27,9 +29,8 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
             </span>
           </Tooltip>
           {isMe && (
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-link opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-link"></span>
+            <span className="flex h-2 w-2 relative text-link">
+              <FontAwesomeIcon icon={faCircleUser} size="xs" />
             </span>
           )}
         </div>

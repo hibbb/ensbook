@@ -64,7 +64,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
                 isOpen // 打开状态保持高亮
                   ? "bg-blue-100 text-link"
                   : hasMemo
-                    ? "text-link hover:text-link-hover bg-blue-50/50 hover:bg-blue-100/50"
+                    ? "text-link hover:text-link-hover hover:bg-white"
                     : "text-gray-300 hover:text-text-main hover:bg-gray-100"
               }
             `}
@@ -72,7 +72,6 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
             <FontAwesomeIcon
               icon={hasMemo ? faCommentDots : faPenToSquare}
               size="xs"
-              className={hasMemo ? "text-sm" : "text-xs"}
             />
           </button>
         </PopoverTrigger>

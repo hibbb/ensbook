@@ -3,8 +3,8 @@
 import {
   faSortAlphaDown,
   faSortAlphaUp,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
@@ -76,7 +76,7 @@ export const OwnerHeader = ({
                     : buttonInactiveClass
               }`}
             >
-              <FontAwesomeIcon icon={faUser} size="xs" />
+              <FontAwesomeIcon icon={faCircleUser} size="sm" />
             </button>
           </Tooltip>
         </div>

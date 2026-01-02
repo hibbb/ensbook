@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { ThWrapper } from "./ThWrapper";
-import { STATUS_COLOR_TEXT } from "../../../config/constants";
 import type { DeleteCriteria } from "../types";
 import { Tooltip } from "../../ui/Tooltip";
 
