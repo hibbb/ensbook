@@ -6,7 +6,6 @@ export interface NameRecord {
   readonly labelhash: string; // 该 label 对应的哈希值，如 keccak256(toUtf8Bytes('alice'))
   readonly length: number; // 域名长度，如 'alice.eth' 的长度为 5
 
-  level: number;
   /**
    * 域名状态：
    * - Active: 正常使用中
@@ -25,7 +24,6 @@ export interface NameRecord {
   expiryTime: number;
   releaseTime: number;
 
-  // 🚀 新增：备注字段 (可选)
-  // 用于 "仅显示有备注" 的筛选功能
-  notes?: string;
+  level: number;
+  memo?: string;
 }

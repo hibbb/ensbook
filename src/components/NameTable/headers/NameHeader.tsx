@@ -22,7 +22,7 @@ interface NameHeaderProps {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
-    notesCount?: number;
+    memosCount?: number;
   };
   disabled?: boolean; // 🚀 新增
 }
@@ -36,7 +36,7 @@ export const NameHeader = ({
     lengthCounts: {},
     availableLengths: [],
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
-    notesCount: 0,
+    memosCount: 0,
   },
   disabled, // 🚀 解构
 }: NameHeaderProps) => {
@@ -49,15 +49,15 @@ export const NameHeader = ({
   );
 
   // 🚀 1. 计算逻辑状态
-  const notesCount = nameCounts.notesCount || 0;
+  const memosCount = nameCounts.memosCount || 0;
   // 使用 wrappedCounts.all 作为当前上下文的总数 (因为它包含了 wrapped + unwrapped 的总和)
   const totalCount = nameCounts.wrappedCounts.all;
 
-  const isNoNotes = notesCount === 0;
-  const isAllNotes = totalCount > 0 && notesCount === totalCount;
+  const isNoNotes = memosCount === 0;
+  const isAllNotes = totalCount > 0 && memosCount === totalCount;
 
   // 只要满足“全无”或“全有”，且当前没有处于“仅显示备注”的筛选状态下，就禁用
-  // (注意：如果用户已经在筛选状态下，即使 notesCount 为 0，也应该允许他点击以取消筛选，防止死锁。
+  // (注意：如果用户已经在筛选状态下，即使 memosCount 为 0，也应该允许他点击以取消筛选，防止死锁。
   // 但根据你的需求描述，我们优先满足禁用逻辑。如果处于筛选状态且数量为0，列表为空，用户通常会重置过滤器)
   // 🚀 逻辑合并：原有的业务禁用逻辑 || 全局禁用
   const isDisabled = disabled || isNoNotes || isAllNotes;
@@ -71,7 +71,7 @@ export const NameHeader = ({
   } else {
     tooltipContent = filterConfig.onlyWithNotes
       ? "显示所有名称"
-      : `仅显示有备注的 (${notesCount}) 个`;
+      : `仅显示有备注的 (${memosCount}) 个`;
   }
 
   const buttonBaseClass =

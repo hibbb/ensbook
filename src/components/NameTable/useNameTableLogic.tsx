@@ -64,7 +64,7 @@ export const useNameTableLogic = (
     };
     const checkNotes = (r: NameRecord) => {
       if (!filterConfig.onlyWithNotes) return true;
-      return !!r.notes && r.notes.trim().length > 0;
+      return !!r.memo && r.memo.trim().length > 0;
     };
 
     // 2.1 状态计数
@@ -123,10 +123,10 @@ export const useNameTableLogic = (
         checkAction(r) &&
         checkLength(r) &&
         checkWrapped(r) &&
-        !!r.notes &&
-        r.notes.trim().length > 0,
+        !!r.memo &&
+        r.memo.trim().length > 0,
     );
-    const notesCount = recordsWithNotes.length;
+    const memosCount = recordsWithNotes.length;
 
     return {
       statusCounts,
@@ -135,7 +135,7 @@ export const useNameTableLogic = (
         lengthCounts,
         availableLengths: Array.from(availableLengths).sort((a, b) => a - b),
         wrappedCounts,
-        notesCount,
+        memosCount,
       },
     };
   }, [

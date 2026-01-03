@@ -34,7 +34,7 @@ interface TableHeaderProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     // 🚀 新增字段
-    notesCount?: number;
+    memosCount?: number;
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
@@ -61,7 +61,7 @@ export const TableHeader = ({
     lengthCounts: {},
     availableLengths: [],
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
-    notesCount: 0,
+    memosCount: 0,
   },
   myCount = 0,
   ownershipCounts = { mine: 0, others: 0 },

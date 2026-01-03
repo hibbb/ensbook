@@ -43,7 +43,7 @@ interface NameTableProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     // 🚀 新增字段
-    notesCount?: number;
+    memosCount?: number;
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };

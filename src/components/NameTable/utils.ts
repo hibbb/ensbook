@@ -50,7 +50,7 @@ export const processNameRecords = (
 
     // D. 备注过滤
     if (filterConfig.onlyWithNotes) {
-      if (!r.notes || r.notes.trim().length === 0) return false;
+      if (!r.memo || r.memo.trim().length === 0) return false;
     }
 
     // E. 长度过滤

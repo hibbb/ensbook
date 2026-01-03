@@ -151,7 +151,7 @@ export async function fetchNameRecords(
       const isFetchSuccess = labelSuccessMap.get(label) ?? false;
 
       // 🚀 2. 从统一的数据源中查找备注
-      const note = allMemos[label];
+      const memo = allMemos[label];
 
       const baseInfo = {
         label,
@@ -163,7 +163,7 @@ export async function fetchNameRecords(
       if (!isFetchSuccess) {
         return {
           ...baseInfo,
-          level: 1,
+          level: 0,
           status: "Unknown",
           wrapped: false,
           registeredTime: 0,
@@ -171,7 +171,7 @@ export async function fetchNameRecords(
           releaseTime: 0,
           owner: null,
           ownerPrimaryName: undefined,
-          notes: note, // 即使失败也返回备注
+          memo: memo, // 即使失败也返回备注
         };
       }
 
@@ -181,7 +181,7 @@ export async function fetchNameRecords(
       if (!registration) {
         return {
           ...baseInfo,
-          level: 1,
+          level: 0,
           status: "Available",
           wrapped: false,
           registeredTime: 0,
@@ -189,7 +189,7 @@ export async function fetchNameRecords(
           releaseTime: 0,
           owner: null,
           ownerPrimaryName: undefined,
-          notes: note, // 即使未注册也返回备注
+          memo: memo, // 即使未注册也返回备注
         };
       }
 
@@ -203,7 +203,7 @@ export async function fetchNameRecords(
 
       return {
         ...baseInfo,
-        level: 1,
+        level: 0,
         status: deriveNameStatus(expiryTime),
         wrapped: isWrapped,
         registeredTime: parseInt(registration.registrationDate),
@@ -211,7 +211,7 @@ export async function fetchNameRecords(
         releaseTime: expiryTime + DURATION_GRACE_PERIOD,
         owner: currentOwner,
         ownerPrimaryName: undefined,
-        notes: note, // 🚀 填充备注字段
+        memo: memo, // 🚀 填充备注字段
       };
     });
 
@@ -225,14 +225,14 @@ export async function fetchNameRecords(
       labelhash: labelhash(label),
       namehash: namehash(`${label}.eth`),
       length: label.length,
-      level: 1,
+      level: 0,
       status: "Unknown",
       wrapped: false,
       registeredTime: 0,
       expiryTime: 0,
       releaseTime: 0,
       owner: null,
-      notes: allMemos[label],
+      memo: allMemos[label],
     })) as NameRecord[];
   }
 }
