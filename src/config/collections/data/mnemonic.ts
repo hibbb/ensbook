@@ -4,7 +4,7 @@
  * 完整的 BIP-39 英文助记词词库 (2048 words)
  * Source: https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt
  */
-export const MNEMONIC_LABELS = [
+export const COLLECTION_MNEMONIC_LABELS = [
   "abandon",
   "ability",
   "able",

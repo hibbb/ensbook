@@ -41,14 +41,14 @@ export const NavBar = () => {
               <FontAwesomeIcon icon={faMagnifyingGlass} /> Search
             </Link>
             <Link
-              to="/collection/999-club"
-              className={getLinkClass("/collection/999-club")}
+              to="/collection/999"
+              className={getLinkClass("/collection/999")}
             >
               <FontAwesomeIcon icon={faBars} /> 999
             </Link>
             <Link
-              to="/collection/mnemonic-club"
-              className={getLinkClass("/collection/mnemonic-club")}
+              to="/collection/mnemonic"
+              className={getLinkClass("/collection/mnemonic")}
             >
               <FontAwesomeIcon icon={faBars} /> Mnemonic
             </Link>
