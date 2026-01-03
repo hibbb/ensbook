@@ -7,10 +7,12 @@ import {
   faCommentDots,
 } from "@fortawesome/free-regular-svg-icons";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { getMemo, setMemo } from "../services/storage/memos";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover"; // 🚀 引入新组件
-import { Tooltip } from "./ui/Tooltip"; // 🚀 复用 Tooltip 显示简单提示
+import { useQueryClient } from "@tanstack/react-query"; // 🚀 引入 QueryClient
 import toast from "react-hot-toast";
+
+import { getMemo, setMemo } from "../services/storage/memos";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
+import { Tooltip } from "./ui/Tooltip";
 
 interface MemoEditorProps {
   label: string;
@@ -21,14 +23,15 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editValue, setEditValue] = useState("");
 
-  // 初始化读取
+  // 🚀 获取 QueryClient 实例
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     setLocalMemo(getMemo(label));
   }, [label]);
 
   const hasMemo = !!memo;
 
-  // 打开时同步数据
   const handleOpenChange = (open: boolean) => {
     if (open) {
       setEditValue(memo);
@@ -37,31 +40,33 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
   };
 
   const handleSave = () => {
+    // 1. 保存到本地存储 (同步操作)
     setMemo(label, editValue);
     setLocalMemo(editValue.trim());
     setIsOpen(false);
     toast.success(editValue.trim() ? "备注已更新" : "备注已删除");
+
+    // 🚀 2. 核心修复：通知数据层失效
+    // 这会触发 useNameRecords / useCollectionRecords 重新运行 fetchNameRecords
+    // 从而重新读取 memos.ts 中的最新数据
+    queryClient.invalidateQueries({ queryKey: ["name-records"] });
+    queryClient.invalidateQueries({ queryKey: ["collection-records"] });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       handleSave();
     }
-    // Popover 自带 ESC 关闭功能，这里不需要额外写
   };
 
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
-      {/* 这里巧妙地组合了：
-        1. Tooltip: 鼠标悬停显示 "添加备注" 或当前备注内容
-        2. Popover: 鼠标点击打开编辑框
-      */}
       <Tooltip content={hasMemo ? memo : "添加备注"}>
         <PopoverTrigger asChild>
           <button
             className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 outline-none ml-1
               ${
-                isOpen // 打开状态保持高亮
+                isOpen
                   ? "bg-blue-100 text-link"
                   : hasMemo
                     ? "text-link hover:text-link-hover hover:bg-white"

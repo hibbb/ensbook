@@ -3,15 +3,15 @@
 import {
   faSortAlphaDown,
   faSortAlphaUp,
-  faSortAmountDown,
-  faSortAmountUp,
   faCheck,
+  faCommentDots,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import { FilterDropdown } from "../FilterDropdown";
 import type { SortConfig, SortField, FilterConfig } from "../types";
+import { Tooltip } from "../../ui/Tooltip";
 
 interface NameHeaderProps {
   sortConfig: SortConfig;
@@ -22,6 +22,8 @@ interface NameHeaderProps {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
+    // 🚀 新增字段
+    notesCount?: number;
   };
 }
 
@@ -34,16 +36,21 @@ export const NameHeader = ({
     lengthCounts: {},
     availableLengths: [],
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
+    notesCount: 0,
   },
 }: NameHeaderProps) => {
   const isActive =
     filterConfig.lengthList.length > 0 || filterConfig.wrappedType !== "all";
 
-  // 🚀 计算长度总数
   const totalLengthCount = Object.values(nameCounts.lengthCounts).reduce(
     (a, b) => a + b,
     0,
   );
+
+  const buttonBaseClass =
+    "w-6 h-6 flex items-center justify-center rounded-md transition-all";
+  const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
+  const buttonInactiveClass = "text-link hover:bg-gray-50";
 
   return (
     <ThWrapper>
@@ -59,15 +66,31 @@ export const NameHeader = ({
             descIcon={faSortAlphaUp}
             title="按名称字母排序"
           />
-          <SortButton
-            field="length"
-            currentSort={sortConfig}
-            onSort={onSort}
-            defaultIcon={faSortAmountDown}
-            ascIcon={faSortAmountUp}
-            descIcon={faSortAmountDown}
-            title="按长度排序"
-          />
+
+          {/* 🚀 更新 Tooltip 内容，显示数量 */}
+          <Tooltip
+            content={
+              filterConfig.onlyWithNotes
+                ? "显示所有名称"
+                : `仅显示有备注的 (${nameCounts.notesCount || 0}) 个`
+            }
+          >
+            <button
+              onClick={() =>
+                onFilterChange({
+                  ...filterConfig,
+                  onlyWithNotes: !filterConfig.onlyWithNotes,
+                })
+              }
+              className={`${buttonBaseClass} ${
+                filterConfig.onlyWithNotes
+                  ? buttonActiveClass
+                  : buttonInactiveClass
+              }`}
+            >
+              <FontAwesomeIcon icon={faCommentDots} size="sm" />
+            </button>
+          </Tooltip>
 
           <FilterDropdown
             isActive={isActive}
@@ -114,7 +137,7 @@ export const NameHeader = ({
                     ${
                       isDisabled
                         ? "opacity-40 cursor-not-allowed bg-gray-50"
-                        : "cursor-pointer hover:bg-gray-200" // 🚀 统一 Hover
+                        : "cursor-pointer hover:bg-gray-200"
                     }
                     ${isSelected ? "text-link font-bold" : "text-gray-500"}
                   `}
@@ -158,7 +181,7 @@ export const NameHeader = ({
                     ${
                       isDisabled
                         ? "opacity-40 cursor-not-allowed bg-gray-50"
-                        : "cursor-pointer hover:bg-gray-200" // 🚀 统一 Hover
+                        : "cursor-pointer hover:bg-gray-200"
                     }
                     ${isSelected ? "text-link font-bold" : "text-gray-500"}
                   `}

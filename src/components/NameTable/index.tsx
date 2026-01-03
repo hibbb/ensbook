@@ -42,6 +42,8 @@ interface NameTableProps {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
+    // 🚀 新增字段
+    notesCount?: number;
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
@@ -86,16 +88,13 @@ export const NameTable = (props: NameTableProps) => {
   // 2. 解析 (异步)
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
-  // 🚀 3. 智能骨架屏逻辑 (Smart Skeleton)
-  // 必须修复：当翻页时，paginatedBasicRecords 会瞬间更新，但 displayRecords 还在加载。
-  // 如果不加这个判断，会短暂显示上一页的解析结果，导致 UI 跳变。
+  // 3. 智能骨架屏逻辑
   const isDataStale =
     displayRecords &&
     displayRecords.length > 0 &&
     paginatedBasicRecords.length > 0 &&
     displayRecords[0].label !== paginatedBasicRecords[0].label;
 
-  // 汇总加载状态：父组件Loading OR 解析未完成 OR 数据陈旧
   const isResolvingPage =
     safeRecords.length > 0 && (!displayRecords || isDataStale);
 
@@ -158,7 +157,6 @@ export const NameTable = (props: NameTableProps) => {
                 <SkeletonRow key={i} />
               ))
             ) : safeRecords.length > 0 ? (
-              // 🚀 4. 安全渲染
               (displayRecords || paginatedBasicRecords).map((r, i) => (
                 <TableRow
                   key={r.namehash}

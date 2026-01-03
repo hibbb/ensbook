@@ -24,4 +24,8 @@ export interface NameRecord {
   registeredTime: number;
   expiryTime: number;
   releaseTime: number;
+
+  // 🚀 新增：备注字段 (可选)
+  // 用于 "仅显示有备注" 的筛选功能
+  notes?: string;
 }

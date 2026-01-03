@@ -33,9 +33,10 @@ interface TableHeaderProps {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
+    // 🚀 新增字段
+    notesCount?: number;
   };
   myCount?: number;
-  // 🚀 新增 prop
   ownershipCounts?: { mine: number; others: number };
 }
 
@@ -60,9 +61,9 @@ export const TableHeader = ({
     lengthCounts: {},
     availableLengths: [],
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
+    notesCount: 0,
   },
   myCount = 0,
-  // 🚀 默认值
   ownershipCounts = { mine: 0, others: 0 },
 }: TableHeaderProps) => {
   const headerStyle = {
@@ -108,7 +109,6 @@ export const TableHeader = ({
             onSort={onSort}
             onFilterChange={onFilterChange}
             myCount={myCount}
-            // 🚀 传递 listCount
             listCount={filteredCount}
           />
         </th>
@@ -136,7 +136,6 @@ export const TableHeader = ({
             uniqueStatuses={uniqueStatuses}
             statusCounts={statusCounts}
             nameCounts={nameCounts}
-            // 🚀 透传 ownershipCounts
             ownershipCounts={ownershipCounts}
           />
         </th>

@@ -1,8 +1,9 @@
-import { isRenewable } from "../../utils/ens"; //
-import type { NameRecord } from "../../types/ensNames"; //
+// src/components/NameTable/utils.ts
+
+import { isRenewable } from "../../utils/ens";
+import type { NameRecord } from "../../types/ensNames";
 import type { SortConfig, FilterConfig } from "./types";
 
-// 🚀 状态排序权重：统一管理，保证不同页面排序规则一致
 export const STATUS_WEIGHT: Record<string, number> = {
   Available: 1,
   Premium: 2,
@@ -11,10 +12,6 @@ export const STATUS_WEIGHT: Record<string, number> = {
   Released: 5,
 };
 
-/**
- * 🚀 核心逻辑迁移：将数据过滤和排序封装为通用函数
- * 这样后期 Home.tsx 直接调用此函数即可，无需重复编写逻辑
- */
 export const processNameRecords = (
   records: NameRecord[] | undefined,
   sortConfig: SortConfig,
@@ -25,7 +22,7 @@ export const processNameRecords = (
 
   // 1. 过滤逻辑
   const filtered = records.filter((r) => {
-    // A. 所有者过滤 (安全检查：处理大小写和空值)
+    // A. 所有者过滤
     if (filterConfig.onlyMe) {
       if (!currentAddress || !r.owner) return false;
       if (r.owner.toLowerCase() !== currentAddress.toLowerCase()) return false;
@@ -44,6 +41,25 @@ export const processNameRecords = (
     if (filterConfig.actionType === "register" && renewable) return false;
     if (filterConfig.actionType === "renew" && !renewable) return false;
 
+    // D. 备注过滤
+    if (filterConfig.onlyWithNotes) {
+      if (!r.notes || r.notes.trim().length === 0) return false;
+    }
+
+    // 🚀 修复 E: 长度过滤 (补回遗漏逻辑)
+    if (
+      filterConfig.lengthList.length > 0 &&
+      !filterConfig.lengthList.includes(r.label.length)
+    ) {
+      return false;
+    }
+
+    // 🚀 修复 F: 包装状态过滤 (补回遗漏逻辑)
+    if (filterConfig.wrappedType !== "all") {
+      if (filterConfig.wrappedType === "wrapped" && !r.wrapped) return false;
+      if (filterConfig.wrappedType === "unwrapped" && r.wrapped) return false;
+    }
+
     return true;
   });
 
@@ -58,7 +74,11 @@ export const processNameRecords = (
       case "length":
         return r.label.length;
       case "status":
+        // 按过期时间排序
         return r.expiryTime || r.releaseTime || 0;
+      case "registered":
+        // 按注册时间排序
+        return r.registeredTime || 0;
       case "owner":
         return r.ownerPrimaryName || r.owner || "";
       default:

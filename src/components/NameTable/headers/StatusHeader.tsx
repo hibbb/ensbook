@@ -4,6 +4,9 @@ import {
   faSortAmountDown,
   faSortAmountUp,
   faCheck,
+  faClock, // 🚀 引入时钟图标
+  faRotateLeft,
+  faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ThWrapper } from "./ThWrapper";
@@ -35,7 +38,6 @@ export const StatusHeader = ({
   onFilterChange,
   statusCounts = {},
 }: StatusHeaderProps) => {
-  // 计算总数用于“全部显示”
   const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
   return (
@@ -50,7 +52,18 @@ export const StatusHeader = ({
             defaultIcon={faSortAmountDown}
             ascIcon={faSortAmountUp}
             descIcon={faSortAmountDown}
-            title="按过期时间排序"
+            title="按状态排序"
+          />
+
+          {/* 🚀 新增：按注册时间排序 */}
+          <SortButton
+            field="registered"
+            currentSort={sortConfig}
+            onSort={onSort}
+            defaultIcon={faClock} // 默认显示时钟
+            ascIcon={faRotateRight}
+            descIcon={faRotateLeft}
+            title="按注册时间排序"
           />
 
           <FilterDropdown
@@ -83,8 +96,6 @@ export const StatusHeader = ({
             {STATUS_OPTIONS.map((s) => {
               const count = statusCounts[s] || 0;
 
-              // 🚀 核心优化：如果 Unknown 数量为 0，则隐藏该选项
-              // 避免在正常情况下干扰用户
               if (s === "Unknown" && count === 0) {
                 return null;
               }

@@ -1,11 +1,10 @@
-// src/components/NameTable/useNameTableLogic.ts
+// src/components/NameTable/useNameTableLogic.tsx
 
 import { useState, useMemo, useCallback } from "react";
 import type { NameRecord } from "../../types/ensNames";
 import { isRenewable } from "../../utils/ens";
 import type { SortField, SortConfig, FilterConfig } from "./types";
-
-type SortableValue = string | number | null | undefined;
+import { processNameRecords } from "./utils";
 
 export const useNameTableLogic = (
   records: NameRecord[] | undefined,
@@ -19,19 +18,18 @@ export const useNameTableLogic = (
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({
     statusList: [],
     onlyMe: false,
+    onlyWithNotes: false,
     actionType: "all",
-    // 🚀 初始化新筛选状态
     lengthList: [],
     wrappedType: "all",
   });
 
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
 
-  // 解构所有配置项
   const { statusList, actionType, onlyMe, lengthList, wrappedType } =
     filterConfig;
 
-  // --- 1. 基础过滤 (Base Filter) ---
+  // --- 1. 基础过滤 ---
   const baseRecords = useMemo(() => {
     if (!records) return [];
     const lowerCurrentAddress = currentAddress?.toLowerCase();
@@ -44,10 +42,8 @@ export const useNameTableLogic = (
     return records;
   }, [records, onlyMe, currentAddress]);
 
-  // --- 2. 统计计数 (Counts Calculation) ---
-  // 使用 "Cross-Filtering" 逻辑：计算某一项的计数时，应基于"除了该项以外的其他所有筛选条件"过滤后的结果
+  // --- 2. 统计计数 ---
   const { statusCounts, actionCounts, nameCounts } = useMemo(() => {
-    // 辅助：通用过滤检查器
     const checkStatus = (r: NameRecord) =>
       statusList.length === 0 || statusList.includes(r.status);
     const checkAction = (r: NameRecord) => {
@@ -61,18 +57,26 @@ export const useNameTableLogic = (
       if (wrappedType === "all") return true;
       return wrappedType === "wrapped" ? r.wrapped : !r.wrapped;
     };
+    const checkNotes = (r: NameRecord) => {
+      if (!filterConfig.onlyWithNotes) return true;
+      return !!r.notes && r.notes.trim().length > 0;
+    };
 
-    // 2.1 计算状态计数 (受 Action, Length, Wrapped 影响)
+    // 2.1 状态计数
     const statusCounts: Record<string, number> = {};
     baseRecords
-      .filter((r) => checkAction(r) && checkLength(r) && checkWrapped(r))
+      .filter(
+        (r) =>
+          checkAction(r) && checkLength(r) && checkWrapped(r) && checkNotes(r),
+      )
       .forEach(
         (r) => (statusCounts[r.status] = (statusCounts[r.status] || 0) + 1),
       );
 
-    // 2.2 计算操作计数 (受 Status, Length, Wrapped 影响)
+    // 2.2 操作计数
     const recordsForAction = baseRecords.filter(
-      (r) => checkStatus(r) && checkLength(r) && checkWrapped(r),
+      (r) =>
+        checkStatus(r) && checkLength(r) && checkWrapped(r) && checkNotes(r),
     );
     const actionCounts = {
       all: recordsForAction.length,
@@ -80,30 +84,44 @@ export const useNameTableLogic = (
       renew: recordsForAction.filter((r) => isRenewable(r.status)).length,
     };
 
-    // 🚀 2.3 计算名称相关计数 (Length & Wrapped)
-    // Length 计数 (受 Status, Action, Wrapped 影响)
+    // 2.3 名称相关计数
     const lengthCounts: Record<number, number> = {};
-    const availableLengths = new Set<number>(); // 记录所有存在的长度
-    baseRecords.forEach((r) => availableLengths.add(r.label.length)); // 先收集所有可能长度
+    const availableLengths = new Set<number>();
+    baseRecords.forEach((r) => availableLengths.add(r.label.length));
 
-    // 填充计数
     baseRecords
-      .filter((r) => checkStatus(r) && checkAction(r) && checkWrapped(r))
+      .filter(
+        (r) =>
+          checkStatus(r) && checkAction(r) && checkWrapped(r) && checkNotes(r),
+      )
       .forEach(
         (r) =>
           (lengthCounts[r.label.length] =
             (lengthCounts[r.label.length] || 0) + 1),
       );
 
-    // Wrapped 计数 (受 Status, Action, Length 影响)
     const recordsForWrapped = baseRecords.filter(
-      (r) => checkStatus(r) && checkAction(r) && checkLength(r),
+      (r) =>
+        checkStatus(r) && checkAction(r) && checkLength(r) && checkNotes(r),
     );
     const wrappedCounts = {
       all: recordsForWrapped.length,
       wrapped: recordsForWrapped.filter((r) => r.wrapped).length,
       unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
     };
+
+    // 🚀 2.4 计算有备注的数量 (新增)
+    // 逻辑：在当前 状态/操作/长度/包装 过滤条件下，有多少条记录包含备注
+    const recordsWithNotes = baseRecords.filter(
+      (r) =>
+        checkStatus(r) &&
+        checkAction(r) &&
+        checkLength(r) &&
+        checkWrapped(r) &&
+        !!r.notes &&
+        r.notes.trim().length > 0,
+    );
+    const notesCount = recordsWithNotes.length;
 
     return {
       statusCounts,
@@ -112,66 +130,25 @@ export const useNameTableLogic = (
         lengthCounts,
         availableLengths: Array.from(availableLengths).sort((a, b) => a - b),
         wrappedCounts,
+        notesCount, // 导出计数
       },
     };
-  }, [baseRecords, statusList, actionType, lengthList, wrappedType]);
+  }, [
+    baseRecords,
+    statusList,
+    actionType,
+    lengthList,
+    wrappedType,
+    filterConfig.onlyWithNotes,
+  ]);
 
-  // --- 3. 最终表格数据过滤 ---
-  const filteredRecords = useMemo(() => {
-    return baseRecords.filter((record) => {
-      // 状态
-      if (statusList.length > 0 && !statusList.includes(record.status))
-        return false;
-      // 操作类型
-      if (actionType !== "all") {
-        const renewable = isRenewable(record.status);
-        if (actionType === "renew" && !renewable) return false;
-        if (actionType === "register" && renewable) return false;
-      }
-      // 🚀 长度
-      if (lengthList.length > 0 && !lengthList.includes(record.label.length))
-        return false;
-      // 🚀 包装状态
-      if (wrappedType !== "all") {
-        if (wrappedType === "wrapped" && !record.wrapped) return false;
-        if (wrappedType === "unwrapped" && record.wrapped) return false;
-      }
-      return true;
-    });
-  }, [baseRecords, statusList, actionType, lengthList, wrappedType]);
+  // --- 3 & 4. 统一使用 utils 中的 processNameRecords ---
+  const processedRecords = useMemo(
+    () =>
+      processNameRecords(baseRecords, sortConfig, filterConfig, currentAddress),
+    [baseRecords, sortConfig, filterConfig, currentAddress],
+  );
 
-  // --- 4. 排序逻辑 (保持不变) ---
-  const processedRecords = useMemo(() => {
-    if (!sortConfig.direction || !sortConfig.field) return filteredRecords;
-    const sorted = [...filteredRecords];
-    const { field, direction } = sortConfig;
-
-    const getValue = (item: NameRecord): SortableValue => {
-      if (field === "length") return item.label.length;
-      if (field === "status") return item.expiryTime;
-      const key = field as keyof NameRecord;
-      const value = item[key];
-      return typeof value === "string" || typeof value === "number"
-        ? value
-        : null;
-    };
-
-    sorted.sort((a, b) => {
-      const aValue = getValue(a);
-      const bValue = getValue(b);
-      const compare = (valA: SortableValue, valB: SortableValue) => {
-        if (valA === valB) return 0;
-        if (valA == null) return 1;
-        if (valB == null) return -1;
-        return valA < valB ? -1 : 1;
-      };
-      const diff = compare(aValue, bValue);
-      return direction === "asc" ? diff : -diff;
-    });
-    return sorted;
-  }, [filteredRecords, sortConfig]);
-
-  // ... Handlers (保持不变) ...
   const handleSort = useCallback((field: SortField) => {
     setSortConfig((prev) => {
       if (prev.field !== field) return { field, direction: "asc" };
@@ -224,6 +201,6 @@ export const useNameTableLogic = (
     clearSelection,
     statusCounts,
     actionCounts,
-    nameCounts, // 🚀 导出新计数
+    nameCounts,
   };
 };
