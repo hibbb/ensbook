@@ -1,6 +1,7 @@
 // src/components/NameTable/utils.ts
 
-import { isRenewable } from "../../utils/ens";
+// 🚀 引入 isRegistrable
+import { isRenewable, isRegistrable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 import type { SortConfig, FilterConfig } from "./types";
 
@@ -36,17 +37,23 @@ export const processNameRecords = (
       return false;
     }
 
-    // C. 操作类型过滤
-    const renewable = isRenewable(r.status);
-    if (filterConfig.actionType === "register" && renewable) return false;
-    if (filterConfig.actionType === "renew" && !renewable) return false;
+    // 🚀 C. 操作类型过滤 (精确匹配)
+    if (filterConfig.actionType !== "all") {
+      if (filterConfig.actionType === "renew" && !isRenewable(r.status)) {
+        return false;
+      }
+      // 以前是 !isRenewable，现在精确检查是否可注册
+      if (filterConfig.actionType === "register" && !isRegistrable(r.status)) {
+        return false;
+      }
+    }
 
     // D. 备注过滤
     if (filterConfig.onlyWithNotes) {
       if (!r.notes || r.notes.trim().length === 0) return false;
     }
 
-    // 🚀 修复 E: 长度过滤 (补回遗漏逻辑)
+    // E. 长度过滤
     if (
       filterConfig.lengthList.length > 0 &&
       !filterConfig.lengthList.includes(r.label.length)
@@ -54,7 +61,7 @@ export const processNameRecords = (
       return false;
     }
 
-    // 🚀 修复 F: 包装状态过滤 (补回遗漏逻辑)
+    // F. 包装状态过滤
     if (filterConfig.wrappedType !== "all") {
       if (filterConfig.wrappedType === "wrapped" && !r.wrapped) return false;
       if (filterConfig.wrappedType === "unwrapped" && r.wrapped) return false;

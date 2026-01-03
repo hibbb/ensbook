@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 import type { NameRecord } from "../../types/ensNames";
-import { isRenewable } from "../../utils/ens";
+// 🚀 引入 isRegistrable
+import { isRenewable, isRegistrable } from "../../utils/ens";
 import type { SortField, SortConfig, FilterConfig } from "./types";
 import { processNameRecords } from "./utils";
 
@@ -46,11 +47,15 @@ export const useNameTableLogic = (
   const { statusCounts, actionCounts, nameCounts } = useMemo(() => {
     const checkStatus = (r: NameRecord) =>
       statusList.length === 0 || statusList.includes(r.status);
+
+    // 🚀 优化：使用精确的操作判断
     const checkAction = (r: NameRecord) => {
       if (actionType === "all") return true;
-      const renewable = isRenewable(r.status);
-      return actionType === "renew" ? renewable : !renewable;
+      if (actionType === "renew") return isRenewable(r.status);
+      if (actionType === "register") return isRegistrable(r.status);
+      return false;
     };
+
     const checkLength = (r: NameRecord) =>
       lengthList.length === 0 || lengthList.includes(r.label.length);
     const checkWrapped = (r: NameRecord) => {
@@ -73,14 +78,16 @@ export const useNameTableLogic = (
         (r) => (statusCounts[r.status] = (statusCounts[r.status] || 0) + 1),
       );
 
-    // 2.2 操作计数
+    // 🚀 2.2 操作计数 (精确统计)
     const recordsForAction = baseRecords.filter(
       (r) =>
         checkStatus(r) && checkLength(r) && checkWrapped(r) && checkNotes(r),
     );
     const actionCounts = {
       all: recordsForAction.length,
-      register: recordsForAction.filter((r) => !isRenewable(r.status)).length,
+      // 以前是 !isRenewable，现在改为显式 isRegistrable
+      // 这样 Unknown 状态就不会被算进去了
+      register: recordsForAction.filter((r) => isRegistrable(r.status)).length,
       renew: recordsForAction.filter((r) => isRenewable(r.status)).length,
     };
 
@@ -110,8 +117,6 @@ export const useNameTableLogic = (
       unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
     };
 
-    // 🚀 2.4 计算有备注的数量 (新增)
-    // 逻辑：在当前 状态/操作/长度/包装 过滤条件下，有多少条记录包含备注
     const recordsWithNotes = baseRecords.filter(
       (r) =>
         checkStatus(r) &&
@@ -130,7 +135,7 @@ export const useNameTableLogic = (
         lengthCounts,
         availableLengths: Array.from(availableLengths).sort((a, b) => a - b),
         wrappedCounts,
-        notesCount, // 导出计数
+        notesCount,
       },
     };
   }, [
@@ -142,7 +147,7 @@ export const useNameTableLogic = (
     filterConfig.onlyWithNotes,
   ]);
 
-  // --- 3 & 4. 统一使用 utils 中的 processNameRecords ---
+  // ... (其余部分保持不变)
   const processedRecords = useMemo(
     () =>
       processNameRecords(baseRecords, sortConfig, filterConfig, currentAddress),

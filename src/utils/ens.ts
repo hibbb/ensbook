@@ -2,7 +2,7 @@
 import { type Hex, toHex } from "viem";
 import { normalize } from "viem/ens";
 import type { NameRecord } from "../types/ensNames";
-import { mainnet } from "viem/chains"; // 🚀 引入 viem 定义的主网 ID
+import { mainnet } from "viem/chains";
 
 /**
  * 解析并标准化域名
@@ -25,8 +25,6 @@ export function generateSecret(): Hex {
   return toHex(randomValues) as unknown as Hex;
 }
 
-// 检查当前是否连接主网，如果未连接钱包 (chainId 为 undefined)，默认返回 true
-
 export const isMainnet = (chainId?: number): boolean => {
   return !chainId || chainId === mainnet.id;
 };
@@ -40,38 +38,35 @@ export const isReleased = (status: NameRecord["status"]) =>
   status === "Released";
 export const isAvailable = (status: NameRecord["status"]) =>
   status === "Available";
+
 // isRenewable 判断当前用户是否应该看到“续费”按钮
 export const isRenewable = (status: NameRecord["status"]) =>
   status === "Active" || status === "Grace";
 
+// 🚀 新增：isRegistrable 判断当前用户是否应该看到“注册”按钮
+// Premium (溢价期) 也是可以注册的，只是价格不同
+export const isRegistrable = (status: NameRecord["status"]) =>
+  status === "Available" || status === "Released" || status === "Premium";
+
 /**
  * 计算 ENS 域名的当前溢价 (Premium Price)
- * @param releaseTime - 域名的释放时间 (Unix 时间戳，秒)
- * @param decimals -保留的小数位数，默认为 0
- * @returns 格式化后的价格字符串
  */
 export const fetchPremiumPrice = (
   releaseTime: number,
   decimals: number = 0,
 ): string => {
-  // 如果没有释放时间，直接返回 0
   if (!releaseTime) return (0).toFixed(decimals);
 
-  const START_PRICE = 100_000_000; // 起始价格 1亿美元
-  const OFFSET = 47.6837158203125; // 偏移量，用于修正曲线
-  const FACTOR = 0.5; // 衰减因子
+  const START_PRICE = 100_000_000;
+  const OFFSET = 47.6837158203125;
+  const FACTOR = 0.5;
 
-  // 使用原生 Date.now() 替代 moment.now()
-  // releaseTime 通常是秒，需要转换为毫秒
   const now = Date.now();
   const releaseTimeMs = releaseTime * 1000;
 
-  // 计算距离释放时间过去的天数
   const diffMs = now - releaseTimeMs;
   const daysPassed = diffMs / (24 * 60 * 60 * 1000);
 
-  // 核心公式：Start * (0.5 ^ days) - Offset
-  // 使用 Math.max 确保价格不会跌破 0
   const currentPremium = START_PRICE * Math.pow(FACTOR, daysPassed) - OFFSET;
   const exactPrice = Math.max(currentPremium, 0);
 

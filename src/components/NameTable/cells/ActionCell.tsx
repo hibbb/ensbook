@@ -7,10 +7,11 @@ import {
   faWallet,
   faClock,
   faBell,
-  faTriangleExclamation, // 引入错误图标
+  faTriangleExclamation,
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-import { isRenewable } from "../../../utils/ens";
+// 🚀 引入新函数 isRegistrable
+import { isRenewable, isRegistrable } from "../../../utils/ens";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
 
@@ -59,7 +60,7 @@ export const ActionCell = ({
       };
     }
 
-    // 🚀 2. Unknown 状态处理 (修复逻辑漏洞)
+    // 2. Unknown 状态处理
     if (record.status === "Unknown") {
       return {
         text: "未知",
@@ -102,8 +103,9 @@ export const ActionCell = ({
       };
     }
 
-    // 🚀 5. 显式可注册状态 (Available / Released)
-    if (record.status === "Available" || record.status === "Released") {
+    // 🚀 5. 显式可注册状态 (Available / Released / Premium)
+    // 使用 isRegistrable 统一判断，包含 Premium
+    if (isRegistrable(record.status)) {
       return {
         text: "注册",
         style:
@@ -113,8 +115,7 @@ export const ActionCell = ({
       };
     }
 
-    // 6. 其他情况 (如 Premium, Grace 且不可续费等极端情况，或者数据异常)
-    // 兜底显示不可操作，而不是注册
+    // 6. 其他情况 (兜底)
     return {
       text: "—",
       style: "text-gray-300 cursor-not-allowed",
@@ -158,7 +159,7 @@ export const ActionCell = ({
       {onToggleSelection &&
         isConnected &&
         !renewable &&
-        record.status !== "Unknown" && ( // Unknown 状态下不显示加号
+        record.status !== "Unknown" && (
           <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
             <FontAwesomeIcon icon={faPlus} size="2xs" />
           </div>
