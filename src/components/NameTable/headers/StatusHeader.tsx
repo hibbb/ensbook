@@ -29,6 +29,7 @@ interface StatusHeaderProps {
   onSort: (field: SortField) => void;
   onFilterChange: (config: FilterConfig) => void;
   statusCounts?: Record<string, number>;
+  disabled?: boolean; // 🚀 新增
 }
 
 export const StatusHeader = ({
@@ -37,6 +38,7 @@ export const StatusHeader = ({
   onSort,
   onFilterChange,
   statusCounts = {},
+  disabled, // 🚀 解构
 }: StatusHeaderProps) => {
   const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
@@ -53,6 +55,7 @@ export const StatusHeader = ({
             ascIcon={faSortAmountUp}
             descIcon={faSortAmountDown}
             title="按状态排序"
+            disabled={disabled} // 🚀
           />
 
           {/* 🚀 新增：按注册时间排序 */}
@@ -64,11 +67,13 @@ export const StatusHeader = ({
             ascIcon={faRotateRight}
             descIcon={faRotateLeft}
             title="按注册时间排序"
+            disabled={disabled} // 🚀
           />
 
           <FilterDropdown
             isActive={filterConfig.statusList.length > 0}
             title="按状态筛选"
+            disabled={disabled} // 🚀
           >
             {/* 全部显示选项 */}
             <div

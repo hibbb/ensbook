@@ -15,9 +15,13 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // 全局默认配置
-      staleTime: 1000 * 60, // 数据 1 分钟内认为是新鲜的，不重新请求
-      refetchOnWindowFocus: false, // 窗口聚焦时不自动刷新 (根据需求开启)
-      retry: 1, // 失败后重试 1 次
+      // 1. 保持现状
+      staleTime: 1000 * 60,
+      // 2. 建议：在窗口重新聚焦时，强制刷新关键数据
+      // 理由：用户可能去 Rainbow 钱包转账了，切回来时希望看到最新状态
+      refetchOnWindowFocus: true, // 你目前设的是 false，建议改为 true 或针对特定 Query 开启
+      // 3. 建议：网络恢复时自动刷新
+      refetchOnReconnect: true,
     },
   },
 });

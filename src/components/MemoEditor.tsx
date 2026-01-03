@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { getMemo, setMemo } from "../services/storage/memos";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { Tooltip } from "./ui/Tooltip";
+import { MAX_MEMO_LENGTH } from "../services/storage/memos"; // 引入常量
 
 interface MemoEditorProps {
   label: string;
@@ -40,17 +41,19 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
   };
 
   const handleSave = () => {
-    // 1. 保存到本地存储 (同步操作)
-    setMemo(label, editValue);
-    setLocalMemo(editValue.trim());
-    setIsOpen(false);
-    toast.success(editValue.trim() ? "备注已更新" : "备注已删除");
+    try {
+      setMemo(label, editValue); // 这里可能会抛出我们刚才定义的 Error
+      setLocalMemo(editValue.trim());
+      setIsOpen(false);
+      toast.success(editValue.trim() ? "备注已更新" : "备注已删除");
 
-    // 🚀 2. 核心修复：通知数据层失效
-    // 这会触发 useNameRecords / useCollectionRecords 重新运行 fetchNameRecords
-    // 从而重新读取 memos.ts 中的最新数据
-    queryClient.invalidateQueries({ queryKey: ["name-records"] });
-    queryClient.invalidateQueries({ queryKey: ["collection-records"] });
+      queryClient.invalidateQueries({ queryKey: ["name-records"] });
+      queryClient.invalidateQueries({ queryKey: ["collection-records"] });
+    } catch (e) {
+      console.log(e);
+      // 🚀 捕获爆仓错误
+      toast.error("保存失败：本地存储空间已满");
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -85,6 +88,12 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
       <PopoverContent align="start" side="bottom" className="w-64 p-3">
         <div className="mb-2 flex justify-between items-center">
           <span className="text-xs font-qs-bold text-gray-400">编辑备注</span>
+          {/* 🚀 显示字数统计 */}
+          <span
+            className={`text-[10px] ${editValue.length >= MAX_MEMO_LENGTH ? "text-red-400" : "text-gray-300"}`}
+          >
+            {editValue.length}/{MAX_MEMO_LENGTH}
+          </span>
           <span className="text-[10px] text-gray-300">Ctrl+Enter 保存</span>
         </div>
 
@@ -95,7 +104,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           onKeyDown={handleKeyDown}
           placeholder="输入备注信息..."
           className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-qs-medium"
-          maxLength={200}
+          maxLength={MAX_MEMO_LENGTH} // 使用常量
         />
 
         <div className="flex gap-2 mt-3">

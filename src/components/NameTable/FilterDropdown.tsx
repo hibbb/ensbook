@@ -10,6 +10,7 @@ interface FilterDropdownProps {
   children: ReactNode;
   menuWidth?: string;
   title?: string; // 🚀 新增 title 属性
+  disabled?: boolean; // 🚀 新增
 }
 
 export const FilterDropdown = ({
@@ -17,6 +18,7 @@ export const FilterDropdown = ({
   children,
   menuWidth = "w-48",
   title = "筛选", // 🚀 默认值
+  disabled, // 🚀 解构
 }: FilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -48,6 +50,7 @@ export const FilterDropdown = ({
   }, [isOpen]);
 
   const toggleOpen = () => {
+    if (disabled) return;
     if (!isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       setPosition({
@@ -65,10 +68,13 @@ export const FilterDropdown = ({
         <button
           type="button"
           onClick={toggleOpen}
+          disabled={disabled} // 🚀 绑定原生 disabled
           className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-150 ${
-            isActive || isOpen
-              ? "bg-link text-white"
-              : "text-link hover:bg-gray-100"
+            disabled
+              ? "text-gray-300 cursor-not-allowed" // 禁用样式
+              : isActive || isOpen
+                ? "bg-link text-white"
+                : "text-link hover:bg-gray-100"
           }`}
         >
           <FontAwesomeIcon icon={faFilter} size="xs" />

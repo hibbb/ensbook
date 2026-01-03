@@ -1,6 +1,8 @@
 // src/services/storage/memos.ts
 
 const MEMO_STORAGE_KEY = "eb_user_memos";
+// 🚀 定义最大长度常量，方便全局引用
+export const MAX_MEMO_LENGTH = 200;
 
 export type MemoMap = Record<string, string>;
 
@@ -29,10 +31,25 @@ export const getMemo = (label: string): string => {
 
 export const setMemo = (label: string, content: string) => {
   const memos = getStoredMemos();
-  if (!content.trim()) {
-    delete memos[label]; // 如果内容为空，则删除 key
+
+  // 🚀 1. 强制截断：无论传入什么，只存前 200 个字
+  const safeContent = content.trim().slice(0, MAX_MEMO_LENGTH);
+
+  if (!safeContent) {
+    delete memos[label];
   } else {
-    memos[label] = content.trim();
+    memos[label] = safeContent;
   }
-  saveStoredMemos(memos);
+
+  // 🚀 2. 捕获 QuotaExceededError (爆仓保护)
+  try {
+    saveStoredMemos(memos);
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      // 这里可以抛出错误让 UI 层捕获，或者 console.error
+      console.error("存储空间已满，无法保存备注");
+      // 可以在这里触发一个全局的 toast.error("存储空间不足")，但这需要引入 toast
+      throw new Error("存储空间不足");
+    }
+  }
 };

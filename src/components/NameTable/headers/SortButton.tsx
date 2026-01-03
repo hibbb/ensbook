@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import type { SortField, SortConfig } from "../types";
-import { Tooltip } from "../../ui/Tooltip"; // 🚀 引入 Tooltip
+import { Tooltip } from "../../ui/Tooltip";
 
 interface SortButtonProps {
   field: SortField;
@@ -13,6 +13,7 @@ interface SortButtonProps {
   ascIcon: IconDefinition;
   descIcon: IconDefinition;
   title?: string;
+  disabled?: boolean; // 🚀 新增
 }
 
 export const SortButton = ({
@@ -23,6 +24,7 @@ export const SortButton = ({
   ascIcon,
   descIcon,
   title,
+  disabled, // 🚀 解构
 }: SortButtonProps) => {
   const isActive =
     currentSort.field === field && currentSort.direction !== null;
@@ -31,15 +33,22 @@ export const SortButton = ({
 
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
-  const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
-  const buttonInactiveClass = "text-link hover:bg-gray-50";
+
+  // 🚀 样式逻辑更新
+  let stateClass = "";
+  if (disabled) {
+    stateClass = "text-gray-300 cursor-not-allowed";
+  } else if (isActive) {
+    stateClass = "bg-link text-white hover:bg-link-hover";
+  } else {
+    stateClass = "text-link hover:bg-gray-50";
+  }
 
   const buttonContent = (
     <button
-      onClick={() => onSort(field)}
-      className={`${buttonBaseClass} ${
-        isActive ? buttonActiveClass : buttonInactiveClass
-      }`}
+      onClick={() => !disabled && onSort(field)}
+      disabled={disabled} // 🚀 绑定原生 disabled
+      className={`${buttonBaseClass} ${stateClass}`}
     >
       <FontAwesomeIcon
         icon={isAsc ? ascIcon : isDesc ? descIcon : defaultIcon}
@@ -48,8 +57,7 @@ export const SortButton = ({
     </button>
   );
 
-  // 🚀 如果有 title，则包裹 Tooltip
-  if (title) {
+  if (title && !disabled) {
     return <Tooltip content={title}>{buttonContent}</Tooltip>;
   }
 

@@ -15,6 +15,7 @@ interface ActionHeaderProps {
   hasRenewable?: boolean;
   onToggleSelectAll?: () => void;
   actionCounts?: { all: number; register: number; renew: number };
+  disabled?: boolean; // 🚀 新增
 }
 
 export const ActionHeader = ({
@@ -25,6 +26,7 @@ export const ActionHeader = ({
   hasRenewable,
   onToggleSelectAll,
   actionCounts = { all: 0, register: 0, renew: 0 },
+  disabled, // 🚀 解构
 }: ActionHeaderProps) => {
   return (
     <ThWrapper>
@@ -62,6 +64,7 @@ export const ActionHeader = ({
             isActive={filterConfig.actionType !== "all"}
             menuWidth="w-40 right-0"
             title="按操作类型筛选"
+            disabled={disabled} // 🚀
           >
             {(["all", "register", "renew"] as const).map((type) => {
               const count = actionCounts[type];

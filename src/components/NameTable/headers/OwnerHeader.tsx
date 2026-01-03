@@ -19,6 +19,7 @@ interface OwnerHeaderProps {
   onFilterChange: (config: FilterConfig) => void;
   myCount?: number;
   listCount?: number; // 🚀 新增：当前列表总数
+  disabled?: boolean; // 🚀 新增
 }
 
 export const OwnerHeader = ({
@@ -29,6 +30,7 @@ export const OwnerHeader = ({
   onFilterChange,
   myCount = 0,
   listCount = 0, // 🚀 默认值
+  disabled, // 🚀 解构
 }: OwnerHeaderProps) => {
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
@@ -43,8 +45,12 @@ export const OwnerHeader = ({
   // 2. 我的数量为0
   // 3. [新] 全部都是我的，且当前并未开启"只看我的"筛选 (因为此时筛选毫无意义)
   //    注意：如果 onlyMe 为 true，即使 isAllMine 成立，也不该禁用，因为需要允许用户点击以"取消"筛选
+  // 🚀 逻辑合并：全局禁用 || 原有业务禁用
   const isDisabled =
-    !isConnected || myCount === 0 || (isAllMine && !filterConfig.onlyMe);
+    disabled ||
+    !isConnected ||
+    myCount === 0 ||
+    (isAllMine && !filterConfig.onlyMe);
 
   // Tooltip 文本逻辑
   const getTooltipContent = () => {
@@ -68,6 +74,7 @@ export const OwnerHeader = ({
             ascIcon={faSortAlphaDown}
             descIcon={faSortAlphaUp}
             title="按所有者排序"
+            disabled={disabled} // 🚀
           />
 
           <Tooltip content={getTooltipContent()}>

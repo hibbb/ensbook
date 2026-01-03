@@ -71,6 +71,9 @@ export const TableHeader = ({
       typeof topOffset === "number" ? `${topOffset}px` : topOffset,
   } as React.CSSProperties;
 
+  // 🚀 核心逻辑：当总数 <= 1 时，禁用所有控制功能
+  const isControlsDisabled = totalCount <= 1;
+
   return (
     <thead
       className="sticky top-0 z-20 bg-table-header backdrop-blur-sm transition-all duration-300 lg:top-[var(--header-offset)]"
@@ -88,6 +91,7 @@ export const TableHeader = ({
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
             nameCounts={nameCounts}
+            disabled={isControlsDisabled} // 🚀 传参
           />
         </th>
 
@@ -98,6 +102,7 @@ export const TableHeader = ({
             onSort={onSort}
             onFilterChange={onFilterChange}
             statusCounts={statusCounts}
+            disabled={isControlsDisabled} // 🚀 传参
           />
         </th>
 
@@ -110,6 +115,7 @@ export const TableHeader = ({
             onFilterChange={onFilterChange}
             myCount={myCount}
             listCount={filteredCount}
+            disabled={isControlsDisabled} // 🚀 传参
           />
         </th>
 
@@ -122,6 +128,7 @@ export const TableHeader = ({
             hasRenewable={hasRenewable}
             onToggleSelectAll={onToggleSelectAll}
             actionCounts={actionCounts}
+            disabled={isControlsDisabled} // 🚀 传参
           />
         </th>
 
