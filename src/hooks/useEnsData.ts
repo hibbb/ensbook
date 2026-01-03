@@ -1,19 +1,24 @@
 // src/hooks/useEnsData.ts
+
 import { useQuery } from "@tanstack/react-query";
-import { keepPreviousData } from "@tanstack/react-query";
 import { fetchNameRecords } from "../services/graph/fetchNameRecords";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import type { ClassifiedInputs } from "../utils/parseInputs";
 import { ENS_COLLECTIONS } from "../config/collections";
 
+/**
+ * Hook 1: 获取通用域名列表 (Home 页)
+ * 场景：用户手动输入、添加、删除、批量操作
+ * 需求：列表增减时保持 UI 稳定（不闪烁），但完全重置（如清空）时显示骨架屏
+ */
 export function useNameRecords(labels: string[]) {
   return useQuery({
     queryKey: ["name-records", labels],
     queryFn: () => fetchNameRecords(labels),
     enabled: labels.length > 0,
-    staleTime: 1000 * 30, // 数据新鲜度 30秒
+    staleTime: 1000 * 30, // 30秒
 
-    // 🚀 性能优化：智能占位检测 (Smart Placeholder)
+    // 🚀 智能占位逻辑：仅在"增量"或"减量"更新时保留旧数据
     placeholderData: (previousData, previousQuery) => {
       if (!previousData) return undefined;
 
@@ -29,18 +34,19 @@ export function useNameRecords(labels: string[]) {
       );
 
       // 2. 删除判定：新列表的所有元素都在旧列表中 (e.g. [A, B] -> [A])
-      // 🚀 新增逻辑：处理删除操作不显示骨架屏
       const isDeleting = labels.every((label) => prevLabelSet.has(label));
 
       // 只要是增量或减量操作，都保留旧数据，避免闪烁
+      // 如果是完全无关的列表切换，则返回 undefined (显示骨架屏)
       return isAppending || isDeleting ? previousData : undefined;
     },
   });
 }
 
 /**
- * Hook 2: 获取特定集合的域名详情
- * 用于 999 俱乐部或助记词集合页面
+ * Hook 2: 获取特定集合的域名详情 (集合页)
+ * 场景：侧边栏导航切换
+ * 需求：切换集合时，必须立即显示骨架屏，给用户加载反馈
  */
 export function useCollectionRecords(collectionId: string) {
   const collection = ENS_COLLECTIONS[collectionId];
@@ -50,15 +56,16 @@ export function useCollectionRecords(collectionId: string) {
     queryKey: ["collection-records", collectionId, labels.length],
     queryFn: () => fetchNameRecords(labels),
     enabled: !!collection && labels.length > 0,
-    staleTime: 1000 * 60 * 5, // 集合数据相对稳定，缓存 5 分钟
-    // 注意：如果您希望切换集合时显示骨架屏，请确保移除了 keepPreviousData
-    // 如果保留 keepPreviousData，切换时会显示上一个集合的数据
-    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5, // 5分钟
+
+    // ❌ 关键修复：移除 placeholderData
+    // 切换集合是"导航"行为，我们需要 isLoading 立即变回 true 以展示骨架屏。
+    // 如果加了 keepPreviousData，用户会看到上一个集合的数据，直到新集合加载完突然跳变。
   });
 }
 
 /**
- * Hook 3: 反查/解析域名 (Fetch Labels)
+ * Hook 3: 反查/解析域名
  */
 export function useEnsLabels(classifiedInputs: ClassifiedInputs) {
   const hasInputs =
