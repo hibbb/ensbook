@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,9 +31,7 @@ export const Home = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
-  // ==========================================================================
-  // 1. 本地状态与存储
-  // ==========================================================================
+  // 1. 本地状态
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getStoredLabels(),
   );
@@ -41,46 +39,41 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // 流程控制状态
+  // 流程与提醒状态
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
     record?: NameRecord;
     labels?: string[];
   } | null>(null);
-
-  // 提醒功能状态
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
 
   useEffect(() => {
     saveStoredLabels(resolvedLabels);
   }, [resolvedLabels]);
 
-  // ==========================================================================
-  // 2. 数据获取与处理
-  // ==========================================================================
+  // 🚀 UX 优化：Home 组件挂载时（如从集合页返回），强制清除缓存。
+  // 这保证了 "Navigation" 操作 (场景 2) 总是触发骨架屏。
+  useEffect(() => {
+    queryClient.removeQueries({ queryKey: ["name-records"] });
+  }, [queryClient]);
+
+  // 2. 数据获取
+  // 您的 useNameRecords 已经包含了智能 placeholderData 逻辑
+  // 当添加域名时，isAppending = true，会返回旧数据，isLoading = false -> 界面不闪烁 (符合预期)
+  // 当刷新页面时，isAppending = false，data = undefined，isLoading = true -> 显示骨架屏 (符合预期)
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
-  const previousRecordsRef = useRef<NameRecord[]>([]);
-  useEffect(() => {
-    if (records) {
-      previousRecordsRef.current = records;
-    }
-  }, [records]);
+  const showSkeleton = isQuerying || isResolving;
 
-  const effectiveRecords = records || previousRecordsRef.current;
-
-  // 客户端过滤
   const validRecords = useMemo(() => {
-    if (!effectiveRecords || resolvedLabels.length === 0) return [];
+    if (!records || resolvedLabels.length === 0) return [];
     const currentLabelSet = new Set(resolvedLabels);
-    return effectiveRecords.filter((r) => currentLabelSet.has(r.label));
-  }, [effectiveRecords, resolvedLabels]);
-
-  // 🚀 移除全量解析：const enrichedRecords = usePrimaryNames(validRecords);
+    return records.filter((r) => currentLabelSet.has(r.label));
+  }, [records, resolvedLabels]);
 
   const {
-    processedRecords, // 这里是排序/筛选后的基础数据（未解析主域名）
+    processedRecords,
     sortConfig,
     filterConfig,
     handleSort,
@@ -92,12 +85,9 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-  } = useNameTableLogic(validRecords, address); // ✅ 直接使用 validRecords
+  } = useNameTableLogic(validRecords, address);
 
-  // ==========================================================================
-  // 3. 区块链交互 Hooks
-  // ==========================================================================
-
+  // ... (Hooks, Handlers 保持不变，请确保完整复制之前的实现) ...
   const {
     renewSingle,
     renewBatch,
@@ -123,10 +113,6 @@ export const Home = () => {
   }, [resolvedLabels, regStatus]);
 
   const hasContent = resolvedLabels.length > 0;
-
-  // ==========================================================================
-  // 4. 事件处理函数
-  // ==========================================================================
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -167,7 +153,7 @@ export const Home = () => {
   };
 
   const handleBatchDelete = (criteria: DeleteCriteria) => {
-    const targetRecords = records || effectiveRecords;
+    const targetRecords = records; // 使用 records 即可
     if (!targetRecords) return;
 
     const { type, value } = criteria;
@@ -304,9 +290,6 @@ export const Home = () => {
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
-  const showSkeleton =
-    isQuerying && resolvedLabels.length > 0 && validRecords.length === 0;
-
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
       <HomeSearchSection
@@ -341,7 +324,7 @@ export const Home = () => {
             onReminder={handleSetReminder}
             skeletonRows={5}
             headerTop="88px"
-            totalRecordsCount={validRecords?.length || 0} // ✅ 使用 validRecords
+            totalRecordsCount={validRecords?.length || 0}
             statusCounts={statusCounts}
             actionCounts={actionCounts}
             nameCounts={nameCounts}

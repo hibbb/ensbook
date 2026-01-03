@@ -30,17 +30,12 @@ export const CollectionDetail = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
-  // ==========================================================================
   // 1. 数据获取
-  // ==========================================================================
   const {
-    data: basicRecords,
-    isLoading,
+    data: records, // 直接使用 data，因为移除了 keepPreviousData，切换时这里会自动重置
+    isLoading, // 切换时会自动变为 true
     isError,
   } = useCollectionRecords(id || "");
-
-  // 🚀 移除全量解析: const records = usePrimaryNames(basicRecords);
-  const records = basicRecords; // ✅ 直接使用基础数据
 
   const {
     processedRecords,
@@ -57,10 +52,7 @@ export const CollectionDetail = () => {
     nameCounts,
   } = useNameTableLogic(records, address);
 
-  // ==========================================================================
-  // 2. 区块链交互 Hooks
-  // ==========================================================================
-
+  // ... (中间的 Hooks: useEnsRenewal, useEnsRegistration 保持不变) ...
   const {
     renewSingle,
     renewBatch,
@@ -79,19 +71,13 @@ export const CollectionDetail = () => {
     resetStatus: resetReg,
   } = useEnsRegistration();
 
-  // ==========================================================================
-  // 3. 状态管理
-  // ==========================================================================
-
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
     record?: NameRecord;
     labels?: string[];
   } | null>(null);
 
-  // 提醒功能状态
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
-
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -107,12 +93,10 @@ export const CollectionDetail = () => {
         queryClient.invalidateQueries({ queryKey: ["collection-records"] });
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 2000);
-
       const deepTimer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["collection-records"] });
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 10000);
-
       return () => {
         clearTimeout(timer);
         clearTimeout(deepTimer);
@@ -120,10 +104,7 @@ export const CollectionDetail = () => {
     }
   }, [regStatus, renewalStatus, queryClient]);
 
-  // ==========================================================================
-  // 4. 业务逻辑处理
-  // ==========================================================================
-
+  // ... (业务逻辑: renewableLabelSet, validSelection 等保持不变) ...
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
     return new Set(
@@ -137,11 +118,9 @@ export const CollectionDetail = () => {
       renewableLabelSet.has(label),
     );
   }, [selectedLabels, renewableLabelSet]);
-
   const selectionCount = validSelection.length;
 
-  // --- 触发器 ---
-
+  // ... (Event Handlers 保持不变) ...
   const handleSingleRegister = async (record: NameRecord) => {
     if (pendingLabels.has(record.label)) {
       setDurationTarget({ type: "register", record });
@@ -150,45 +129,31 @@ export const CollectionDetail = () => {
       setDurationTarget({ type: "register", record });
     }
   };
-
-  const handleSingleRenew = (record: NameRecord) => {
-    setDurationTarget({ type: "renew", record });
-  };
-
-  const handleSetReminder = (record: NameRecord) => {
-    setReminderTarget(record);
-  };
-
+  const handleSingleRenew = (r: NameRecord) =>
+    setDurationTarget({ type: "renew", record: r });
+  const handleSetReminder = (r: NameRecord) => setReminderTarget(r);
   const handleBatchRenewalTrigger = () => {
-    if (selectionCount === 0) return;
-    setDurationTarget({ type: "batch", labels: validSelection });
+    if (selectionCount > 0)
+      setDurationTarget({ type: "batch", labels: validSelection });
   };
-
-  const onDurationConfirm = (duration: bigint) => {
-    if (!durationTarget) return;
-
-    if (durationTarget.type === "register" && durationTarget.record) {
-      startRegistration(durationTarget.record.label, duration);
-    } else if (durationTarget.type === "renew" && durationTarget.record) {
-      renewSingle(durationTarget.record.label, duration);
-    } else if (durationTarget.type === "batch" && durationTarget.labels) {
-      renewBatch(durationTarget.labels, duration);
-    }
-  };
-
   const handleCloseModal = () => {
     setDurationTarget(null);
     resetRenewal();
     resetReg();
   };
+  const onDurationConfirm = (d: bigint) => {
+    if (!durationTarget) return;
+    if (durationTarget.type === "register" && durationTarget.record)
+      startRegistration(durationTarget.record.label, d);
+    else if (durationTarget.type === "renew" && durationTarget.record)
+      renewSingle(durationTarget.record.label, d);
+    else if (durationTarget.type === "batch" && durationTarget.labels)
+      renewBatch(durationTarget.labels, d);
+  };
 
   const activeType = durationTarget?.type || "renew";
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
-
-  // ==========================================================================
-  // 5. 渲染
-  // ==========================================================================
 
   if (!collection) return <div className="p-20 text-center">集合未找到</div>;
   if (isError)
@@ -200,7 +165,12 @@ export const CollectionDetail = () => {
         <h1 className="text-4xl font-qs-semibold">{collection.displayName}</h1>
         <p className="text-gray-400 mt-2">{collection.description}</p>
       </header>
+
+      {/* 🚀 核心修复：key={id} */}
+      {/* 1. 强制组件销毁重建，彻底清除旧状态 */}
+      {/* 2. isLoading 会因为 hook 修改而正确为 true，触发骨架屏 */}
       <NameTable
+        key={id}
         records={processedRecords}
         isLoading={isLoading}
         currentAddress={address}
@@ -222,7 +192,8 @@ export const CollectionDetail = () => {
         actionCounts={actionCounts}
         nameCounts={nameCounts}
       />
-      {/* 底部悬浮操作栏 */}
+
+      {/* ... (悬浮栏和 Modal 渲染保持不变) ... */}
       {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
@@ -231,22 +202,15 @@ export const CollectionDetail = () => {
               <span className="text-link font-bold">{selectionCount}</span>{" "}
               个域名
             </span>
-
             <div className="h-4 w-px bg-gray-300 mx-1" />
-
             <button
               onClick={handleBatchRenewalTrigger}
               disabled={isRenewalBusy || !isConnected}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-qs-semibold transition-all shadow-sm ${
-                isRenewalBusy || !isConnected
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"
-              }`}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-qs-semibold transition-all shadow-sm ${isRenewalBusy || !isConnected ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"}`}
             >
               <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
               批量续费
             </button>
-
             <button
               onClick={clearSelection}
               className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
@@ -256,7 +220,7 @@ export const CollectionDetail = () => {
           </div>
         </div>
       )}
-      {/* 流程模态框 */}
+
       <ProcessModal
         isOpen={!!durationTarget}
         type={activeType}
@@ -273,7 +237,6 @@ export const CollectionDetail = () => {
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
       />
-      {/* 🚀 5. 渲染提醒模态框 */}
       <ReminderModal
         isOpen={!!reminderTarget}
         onClose={() => setReminderTarget(null)}

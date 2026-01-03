@@ -1,7 +1,9 @@
 // src/hooks/useEnsData.ts
+
 import { useQuery } from "@tanstack/react-query";
-import { keepPreviousData } from "@tanstack/react-query";
-import { fetchNameRecords } from "../services/graph/fetchNameRecords"; // 确认路径
+// ❌ 删除 keepPreviousData 的引用，不再需要它
+// import { keepPreviousData } from "@tanstack/react-query";
+import { fetchNameRecords } from "../services/graph/fetchNameRecords";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import type { ClassifiedInputs } from "../utils/parseInputs";
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -11,17 +13,15 @@ export function useNameRecords(labels: string[]) {
     queryKey: ["name-records", labels],
     queryFn: () => fetchNameRecords(labels),
     enabled: labels.length > 0,
-    staleTime: 1000 * 30, // 数据新鲜度 30秒
+    staleTime: 1000 * 30,
 
-    // 🚀 性能优化：O(N) 复杂度的智能占位检测
+    // ✅ 保留这里的智能占位逻辑，它保证了“手动添加域名”时不会闪烁
     placeholderData: (previousData, previousQuery) => {
       if (!previousData) return undefined;
 
       const previousLabels = previousQuery?.queryKey[1] as string[] | undefined;
       if (!previousLabels || !Array.isArray(previousLabels)) return undefined;
 
-      // 优化点：使用 Set 进行 O(1) 查找
-      // 逻辑：如果 【新列表】 包含了 【旧列表】 的所有元素，则视为追加
       const newLabelSet = new Set(labels);
       const isAppending = previousLabels.every((label) =>
         newLabelSet.has(label),
@@ -33,8 +33,7 @@ export function useNameRecords(labels: string[]) {
 }
 
 /**
- * Hook 2: 获取特定集合的域名详情 (新增加)
- * 用于 999 俱乐部或助记词集合页面
+ * Hook 2: 获取特定集合的域名详情
  */
 export function useCollectionRecords(collectionId: string) {
   const collection = ENS_COLLECTIONS[collectionId];
@@ -44,13 +43,15 @@ export function useCollectionRecords(collectionId: string) {
     queryKey: ["collection-records", collectionId, labels.length],
     queryFn: () => fetchNameRecords(labels),
     enabled: !!collection && labels.length > 0,
-    staleTime: 1000 * 60 * 5, // 集合数据相对稳定，缓存 5 分钟
-    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+    // 🚀 核心修复：移除 keepPreviousData
+    // 这样当 collectionId 变化时，data 会立即变为 undefined，isLoading 变为 true
+    // 从而自然触发页面级的骨架屏
   });
 }
 
 /**
- * Hook 3: 反查/解析域名 (Fetch Labels)
+ * Hook 3: 反查/解析域名
  */
 export function useEnsLabels(classifiedInputs: ClassifiedInputs) {
   const hasInputs =
