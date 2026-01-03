@@ -18,6 +18,7 @@ export const STATUS_COLOR_BG: Record<string, string> = {
   Grace: "bg-yellow-200",
   Premium: "bg-purple-200",
   Released: "bg-green-200",
+  Unknown: "bg-gray-200",
 };
 
 export const STATUS_COLOR_TEXT: Record<string, string> = {
@@ -26,6 +27,7 @@ export const STATUS_COLOR_TEXT: Record<string, string> = {
   Grace: "text-yellow-700",
   Premium: "text-purple-700",
   Released: "text-green-700",
+  Unknown: "text-gray-700",
 };
 
 export const STATUS_COLOR_BG_HOVER: Record<string, string> = {
@@ -34,6 +36,7 @@ export const STATUS_COLOR_BG_HOVER: Record<string, string> = {
   Grace: "hover:bg-yellow-200",
   Premium: "hover:bg-purple-200",
   Released: "hover:bg-green-200",
+  Unknown: "hover:bg-gray-200",
 };
 
 export const STATUS_COLOR_TEXT_HOVER: Record<string, string> = {
@@ -42,4 +45,5 @@ export const STATUS_COLOR_TEXT_HOVER: Record<string, string> = {
   Grace: "hover:text-yellow-700",
   Premium: "hover:text-purple-700",
   Released: "hover:text-green-700",
+  Unknown: "hover:text-gray-700",
 };

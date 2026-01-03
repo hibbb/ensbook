@@ -49,6 +49,8 @@ interface NameTableProps {
 
 export const NameTable = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+
+  // 分页状态
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 50;
 
@@ -59,8 +61,10 @@ export const NameTable = (props: NameTableProps) => {
     return () => clearInterval(timer);
   }, []);
 
+  // 缓存全量数据引用
   const safeRecords = useMemo(() => props.records || [], [props.records]);
 
+  // 状态镜像重置页码 (当筛选条件改变时，回到第一页)
   const [prevFilterConfig, setPrevFilterConfig] = useState(props.filterConfig);
   const [prevRecordsLen, setPrevRecordsLen] = useState(safeRecords.length);
 
@@ -73,47 +77,50 @@ export const NameTable = (props: NameTableProps) => {
     setCurrentPage(1);
   }
 
-  // 1. 切片
+  // 1. 切片 (同步)
   const paginatedBasicRecords = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
 
-  // 2. 解析
+  // 2. 解析 (异步)
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
-  // 🚀 3. 智能防闪烁逻辑 (Smart Skeleton Trigger)
-  // 当翻页时，paginatedBasicRecords 会立即更新为新页数据。
-  // 但 displayRecords 是异步的，可能还保留着上一页的数据 (React Query 缓存或状态更新滞后)。
-  // 如果我们检测到 label 不匹配，说明数据正在解析中 (Stale)，必须强制显示骨架屏。
+  // 🚀 3. 智能骨架屏逻辑 (Smart Skeleton)
+  // 必须修复：当翻页时，paginatedBasicRecords 会瞬间更新，但 displayRecords 还在加载。
+  // 如果不加这个判断，会短暂显示上一页的解析结果，导致 UI 跳变。
   const isDataStale =
     displayRecords &&
     displayRecords.length > 0 &&
     paginatedBasicRecords.length > 0 &&
     displayRecords[0].label !== paginatedBasicRecords[0].label;
 
-  // 状态汇总：父组件加载中 OR 解析未完成 OR 解析数据过时
+  // 汇总加载状态：父组件Loading OR 解析未完成 OR 数据陈旧
   const isResolvingPage =
     safeRecords.length > 0 && (!displayRecords || isDataStale);
 
   const showSkeleton = props.isLoading || isResolvingPage;
   const skeletonCount = props.skeletonRows || 8;
 
-  // ... (统计逻辑保持不变) ...
+  // 统计逻辑
   const myCount = safeRecords.filter(
     (r) =>
       props.currentAddress &&
       r.owner?.toLowerCase() === props.currentAddress.toLowerCase(),
   ).length;
+
   const ownershipCounts = {
     mine: myCount,
     others: safeRecords.length - myCount,
   };
+
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
   const hasRenewableRecords = renewableRecords.length > 0;
+
   const statusSet = new Set<string>();
   safeRecords.forEach((r) => statusSet.add(r.status));
   const uniqueStatuses = Array.from(statusSet).sort();
+
   const isAllSelected =
     hasRenewableRecords &&
     props.selectedLabels &&
@@ -151,8 +158,8 @@ export const NameTable = (props: NameTableProps) => {
                 <SkeletonRow key={i} />
               ))
             ) : safeRecords.length > 0 ? (
-              // 此时数据已就绪且匹配，放心渲染
-              displayRecords!.map((r, i) => (
+              // 🚀 4. 安全渲染
+              (displayRecords || paginatedBasicRecords).map((r, i) => (
                 <TableRow
                   key={r.namehash}
                   record={r}
@@ -183,6 +190,7 @@ export const NameTable = (props: NameTableProps) => {
           </tbody>
         </table>
       </div>
+
       {!showSkeleton && safeRecords.length > 0 && (
         <Pagination
           currentPage={currentPage}
@@ -196,7 +204,6 @@ export const NameTable = (props: NameTableProps) => {
 };
 
 const SkeletonRow = () => (
-  // ... 保持不变
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
     <td>
       <div className="h-14 flex items-center justify-center">

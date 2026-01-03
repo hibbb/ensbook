@@ -35,7 +35,7 @@ export const StatusHeader = ({
   onFilterChange,
   statusCounts = {},
 }: StatusHeaderProps) => {
-  // 🚀 计算总数用于“全部显示”
+  // 计算总数用于“全部显示”
   const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
   return (
@@ -82,6 +82,13 @@ export const StatusHeader = ({
             {/* 状态列表 */}
             {STATUS_OPTIONS.map((s) => {
               const count = statusCounts[s] || 0;
+
+              // 🚀 核心优化：如果 Unknown 数量为 0，则隐藏该选项
+              // 避免在正常情况下干扰用户
+              if (s === "Unknown" && count === 0) {
+                return null;
+              }
+
               const isSelected = filterConfig.statusList.includes(s);
               const isDisabled = count === 0 && !isSelected;
 

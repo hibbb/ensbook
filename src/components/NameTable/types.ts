@@ -1,6 +1,5 @@
 // src/components/NameTable/types.ts
 
-// 🚀 修改：增加 "owner" 类型
 export type DeleteType = "all" | "status" | "length" | "wrapped" | "owner";
 
 export type SortField = "label" | "length" | "status" | "owner" | null;
@@ -24,10 +23,12 @@ export interface FilterConfig {
   wrappedType: "all" | "wrapped" | "unwrapped";
 }
 
+// 🚀 核心修改：添加 "Unknown"
 export const STATUS_OPTIONS = [
   "Available",
   "Premium",
   "Grace",
   "Active",
   "Released",
+  "Unknown", // 必需保留在类型定义中，但在 UI 层根据数量决定是否显示
 ] as const;

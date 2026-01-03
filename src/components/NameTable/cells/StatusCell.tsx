@@ -42,16 +42,26 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
     record.releaseTime || 0,
   );
 
-  const statusClass =
-    STATUS_COLOR_BG[record.status] + " " + STATUS_COLOR_TEXT[record.status] ||
-    "bg-gray-50 text-text-main border-table-border";
+  // 🚀 1. 样式逻辑优化：直接使用常量配置
+  // 由于 constants.ts 已经包含了 "Unknown"，这里不再需要手动判断
+  const bgClass = STATUS_COLOR_BG[record.status] || "bg-gray-50";
+  const textClass = STATUS_COLOR_TEXT[record.status] || "text-text-main";
+  const statusClass = `${bgClass} ${textClass} border-table-border`;
 
   // 2. 构建 Tooltip 内容逻辑
   const getTooltipContent = () => {
+    // 🚀 2. 针对 Unknown 状态显示友好提示
+    if (record.status === "Unknown") {
+      return (
+        <div className="px-2 py-1 text-xs text-gray-300">
+          数据获取失败，无法确定状态
+        </div>
+      );
+    }
+
     const timePoints = [
       {
         label: "注册时间",
-        // 🛠️ 修复 1: 使用 correct field name: registeredTime
         time: record.registeredTime,
         show: !!record.registeredTime,
       },
@@ -67,7 +77,6 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
       },
       {
         label: "当前时间",
-        // 🛠️ 修复 2: 直接使用 props 传入的 now，避免 impure function 警告
         time: now,
         show: true,
         isCurrent: true,
@@ -112,6 +121,9 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
   };
 
   const getStatusInfo = () => {
+    // 🚀 3. Unknown 状态下不计算剩余时间
+    if (record.status === "Unknown") return null;
+
     if (record.status === "Premium" && premiumEthPrice) {
       return (
         <>
@@ -138,11 +150,13 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
     <div className="h-12 flex flex-col justify-center items-start">
       <Tooltip content={getTooltipContent()}>
         <div
-          className={`inline-flex items-center px-2.5 py-1 text-xs uppercase tracking-wide cursor-default transition-opacity hover:opacity-90 ${statusClass}`}
+          className={`inline-flex items-center px-2.5 py-1 text-xs uppercase tracking-wide cursor-default transition-opacity hover:opacity-90 rounded-md ${statusClass}`}
         >
           <span>{record.status}</span>
           {displayInfo && (
-            <span className="pl-1 leading-none">{displayInfo}</span>
+            <span className="pl-1 leading-none border-l border-current/20 ml-1.5">
+              {displayInfo}
+            </span>
           )}
         </div>
       </Tooltip>

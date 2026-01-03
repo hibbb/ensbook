@@ -6,21 +6,22 @@ export interface NameRecord {
   readonly labelhash: string; // 该 label 对应的哈希值，如 keccak256(toUtf8Bytes('alice'))
   readonly length: number; // 域名长度，如 'alice.eth' 的长度为 5
 
-  level: number; // 用户标记等级，默认 1
+  level: number;
   /**
    * 域名状态：
    * - Active: 正常使用中
    * - Grace: 宽限期
    * - Premium: 溢价期
    * - Released: 已被释放
-   * - Available: 未注册
+   * - Available: 未注册 (明确确认未注册)
+   * - Unknown: 状态未知 (网络错误或数据缺失)
    */
-  status: "Active" | "Grace" | "Premium" | "Released" | "Available";
+  status: "Active" | "Grace" | "Premium" | "Released" | "Available" | "Unknown";
   wrapped: boolean;
   owner: string | null;
   ownerPrimaryName?: string;
 
-  registeredTime: number; // 注册时间 (Unix)
-  expiryTime: number; // 到期时间 (Unix)
-  releaseTime: number; // 释放/进入溢价期时间 (Unix)
+  registeredTime: number;
+  expiryTime: number;
+  releaseTime: number;
 }

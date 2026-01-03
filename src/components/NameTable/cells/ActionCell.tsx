@@ -7,7 +7,8 @@ import {
   faWallet,
   faClock,
   faBell,
-  type IconDefinition, // 引入类型
+  faTriangleExclamation, // 引入错误图标
+  type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { isRenewable } from "../../../utils/ens";
 import type { NameRecord } from "../../../types/ensNames";
@@ -24,7 +25,6 @@ interface ActionCellProps {
   onReminder?: (record: NameRecord) => void;
 }
 
-// 🚀 1. 定义统一的配置接口
 interface ActionConfig {
   text: string;
   style: string;
@@ -48,7 +48,6 @@ export const ActionCell = ({
 }: ActionCellProps) => {
   const renewable = isRenewable(record.status);
 
-  // 🚀 2. 显式指定返回类型为 ActionConfig
   const config = useMemo<ActionConfig>(() => {
     // 1. 未连接
     if (!isConnected) {
@@ -60,7 +59,20 @@ export const ActionCell = ({
       };
     }
 
-    // 2. 可续费 (Renew)
+    // 🚀 2. Unknown 状态处理 (修复逻辑漏洞)
+    if (record.status === "Unknown") {
+      return {
+        text: "未知",
+        style: "text-gray-300 cursor-not-allowed bg-transparent",
+        disabled: true,
+        action: () => {},
+        sideIcon: faTriangleExclamation,
+        sideIconClass: "text-gray-300",
+        sideTooltip: "数据获取失败，无法操作",
+      };
+    }
+
+    // 3. 可续费 (Renew)
     if (renewable) {
       return {
         text: "续费",
@@ -76,7 +88,7 @@ export const ActionCell = ({
       };
     }
 
-    // 3. 挂起状态 (Continue)
+    // 4. 挂起状态 (Continue)
     if (isPending) {
       return {
         text: "继续",
@@ -87,23 +99,33 @@ export const ActionCell = ({
         sideIcon: faClock,
         sideIconClass: "text-orange-400 animate-pulse cursor-help",
         sideTooltip: "注册未完成，点击继续",
-        // 这里没有 sideAction，类型定义中它是可选的，所以安全
       };
     }
 
-    // 4. 默认注册状态 (Register)
+    // 🚀 5. 显式可注册状态 (Available / Released)
+    if (record.status === "Available" || record.status === "Released") {
+      return {
+        text: "注册",
+        style:
+          "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover",
+        disabled: false,
+        action: () => onRegister?.(record),
+      };
+    }
+
+    // 6. 其他情况 (如 Premium, Grace 且不可续费等极端情况，或者数据异常)
+    // 兜底显示不可操作，而不是注册
     return {
-      text: "注册",
-      style:
-        "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover",
-      disabled: false,
-      action: () => onRegister?.(record),
+      text: "—",
+      style: "text-gray-300 cursor-not-allowed",
+      disabled: true,
+      action: () => {},
     };
   }, [
     isConnected,
     renewable,
     isPending,
-    record,
+    record, // record.status 变化会触发重新计算
     onRenew,
     onRegister,
     onReminder,
@@ -118,7 +140,7 @@ export const ActionCell = ({
 
   return (
     <div className="h-12 flex items-center justify-start gap-3">
-      {/* ... Checkbox 和图标部分保持不变 ... */}
+      {/* Checkbox: 仅在可续费且连接时显示 */}
       {onToggleSelection && isConnected && renewable && (
         <Tooltip content="Select to renew">
           <input
@@ -132,11 +154,15 @@ export const ActionCell = ({
         </Tooltip>
       )}
 
-      {onToggleSelection && isConnected && !renewable && (
-        <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
-          <FontAwesomeIcon icon={faPlus} size="2xs" />
-        </div>
-      )}
+      {/* 占位符: 仅在不可续费但已连接时显示 (保持对齐) */}
+      {onToggleSelection &&
+        isConnected &&
+        !renewable &&
+        record.status !== "Unknown" && ( // Unknown 状态下不显示加号
+          <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
+            <FontAwesomeIcon icon={faPlus} size="2xs" />
+          </div>
+        )}
 
       {!isConnected && (
         <Tooltip content="Connect Wallet">
@@ -159,7 +185,6 @@ export const ActionCell = ({
           <Tooltip content={config.sideTooltip || ""}>
             <div
               className={config.sideIconClass}
-              // 🚀 3. 安全的点击事件处理，无需 @ts-ignore
               onClick={(e) => {
                 if (config.sideAction) {
                   e.stopPropagation();
