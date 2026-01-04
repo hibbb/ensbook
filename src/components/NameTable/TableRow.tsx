@@ -12,6 +12,9 @@ import { ActionCell } from "./cells/ActionCell";
 import { Tooltip } from "../ui/Tooltip";
 
 interface TableRowProps {
+  // 🚀 新增 prop
+  context: "home" | "collection";
+
   record: NameRecord;
   index: number;
   now: number;
@@ -24,11 +27,12 @@ interface TableRowProps {
   onDelete?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
-  onReminder?: (record: NameRecord) => void; // 🚀 新增 prop
+  onReminder?: (record: NameRecord) => void;
   isPending?: boolean;
 }
 
 export const TableRow = ({
+  context, // 🚀 解构
   record,
   index,
   now,
@@ -41,7 +45,7 @@ export const TableRow = ({
   onToggleSelection,
   onRegister,
   onRenew,
-  onReminder, // 🚀 解构
+  onReminder,
   isPending = false,
 }: TableRowProps) => {
   return (
@@ -53,7 +57,8 @@ export const TableRow = ({
       </td>
 
       <td>
-        <NameCell record={record} />
+        {/* 🚀 透传 context 给 NameCell (用于 MemoEditor) */}
+        <NameCell record={record} context={context} />
       </td>
 
       <td>
@@ -73,7 +78,7 @@ export const TableRow = ({
           onToggleSelection={onToggleSelection}
           onRegister={onRegister}
           onRenew={onRenew}
-          onReminder={onReminder} // 🚀 透传给 ActionCell
+          onReminder={onReminder}
         />
       </td>
 

@@ -166,11 +166,10 @@ export const CollectionDetail = () => {
         <p className="text-gray-400 mt-2">{collection.description}</p>
       </header>
 
-      {/* 🚀 核心修复：key={id} */}
-      {/* 1. 强制组件销毁重建，彻底清除旧状态 */}
-      {/* 2. isLoading 会因为 hook 修改而正确为 true，触发骨架屏 */}
+      {/* 🚀 核心修复：添加 context="collection" */}
       <NameTable
         key={id}
+        context="collection" // 👈 必填参数
         records={processedRecords}
         isLoading={isLoading}
         currentAddress={address}

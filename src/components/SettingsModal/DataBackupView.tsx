@@ -8,12 +8,13 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
+
+// 🚀 引入新服务
 import {
-  getStoredLabels,
-  saveStoredLabels,
-} from "../../services/storage/labels";
-import { getStoredMemos, saveStoredMemos } from "../../services/storage/memos";
-import { exportBackup, validateBackup } from "../../utils/dataManagement";
+  getFullUserData,
+  importUserData,
+} from "../../services/storage/userStore";
+import type { EnsBookBackup } from "../../types/backup";
 
 interface DataBackupViewProps {
   onClose: () => void;
@@ -23,14 +24,39 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
-    const labels = getStoredLabels();
-    if (labels.length === 0) {
-      toast.error("当前列表为空，无需导出");
-      return;
-    }
     try {
-      exportBackup(labels);
-      toast.success(`成功导出 ${labels.length} 个域名`);
+      const userData = getFullUserData();
+
+      // 检查是否有数据可导 (Home 或 Collections 有数据即可)
+      const homeCount = Object.keys(userData.home.items).length;
+      const collectionCount = Object.keys(userData.collections.items).length;
+
+      if (homeCount === 0 && collectionCount === 0) {
+        toast.error("当前暂无数据，无需导出");
+        return;
+      }
+
+      // 构造备份对象
+      const backupData: EnsBookBackup = {
+        ...userData,
+        source: "ENSBook",
+        timestamp: Date.now(),
+      };
+
+      // 执行下载
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ensbook-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success(`成功导出数据`);
     } catch (e) {
       console.error(e);
       toast.error("导出失败");
@@ -38,7 +64,6 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // ... (逻辑保持不变)
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -46,35 +71,33 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
     reader.onload = (event) => {
       try {
         const json = JSON.parse(event.target?.result as string);
-        if (!validateBackup(json)) {
+
+        // 简单的格式校验
+        if (json.source !== "ENSBook" || !json.home || !json.collections) {
           toast.error("无效的备份文件格式");
           return;
         }
 
-        const newLabels = json.data.labels;
-        const newMemos = json.data.memos || {};
-        const currentLabels = getStoredLabels();
-        const currentMemos = getStoredMemos();
+        const backup = json as EnsBookBackup;
+        const newHomeCount = Object.keys(backup.home.items).length;
+        const newColCount = Object.keys(backup.collections.items).length;
 
         const mode = window.confirm(
-          `检测到备份文件中包含 ${newLabels.length} 个域名。\n\n点击【确定】进行“合并” (保留现有数据并去重)\n点击【取消】进行“覆盖” (清空现有数据并替换)`,
+          `备份包含:\n- 关注列表: ${newHomeCount} 个\n- 集合记录: ${newColCount} 个\n\n点击【确定】进行“合并” (保留现有数据，冲突时以导入为准)\n点击【取消】进行“覆盖” (清空现有数据并替换)`,
         );
 
-        let finalLabels: string[];
-        if (mode) {
-          finalLabels = Array.from(new Set([...currentLabels, ...newLabels]));
-          saveStoredMemos({ ...currentMemos, ...newMemos });
-        } else {
+        if (!mode) {
           if (
             !window.confirm("⚠️ 警告：这将清空您当前的所有数据！确定要覆盖吗？")
           ) {
+            e.target.value = ""; // 重置 input
             return;
           }
-          finalLabels = newLabels;
-          saveStoredMemos(newMemos);
         }
 
-        saveStoredLabels(finalLabels);
+        // 🚀 调用 Store 进行导入
+        importUserData(backup, mode ? "merge" : "overwrite");
+
         toast.success("导入成功！正在刷新...");
         setTimeout(() => window.location.reload(), 1000);
         onClose();
@@ -84,15 +107,18 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
       }
     };
     reader.readAsText(file);
-    e.target.value = "";
+    e.target.value = ""; // 重置 input 以便下次选择同一文件
   };
+
+  // 获取当前数据概览用于显示
+  const currentData = getFullUserData();
+  const currentCount = Object.keys(currentData.home.items).length;
 
   return (
     <div className="space-y-0 animate-in fade-in slide-in-from-right-4 duration-300">
-      {/* 导出区块：扁平化设计 */}
+      {/* 导出区块 */}
       <section className="py-4 border-b border-gray-100 first:pt-0">
         <div className="flex items-start gap-5">
-          {/* 图标直接显示，无背景容器 */}
           <div className="mt-1 text-link text-xl">
             <FontAwesomeIcon icon={faDownload} />
           </div>
@@ -101,9 +127,9 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
               备份数据
             </h5>
             <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
-              生成包含您所有关注域名及备注的 JSON 文件。
+              生成包含您所有关注列表、备注及设置的 JSON 文件。
               <span className="ml-2 text-gray-400 font-qs-regular">
-                (当前: {getStoredLabels().length} 个)
+                (当前关注: {currentCount} 个)
               </span>
             </p>
             <button
@@ -116,7 +142,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
         </div>
       </section>
 
-      {/* 导入区块：扁平化设计 */}
+      {/* 导入区块 */}
       <section className="py-6">
         <div className="flex items-start gap-5">
           <div className="mt-1 text-lime-600 text-xl">

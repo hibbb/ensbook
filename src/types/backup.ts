@@ -1,17 +1,11 @@
 // src/types/backup.ts
 
-export interface EnsBookBackup {
-  version: number;
-  timestamp: number;
-  source: "ENSBook";
-  data: {
-    labels: string[]; // 关注列表
-    memos?: Record<string, string>; // 域名备注
-    settings?: {
-      // 预留设置项
-      theme?: "light" | "dark";
-      locale?: "zh" | "en";
-      defaultDuration?: number;
-    };
-  };
+import type { EnsBookUserData } from "./userData";
+
+/**
+ * 备份文件结构
+ * 直接复用核心数据结构，确保“所见即所得”的备份
+ */
+export interface EnsBookBackup extends EnsBookUserData {
+  source: "ENSBook"; // 用于校验文件来源
 }

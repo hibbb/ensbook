@@ -6,8 +6,8 @@ import { queryData, type GraphQLQueryCode } from "./client";
 import type { NameRecord } from "../../types/ensNames";
 import { getContracts } from "../../config/contracts";
 import { GRAPHQL_CONFIG } from "../../config/constants";
-// 🚀 核心修改：引入统一的备注存储服务
-import { getStoredMemos } from "../../services/storage/memos";
+// 🚀 核心修改：引入新的用户数据存储服务
+import { getFullUserData } from "../../services/storage/userStore";
 
 // ============================================================================
 // 1. 内部逻辑常量与辅助函数
@@ -70,12 +70,16 @@ function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
 
 export async function fetchNameRecords(
   labels: string[],
+  // 🚀 新增参数：上下文 (决定从哪里读取备注和等级)
+  context: "home" | "collection",
 ): Promise<NameRecord[]> {
   if (!labels || labels.length === 0) return [];
 
-  // 🚀 1. 在开始处理前，一次性获取所有备注
-  // 这比在 map 循环中每次都读 localStorage 性能更好
-  const allMemos = getStoredMemos();
+  // 🚀 1. 根据上下文一次性获取对应的元数据映射表
+  // 实现了 Home 和 Collection 数据的物理隔离
+  const userData = getFullUserData();
+  const metaMap =
+    context === "home" ? userData.home.items : userData.collections.items;
 
   const validLabels = Array.from(
     new Set(
@@ -150,8 +154,10 @@ export async function fetchNameRecords(
     const records = validLabels.map((label) => {
       const isFetchSuccess = labelSuccessMap.get(label) ?? false;
 
-      // 🚀 2. 从统一的数据源中查找备注
-      const memo = allMemos[label];
+      // 🚀 2. 从上下文映射表中查找元数据
+      const meta = metaMap[label];
+      const memo = meta?.memo || "";
+      const level = meta?.level || 0;
 
       const baseInfo = {
         label,
@@ -163,7 +169,7 @@ export async function fetchNameRecords(
       if (!isFetchSuccess) {
         return {
           ...baseInfo,
-          level: 0,
+          level: level, // 使用存储的等级
           status: "Unknown",
           wrapped: false,
           registeredTime: 0,
@@ -171,7 +177,7 @@ export async function fetchNameRecords(
           releaseTime: 0,
           owner: null,
           ownerPrimaryName: undefined,
-          memo: memo, // 即使失败也返回备注
+          memo: memo, // 使用存储的备注
         };
       }
 
@@ -181,7 +187,7 @@ export async function fetchNameRecords(
       if (!registration) {
         return {
           ...baseInfo,
-          level: 0,
+          level: level,
           status: "Available",
           wrapped: false,
           registeredTime: 0,
@@ -189,7 +195,7 @@ export async function fetchNameRecords(
           releaseTime: 0,
           owner: null,
           ownerPrimaryName: undefined,
-          memo: memo, // 即使未注册也返回备注
+          memo: memo,
         };
       }
 
@@ -203,7 +209,7 @@ export async function fetchNameRecords(
 
       return {
         ...baseInfo,
-        level: 0,
+        level: level,
         status: deriveNameStatus(expiryTime),
         wrapped: isWrapped,
         registeredTime: parseInt(registration.registrationDate),
@@ -211,28 +217,34 @@ export async function fetchNameRecords(
         releaseTime: expiryTime + DURATION_GRACE_PERIOD,
         owner: currentOwner,
         ownerPrimaryName: undefined,
-        memo: memo, // 🚀 填充备注字段
+        memo: memo,
       };
     });
 
     return records as NameRecord[];
   } catch (error) {
     console.error("Critical error in fetchNameRecords:", error);
-    // 即使严重错误，也尝试返回带有备注的 Unknown 记录
-    const allMemos = getStoredMemos();
-    return validLabels.map((label) => ({
-      label,
-      labelhash: labelhash(label),
-      namehash: namehash(`${label}.eth`),
-      length: label.length,
-      level: 0,
-      status: "Unknown",
-      wrapped: false,
-      registeredTime: 0,
-      expiryTime: 0,
-      releaseTime: 0,
-      owner: null,
-      memo: allMemos[label],
-    })) as NameRecord[];
+    // 即使严重错误，也尝试返回带有元数据的 Unknown 记录
+    const userData = getFullUserData();
+    const metaMap =
+      context === "home" ? userData.home.items : userData.collections.items;
+
+    return validLabels.map((label) => {
+      const meta = metaMap[label];
+      return {
+        label,
+        labelhash: labelhash(label),
+        namehash: namehash(`${label}.eth`),
+        length: label.length,
+        level: meta?.level || 0,
+        status: "Unknown",
+        wrapped: false,
+        registeredTime: 0,
+        expiryTime: 0,
+        releaseTime: 0,
+        owner: null,
+        memo: meta?.memo || "",
+      };
+    }) as NameRecord[];
   }
 }

@@ -1,35 +1,45 @@
 // src/components/MemoEditor.tsx
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
   faCommentDots,
 } from "@fortawesome/free-regular-svg-icons";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { useQueryClient } from "@tanstack/react-query"; // 🚀 引入 QueryClient
+import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-import { getMemo, setMemo } from "../services/storage/memos";
+// 🚀 核心修改：引入新的存储服务
+import {
+  getItemByContext,
+  updateHomeItem,
+  updateCollectionItem,
+} from "../services/storage/userStore";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { Tooltip } from "./ui/Tooltip";
-import { MAX_MEMO_LENGTH } from "../services/storage/memos"; // 引入常量
+
+// 简单的长度常量 (或者可以从 userStore 导出)
+const MAX_MEMO_LENGTH = 200;
 
 interface MemoEditorProps {
   label: string;
+  // 🚀 新增 prop：明确当前是在哪个页面编辑
+  context: "home" | "collection";
 }
 
-export const MemoEditor = ({ label }: MemoEditorProps) => {
-  const [memo, setLocalMemo] = useState("");
+export const MemoEditor = ({ label, context }: MemoEditorProps) => {
+  // 🚀 使用 Lazy Initialization 读取对应 context 的数据
+  // 这样保证初始值是准确的 (Home 读 Home 的，Collection 读 Collection 的)
+  const [memo, setLocalMemo] = useState(() => {
+    const meta = getItemByContext(context, label);
+    return meta?.memo || "";
+  });
+
   const [isOpen, setIsOpen] = useState(false);
   const [editValue, setEditValue] = useState("");
 
-  // 🚀 获取 QueryClient 实例
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    setLocalMemo(getMemo(label));
-  }, [label]);
 
   const hasMemo = !!memo;
 
@@ -42,16 +52,22 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
 
   const handleSave = () => {
     try {
-      setMemo(label, editValue); // 这里可能会抛出我们刚才定义的 Error
+      // 🚀 根据上下文调用不同的更新函数
+      if (context === "home") {
+        updateHomeItem(label, { memo: editValue });
+        // 仅刷新 Home 列表
+        queryClient.invalidateQueries({ queryKey: ["name-records"] });
+      } else {
+        updateCollectionItem(label, { memo: editValue });
+        // 仅刷新集合列表
+        queryClient.invalidateQueries({ queryKey: ["collection-records"] });
+      }
+
       setLocalMemo(editValue.trim());
       setIsOpen(false);
       toast.success(editValue.trim() ? "备注已更新" : "备注已删除");
-
-      queryClient.invalidateQueries({ queryKey: ["name-records"] });
-      queryClient.invalidateQueries({ queryKey: ["collection-records"] });
     } catch (e) {
-      console.log(e);
-      // 🚀 捕获爆仓错误
+      console.error(e);
       toast.error("保存失败：本地存储空间已满");
     }
   };
@@ -88,13 +104,15 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
       <PopoverContent align="start" side="bottom" className="w-64 p-3">
         <div className="mb-2 flex justify-between items-center">
           <span className="text-xs font-qs-bold text-gray-400">编辑备注</span>
-          {/* 🚀 显示字数统计 */}
           <span
-            className={`text-[10px] ${editValue.length >= MAX_MEMO_LENGTH ? "text-red-400" : "text-gray-300"}`}
+            className={`text-[10px] ${
+              editValue.length >= MAX_MEMO_LENGTH
+                ? "text-red-400 font-bold"
+                : "text-gray-300"
+            }`}
           >
             {editValue.length}/{MAX_MEMO_LENGTH}
           </span>
-          <span className="text-[10px] text-gray-300">Ctrl+Enter 保存</span>
         </div>
 
         <textarea
@@ -104,7 +122,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           onKeyDown={handleKeyDown}
           placeholder="输入备注信息..."
           className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-qs-medium"
-          maxLength={MAX_MEMO_LENGTH} // 使用常量
+          maxLength={MAX_MEMO_LENGTH}
         />
 
         <div className="flex gap-2 mt-3">

@@ -14,9 +14,11 @@ import { Popover, PopoverTrigger, PopoverContent } from "../../ui/Popover";
 
 interface NameCellProps {
   record: NameRecord;
+  // 🚀 新增 prop
+  context: "home" | "collection";
 }
 
-// 辅助组件：元数据行
+// ... MetadataRow 组件保持不变 ...
 const MetadataRow = ({
   label,
   value,
@@ -50,8 +52,7 @@ const MetadataRow = ({
   );
 };
 
-export const NameCell = ({ record }: NameCellProps) => {
-  // 🚀 计算元数据 (使用 useMemo 避免不必要的重算)
+export const NameCell = ({ record, context }: NameCellProps) => {
   const metadata = useMemo(() => {
     try {
       const fullName = `${record.label}.eth`;
@@ -61,7 +62,6 @@ export const NameCell = ({ record }: NameCellProps) => {
       const labelHashDec = BigInt(labelHashHex).toString();
       const nameHashDec = BigInt(nameHashHex).toString();
 
-      // 截断辅助函数
       const truncate = (str: string, len = 6) =>
         `${str.slice(0, len)}...${str.slice(-4)}`;
 
@@ -71,7 +71,6 @@ export const NameCell = ({ record }: NameCellProps) => {
         nameHashDec,
         labelHashHex,
         labelHashDec,
-        // 显示用的截断值
         display: {
           nameHashHex: truncate(nameHashHex),
           nameHashDec: truncate(nameHashDec),
@@ -109,7 +108,7 @@ export const NameCell = ({ record }: NameCellProps) => {
           </a>
         </Tooltip>
 
-        {/* 🚀 2. 元数据 Popover (新增) */}
+        {/* 2. 元数据 Popover */}
         {metadata && (
           <Popover>
             <Tooltip content="元数据">
@@ -162,8 +161,8 @@ export const NameCell = ({ record }: NameCellProps) => {
           </Popover>
         )}
 
-        {/* 3. 备注编辑器 */}
-        <MemoEditor label={record.label} />
+        {/* 🚀 3. 备注编辑器 (传入 context) */}
+        <MemoEditor label={record.label} context={context} />
       </div>
     </div>
   );

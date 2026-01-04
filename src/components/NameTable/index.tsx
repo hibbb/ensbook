@@ -15,6 +15,9 @@ import type {
 } from "./types";
 
 interface NameTableProps {
+  // 🚀 新增 prop：上下文
+  context: "home" | "collection";
+
   records: NameRecord[] | undefined | null;
   isLoading: boolean;
   currentAddress?: string;
@@ -42,7 +45,6 @@ interface NameTableProps {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
-    // 🚀 新增字段
     memosCount?: number;
   };
   myCount?: number;
@@ -52,6 +54,7 @@ interface NameTableProps {
 export const NameTable = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
+  // ... (分页和时间逻辑保持不变) ...
   // 分页状态
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 50;
@@ -66,7 +69,7 @@ export const NameTable = (props: NameTableProps) => {
   // 缓存全量数据引用
   const safeRecords = useMemo(() => props.records || [], [props.records]);
 
-  // 状态镜像重置页码 (当筛选条件改变时，回到第一页)
+  // 状态镜像重置页码
   const [prevFilterConfig, setPrevFilterConfig] = useState(props.filterConfig);
   const [prevRecordsLen, setPrevRecordsLen] = useState(safeRecords.length);
 
@@ -79,16 +82,16 @@ export const NameTable = (props: NameTableProps) => {
     setCurrentPage(1);
   }
 
-  // 1. 切片 (同步)
+  // 1. 切片
   const paginatedBasicRecords = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
 
-  // 2. 解析 (异步)
+  // 2. 解析
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
-  // 3. 智能骨架屏逻辑
+  // 3. 智能骨架屏
   const isDataStale =
     displayRecords &&
     displayRecords.length > 0 &&
@@ -163,6 +166,8 @@ export const NameTable = (props: NameTableProps) => {
                   record={r}
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
+                  // 🚀 透传 context 给 TableRow
+                  context={props.context}
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}
@@ -203,6 +208,7 @@ export const NameTable = (props: NameTableProps) => {
 
 const SkeletonRow = () => (
   <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
+    {/* ... 骨架屏内容保持不变 ... */}
     <td>
       <div className="h-14 flex items-center justify-center">
         <div className="h-3 w-4 bg-gray-200 rounded"></div>
