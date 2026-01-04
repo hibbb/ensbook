@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 // Components
 import { NameTable } from "../components/NameTable";
-import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
+import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { SearchHelpModal } from "../components/SearchHelpModal";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
@@ -82,7 +82,7 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-  } = useNameTableLogic(validRecords, address, "home");
+  } = useNameTableView(validRecords, address, "home");
 
   const {
     renewSingle,

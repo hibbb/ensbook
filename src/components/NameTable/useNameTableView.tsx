@@ -1,4 +1,4 @@
-// src/components/NameTable/useNameTableLogic.tsx
+// src/components/NameTable/useNameTableView.tsx
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { NameRecord } from "../../types/ensNames";
@@ -23,7 +23,7 @@ const DEFAULT_FILTER: FilterConfig = {
   wrappedType: "all",
 };
 
-export const useNameTableLogic = (
+export const useNameTableView = (
   records: NameRecord[] | undefined,
   currentAddress?: string,
   context?: "home" | "collection",

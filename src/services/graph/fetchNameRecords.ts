@@ -5,7 +5,11 @@ import { normalize } from "viem/ens";
 import { queryData, type GraphQLQueryCode } from "./client";
 import type { NameRecord } from "../../types/ensNames";
 import { getContracts } from "../../config/contracts";
-import { GRAPHQL_CONFIG } from "../../config/constants";
+import {
+  GRAPHQL_CONFIG,
+  GRACE_PERIOD_DURATION,
+  PREMIUM_PERIOD_DURATION,
+} from "../../config/constants";
 // 🚀 核心修改：引入新的用户数据存储服务
 import { getFullUserData } from "../../services/storage/userStore";
 
@@ -13,8 +17,6 @@ import { getFullUserData } from "../../services/storage/userStore";
 // 1. 内部逻辑常量与辅助函数
 // ============================================================================
 
-const DURATION_GRACE_PERIOD = 90 * 24 * 60 * 60;
-const DURATION_PREMIUM_PERIOD = 21 * 24 * 60 * 60;
 const contracts = getContracts(1);
 const WRAPPER_ADDRESS = contracts.ENS_NAME_WRAPPER.toLowerCase();
 
@@ -55,8 +57,8 @@ interface FetchResult {
 
 function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
   const currentTimestamp = Math.floor(Date.now() / 1000);
-  const graceEnd = expiryTimestamp + DURATION_GRACE_PERIOD;
-  const premiumEnd = graceEnd + DURATION_PREMIUM_PERIOD;
+  const graceEnd = expiryTimestamp + GRACE_PERIOD_DURATION;
+  const premiumEnd = graceEnd + PREMIUM_PERIOD_DURATION;
 
   if (currentTimestamp <= expiryTimestamp) return "Active";
   if (currentTimestamp <= graceEnd) return "Grace";

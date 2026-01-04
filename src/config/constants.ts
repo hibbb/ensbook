@@ -6,6 +6,10 @@
 export const DEFAULT_DURATION_SECONDS = 2592000n;
 export const SECONDS_PER_YEAR = 31536000n; // 365 * 24 * 60 * 60
 
+// ENS 协议相关的常量
+export const GRACE_PERIOD_DURATION = 90 * 24 * 60 * 60;
+export const PREMIUM_PERIOD_DURATION = 21 * 24 * 60 * 60;
+
 export const GRAPHQL_CONFIG = {
   // 每次从 Subgraph 获取数据的最大数量限制，默认 1000 是 The Graph 节点的常见分页上限
   FETCH_LIMIT: 1000,

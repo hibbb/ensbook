@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
+import { SkeletonRow } from "./SkeletonRow";
 import { Pagination } from "../ui/Pagination";
 import { isRenewable } from "../../utils/ens";
 import { usePrimaryNames } from "../../hooks/usePrimaryNames";
@@ -205,45 +206,3 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
-
-const SkeletonRow = () => (
-  <tr className="animate-pulse border-b border-gray-50 last:border-0 bg-white/50">
-    {/* ... 骨架屏内容保持不变 ... */}
-    <td>
-      <div className="h-14 flex items-center justify-center">
-        <div className="h-3 w-4 bg-gray-200 rounded"></div>
-      </div>
-    </td>
-    <td>
-      <div className="h-14 flex items-center">
-        <div className="h-4 w-32 bg-gray-200 rounded"></div>
-      </div>
-    </td>
-    <td>
-      <div className="h-14 flex items-center">
-        <div className="h-5 w-16 bg-gray-200 rounded-full"></div>
-      </div>
-    </td>
-    <td>
-      <div className="h-14 flex items-center">
-        <div className="h-3 w-24 bg-gray-200 rounded"></div>
-      </div>
-    </td>
-    <td>
-      <div className="h-14 flex items-center justify-center gap-2">
-        <div className="h-5 w-5 bg-gray-200 rounded"></div>
-        <div className="h-5 w-5 bg-gray-200 rounded"></div>
-      </div>
-    </td>
-    <td>
-      <div className="h-14 flex items-center justify-end">
-        <div className="h-7 w-16 bg-gray-200 rounded-lg"></div>
-      </div>
-    </td>
-    <td>
-      <div className="h-14 flex items-center justify-center">
-        <div className="h-4 w-4 bg-gray-200 rounded"></div>
-      </div>
-    </td>
-  </tr>
-);

@@ -9,7 +9,7 @@ import { faRotate } from "@fortawesome/free-solid-svg-icons";
 
 // Components
 import { NameTable } from "../components/NameTable";
-import { useNameTableLogic } from "../components/NameTable/useNameTableLogic";
+import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
 
@@ -48,7 +48,7 @@ export const CollectionDetail = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-  } = useNameTableLogic(records, address, "collection", id);
+  } = useNameTableView(records, address, "collection", id);
 
   const {
     renewSingle,
