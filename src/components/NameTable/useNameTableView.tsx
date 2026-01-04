@@ -13,11 +13,12 @@ import {
 } from "../../services/storage/userStore";
 import type { PageViewState } from "../../types/userData";
 
-const DEFAULT_SORT: SortConfig = { field: "status", direction: null };
-const DEFAULT_FILTER: FilterConfig = {
+// 🚀 导出默认值常量
+export const DEFAULT_SORT: SortConfig = { field: "status", direction: null };
+export const DEFAULT_FILTER: FilterConfig = {
   statusList: [],
   onlyMe: false,
-  onlyWithMemos: false, // 注意：确保这里使用的是 onlyWithMemos 而不是 onlyWithNotes，根据您的 types 定义
+  onlyWithMemos: false,
   actionType: "all",
   lengthList: [],
   wrappedType: "all",
@@ -48,10 +49,7 @@ export const useNameTableView = (
     return saved.filter || DEFAULT_FILTER;
   });
 
-  // 🚀 2. 导航切换处理 (Render-Phase Update)
-  // 修复 "Cannot access refs during render" 错误
-  // 使用 useState 替代 useRef。React 允许在渲染期间更新组件本身的状态（setPrevKey），
-  // 这会触发立即重新渲染（Immediate Re-render），从而在浏览器绘制前更新状态。
+  // 2. 导航切换处理 (Render-Phase Update)
   const currentKey = `${context}-${collectionId}`;
   const [prevKey, setPrevKey] = useState(currentKey);
 
@@ -67,7 +65,7 @@ export const useNameTableView = (
     if (!context) return;
     const viewState: PageViewState = { sort: sortConfig, filter: filterConfig };
 
-    // 🛡️ P2原则修正：增加 try-catch 防止存储满时崩溃
+    // 增加健壮性保护，防止存储满时崩溃
     try {
       if (context === "home") {
         saveHomeViewState(viewState);
@@ -75,18 +73,39 @@ export const useNameTableView = (
         saveCollectionViewState(collectionId, viewState);
       }
     } catch (e) {
-      // 存储失败通常是因为空间满，视图状态保存失败不应阻断用户操作
-      // 可以选择 console.warn 或者忽略
       console.warn("Failed to save view state:", e);
     }
   }, [sortConfig, filterConfig, context, collectionId]);
+
+  // 🚀 4. 视图状态脏检查 (Dirty Check)
+  const isViewStateDirty = useMemo(() => {
+    const isSortDirty =
+      sortConfig.field !== DEFAULT_SORT.field ||
+      sortConfig.direction !== DEFAULT_SORT.direction;
+
+    const isFilterDirty =
+      filterConfig.onlyMe !== DEFAULT_FILTER.onlyMe ||
+      filterConfig.onlyWithMemos !== DEFAULT_FILTER.onlyWithMemos ||
+      filterConfig.actionType !== DEFAULT_FILTER.actionType ||
+      filterConfig.wrappedType !== DEFAULT_FILTER.wrappedType ||
+      filterConfig.statusList.length > 0 ||
+      filterConfig.lengthList.length > 0;
+
+    return isSortDirty || isFilterDirty;
+  }, [sortConfig, filterConfig]);
+
+  // 🚀 5. 重置视图状态
+  const resetViewState = useCallback(() => {
+    setSortConfig(DEFAULT_SORT);
+    setFilterConfig(DEFAULT_FILTER);
+  }, []);
 
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
 
   const { statusList, actionType, onlyMe, lengthList, wrappedType } =
     filterConfig;
 
-  // --- 1. 基础过滤 ---
+  // --- 基础过滤 ---
   const baseRecords = useMemo(() => {
     if (!records) return [];
     const lowerCurrentAddress = currentAddress?.toLowerCase();
@@ -99,7 +118,7 @@ export const useNameTableView = (
     return records;
   }, [records, onlyMe, currentAddress]);
 
-  // --- 2. 统计计数 ---
+  // --- 统计计数 ---
   const { statusCounts, actionCounts, nameCounts } = useMemo(() => {
     const checkStatus = (r: NameRecord) =>
       statusList.length === 0 || statusList.includes(r.status);
@@ -122,7 +141,7 @@ export const useNameTableView = (
       return !!r.memo && r.memo.trim().length > 0;
     };
 
-    // 2.1 状态计数
+    // 状态计数
     const statusCounts: Record<string, number> = {};
     baseRecords
       .filter(
@@ -133,7 +152,7 @@ export const useNameTableView = (
         (r) => (statusCounts[r.status] = (statusCounts[r.status] || 0) + 1),
       );
 
-    // 2.2 操作计数
+    // 操作计数
     const recordsForAction = baseRecords.filter(
       (r) =>
         checkStatus(r) && checkLength(r) && checkWrapped(r) && checkMemos(r),
@@ -144,7 +163,7 @@ export const useNameTableView = (
       renew: recordsForAction.filter((r) => isRenewable(r.status)).length,
     };
 
-    // 2.3 名称相关计数
+    // 名称相关计数
     const lengthCounts: Record<number, number> = {};
     const availableLengths = new Set<number>();
     baseRecords.forEach((r) => availableLengths.add(r.label.length));
@@ -260,5 +279,8 @@ export const useNameTableView = (
     statusCounts,
     actionCounts,
     nameCounts,
+    // 🚀 返回新属性，解决 TS 报错
+    isViewStateDirty,
+    resetViewState,
   };
 };

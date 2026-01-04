@@ -12,6 +12,7 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
+import { ViewStateReset } from "../components/NameTable/ViewStateReset";
 
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
@@ -48,6 +49,9 @@ export const CollectionDetail = () => {
     statusCounts,
     actionCounts,
     nameCounts,
+    // 🚀 解构
+    isViewStateDirty,
+    resetViewState,
   } = useNameTableView(records, address, "collection", id);
 
   const {
@@ -184,6 +188,13 @@ export const CollectionDetail = () => {
         statusCounts={statusCounts}
         actionCounts={actionCounts}
         nameCounts={nameCounts}
+      />
+
+      {/* 🚀 新增 */}
+      <ViewStateReset
+        isVisible={isViewStateDirty}
+        onReset={resetViewState}
+        hasSelection={selectedLabels.size > 0}
       />
 
       {selectionCount > 0 && (

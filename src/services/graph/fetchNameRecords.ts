@@ -216,7 +216,7 @@ export async function fetchNameRecords(
         wrapped: isWrapped,
         registeredTime: parseInt(registration.registrationDate),
         expiryTime,
-        releaseTime: expiryTime + DURATION_GRACE_PERIOD,
+        releaseTime: expiryTime + GRACE_PERIOD_DURATION,
         owner: currentOwner,
         ownerPrimaryName: undefined,
         memo: memo,

@@ -13,6 +13,7 @@ import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
 import { HomeFloatingBar } from "./Home/HomeFloatingBar";
+import { ViewStateReset } from "../components/NameTable/ViewStateReset";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -82,6 +83,9 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
+    // 🚀 解构新能力
+    isViewStateDirty,
+    resetViewState,
   } = useNameTableView(validRecords, address, "home");
 
   const {
@@ -327,6 +331,13 @@ export const Home = () => {
           />
         </div>
       )}
+
+      {/* 🚀 新增：视图重置按钮 */}
+      <ViewStateReset
+        isVisible={isViewStateDirty}
+        onReset={resetViewState}
+        hasSelection={selectedLabels.size > 0}
+      />
 
       <HomeFloatingBar
         selectedCount={selectedLabels.size}
