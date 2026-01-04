@@ -1,6 +1,10 @@
 // src/services/storage/userStore.ts
 
-import type { EnsBookUserData, UserDomainMeta } from "../../types/userData";
+import type {
+  EnsBookUserData,
+  UserDomainMeta,
+  PageViewState,
+} from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
 
 const STORAGE_KEY = "ensbook_user_data_v1";
@@ -170,6 +174,33 @@ export const getItemByContext = (
   return context === "home" ? getHomeItem(label) : getCollectionItem(label);
 };
 
+// 🚀 新增：视图状态持久化逻辑
+
+export const getHomeViewState = (): PageViewState => {
+  const data = getFullUserData();
+  return data.home.viewState || {};
+};
+
+export const saveHomeViewState = (viewState: PageViewState) => {
+  const data = getFullUserData();
+  data.home.viewState = viewState;
+  saveFullUserData(data);
+};
+
+export const getCollectionViewState = (collectionId: string): PageViewState => {
+  const data = getFullUserData();
+  return data.collections.viewStates[collectionId] || {};
+};
+
+export const saveCollectionViewState = (
+  collectionId: string,
+  viewState: PageViewState,
+) => {
+  const data = getFullUserData();
+  data.collections.viewStates[collectionId] = viewState;
+  saveFullUserData(data);
+};
+
 // --- 导入逻辑 ---
 
 export const importUserData = (
@@ -177,8 +208,6 @@ export const importUserData = (
   mode: "merge" | "overwrite",
 ) => {
   if (mode === "overwrite") {
-    // 覆盖模式：直接保存，但移除 source 字段
-    // 🚀 修复：使用 eslint-disable 忽略未使用的解构变量
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { source, ...dataToSave } = backup;
     saveFullUserData(dataToSave);
@@ -188,19 +217,29 @@ export const importUserData = (
   // 合并模式
   const currentData = getFullUserData();
 
-  // 1. 合并 Home 列表 (Import 优先覆盖 Local)
+  // 1. 合并 Home
   const mergedHomeItems = {
     ...currentData.home.items,
     ...backup.home.items,
   };
+  // 🚀 合并 Home 视图状态 (导入优先)
+  const mergedHomeViewState = {
+    ...currentData.home.viewState,
+    ...backup.home.viewState,
+  };
 
-  // 2. 合并 Collection 记录
+  // 2. 合并 Collection
   const mergedCollectionItems = {
     ...currentData.collections.items,
     ...backup.collections.items,
   };
+  // 🚀 合并 Collection 视图状态
+  const mergedCollectionViewStates = {
+    ...currentData.collections.viewStates,
+    ...backup.collections.viewStates,
+  };
 
-  // 3. 合并设置 (Import 优先)
+  // 3. 合并设置
   const mergedSettings = {
     ...currentData.settings,
     ...backup.settings,
@@ -210,12 +249,12 @@ export const importUserData = (
   const mergedData: EnsBookUserData = {
     ...currentData,
     home: {
-      ...currentData.home,
       items: mergedHomeItems,
+      viewState: mergedHomeViewState, // 🚀
     },
     collections: {
-      ...currentData.collections,
       items: mergedCollectionItems,
+      viewStates: mergedCollectionViewStates, // 🚀
     },
     settings: mergedSettings,
     timestamp: Date.now(),

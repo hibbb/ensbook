@@ -21,7 +21,6 @@ import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 
-// 🚀 修正：移除未使用的 updateHomeItem 和旧的 labels 服务引用
 import {
   getHomeLabels,
   removeHomeItem,
@@ -40,7 +39,6 @@ export const Home = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
-  // 1. 本地状态
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getHomeLabels(),
   );
@@ -48,7 +46,6 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // 流程与提醒状态
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
     record?: NameRecord;
@@ -56,12 +53,10 @@ export const Home = () => {
   } | null>(null);
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
 
-  // UX 优化：Home 组件挂载时，强制清除缓存以触发骨架屏
   useEffect(() => {
     queryClient.removeQueries({ queryKey: ["name-records"] });
   }, [queryClient]);
 
-  // 2. 数据获取
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
@@ -73,6 +68,7 @@ export const Home = () => {
     return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
+  // 🚀 核心修改：传递 context="home" 以启用视图状态持久化
   const {
     processedRecords,
     sortConfig,
@@ -86,7 +82,7 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-  } = useNameTableLogic(validRecords, address);
+  } = useNameTableLogic(validRecords, address, "home");
 
   const {
     renewSingle,
@@ -130,9 +126,7 @@ export const Home = () => {
         if (newUniqueLabels.length === 0) {
           toast("所有域名已存在列表中", { icon: "👌" });
         } else {
-          // 使用批量更新，只触发一次 localStorage 写入
           bulkUpdateHomeItems(newUniqueLabels);
-
           setResolvedLabels(getHomeLabels());
           toast.success(`成功添加 ${newUniqueLabels.length} 个域名`);
           setInputValue("");
@@ -179,7 +173,6 @@ export const Home = () => {
           targetRecords.filter((r) => r.status === value).map((r) => r.label),
         );
         break;
-
       case "length":
         labelsToDelete = new Set(
           targetRecords
@@ -187,7 +180,6 @@ export const Home = () => {
             .map((r) => r.label),
         );
         break;
-
       case "wrapped": {
         const isWrapped = value as boolean;
         labelsToDelete = new Set(
@@ -197,7 +189,6 @@ export const Home = () => {
         );
         break;
       }
-
       case "owner": {
         if (!address) {
           toast.error("请先连接钱包以识别所有权");
@@ -221,7 +212,6 @@ export const Home = () => {
     if (labelsToDelete.size === 0) return;
 
     bulkRemoveHomeItems(Array.from(labelsToDelete));
-
     setResolvedLabels((prev) =>
       prev.filter((label) => !labelsToDelete.has(label)),
     );
@@ -281,11 +271,9 @@ export const Home = () => {
       const timer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 2000);
-
       const deepTimer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
       }, 10000);
-
       return () => {
         clearTimeout(timer);
         clearTimeout(deepTimer);

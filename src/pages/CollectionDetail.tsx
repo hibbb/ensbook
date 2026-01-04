@@ -31,12 +31,10 @@ export const CollectionDetail = () => {
   const queryClient = useQueryClient();
 
   // 1. 数据获取
-  const {
-    data: records, // 直接使用 data，因为移除了 keepPreviousData，切换时这里会自动重置
-    isLoading, // 切换时会自动变为 true
-    isError,
-  } = useCollectionRecords(id || "");
+  const { data: records, isLoading, isError } = useCollectionRecords(id || "");
 
+  // 🚀 核心修改：传递 context="collection" 和 collectionId={id}
+  // 这样每个集合的筛选状态都会被独立保存
   const {
     processedRecords,
     sortConfig,
@@ -50,9 +48,8 @@ export const CollectionDetail = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-  } = useNameTableLogic(records, address);
+  } = useNameTableLogic(records, address, "collection", id);
 
-  // ... (中间的 Hooks: useEnsRenewal, useEnsRegistration 保持不变) ...
   const {
     renewSingle,
     renewBatch,
@@ -104,7 +101,6 @@ export const CollectionDetail = () => {
     }
   }, [regStatus, renewalStatus, queryClient]);
 
-  // ... (业务逻辑: renewableLabelSet, validSelection 等保持不变) ...
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
     return new Set(
@@ -120,7 +116,6 @@ export const CollectionDetail = () => {
   }, [selectedLabels, renewableLabelSet]);
   const selectionCount = validSelection.length;
 
-  // ... (Event Handlers 保持不变) ...
   const handleSingleRegister = async (record: NameRecord) => {
     if (pendingLabels.has(record.label)) {
       setDurationTarget({ type: "register", record });
@@ -166,10 +161,9 @@ export const CollectionDetail = () => {
         <p className="text-gray-400 mt-2">{collection.description}</p>
       </header>
 
-      {/* 🚀 核心修复：添加 context="collection" */}
       <NameTable
         key={id}
-        context="collection" // 👈 必填参数
+        context="collection"
         records={processedRecords}
         isLoading={isLoading}
         currentAddress={address}
@@ -192,7 +186,6 @@ export const CollectionDetail = () => {
         nameCounts={nameCounts}
       />
 
-      {/* ... (悬浮栏和 Modal 渲染保持不变) ... */}
       {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
