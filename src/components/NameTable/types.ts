@@ -25,7 +25,7 @@ export interface SortConfig {
 export interface FilterConfig {
   onlyMe: boolean;
   // 🚀 新增 "仅显示有备注" 筛选配置
-  onlyWithNotes: boolean;
+  onlyWithMemos: boolean;
   statusList: string[];
   actionType: "all" | "register" | "renew";
   lengthList: number[];

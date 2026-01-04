@@ -24,7 +24,7 @@ interface NameHeaderProps {
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
   };
-  disabled?: boolean; // 🚀 新增
+  disabled?: boolean;
 }
 
 export const NameHeader = ({
@@ -38,7 +38,7 @@ export const NameHeader = ({
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
     memosCount: 0,
   },
-  disabled, // 🚀 解构
+  disabled,
 }: NameHeaderProps) => {
   const isActive =
     filterConfig.lengthList.length > 0 || filterConfig.wrappedType !== "all";
@@ -48,40 +48,39 @@ export const NameHeader = ({
     0,
   );
 
-  // 🚀 1. 计算逻辑状态
   const memosCount = nameCounts.memosCount || 0;
-  // 使用 wrappedCounts.all 作为当前上下文的总数 (因为它包含了 wrapped + unwrapped 的总和)
+  // 当前视图下的总数
   const totalCount = nameCounts.wrappedCounts.all;
 
-  const isNoNotes = memosCount === 0;
-  const isAllNotes = totalCount > 0 && memosCount === totalCount;
+  const isNoMemos = memosCount === 0;
+  const isAllMemos = totalCount > 0 && memosCount === totalCount;
 
-  // 只要满足“全无”或“全有”，且当前没有处于“仅显示备注”的筛选状态下，就禁用
-  // (注意：如果用户已经在筛选状态下，即使 memosCount 为 0，也应该允许他点击以取消筛选，防止死锁。
-  // 但根据你的需求描述，我们优先满足禁用逻辑。如果处于筛选状态且数量为0，列表为空，用户通常会重置过滤器)
-  // 🚀 逻辑合并：原有的业务禁用逻辑 || 全局禁用
-  const isDisabled = disabled || isNoNotes || isAllNotes;
+  // 🚀 修复 Bug：
+  // 只有在 "所有都有备注" 且 "当前并未开启筛选" 时才禁用。
+  // 如果当前 filterConfig.onlyWithMemos 为 true，按钮必须保持可用，以便用户取消筛选。
+  const isDisabled =
+    disabled || isNoMemos || (isAllMemos && !filterConfig.onlyWithMemos);
 
-  // 🚀 2. 动态生成 Tooltip 文案
+  // 🚀 同步修复 Tooltip 逻辑
   let tooltipContent = "";
-  if (isNoNotes) {
+  if (isNoMemos) {
     tooltipContent = "没有任何备注";
-  } else if (isAllNotes) {
+  } else if (isAllMemos && !filterConfig.onlyWithMemos) {
+    // 只有在未筛选状态下，才提示"全都有备注"
     tooltipContent = "所有名称都进行了备注";
   } else {
-    tooltipContent = filterConfig.onlyWithNotes
-      ? "显示所有名称"
+    tooltipContent = filterConfig.onlyWithMemos
+      ? "显示所有名称" // 激活状态下提示取消
       : `仅显示有备注的 (${memosCount}) 个`;
   }
 
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
 
-  // 🚀 3. 动态生成样式
   let buttonClass = "";
   if (isDisabled) {
     buttonClass = "text-gray-300 cursor-not-allowed bg-transparent";
-  } else if (filterConfig.onlyWithNotes) {
+  } else if (filterConfig.onlyWithMemos) {
     buttonClass = "bg-link text-white hover:bg-link-hover";
   } else {
     buttonClass = "text-link hover:bg-gray-50";
@@ -100,10 +99,9 @@ export const NameHeader = ({
             ascIcon={faSortAlphaDown}
             descIcon={faSortAlphaUp}
             title="按名称字母排序"
-            disabled={disabled} // 🚀 传参
+            disabled={disabled}
           />
 
-          {/* 🚀 4. 应用新的 Tooltip 和 Button 逻辑 */}
           <Tooltip content={tooltipContent}>
             <button
               disabled={isDisabled}
@@ -111,7 +109,7 @@ export const NameHeader = ({
                 !isDisabled &&
                 onFilterChange({
                   ...filterConfig,
-                  onlyWithNotes: !filterConfig.onlyWithNotes,
+                  onlyWithMemos: !filterConfig.onlyWithMemos,
                 })
               }
               className={`${buttonBaseClass} ${buttonClass}`}
@@ -124,7 +122,7 @@ export const NameHeader = ({
             isActive={isActive}
             menuWidth="w-48"
             title="按长度或包装筛选"
-            disabled={disabled} // 🚀 传参
+            disabled={disabled}
           >
             {/* 1. 长度筛选 */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">

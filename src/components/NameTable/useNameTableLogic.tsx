@@ -19,7 +19,7 @@ export const useNameTableLogic = (
   const [filterConfig, setFilterConfig] = useState<FilterConfig>({
     statusList: [],
     onlyMe: false,
-    onlyWithNotes: false,
+    onlyWithMemos: false,
     actionType: "all",
     lengthList: [],
     wrappedType: "all",
@@ -62,8 +62,8 @@ export const useNameTableLogic = (
       if (wrappedType === "all") return true;
       return wrappedType === "wrapped" ? r.wrapped : !r.wrapped;
     };
-    const checkNotes = (r: NameRecord) => {
-      if (!filterConfig.onlyWithNotes) return true;
+    const checkMemos = (r: NameRecord) => {
+      if (!filterConfig.onlyWithMemos) return true;
       return !!r.memo && r.memo.trim().length > 0;
     };
 
@@ -72,7 +72,7 @@ export const useNameTableLogic = (
     baseRecords
       .filter(
         (r) =>
-          checkAction(r) && checkLength(r) && checkWrapped(r) && checkNotes(r),
+          checkAction(r) && checkLength(r) && checkWrapped(r) && checkMemos(r),
       )
       .forEach(
         (r) => (statusCounts[r.status] = (statusCounts[r.status] || 0) + 1),
@@ -81,7 +81,7 @@ export const useNameTableLogic = (
     // 🚀 2.2 操作计数 (精确统计)
     const recordsForAction = baseRecords.filter(
       (r) =>
-        checkStatus(r) && checkLength(r) && checkWrapped(r) && checkNotes(r),
+        checkStatus(r) && checkLength(r) && checkWrapped(r) && checkMemos(r),
     );
     const actionCounts = {
       all: recordsForAction.length,
@@ -99,7 +99,7 @@ export const useNameTableLogic = (
     baseRecords
       .filter(
         (r) =>
-          checkStatus(r) && checkAction(r) && checkWrapped(r) && checkNotes(r),
+          checkStatus(r) && checkAction(r) && checkWrapped(r) && checkMemos(r),
       )
       .forEach(
         (r) =>
@@ -109,7 +109,7 @@ export const useNameTableLogic = (
 
     const recordsForWrapped = baseRecords.filter(
       (r) =>
-        checkStatus(r) && checkAction(r) && checkLength(r) && checkNotes(r),
+        checkStatus(r) && checkAction(r) && checkLength(r) && checkMemos(r),
     );
     const wrappedCounts = {
       all: recordsForWrapped.length,
@@ -117,7 +117,7 @@ export const useNameTableLogic = (
       unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
     };
 
-    const recordsWithNotes = baseRecords.filter(
+    const recordsWithMemos = baseRecords.filter(
       (r) =>
         checkStatus(r) &&
         checkAction(r) &&
@@ -126,7 +126,7 @@ export const useNameTableLogic = (
         !!r.memo &&
         r.memo.trim().length > 0,
     );
-    const memosCount = recordsWithNotes.length;
+    const memosCount = recordsWithMemos.length;
 
     return {
       statusCounts,
@@ -144,7 +144,7 @@ export const useNameTableLogic = (
     actionType,
     lengthList,
     wrappedType,
-    filterConfig.onlyWithNotes,
+    filterConfig.onlyWithMemos,
   ]);
 
   // ... (其余部分保持不变)

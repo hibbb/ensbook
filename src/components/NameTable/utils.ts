@@ -49,7 +49,7 @@ export const processNameRecords = (
     }
 
     // D. 备注过滤
-    if (filterConfig.onlyWithNotes) {
+    if (filterConfig.onlyWithMemos) {
       if (!r.memo || r.memo.trim().length === 0) return false;
     }
 
