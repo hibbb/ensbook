@@ -42,8 +42,6 @@ export const Home = () => {
   const queryClient = useQueryClient();
 
   // 🚀 动态设置标题
-  // 不传参数，标题将被重置为 "ENSBook" (即 __APP_NAME__)
-  // 如果你想显示 "ENSBook - Home"，可以传 "Home"
   useDocumentTitle("Home");
 
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
@@ -75,7 +73,7 @@ export const Home = () => {
     return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
-  // 🚀 核心修改：传递 context="home" 以启用视图状态持久化
+  // 🚀 启用视图状态持久化
   const {
     processedRecords,
     sortConfig,
@@ -89,7 +87,6 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-    // 🚀 解构新能力
     isViewStateDirty,
     resetViewState,
   } = useNameTableView(validRecords, address, "home");
@@ -119,6 +116,14 @@ export const Home = () => {
   }, [resolvedLabels, regStatus]);
 
   const hasContent = resolvedLabels.length > 0;
+
+  // 🚀 UX 优化：当列表清空时（无论是批量删除还是逐个删除），自动重置视图状态
+  // 避免 "隐形筛选" 问题：列表变空后，筛选器自动归位，确保下次添加数据时立即可见
+  useEffect(() => {
+    if (!hasContent && isViewStateDirty) {
+      resetViewState();
+    }
+  }, [hasContent, isViewStateDirty, resetViewState]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -168,8 +173,12 @@ export const Home = () => {
 
     if (type === "all") {
       if (window.confirm("确定要清空所有历史记录吗？")) {
+        // 1. 清空存储中的数据
         clearHomeItems();
+        // 2. 清空当前页面的列表状态
+        // 注意：这将导致 hasContent 变为 false，从而触发上方的 useEffect 自动重置视图状态
         setResolvedLabels([]);
+        // 3. 清空勾选状态
         clearSelection();
       }
       return;
@@ -338,9 +347,9 @@ export const Home = () => {
         </div>
       )}
 
-      {/* 🚀 新增：视图重置按钮 */}
+      {/* 视图重置按钮：仅在有内容且视图被修改时显示 */}
       <ViewStateReset
-        isVisible={isViewStateDirty}
+        isVisible={hasContent && isViewStateDirty}
         onReset={resetViewState}
         hasSelection={selectedLabels.size > 0}
       />

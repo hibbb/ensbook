@@ -39,6 +39,10 @@ export const CollectionDetail = () => {
   // 1. 数据获取
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
 
+  // 🚀 定义 hasContent (辅助判断)
+  // 注意：这里判断的是原始数据是否有内容，而不是过滤后的 processedRecords
+  const hasContent = (records?.length || 0) > 0;
+
   // 🚀 核心修改：传递 context="collection" 和 collectionId={id}
   // 这样每个集合的筛选状态都会被独立保存
   const {
@@ -195,9 +199,10 @@ export const CollectionDetail = () => {
         nameCounts={nameCounts}
       />
 
-      {/* 🚀 新增 */}
+      {/* 🚀 修复：增加 hasContent 判断 */}
+      {/* 避免在 Loading 状态或集合本身为空时显示重置按钮 */}
       <ViewStateReset
-        isVisible={isViewStateDirty}
+        isVisible={hasContent && isViewStateDirty}
         onReset={resetViewState}
         hasSelection={selectedLabels.size > 0}
       />
