@@ -210,7 +210,7 @@ export const Mine = () => {
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
           Mine 页面允许你通过自定义规则
           <br />
-          （如 "abc, hello, 12345"、"@vitalik.eth" 或特定账户地址）
+          （如 "abc, hello, 12345"、"@vitalik.eth" 或以太坊地址）
           <br />
           来创建一个专属的域名集合。
         </p>

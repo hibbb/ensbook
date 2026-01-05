@@ -4,10 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
   faAt,
-  faHashtag,
   faGears,
 } from "@fortawesome/free-solid-svg-icons";
 import { BaseModal } from "./ui/BaseModal"; // 🚀 引入 BaseModal
+import { faEthereum } from "@fortawesome/free-brands-svg-icons";
 
 interface SearchHelpModalProps {
   isOpen: boolean;
@@ -38,17 +38,17 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 域名批量搜索
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                输入任意名称，支持空格或逗号分隔多个名称。
+                输入任意名称或名称标签，支持空格或逗号分隔多个名称。
               </p>
-              <div className="mt-2 text-xs bg-gray-50 border border-gray-100 px-3 py-2 rounded-lg font-qs-medium text-text-main">
-                vitalik paradigm.eth 999
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+                abc.eth apple 999
               </div>
             </div>
           </div>
 
           {/* 模式 2: 所有者持仓查询 */}
           <div className="flex gap-4 group">
-            <div className="w-10 h-10 shrink-0 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 shrink-0 rounded-lg bg-cyan-50 flex items-center justify-center text-cyan-500 group-hover:scale-110 transition-transform">
               <FontAwesomeIcon icon={faAt} size="sm" />
             </div>
             <div>
@@ -56,30 +56,29 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 名称所有者持仓查询
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                使用 “<span className="text-purple-500 font-bold">@</span> +
-                ENS（或以太坊地址）” 的格式查询。
+                使用 “<span className="text-cyan-500 font-bold">@</span> +
+                ENS/标签” 的格式查询。
               </p>
-              <div className="mt-2 text-xs bg-gray-50 border border-gray-100 px-3 py-2 rounded-lg font-qs-medium text-text-main">
-                @vitalik.eth @0xd8dA6...
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+                @vitalik.eth 或 @vitalik
               </div>
             </div>
           </div>
 
           {/* 模式 3: 绑定地址持仓查询 */}
           <div className="flex gap-4 group">
-            <div className="w-10 h-10 shrink-0 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
-              <FontAwesomeIcon icon={faHashtag} size="sm" />
+            <div className="w-10 h-10 shrink-0 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
+              <FontAwesomeIcon icon={faEthereum} size="sm" />
             </div>
             <div>
               <h4 className="font-qs-bold text-text-main text-sm">
-                名称绑定地址持仓查询
+                以太坊地址持仓查询
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                使用 “<span className="text-orange-500 font-bold">#</span> +
-                ENS” 的格式查询。
+                直接输入以太坊地址查询其 ENS 名称持仓情况。
               </p>
-              <div className="mt-2 text-xs bg-gray-50 border border-gray-100 px-3 py-2 rounded-lg font-qs-medium text-text-main">
-                #vitalik.eth
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+                0xd8dA...6045
               </div>
             </div>
           </div>
@@ -94,8 +93,8 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <p className="text-xs text-gray-400 mt-1">
                 同时支持上述所有格式的混合输入。
               </p>
-              <div className="mt-2 text-xs bg-gray-50 border border-gray-100 px-3 py-2 rounded-lg font-qs-medium text-text-main">
-                apple #vitalik.eth @0xd8...
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+                apple @vitalik.eth 0xd8...
               </div>
             </div>
           </div>

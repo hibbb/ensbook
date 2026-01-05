@@ -12,6 +12,7 @@ import {
 import {
   getMyCollectionSource,
   saveMyCollectionSource,
+  saveCollectionViewState,
 } from "../../services/storage/userStore";
 import { parseAndClassifyInputs } from "../../utils/parseInputs";
 import { fetchLabels } from "../../services/graph/fetchLabels";
@@ -32,6 +33,8 @@ export const MyCollectionSettings = () => {
           )
         ) {
           saveMyCollectionSource("");
+          // 🚀 2. 核心修复：同时重置 "mine" 页面的视图状态
+          saveCollectionViewState("mine", {});
           setInput("");
           toast.success("已清空自定义集合");
         } else {

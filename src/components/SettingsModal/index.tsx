@@ -74,7 +74,7 @@ const SidebarItem = ({
 
 export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
   // 🚀 默认 Tab 建议先保持 data 或 about，或者也可以改成 my-collection 方便调试
-  const [activeTab, setActiveTab] = useState<SettingsTab>("data");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("my-collection");
 
   const getTitle = () => {
     switch (activeTab) {

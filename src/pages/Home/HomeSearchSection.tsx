@@ -58,8 +58,8 @@ export const HomeSearchSection = ({
             className="w-full h-14 pl-14 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
             placeholder={
               hasContent
-                ? "继续添加域名..."
-                : "输入域名、地址(@0x...) 或 记录(#user)..."
+                ? "继续添加名称..."
+                : "输入名称标签、地址、特殊标记，或先从左侧 💡 处查看帮助"
             }
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
