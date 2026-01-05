@@ -1,8 +1,12 @@
+// src/App.tsx
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { NavBar } from "./components/NavBar";
 import { Home } from "./pages/Home";
 import { CollectionDetail } from "./pages/CollectionDetail";
+// 🚀 1. 引入 Mine 页面
+import { Mine } from "./pages/Mine";
 
 export default function App() {
   return (
@@ -15,6 +19,10 @@ export default function App() {
           <main className="animate-in fade-in duration-500">
             <Routes>
               <Route path="/" element={<Home />} />
+
+              {/* 🚀 2. 注册 Mine 路由 */}
+              <Route path="/mine" element={<Mine />} />
+
               <Route path="/collection/:id" element={<CollectionDetail />} />
               <Route
                 path="*"

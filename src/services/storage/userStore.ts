@@ -9,6 +9,7 @@ import type { EnsBookBackup } from "../../types/backup";
 
 const STORAGE_KEY = "ensbook_user_data_v1";
 
+// 🚀 修改：初始化新增字段，确保数据完整性
 const DEFAULT_DATA: EnsBookUserData = {
   version: 1,
   timestamp: 0,
@@ -24,6 +25,7 @@ const DEFAULT_DATA: EnsBookUserData = {
     theme: "system",
     locale: "zh",
     defaultDuration: 31536000,
+    myCollectionSource: "", // 🚀 默认值为空字符串
   },
 };
 
@@ -34,7 +36,12 @@ export const getFullUserData = (): EnsBookUserData => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return initUserData();
     const data = JSON.parse(raw);
-    return { ...DEFAULT_DATA, ...data };
+    // 🛡️ 健壮性：深度合并默认值，防止旧版本数据缺少新字段导致 crash
+    return {
+      ...DEFAULT_DATA,
+      ...data,
+      settings: { ...DEFAULT_DATA.settings, ...data.settings },
+    };
   } catch (e) {
     console.error("Failed to load user data:", e);
     return initUserData();
@@ -47,6 +54,7 @@ export const saveFullUserData = (data: EnsBookUserData) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.error("Failed to save user data:", e);
+    // 这里可以选择抛出异常，让 UI 层处理存储空间不足的情况
     throw e;
   }
 };
@@ -174,7 +182,7 @@ export const getItemByContext = (
   return context === "home" ? getHomeItem(label) : getCollectionItem(label);
 };
 
-// 🚀 新增：视图状态持久化逻辑
+// 视图状态持久化逻辑
 
 export const getHomeViewState = (): PageViewState => {
   const data = getFullUserData();
@@ -201,6 +209,25 @@ export const saveCollectionViewState = (
   saveFullUserData(data);
 };
 
+// 🚀 新增：自由飞翔功能 (My Collection) 存储逻辑
+
+export const getMyCollectionSource = (): string => {
+  const data = getFullUserData();
+  // 🛡️ 健壮性：确保返回值永远是字符串，即使数据损坏
+  return data.settings.myCollectionSource || "";
+};
+
+export const saveMyCollectionSource = (source: string) => {
+  const data = getFullUserData();
+  data.settings.myCollectionSource = source;
+  saveFullUserData(data);
+
+  // 🔔 触发事件通知：让 Navbar 等组件知道数据变了，实时显示/隐藏入口
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("user-settings-updated"));
+  }
+};
+
 // --- 导入逻辑 ---
 
 export const importUserData = (
@@ -222,7 +249,6 @@ export const importUserData = (
     ...currentData.home.items,
     ...backup.home.items,
   };
-  // 🚀 合并 Home 视图状态 (导入优先)
   const mergedHomeViewState = {
     ...currentData.home.viewState,
     ...backup.home.viewState,
@@ -233,7 +259,6 @@ export const importUserData = (
     ...currentData.collections.items,
     ...backup.collections.items,
   };
-  // 🚀 合并 Collection 视图状态
   const mergedCollectionViewStates = {
     ...currentData.collections.viewStates,
     ...backup.collections.viewStates,
@@ -243,6 +268,11 @@ export const importUserData = (
   const mergedSettings = {
     ...currentData.settings,
     ...backup.settings,
+    // 🚀 合并策略：如果备份中有自定义集合，优先使用备份的（或者你可以定义其他策略）
+    // 这里采用：如果备份有值，则覆盖；否则保留当前的
+    myCollectionSource:
+      backup.settings.myCollectionSource ||
+      currentData.settings.myCollectionSource,
   };
 
   // 4. 构建最终数据
@@ -250,11 +280,11 @@ export const importUserData = (
     ...currentData,
     home: {
       items: mergedHomeItems,
-      viewState: mergedHomeViewState, // 🚀
+      viewState: mergedHomeViewState,
     },
     collections: {
       items: mergedCollectionItems,
-      viewStates: mergedCollectionViewStates, // 🚀
+      viewStates: mergedCollectionViewStates,
     },
     settings: mergedSettings,
     timestamp: Date.now(),

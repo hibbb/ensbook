@@ -5,7 +5,7 @@ import {
   faMagnifyingGlass,
   faAt,
   faHashtag,
-  faLayerGroup,
+  faGears,
 } from "@fortawesome/free-solid-svg-icons";
 import { BaseModal } from "./ui/BaseModal"; // 🚀 引入 BaseModal
 
@@ -87,7 +87,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
           {/* 模式 4: 混合查询 */}
           <div className="flex gap-4 group">
             <div className="w-10 h-10 shrink-0 rounded-lg bg-green-50 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform">
-              <FontAwesomeIcon icon={faLayerGroup} size="sm" />
+              <FontAwesomeIcon icon={faGears} size="sm" />
             </div>
             <div>
               <h4 className="font-qs-bold text-text-main text-sm">混合模式</h4>

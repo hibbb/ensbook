@@ -9,11 +9,14 @@ import {
   faClock,
   faPalette,
   faCircleInfo,
+  faFeatherPointed, // 🚀 新增图标
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-import { BaseModal } from "../ui/BaseModal"; // 🚀 引入 BaseModal
+import { BaseModal } from "../ui/BaseModal";
 import { DataBackupView } from "./DataBackupView";
 import { AboutView } from "./AboutView";
+// 🚀 引入新组件
+import { MyCollectionSettings } from "./MyCollectionSettings";
 import pkg from "../../../package.json";
 
 interface SettingsModalProps {
@@ -21,7 +24,13 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-type SettingsTab = "general" | "registration" | "data" | "about";
+// 🚀 扩展 Tab 类型
+type SettingsTab =
+  | "general"
+  | "registration"
+  | "data"
+  | "about"
+  | "my-collection";
 
 interface SidebarItemProps {
   icon: IconDefinition;
@@ -31,7 +40,6 @@ interface SidebarItemProps {
   disabled?: boolean;
 }
 
-// 辅助组件：侧边栏按钮 (保持不变)
 const SidebarItem = ({
   icon,
   label,
@@ -44,14 +52,14 @@ const SidebarItem = ({
     disabled={disabled}
     className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-qs-medium transition-colors duration-150 rounded-md ${
       active
-        ? "bg-gray-100 text-link font-qs-bold"
+        ? "bg-gray-100 text-black font-qs-bold" // 激活态样式微调为黑色，更显沉稳
         : disabled
           ? "text-gray-300 cursor-not-allowed"
           : "text-gray-500 hover:bg-gray-50 hover:text-text-main"
     }`}
   >
     <div
-      className={`w-5 flex justify-center ${active ? "text-link" : "text-gray-400"}`}
+      className={`w-5 flex justify-center ${active ? "text-black" : "text-gray-400"}`}
     >
       <FontAwesomeIcon icon={icon} />
     </div>
@@ -65,12 +73,15 @@ const SidebarItem = ({
 );
 
 export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
+  // 🚀 默认 Tab 建议先保持 data 或 about，或者也可以改成 my-collection 方便调试
   const [activeTab, setActiveTab] = useState<SettingsTab>("data");
 
   const getTitle = () => {
     switch (activeTab) {
       case "data":
         return "备份与恢复";
+      case "my-collection":
+        return "我的集合 (Mine)"; // 🚀 对应标题
       case "about":
         return "关于 ENSBook";
       default:
@@ -83,11 +94,9 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
       isOpen={isOpen}
       onClose={onClose}
       maxWidth="max-w-3xl"
-      // 🚀 隐藏 BaseModal 默认的标题栏，以便保留侧边栏布局的完整性
       title={null}
       showCloseButton={false}
     >
-      {/* 内部布局容器：固定高度以维持侧边栏设计 */}
       <div className="flex h-[600px] max-h-[80vh] w-full">
         {/* 左侧侧边栏 */}
         <div className="w-56 bg-white border-r border-gray-100 flex flex-col shrink-0">
@@ -97,25 +106,43 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             </h3>
           </div>
           <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto custom-scrollbar flex flex-col">
-            <SidebarItem
-              icon={faDatabase}
-              label="数据管理"
-              active={activeTab === "data"}
-              onClick={() => setActiveTab("data")}
-            />
-            <SidebarItem
-              icon={faGlobe}
-              label="语言"
-              active={activeTab === "general"}
-              disabled
-            />
-            <SidebarItem
-              icon={faClock}
-              label="注册偏好"
-              active={activeTab === "registration"}
-              disabled
-            />
-            <SidebarItem icon={faPalette} label="外观" disabled />
+            {/* 🚀 新增入口：我的集合 */}
+            <div className="mb-2">
+              <div className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">
+                Features
+              </div>
+              <SidebarItem
+                icon={faFeatherPointed}
+                label="我的集合"
+                active={activeTab === "my-collection"}
+                onClick={() => setActiveTab("my-collection")}
+              />
+            </div>
+
+            <div className="mb-2">
+              <div className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">
+                System
+              </div>
+              <SidebarItem
+                icon={faDatabase}
+                label="数据管理"
+                active={activeTab === "data"}
+                onClick={() => setActiveTab("data")}
+              />
+              <SidebarItem
+                icon={faGlobe}
+                label="语言"
+                active={activeTab === "general"}
+                disabled
+              />
+              <SidebarItem
+                icon={faClock}
+                label="注册偏好"
+                active={activeTab === "registration"}
+                disabled
+              />
+              <SidebarItem icon={faPalette} label="外观" disabled />
+            </div>
 
             <div className="flex-1"></div>
             <SidebarItem
@@ -133,7 +160,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
         {/* 右侧内容区 */}
         <div className="flex-1 flex flex-col min-w-0 bg-white">
-          {/* 右侧顶部标题栏 (包含关闭按钮) */}
           <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100 shrink-0">
             <h4 className="text-lg font-qs-bold text-gray-800">{getTitle()}</h4>
             <button
@@ -144,10 +170,11 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             </button>
           </div>
 
-          {/* 可滚动的内容区域 */}
           <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
             {activeTab === "data" && <DataBackupView onClose={onClose} />}
             {activeTab === "about" && <AboutView />}
+            {/* 🚀 渲染新组件 */}
+            {activeTab === "my-collection" && <MyCollectionSettings />}
           </div>
         </div>
       </div>

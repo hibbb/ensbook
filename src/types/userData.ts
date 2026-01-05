@@ -45,6 +45,11 @@ export interface UserSettings {
   theme: "light" | "dark" | "system";
   locale: "zh" | "en";
   defaultDuration: number;
+  /**
+   * 🚀 新增：自由飞翔功能 - 用户自定义集合源字符串
+   * 存储用户输入的原始索引字符串，如 "001-099, #999"
+   */
+  myCollectionSource: string;
 }
 
 /**

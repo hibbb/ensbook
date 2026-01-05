@@ -154,9 +154,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
         >
           <span>{record.status}</span>
           {displayInfo && (
-            <span className="pl-1 leading-none border-l border-current/20 ml-1.5">
-              {displayInfo}
-            </span>
+            <span className="leading-none ml-1.5">{displayInfo}</span>
           )}
         </div>
       </Tooltip>
