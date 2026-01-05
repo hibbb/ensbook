@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
   faSpinner,
-  faFeatherPointed, // 呼应“自由飞翔”的主题
+  faFeatherPointed,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -17,7 +17,6 @@ import { parseAndClassifyInputs } from "../../utils/parseInputs";
 import { fetchLabels } from "../../services/graph/fetchLabels";
 
 export const MyCollectionSettings = () => {
-  // 读取当前存储的字符串
   const [input, setInput] = useState(getMyCollectionSource());
   const [isValidating, setIsValidating] = useState(false);
 
@@ -25,7 +24,6 @@ export const MyCollectionSettings = () => {
     const trimmed = input.trim();
     const currentStored = getMyCollectionSource();
 
-    // 场景 1: 用户清空了输入框 -> 执行清空操作
     if (!trimmed) {
       if (currentStored) {
         if (
@@ -37,7 +35,6 @@ export const MyCollectionSettings = () => {
           setInput("");
           toast.success("已清空自定义集合");
         } else {
-          // 用户取消清空，恢复显示原内容
           setInput(currentStored);
         }
       } else {
@@ -46,18 +43,15 @@ export const MyCollectionSettings = () => {
       return;
     }
 
-    // 场景 2: 用户输入了内容 -> 验证并保存
     setIsValidating(true);
     const toastId = toast.loading("正在解析并验证域名...");
 
     try {
-      // 1. 解析输入
       const classified = parseAndClassifyInputs(trimmed);
 
-      // 检查是否有潜在内容 (包括地址、标签等)
+      // 🚀 修复：移除 linkOwners，保留 ethAddresses
       const totalCandidates =
         classified.sameOwners.length +
-        classified.linkOwners.length +
         classified.pureLabels.length +
         classified.ethAddresses.length;
 
@@ -66,11 +60,9 @@ export const MyCollectionSettings = () => {
         return;
       }
 
-      // 2. 尝试从 Graph 获取数据 (验证是否存在)
       const labels = await fetchLabels(classified);
 
       if (labels.length > 0) {
-        // 3. 验证成功，保存原始字符串
         saveMyCollectionSource(trimmed);
         toast.success(`保存成功！包含 ${labels.length} 个有效域名`, {
           id: toastId,
@@ -88,7 +80,6 @@ export const MyCollectionSettings = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* 引导提示区 */}
       <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 text-sm text-gray-600">
         <h4 className="font-qs-bold text-gray-800 flex items-center gap-2 mb-3 text-base">
           <FontAwesomeIcon icon={faFeatherPointed} className="text-link" />
@@ -105,13 +96,13 @@ export const MyCollectionSettings = () => {
           <span className="bg-white border border-gray-200 px-2 py-1 rounded shadow-sm">
             @vitalik.eth
           </span>
+          {/* 🚀 UI 更新：直接显示地址示例，不再带 # 前缀 */}
           <span className="bg-white border border-gray-200 px-2 py-1 rounded shadow-sm">
-            #0xd8dA...6045
+            0xd8dA...6045
           </span>
         </div>
       </div>
 
-      {/* 编辑区域 */}
       <div className="relative group">
         <textarea
           value={input}
@@ -128,7 +119,6 @@ export const MyCollectionSettings = () => {
         </div>
       </div>
 
-      {/* 操作栏 */}
       <div className="flex items-center justify-between pt-2">
         <div className="text-sm font-qs-medium">
           {isValidating ? (

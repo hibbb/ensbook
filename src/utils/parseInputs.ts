@@ -2,17 +2,11 @@
 
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
+import { INPUT_LIMITS } from "../config/constants";
 
 // ============================================================================
 // 1. 常量与配置
 // ============================================================================
-
-const LIMITS = {
-  SAME: 10,
-  // 🗑️ 移除 LINK 限制
-  PURE: 500,
-  ADDRESS: 10,
-};
 
 const ETH_SUFFIX_REGEX = /\.eth$/i;
 // 以太坊地址正则 (0x开头，后跟40位16进制字符)
@@ -30,7 +24,6 @@ const SPLIT_REGEX = new RegExp(`[${SEPARATORS.join("")}]+`);
 // 类型定义
 export interface ClassifiedInputs {
   sameOwners: string[];
-  // 🗑️ 移除 linkOwners
   pureLabels: string[];
   ethAddresses: string[];
 }
@@ -85,7 +78,6 @@ const validateAndNormalize = (
 export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
   const result: ClassifiedInputs = {
     sameOwners: [],
-    // 🗑️ 移除 linkOwners
     pureLabels: [],
     ethAddresses: [],
   };
@@ -102,9 +94,9 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
 
     // 性能优化：检查所有桶是否已满
     if (
-      result.sameOwners.length >= LIMITS.SAME &&
-      result.pureLabels.length >= LIMITS.PURE &&
-      result.ethAddresses.length >= LIMITS.ADDRESS
+      result.sameOwners.length >= INPUT_LIMITS.SAME &&
+      result.pureLabels.length >= INPUT_LIMITS.PURE &&
+      result.ethAddresses.length >= INPUT_LIMITS.ADDRESS
     ) {
       break;
     }
@@ -125,7 +117,7 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
 
     // 辅助：添加以太坊地址
     const tryAddAddress = (address: string) => {
-      if (result.ethAddresses.length >= LIMITS.ADDRESS) return;
+      if (result.ethAddresses.length >= INPUT_LIMITS.ADDRESS) return;
       // 统一转小写以匹配 Graph 索引
       const lowerAddr = address.toLowerCase();
       if (!result.ethAddresses.includes(lowerAddr)) {
@@ -148,7 +140,7 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
         // 不需要再检查是否为地址了，因为上面的正则已经拦截了 0x 地址
         // 如果用户输入 @0x123...，会被视为尝试查找名为 "0x123..." 的 ENS 域名的持有者，这在逻辑上也是说得通的
         if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
-        tryAddName(result.sameOwners, name, LIMITS.SAME, true);
+        tryAddName(result.sameOwners, name, INPUT_LIMITS.SAME, true);
       }
       continue;
     }
@@ -157,7 +149,7 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
     // 移除 # 相关的特殊处理
     const label = part.replace(ETH_SUFFIX_REGEX, "");
     if (label) {
-      tryAddName(result.pureLabels, label, LIMITS.PURE, false);
+      tryAddName(result.pureLabels, label, INPUT_LIMITS.PURE, false);
     }
   }
 

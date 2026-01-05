@@ -12,7 +12,6 @@ import { ENS_COLLECTIONS } from "../config/collections";
 export function useNameRecords(labels: string[]) {
   return useQuery({
     queryKey: ["name-records", labels],
-    // 🚀 传入 'home' 上下文
     queryFn: () => fetchNameRecords(labels, "home"),
     enabled: labels.length > 0,
     staleTime: 1000 * 30,
@@ -44,7 +43,6 @@ export function useCollectionRecords(collectionId: string) {
 
   return useQuery({
     queryKey: ["collection-records", collectionId, labels.length],
-    // 🚀 传入 'collection' 上下文
     queryFn: () => fetchNameRecords(labels, "collection"),
     enabled: !!collection && labels.length > 0,
     staleTime: 1000 * 60 * 5,
@@ -55,10 +53,11 @@ export function useCollectionRecords(collectionId: string) {
  * Hook 3: 反查/解析域名
  */
 export function useEnsLabels(classifiedInputs: ClassifiedInputs) {
+  // 🚀 修复：移除 linkOwners，新增 ethAddresses 检查
   const hasInputs =
     classifiedInputs.sameOwners.length > 0 ||
-    classifiedInputs.linkOwners.length > 0 ||
-    classifiedInputs.pureLabels.length > 0;
+    classifiedInputs.pureLabels.length > 0 ||
+    classifiedInputs.ethAddresses.length > 0;
 
   return useQuery({
     queryKey: ["ens-labels", classifiedInputs],

@@ -17,6 +17,12 @@ export const GRAPHQL_CONFIG = {
   FETCH_LIMIT: 1000,
 };
 
+export const INPUT_LIMITS = {
+  ADDRESS: 20,
+  SAME: 20,
+  PURE: 1000,
+};
+
 // 每种状态的标志颜色，与 ens app 的颜色模板保持一致
 export const STATUS_COLOR_BG: Record<string, string> = {
   Available: "bg-green-200",
