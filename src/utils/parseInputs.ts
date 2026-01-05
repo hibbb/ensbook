@@ -8,14 +8,14 @@ import toast from "react-hot-toast";
 // ============================================================================
 
 const LIMITS = {
-  SAME: 5,
-  LINK: 5,
+  SAME: 10,
+  // 🗑️ 移除 LINK 限制
   PURE: 500,
-  ADDRESS: 10, // 🚀 新增：限制单次查询的地址数量
+  ADDRESS: 10,
 };
 
 const ETH_SUFFIX_REGEX = /\.eth$/i;
-// 🚀 新增：以太坊地址正则 (0x开头，后跟40位16进制字符)
+// 以太坊地址正则 (0x开头，后跟40位16进制字符)
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
 const SEPARATORS = [
@@ -30,9 +30,9 @@ const SPLIT_REGEX = new RegExp(`[${SEPARATORS.join("")}]+`);
 // 类型定义
 export interface ClassifiedInputs {
   sameOwners: string[];
-  linkOwners: string[];
+  // 🗑️ 移除 linkOwners
   pureLabels: string[];
-  ethAddresses: string[]; // 🚀 新增字段
+  ethAddresses: string[];
 }
 
 // ============================================================================
@@ -85,9 +85,9 @@ const validateAndNormalize = (
 export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
   const result: ClassifiedInputs = {
     sameOwners: [],
-    linkOwners: [],
+    // 🗑️ 移除 linkOwners
     pureLabels: [],
-    ethAddresses: [], // 🚀 初始化
+    ethAddresses: [],
   };
 
   if (!rawInput || rawInput.length > 10000) {
@@ -103,9 +103,8 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
     // 性能优化：检查所有桶是否已满
     if (
       result.sameOwners.length >= LIMITS.SAME &&
-      result.linkOwners.length >= LIMITS.LINK &&
       result.pureLabels.length >= LIMITS.PURE &&
-      result.ethAddresses.length >= LIMITS.ADDRESS // 🚀 检查地址桶
+      result.ethAddresses.length >= LIMITS.ADDRESS
     ) {
       break;
     }
@@ -124,7 +123,7 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
       }
     };
 
-    // 🚀 辅助：添加以太坊地址
+    // 辅助：添加以太坊地址
     const tryAddAddress = (address: string) => {
       if (result.ethAddresses.length >= LIMITS.ADDRESS) return;
       // 统一转小写以匹配 Graph 索引
@@ -134,36 +133,31 @@ export function parseAndClassifyInputs(rawInput: string): ClassifiedInputs {
       }
     };
 
-    // 分类逻辑
+    // 🚀 核心分类逻辑优化 (版本 2)
+
+    // 1. 优先检查：是否为纯以太坊地址 (0x...)
+    if (ETH_ADDRESS_REGEX.test(part)) {
+      tryAddAddress(part);
+      continue; // 匹配成功，直接处理下一个
+    }
+
+    // 2. 检查：是否为 @ 开头的 Owner 查询
     if (part.startsWith("@")) {
       let name = part.slice(1);
       if (name) {
-        // 🚀 优先检查是否为地址
-        if (ETH_ADDRESS_REGEX.test(name)) {
-          tryAddAddress(name);
-        } else {
-          // 不是地址，按原有 ENS 逻辑处理
-          if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
-          tryAddName(result.sameOwners, name, LIMITS.SAME, true);
-        }
+        // 不需要再检查是否为地址了，因为上面的正则已经拦截了 0x 地址
+        // 如果用户输入 @0x123...，会被视为尝试查找名为 "0x123..." 的 ENS 域名的持有者，这在逻辑上也是说得通的
+        if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
+        tryAddName(result.sameOwners, name, LIMITS.SAME, true);
       }
-    } else if (part.startsWith("#")) {
-      let name = part.slice(1);
-      if (name) {
-        // 🚀 优先检查是否为地址
-        if (ETH_ADDRESS_REGEX.test(name)) {
-          tryAddAddress(name);
-        } else {
-          if (!ETH_SUFFIX_REGEX.test(name)) name += ".eth";
-          tryAddName(result.linkOwners, name, LIMITS.LINK, true);
-        }
-      }
-    } else {
-      // 普通 Label
-      const label = part.replace(ETH_SUFFIX_REGEX, "");
-      if (label) {
-        tryAddName(result.pureLabels, label, LIMITS.PURE, false);
-      }
+      continue;
+    }
+
+    // 3. 默认：视为普通 Label 或 ENS 域名
+    // 移除 # 相关的特殊处理
+    const label = part.replace(ETH_SUFFIX_REGEX, "");
+    if (label) {
+      tryAddName(result.pureLabels, label, LIMITS.PURE, false);
     }
   }
 
