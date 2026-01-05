@@ -33,7 +33,7 @@ const alchemyTransport = ALCHEMY_API_KEY
 
 export const config = createConfig(
   getDefaultConfig({
-    appName: "ENSBook",
+    appName: __APP_NAME__,
 
     // 使用新的大写常量名
     walletConnectProjectId: WALLET_CONNECT_PROJECT_ID,

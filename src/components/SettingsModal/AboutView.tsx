@@ -2,7 +2,6 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import pkg from "../../../package.json";
 
 export const AboutView = () => {
   return (
@@ -14,7 +13,9 @@ export const AboutView = () => {
           alt="ENSBook Logo"
           className="w-auto h-16 md:h-28 mx-auto object-contain pointer-events-none"
         />
-        <p className="text-sm text-gray-400 tracking-tight">v{pkg.version}</p>
+        <p className="text-sm text-gray-400 tracking-tight">
+          v{__APP_VERSION__}
+        </p>
       </div>
 
       {/* 2. 简介：扁平化文本 */}
@@ -32,7 +33,7 @@ export const AboutView = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {/* 作者 X 账号 - 扁平列表项风格 */}
           <a
-            href="https://x.com/forlbb"
+            href={__APP_AUTHOR_URL__}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
@@ -52,7 +53,7 @@ export const AboutView = () => {
 
           {/* GitHub 仓库 - 扁平列表项风格 */}
           <a
-            href="https://github.com/hibbb/eb3"
+            href={__APP_REPO_URL__}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"

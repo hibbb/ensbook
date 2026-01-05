@@ -21,3 +21,11 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+// 定义全局常量的类型
+declare const __APP_VERSION__: string;
+declare const __APP_NAME__: string;
+declare const __APP_DESCRIPTION__: string;
+declare const __APP_REPO_URL__: string; // 清洗后的 GitHub 地址
+declare const __APP_HOMEPAGE__: string; // 应用访问地址
+declare const __APP_AUTHOR_URL__: string;
