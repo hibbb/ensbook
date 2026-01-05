@@ -21,6 +21,7 @@ import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 import {
   getHomeLabels,
@@ -39,6 +40,11 @@ import type { DeleteCriteria } from "../components/NameTable/types";
 export const Home = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
+
+  // 🚀 动态设置标题
+  // 不传参数，标题将被重置为 "ENSBook" (即 __APP_NAME__)
+  // 如果你想显示 "ENSBook - Home"，可以传 "Home"
+  useDocumentTitle("Home");
 
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getHomeLabels(),

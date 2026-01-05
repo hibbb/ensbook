@@ -38,7 +38,7 @@ export const NavBar = () => {
 
           <div className="hidden md:flex gap-6">
             <Link to="/" className={getLinkClass("/")}>
-              <FontAwesomeIcon icon={faMagnifyingGlass} /> Search
+              <FontAwesomeIcon icon={faMagnifyingGlass} /> Home
             </Link>
             <Link
               to="/collection/999"
@@ -47,10 +47,10 @@ export const NavBar = () => {
               <FontAwesomeIcon icon={faBars} /> 999
             </Link>
             <Link
-              to="/collection/mnemonic"
-              className={getLinkClass("/collection/mnemonic")}
+              to="/collection/bip39"
+              className={getLinkClass("/collection/bip38")}
             >
-              <FontAwesomeIcon icon={faBars} /> Mnemonic
+              <FontAwesomeIcon icon={faBars} /> BIP39
             </Link>
           </div>
         </div>

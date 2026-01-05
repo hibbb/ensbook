@@ -19,6 +19,7 @@ import { useCollectionRecords } from "../hooks/useEnsData";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -30,6 +31,10 @@ export const CollectionDetail = () => {
   const collection = id ? ENS_COLLECTIONS[id] : null;
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
+
+  // 🚀 2. 动态设置标题
+  // 当 collection 变化时，标题自动更新为 "ENSBook - 999 Club" 样式
+  useDocumentTitle(collection?.displayName);
 
   // 1. 数据获取
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
