@@ -80,14 +80,14 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "LinkETH",
-    getLabel: (r) => `${r.label}.eth content link on Limo`,
+    getLabel: (r) => `${r.label}.eth.limo`,
     icon: limoIcon,
     shouldShow: (r) => ensUtils.isActive(r.status),
     getLink: (r) => `https://${r.label}.eth.limo/`,
   },
   {
     key: "DNSRelated",
-    getLabel: (r) => `${r.label} DNS registrations`,
+    getLabel: (r) => `DNS registrations of ${r.label}`,
     icon: dnsIcon,
     shouldShow: () => true,
     getLink: (r) =>

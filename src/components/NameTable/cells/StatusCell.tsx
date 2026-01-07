@@ -3,7 +3,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEthereum } from "@fortawesome/free-brands-svg-icons";
 import { usePremiumEthPrice } from "../../../hooks/usePremiumEthPrice";
-import { STATUS_COLOR_BG, STATUS_COLOR_TEXT } from "../../../config/constants";
+import {
+  PREMIUM_PERIOD_DURATION,
+  STATUS_COLOR_BG,
+  STATUS_COLOR_TEXT,
+} from "../../../config/constants";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
 
@@ -37,11 +41,6 @@ interface StatusCellProps {
 }
 
 export const StatusCell = ({ record, now }: StatusCellProps) => {
-  const premiumEthPrice = usePremiumEthPrice(
-    record.status,
-    record.releaseTime || 0,
-  );
-
   // 🚀 1. 样式逻辑优化：直接使用常量配置
   // 由于 constants.ts 已经包含了 "Unknown"，这里不再需要手动判断
   const bgClass = STATUS_COLOR_BG[record.status] || "bg-gray-50";
@@ -85,10 +84,9 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
 
     // 如果是 Premium 状态，添加溢价结束时间 (Release + 21天)
     if (record.status === "Premium" && record.releaseTime) {
-      const PREMIUM_PERIOD = 21 * 24 * 60 * 60;
       timePoints.push({
         label: "溢价结束",
-        time: record.releaseTime + PREMIUM_PERIOD,
+        time: record.releaseTime + PREMIUM_PERIOD_DURATION,
         show: true,
       });
     }
@@ -120,31 +118,62 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
     );
   };
 
-  const getStatusInfo = () => {
-    // 🚀 3. Unknown 状态下不计算剩余时间
-    if (record.status === "Unknown") return null;
+  const premiumEthPrice = usePremiumEthPrice(
+    record.status,
+    record.releaseTime || 0,
+  );
 
-    if (record.status === "Premium" && premiumEthPrice) {
+  // 🚀 核心修改：将内容渲染逻辑拆分，根据状态返回不同的 UI 结构
+  const renderContent = () => {
+    // 1. Unknown 处理
+    if (record.status === "Unknown") return <span>Unknown</span>;
+
+    // 2. Premium 特殊处理 (价格标签模式)
+    if (record.status === "Premium") {
+      const remaining = record.releaseTime
+        ? formatRemainingTime(
+            record.releaseTime + PREMIUM_PERIOD_DURATION - now,
+          )
+        : "";
+
       return (
-        <>
-          <FontAwesomeIcon icon={faEthereum} /> {premiumEthPrice}
-        </>
+        <div className="flex items-center gap-1.5 font-qs-medium">
+          {/* 使用 ETH 图标或 💎 作为“状态指示符” */}
+          <div className="flex items-center gap-0.5">
+            <FontAwesomeIcon icon={faEthereum} className="text-[10px]" />
+            <span>{premiumEthPrice || "-"}</span>
+          </div>
+
+          {/* 分隔符 */}
+          <span className="opacity-50 text-[10px]">|</span>
+
+          {/* 剩余时间 (紧凑显示) */}
+          <span className="font-mono text-[10px] opacity-90">{remaining}</span>
+        </div>
       );
     }
-    if (now === 0) return null;
-    if (record.status === "Active" && record.expiryTime)
-      return formatRemainingTime(record.expiryTime - now);
-    if (record.status === "Grace" && record.releaseTime)
-      return formatRemainingTime(record.releaseTime - now);
 
-    const PREMIUM_PERIOD = 21 * 24 * 60 * 60;
-    if (record.status === "Premium" && record.releaseTime)
-      return formatRemainingTime(record.releaseTime + PREMIUM_PERIOD - now);
+    // 3. 常规状态处理 (Active, Grace, etc.)
+    const remainingTime = (() => {
+      if (now === 0) return null;
+      if (record.status === "Active" && record.expiryTime)
+        return formatRemainingTime(record.expiryTime - now);
+      if (record.status === "Grace" && record.releaseTime)
+        return formatRemainingTime(record.releaseTime - now);
+      return null;
+    })();
 
-    return null;
+    return (
+      <>
+        <span>{record.status}</span>
+        {remainingTime && (
+          <span className="leading-none ml-1.5 font-mono opacity-80 border-l border-current pl-1.5 text-[10px]">
+            {remainingTime}
+          </span>
+        )}
+      </>
+    );
   };
-
-  const displayInfo = getStatusInfo();
 
   return (
     <div className="h-12 flex flex-col justify-center items-start">
@@ -152,10 +181,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
         <div
           className={`inline-flex items-center px-2.5 py-1 text-xs uppercase tracking-wide cursor-default transition-opacity hover:opacity-90 ${statusClass}`}
         >
-          <span>{record.status}</span>
-          {displayInfo && (
-            <span className="leading-none ml-1.5">{displayInfo}</span>
-          )}
+          {renderContent()}
         </div>
       </Tooltip>
     </div>
