@@ -6,6 +6,7 @@ import type {
   PageViewState,
 } from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
+import type { UserSettings } from "../../types/userData";
 
 const STORAGE_KEY = "ensbook_user_data_v1";
 
@@ -25,7 +26,9 @@ const DEFAULT_DATA: EnsBookUserData = {
     theme: "system",
     locale: "zh",
     defaultDuration: 31536000,
-    myCollectionSource: "", // 🚀 默认值为空字符串
+    myCollectionSource: "",
+    // 🚀 新增：默认为 false
+    mineAsHomepage: false,
   },
 };
 
@@ -57,6 +60,22 @@ export const saveFullUserData = (data: EnsBookUserData) => {
     // 这里可以选择抛出异常，让 UI 层处理存储空间不足的情况
     throw e;
   }
+};
+
+// 🚀 新增：通用的设置更新方法 (或者你可以专门写一个 setMineAsHomepage)
+export const updateSettings = (updates: Partial<UserSettings>) => {
+  const data = getFullUserData();
+  data.settings = { ...data.settings, ...updates };
+  saveFullUserData(data);
+  // 触发更新事件，以便 UI 响应
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("user-settings-updated"));
+  }
+};
+
+// 🚀 新增：获取设置的辅助函数
+export const getUserSettings = (): UserSettings => {
+  return getFullUserData().settings;
 };
 
 const initUserData = (): EnsBookUserData => {

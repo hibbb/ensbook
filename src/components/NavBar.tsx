@@ -46,7 +46,8 @@ export const NavBar = () => {
 
           <div className="hidden md:flex gap-6">
             {/* 🚀 注意：在第二步中，我们将把这里的 "/" 改为 "/home" */}
-            <Link to="/" className={getLinkClass("/")}>
+            {/* 🚀 关键变更：Home 菜单项必须显式指向 /home */}
+            <Link to="/home" className={getLinkClass("/home")}>
               <FontAwesomeIcon icon={faMagnifyingGlass} /> Home
             </Link>
 
@@ -76,7 +77,7 @@ export const NavBar = () => {
           <Tooltip content="设置">
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-gray-400 hover:text-text-main hover:bg-gray-100 transition-all active:scale-95 group"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-link hover:text-link-hover hover:bg-gray-100 transition-all active:scale-95 group"
             >
               <FontAwesomeIcon
                 icon={faGear}

@@ -1,18 +1,20 @@
 // src/components/SettingsModal/MyCollectionSettings.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
-  faSpinner,
   faFeatherPointed,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
   getMyCollectionSource,
   saveMyCollectionSource,
   saveCollectionViewState,
+  getUserSettings,
+  updateSettings,
 } from "../../services/storage/userStore";
 import { parseAndClassifyInputs } from "../../utils/parseInputs";
 import { fetchLabels } from "../../services/graph/fetchLabels";
@@ -20,6 +22,19 @@ import { fetchLabels } from "../../services/graph/fetchLabels";
 export const MyCollectionSettings = () => {
   const [input, setInput] = useState(getMyCollectionSource());
   const [isValidating, setIsValidating] = useState(false);
+  const [isHomepage, setIsHomepage] = useState(false);
+
+  useEffect(() => {
+    const settings = getUserSettings();
+    setIsHomepage(settings.mineAsHomepage || false);
+  }, []);
+
+  const handleToggleHomepage = () => {
+    const newValue = !isHomepage;
+    setIsHomepage(newValue);
+    updateSettings({ mineAsHomepage: newValue });
+    toast.success(newValue ? "Mine 已设置为默认首页" : "已恢复默认首页");
+  };
 
   const handleSave = async () => {
     const trimmed = input.trim();
@@ -33,7 +48,6 @@ export const MyCollectionSettings = () => {
           )
         ) {
           saveMyCollectionSource("");
-          // 🚀 2. 核心修复：同时重置 "mine" 页面的视图状态
           saveCollectionViewState("mine", {});
           setInput("");
           toast.success("已清空自定义集合");
@@ -51,8 +65,6 @@ export const MyCollectionSettings = () => {
 
     try {
       const classified = parseAndClassifyInputs(trimmed);
-
-      // 🚀 修复：移除 linkOwners，保留 ethAddresses
       const totalCandidates =
         classified.sameOwners.length +
         classified.pureLabels.length +
@@ -83,35 +95,62 @@ export const MyCollectionSettings = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 text-sm text-gray-600">
-        <h4 className="font-qs-bold text-gray-800 flex items-center gap-2 mb-3 text-base">
-          <FontAwesomeIcon icon={faFeatherPointed} className="text-link" />
+      {/* 🚀 优化 2: 扁平化、简洁的引导说明 */}
+      <div className="text-sm text-text-main/80">
+        <h4 className="font-qs-bold text-base text-black mb-2">
+          <FontAwesomeIcon icon={faFeatherPointed} className="mr-2" />
           自由定义你的 ENS 视界
         </h4>
         <p className="leading-relaxed mb-3">
           在这里，你可以将任何你感兴趣的 ENS 域名组合成一个专属集合 (Mine)。
           支持混合输入：
         </p>
-        <div className="flex flex-wrap gap-2 font-mono text-xs text-text-main">
-          <span className="bg-white border border-gray-200 px-2 py-1 rounded shadow-sm">
-            abc, hello, 12345
+        {/* 使用更扁平的代码块样式 */}
+        <div className="flex flex-wrap gap-2 font-mono text-xs">
+          <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
+            abc, hello, 123
           </span>
-          <span className="bg-white border border-gray-200 px-2 py-1 rounded shadow-sm">
+          <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
             @vitalik.eth
           </span>
-          {/* 🚀 UI 更新：直接显示地址示例，不再带 # 前缀 */}
-          <span className="bg-white border border-gray-200 px-2 py-1 rounded shadow-sm">
+          <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
             0xd8dA...6045
           </span>
         </div>
       </div>
 
+      {/* 分隔线 */}
+      <div className="border-t border-gray-100/80"></div>
+
+      {/* 🚀 优化 1: 修复错位、更标准的开关按钮 UI */}
+      <div className="flex items-center justify-between py-1">
+        <div className="flex flex-col">
+          <span className="font-qs-bold text-sm text-black">设为默认首页</span>
+          <span className="text-xs text-gray-400 mt-0.5">
+            打开 ENSBook 时默认显示 Mine 页面
+          </span>
+        </div>
+
+        {/* 使用标准的 label + input checkbox 实现，更稳定 */}
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={isHomepage}
+            onChange={handleToggleHomepage}
+          />
+          {/* 轨道 */}
+          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-link/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-link"></div>
+        </label>
+      </div>
+
+      {/* 编辑区域 */}
       <div className="relative group">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="在此输入索引字符串... (支持逗号、空格或换行分隔)"
-          rows={6}
+          rows={5}
           className="w-full p-4 bg-white border border-gray-200 rounded-xl font-mono text-sm text-text-main
             focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all resize-none shadow-sm
             placeholder:text-gray-300"
@@ -122,6 +161,7 @@ export const MyCollectionSettings = () => {
         </div>
       </div>
 
+      {/* 操作栏 */}
       <div className="flex items-center justify-between pt-2">
         <div className="text-sm font-qs-medium">
           {isValidating ? (
@@ -142,7 +182,7 @@ export const MyCollectionSettings = () => {
         <button
           onClick={handleSave}
           disabled={isValidating}
-          className={`flex items-center gap-2 px-8 py-2.5 rounded-full font-qs-bold text-white transition-all shadow-md transform
+          className={`flex items-center gap-2 px-6 py-2 rounded-full font-qs-bold text-white transition-all shadow-md transform
             ${
               isValidating
                 ? "bg-gray-400 cursor-not-allowed opacity-80"
