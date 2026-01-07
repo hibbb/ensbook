@@ -1,27 +1,27 @@
 // src/components/NavBar.tsx
 
-import { useState } from "react"; // 🚀 移除 useEffect
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ConnectKitButton } from "connectkit";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMagnifyingGlass,
   faGear,
-  faLayerGroup, // ✅ 保留您的修改
+  faLayerGroup,
   faFeatherPointed,
 } from "@fortawesome/free-solid-svg-icons";
 import { SettingsModal } from "./SettingsModal";
-// 🚀 移除 getMyCollectionSource，因为已通过 Hook 获取
-import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
+// 🗑️ 移除不再需要的 Hook 引用
+// import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { Tooltip } from "./ui/Tooltip";
 
 export const NavBar = () => {
   const location = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // 使用 Hook 获取数据 (自动处理同步)
-  const source = useMyCollectionSource();
-  const hasMine = !!source;
+  // 🗑️ 移除数据源检查逻辑
+  // const source = useMyCollectionSource();
+  // const hasMine = !!source;
 
   const getLinkClass = (path: string) => {
     const isActive = location.pathname === path;
@@ -45,16 +45,15 @@ export const NavBar = () => {
           </Link>
 
           <div className="hidden md:flex gap-6">
+            {/* 🚀 注意：在第二步中，我们将把这里的 "/" 改为 "/home" */}
             <Link to="/" className={getLinkClass("/")}>
               <FontAwesomeIcon icon={faMagnifyingGlass} /> Home
             </Link>
 
-            {/* 动态显示 Mine 入口 */}
-            {hasMine && (
-              <Link to="/mine" className={getLinkClass("/mine")}>
-                <FontAwesomeIcon icon={faFeatherPointed} /> Mine
-              </Link>
-            )}
+            {/* 🚀 变更：移除条件渲染，默认显示 Mine */}
+            <Link to="/mine" className={getLinkClass("/mine")}>
+              <FontAwesomeIcon icon={faFeatherPointed} /> Mine
+            </Link>
 
             <Link
               to="/collection/999"
@@ -74,7 +73,6 @@ export const NavBar = () => {
 
         {/* 右侧：功能区 */}
         <div className="flex items-center gap-3">
-          {/* 设置入口 */}
           <Tooltip content="设置">
             <button
               onClick={() => setIsSettingsOpen(true)}
@@ -87,12 +85,10 @@ export const NavBar = () => {
               />
             </button>
           </Tooltip>
-          {/* 钱包连接 */}
           <ConnectKitButton />
         </div>
       </nav>
 
-      {/* 设置 Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
