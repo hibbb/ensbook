@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# 1. 只检查暂存区文件（关键）
+pnpm lint-staged
+
+# 2. TypeScript 快速类型检查（无 emit）
+pnpm typecheck --if-present
