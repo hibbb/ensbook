@@ -49,7 +49,7 @@ export const TableRow = ({
   isPending = false,
 }: TableRowProps) => {
   return (
-    <tr className="group transition-colors duration-150 last:border-0 hover:bg-link/10 bg-table-row">
+    <tr className="group transition-colors duration-150 last:border-0 hover:bg-yellow-50 bg-table-row">
       <td className="w-14 text-center">
         <div className="h-12 flex items-center justify-center">
           <span className="text-xs text-gray-400">{index + 1}</span>

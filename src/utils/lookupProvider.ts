@@ -18,7 +18,7 @@ import dnsIcon from "../assets/lookups/dnssearch-dark.svg";
  */
 interface LookupItem {
   key: string;
-  label: string;
+  getLabel: (record: NameRecord) => string;
   icon: string; // 🚀 2. 新增 icon 字段
   getLink: (record: NameRecord, chainId?: number) => string;
   shouldShow: (record: NameRecord, chainId?: number) => boolean;
@@ -32,7 +32,7 @@ const getTokenId = (record: NameRecord): string => {
 export const LOOKUP_LINKS: LookupItem[] = [
   {
     key: "Web3bio",
-    label: "Web3.bio: Your Web3 Profile",
+    getLabel: (r) => `${r.label}.eth profile on Web3.bio`,
     icon: web3bioIcon, // 🚀 3. 绑定图片变量
     shouldShow: (r, cid) =>
       ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
@@ -40,7 +40,7 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "EtherScan",
-    label: "Etherscan: Ethereum Explorer",
+    getLabel: (r) => `${r.label}.eth records on Etherscan`,
     icon: etherscanIcon,
     shouldShow: (r) => !ensUtils.isAvailable(r.status),
     getLink: (r, cid) => {
@@ -54,7 +54,7 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "Opensea",
-    label: "OpenSea: NFT Marketplace",
+    getLabel: (r) => `${r.label}.eth on OpenSea`,
     icon: openseaIcon,
     shouldShow: (r, cid) =>
       ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
@@ -66,28 +66,28 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "ENSVision",
-    label: "Vision: ENS Marketplace",
+    getLabel: (r) => `${r.label}.eth on Vision`,
     icon: envisionIcon,
     shouldShow: (_, cid) => ensUtils.isMainnet(cid),
     getLink: (r) => `https://ensvision.com/name/${r.label}.eth`,
   },
   {
     key: "Grails",
-    label: "Grails: ENS Marketplace",
+    getLabel: (r) => `${r.label}.eth on Grails`,
     icon: grailsIcon,
     shouldShow: (_, cid) => ensUtils.isMainnet(cid),
     getLink: (r) => `https://grails.app/${r.label}.eth`,
   },
   {
     key: "LinkETH",
-    label: "Limo: Link to Decentralized Websites",
+    getLabel: (r) => `${r.label}.eth content link on Limo`,
     icon: limoIcon,
     shouldShow: (r) => ensUtils.isActive(r.status),
     getLink: (r) => `https://${r.label}.eth.limo/`,
   },
   {
     key: "DNSRelated",
-    label: "Corresponding DNS",
+    getLabel: (r) => `${r.label} DNS registrations`,
     icon: dnsIcon,
     shouldShow: () => true,
     getLink: (r) =>
