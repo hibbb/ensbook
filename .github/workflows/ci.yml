@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-commit-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 必须设置为 0 以获取完整历史，供 commitlint 检查
+
+      # 2. 安装 pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10 # 或者您当前使用的版本
+
+      # 3. 设置 Node.js 环境
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      # 4. 安装依赖
+      - name: Install dependencies
+        run: pnpm install
+
+      # 5. 检查代码格式 (Prettier)
+      # 这里使用 --check 模式，只检查不修改，不符合规范则报错
+      - name: Check formatting
+        run: pnpm exec prettier --check .
+
+      # 6. 检查提交信息规范 (Commitlint)
+      # 检查从当前分支到主分支的所有提交信息
+      - name: Lint commit messages
+        run: pnpm exec commitlint --from ${{ github.event.pull_request.base.sha || 'HEAD~1' }} --to ${{ github.event.pull_request.head.sha || 'HEAD' }} --verbose
