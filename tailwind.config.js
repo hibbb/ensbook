@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 import forms from "@tailwindcss/forms"; // 🚀 改用 import
 
 export default {

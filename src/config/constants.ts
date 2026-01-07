@@ -25,12 +25,12 @@ export const INPUT_LIMITS = {
 
 // 每种状态的标志颜色，与 ens app 的颜色模板保持一致
 export const STATUS_COLOR_BG: Record<string, string> = {
-  Available: "bg-green-200",
-  Active: "bg-cyan-200",
-  Grace: "bg-yellow-200",
-  Premium: "bg-purple-200",
-  Released: "bg-green-200",
-  Unknown: "bg-gray-200",
+  Available: "bg-green-100",
+  Active: "bg-cyan-100",
+  Grace: "bg-yellow-100",
+  Premium: "bg-purple-100",
+  Released: "bg-green-100",
+  Unknown: "bg-gray-100",
 };
 
 export const STATUS_COLOR_TEXT: Record<string, string> = {
@@ -43,12 +43,12 @@ export const STATUS_COLOR_TEXT: Record<string, string> = {
 };
 
 export const STATUS_COLOR_BG_HOVER: Record<string, string> = {
-  Available: "hover:bg-green-200",
-  Active: "hover:bg-cyan-200",
-  Grace: "hover:bg-yellow-200",
-  Premium: "hover:bg-purple-200",
-  Released: "hover:bg-green-200",
-  Unknown: "hover:bg-gray-200",
+  Available: "hover:bg-green-100",
+  Active: "hover:bg-cyan-100",
+  Grace: "hover:bg-yellow-100",
+  Premium: "hover:bg-purple-100",
+  Released: "hover:bg-green-100",
+  Unknown: "hover:bg-gray-100",
 };
 
 export const STATUS_COLOR_TEXT_HOVER: Record<string, string> = {

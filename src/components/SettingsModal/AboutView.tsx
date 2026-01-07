@@ -26,7 +26,7 @@ export const AboutView = () => {
 
       {/* 链接列表模块 */}
       <div>
-        <h5 className="text-xs font-qs-bold text-gray-400 uppercase tracking-wider px-1 mb-2 border-b border-gray-100 pb-2">
+        <h5 className="text-xs font-qs-semibold text-gray-400 uppercase tracking-wider px-1 mb-2 border-b border-gray-100 pb-2">
           Connect
         </h5>
 
@@ -44,7 +44,7 @@ export const AboutView = () => {
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-qs-bold text-text-main group-hover:text-link transition-colors">
+              <div className="text-sm font-qs-semibold text-text-main group-hover:text-link transition-colors">
                 Author
               </div>
               <div className="text-xs text-gray-500">@forlbb</div>
@@ -62,7 +62,7 @@ export const AboutView = () => {
               <FontAwesomeIcon icon={faGithub} className="text-2xl" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-qs-bold text-text-main group-hover:text-link transition-colors">
+              <div className="text-sm font-qs-semibold text-text-main group-hover:text-link transition-colors">
                 GitHub
               </div>
               <div className="text-xs text-gray-500">Open Source Project</div>

@@ -106,7 +106,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
             key={point.label}
             className={`flex py-0.5 justify-between items-center gap-4 text-xs ${
               point.isCurrent
-                ? "text-white font-qs-bold border-l-2 border-link pl-2 -ml-2.5" // 高亮当前时间
+                ? "text-white font-qs-semibold border-l-2 border-link pl-2 -ml-2.5" // 高亮当前时间
                 : "text-gray-300 font-qs-medium"
             }`}
           >

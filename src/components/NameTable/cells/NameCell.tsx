@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { namehash, keccak256, stringToBytes } from "viem";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import { faFileLines } from "@fortawesome/free-regular-svg-icons";
+// 🚀 变更 1: 为了和 OwnerCell 保持图标风格一致，改用 free-regular-svg-icons
+import { faCopy, faFileLines } from "@fortawesome/free-regular-svg-icons";
 
 import type { NameRecord } from "../../../types/ensNames";
 import { MemoEditor } from "../../MemoEditor";
@@ -14,7 +14,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "../../ui/Popover";
 
 interface NameCellProps {
   record: NameRecord;
-  // 🚀 新增 prop
   context: "home" | "collection";
 }
 
@@ -54,6 +53,7 @@ const MetadataRow = ({
 
 export const NameCell = ({ record, context }: NameCellProps) => {
   const metadata = useMemo(() => {
+    // ... metadata 计算逻辑保持不变 ...
     try {
       const fullName = `${record.label}.eth`;
       const labelHashHex = keccak256(stringToBytes(record.label));
@@ -84,11 +84,73 @@ export const NameCell = ({ record, context }: NameCellProps) => {
     }
   }, [record.label]);
 
+  // 🚀 新增: 复制处理函数 (与 OwnerCell 保持一致)
+  const handleCopy = (e: React.MouseEvent, text: string, label: string) => {
+    e.preventDefault(); // 防止触发外层链接跳转
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    toast.success(`已复制 ${label}`);
+  };
+
+  // 🚀 新增: 构建富文本 Tooltip 内容
+  const renderNameTooltip = () => {
+    const fullName = `${record.label}.eth`;
+
+    return (
+      <div className="flex flex-col gap-2 min-w-[200px]">
+        {/* 第一行：标签 (Label) */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
+              Label
+            </span>
+            <span className="font-qs-medium text-xs text-white">
+              {record.label}
+            </span>
+          </div>
+          <button
+            onClick={(e) => handleCopy(e, record.label, "Label")}
+            className="text-gray-400 hover:text-white transition-colors p-1"
+            title="Copy Label"
+          >
+            <FontAwesomeIcon icon={faCopy} />
+          </button>
+        </div>
+
+        {/* 第二行：名称 (Name) */}
+        <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
+              Name
+            </span>
+            <span className="font-qs-medium text-xs text-white">
+              {fullName}
+            </span>
+          </div>
+          <button
+            onClick={(e) => handleCopy(e, fullName, "Name")}
+            className="text-gray-400 hover:text-white transition-colors p-1"
+            title="Copy Name"
+          >
+            <FontAwesomeIcon icon={faCopy} />
+          </button>
+        </div>
+
+        {/* 第三行：引导提示 */}
+        <div className="pt-2 mt-1 border-t border-white/10 text-center">
+          <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
+            点击前往 ENS APP 查看
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="h-12 flex items-center">
       <div className="flex items-center gap-2">
-        {/* 1. 域名链接 */}
-        <Tooltip content="ENS APP">
+        {/* 1. 域名链接 + 新的 Tooltip */}
+        <Tooltip content={renderNameTooltip()}>
           <a
             href={`https://app.ens.domains/${record.label}.eth`}
             target="_blank"
@@ -108,10 +170,10 @@ export const NameCell = ({ record, context }: NameCellProps) => {
           </a>
         </Tooltip>
 
-        {/* 2. 元数据 Popover */}
+        {/* 2. 元数据 Popover (保持不变) */}
         {metadata && (
           <Popover>
-            <Tooltip content="元数据">
+            <Tooltip content="元数据详情">
               <PopoverTrigger asChild>
                 <button className="text-gray-300 hover:text-link transition-colors outline-none">
                   <FontAwesomeIcon icon={faFileLines} size="xs" />
@@ -120,8 +182,9 @@ export const NameCell = ({ record, context }: NameCellProps) => {
             </Tooltip>
 
             <PopoverContent className="w-80 p-0 overflow-hidden" align="start">
+              {/* 内容保持不变 */}
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                <span className="text-xs font-qs-bold text-gray-500 uppercase tracking-wider">
+                <span className="text-xs font-qs-semibold text-gray-500 uppercase tracking-wider">
                   Metadata
                 </span>
                 <span className="text-xs font-qs-medium text-gray-400">
@@ -161,7 +224,7 @@ export const NameCell = ({ record, context }: NameCellProps) => {
           </Popover>
         )}
 
-        {/* 🚀 3. 备注编辑器 (传入 context) */}
+        {/* 3. 备注编辑器 */}
         <MemoEditor label={record.label} context={context} />
       </div>
     </div>

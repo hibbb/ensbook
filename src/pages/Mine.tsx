@@ -204,7 +204,7 @@ export const Mine = () => {
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
           <FontAwesomeIcon icon={faFeatherPointed} size="2x" />
         </div>
-        <h2 className="text-2xl font-qs-bold text-gray-800 mb-3">
+        <h2 className="text-2xl font-qs-semibold text-gray-800 mb-3">
           开启你的 ENS 自由视界
         </h2>
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">

@@ -123,7 +123,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             <FontAwesomeIcon icon={faDownload} />
           </div>
           <div className="flex-1">
-            <h5 className="text-sm font-qs-bold text-gray-900 mb-1">
+            <h5 className="text-sm font-qs-semibold text-gray-900 mb-1">
               备份数据
             </h5>
             <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
@@ -134,7 +134,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             </p>
             <button
               onClick={handleExport}
-              className="px-4 py-2 bg-gray-100 text-text-main text-sm font-qs-bold rounded hover:bg-gray-200 transition-colors active:scale-95"
+              className="px-4 py-2 bg-gray-100 text-text-main text-sm font-qs-semibold rounded hover:bg-gray-200 transition-colors active:scale-95"
             >
               下载备份 (.json)
             </button>
@@ -149,12 +149,12 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             <FontAwesomeIcon icon={faUpload} />
           </div>
           <div className="flex-1">
-            <h5 className="text-sm font-qs-bold text-gray-900 mb-1">
+            <h5 className="text-sm font-qs-semibold text-gray-900 mb-1">
               恢复数据
             </h5>
             <div className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
               支持与现有数据 <b>合并</b> 或 <b>完全覆盖</b>。
-              <div className="flex items-center gap-1.5 mt-2 text-xs text-lime-700 font-qs-bold">
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-lime-700 font-qs-semibold">
                 <FontAwesomeIcon icon={faTriangleExclamation} />
                 请确保导入的是合法的 EnsBook 备份文件
               </div>
@@ -169,7 +169,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-lime-50 text-lime-700 text-sm font-qs-bold rounded border border-lime-200 hover:bg-lime-100 hover:border-lime-300 transition-all active:scale-95"
+              className="px-4 py-2 bg-lime-50 text-lime-700 text-sm font-qs-semibold rounded border border-lime-200 hover:bg-lime-100 hover:border-lime-300 transition-all active:scale-95"
             >
               选择备份文件
             </button>

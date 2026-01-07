@@ -34,7 +34,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faMagnifyingGlass} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-bold text-text-main text-sm">
+              <h4 className="font-qs-semibold text-text-main text-sm">
                 域名批量搜索
               </h4>
               <p className="text-xs text-gray-400 mt-1">
@@ -52,7 +52,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faAt} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-bold text-text-main text-sm">
+              <h4 className="font-qs-semibold text-text-main text-sm">
                 名称所有者持仓查询
               </h4>
               <p className="text-xs text-gray-400 mt-1">
@@ -71,7 +71,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faEthereum} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-bold text-text-main text-sm">
+              <h4 className="font-qs-semibold text-text-main text-sm">
                 以太坊地址持仓查询
               </h4>
               <p className="text-xs text-gray-400 mt-1">
@@ -89,7 +89,9 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faGears} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-bold text-text-main text-sm">混合模式</h4>
+              <h4 className="font-qs-semibold text-text-main text-sm">
+                混合模式
+              </h4>
               <p className="text-xs text-gray-400 mt-1">
                 同时支持上述所有格式的混合输入。
               </p>
@@ -105,7 +107,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
       <div className="px-6 pb-6 pt-2">
         <button
           onClick={onClose}
-          className="w-full py-3 bg-link text-white text-sm font-qs-bold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
+          className="w-full py-3 bg-link text-white text-sm font-qs-semibold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
         >
           明白了
         </button>

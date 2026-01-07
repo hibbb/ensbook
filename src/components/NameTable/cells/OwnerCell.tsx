@@ -32,10 +32,10 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
         {/* 所有者地址 */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-bold">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
               Owner Address
             </span>
-            <span className="font-mono text-xs">
+            <span className="font-qs-medium text-xs">
               {record.owner.slice(0, 6)}...{record.owner.slice(-4)}
             </span>
           </div>
@@ -53,7 +53,7 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
         {record.ownerPrimaryName && (
           <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
             <div className="flex flex-col">
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-bold">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
                 Primary Name
               </span>
               <span className="font-qs-medium text-xs">

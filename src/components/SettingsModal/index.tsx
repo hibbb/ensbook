@@ -52,7 +52,7 @@ const SidebarItem = ({
     disabled={disabled}
     className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-qs-medium transition-colors duration-150 rounded-md ${
       active
-        ? "bg-gray-100 text-black font-qs-bold" // 激活态样式微调为黑色，更显沉稳
+        ? "bg-gray-100 text-black font-qs-semibold" // 激活态样式微调为黑色，更显沉稳
         : disabled
           ? "text-gray-300 cursor-not-allowed"
           : "text-gray-500 hover:bg-gray-50 hover:text-text-main"
@@ -65,7 +65,7 @@ const SidebarItem = ({
     </div>
     <span>{label}</span>
     {disabled && (
-      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-qs-bold">
+      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-qs-semibold">
         Soon
       </span>
     )}
@@ -101,7 +101,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         {/* 左侧侧边栏 */}
         <div className="w-56 bg-white border-r border-gray-100 flex flex-col shrink-0">
           <div className="p-6">
-            <h3 className="text-xl font-qs-bold text-text-main tracking-tight">
+            <h3 className="text-xl font-qs-semibold text-text-main tracking-tight">
               Settings
             </h3>
           </div>
@@ -161,7 +161,9 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         {/* 右侧内容区 */}
         <div className="flex-1 flex flex-col min-w-0 bg-white">
           <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100 shrink-0">
-            <h4 className="text-lg font-qs-bold text-gray-800">{getTitle()}</h4>
+            <h4 className="text-lg font-qs-semibold text-gray-800">
+              {getTitle()}
+            </h4>
             <button
               onClick={onClose}
               className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors outline-none focus:ring-2 focus:ring-gray-200"

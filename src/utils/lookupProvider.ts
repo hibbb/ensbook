@@ -3,43 +3,48 @@ import type { NameRecord } from "../types/ensNames";
 import { getContracts } from "../config/contracts";
 import * as ensUtils from "./ens";
 
+// 🚀 1. 静态引入所有图片资源
+// Vite 会自动将这些 import 解析为构建后的 URL 字符串
+import web3bioIcon from "../assets/lookups/web3bio-dark.svg";
+import etherscanIcon from "../assets/lookups/etherscan-dark.svg";
+import openseaIcon from "../assets/lookups/opensea-dark.svg";
+import envisionIcon from "../assets/lookups/vision-light.svg";
+import grailsIcon from "../assets/lookups/grails-light.png";
+import limoIcon from "../assets/lookups/limo-dark.svg";
+import dnsIcon from "../assets/lookups/dnssearch-dark.svg";
+
 /**
  * 外部链接项定义接口
- * 增加 chainId 参数支持，以实现动态地址解析
  */
 interface LookupItem {
   key: string;
   label: string;
+  icon: string; // 🚀 2. 新增 icon 字段
   getLink: (record: NameRecord, chainId?: number) => string;
   shouldShow: (record: NameRecord, chainId?: number) => boolean;
 }
 
-/**
- * 辅助函数：获取 TokenID 的十进制字符串
- */
 const getTokenId = (record: NameRecord): string => {
   const hex = record.wrapped ? record.namehash : record.labelhash;
   return BigInt(hex).toString();
 };
 
-/**
- * 🚀 声明式链接配置 (动态版)
- */
 export const LOOKUP_LINKS: LookupItem[] = [
   {
     key: "Web3bio",
-    label: "Web3.bio",
-    // 逻辑：仅在主网且域名已注册时显示
+    label: "Web3.bio: Your Web3 Profile",
+    icon: web3bioIcon, // 🚀 3. 绑定图片变量
     shouldShow: (r, cid) =>
       ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
     getLink: (r) => `https://web3.bio/${r.label}.eth`,
   },
   {
     key: "EtherScan",
-    label: "Etherscan",
+    label: "Etherscan: Ethereum Explorer",
+    icon: etherscanIcon,
     shouldShow: (r) => !ensUtils.isAvailable(r.status),
     getLink: (r, cid) => {
-      const addr = getContracts(cid); // 🚀 动态获取合约地址
+      const addr = getContracts(cid);
       const contract = r.wrapped ? addr.ENS_NAME_WRAPPER : addr.ETH_REGISTRAR;
       const baseUrl = ensUtils.isMainnet(cid)
         ? "https://etherscan.io"
@@ -49,8 +54,8 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "Opensea",
-    label: "OpenSea",
-    // 仅在主网显示
+    label: "OpenSea: NFT Marketplace",
+    icon: openseaIcon,
     shouldShow: (r, cid) =>
       ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
     getLink: (r, cid) => {
@@ -60,35 +65,36 @@ export const LOOKUP_LINKS: LookupItem[] = [
     },
   },
   {
+    key: "ENSVision",
+    label: "Vision: ENS Marketplace",
+    icon: envisionIcon,
+    shouldShow: (_, cid) => ensUtils.isMainnet(cid),
+    getLink: (r) => `https://ensvision.com/name/${r.label}.eth`,
+  },
+  {
     key: "Grails",
-    label: "Grails",
+    label: "Grails: ENS Marketplace",
+    icon: grailsIcon,
     shouldShow: (_, cid) => ensUtils.isMainnet(cid),
     getLink: (r) => `https://grails.app/${r.label}.eth`,
   },
   {
-    key: "CheckTool",
-    label: "Check Tool",
-    shouldShow: (r) => ensUtils.isRenewable(r.status),
-    getLink: (r) => `https://tools.ens.domains/check/${r.label}.eth`,
-  },
-  {
     key: "LinkETH",
-    label: "Limo",
+    label: "Limo: Link to Decentralized Websites",
+    icon: limoIcon,
     shouldShow: (r) => ensUtils.isActive(r.status),
     getLink: (r) => `https://${r.label}.eth.limo/`,
   },
   {
     key: "DNSRelated",
-    label: "DNS",
+    label: "Corresponding DNS",
+    icon: dnsIcon,
     shouldShow: () => true,
     getLink: (r) =>
       `https://instantdomainsearch.com/domain/extensions?q=${r.label}`,
   },
 ];
 
-/**
- * 核心功能：根据 Record 和当前链 ID 过滤链接
- */
 export const getAvailableLookups = (
   record: NameRecord,
   chainId?: number,

@@ -84,7 +84,7 @@ export const ActionCell = ({
         sideIcon: faBell,
         sideIconClass:
           "text-gray-300 hover:text-link transition-colors cursor-pointer",
-        sideTooltip: "设置防断供提醒",
+        sideTooltip: "设置续费提醒",
         sideAction: () => onReminder?.(record),
       };
     }
@@ -94,7 +94,7 @@ export const ActionCell = ({
       return {
         text: "继续",
         style:
-          "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-0.5 rounded-lg hover:bg-orange-100 font-qs-bold shadow-sm transition-all active:scale-95",
+          "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-0.5 rounded-lg hover:bg-orange-100 font-qs-semibold shadow-sm transition-all active:scale-95",
         disabled: false,
         action: () => onRegister?.(record),
         sideIcon: faClock,

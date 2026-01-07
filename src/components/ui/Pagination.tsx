@@ -55,7 +55,7 @@ export const Pagination = ({
   const btnClass =
     "w-8 h-8 flex items-center justify-center rounded-lg text-sm transition-colors outline-none focus:ring-2 focus:ring-link/20";
   const activeClass =
-    "bg-link text-white font-qs-bold shadow-md shadow-link/20";
+    "bg-link text-white font-qs-semibold shadow-md shadow-link/20";
   const inactiveClass = "text-gray-500 hover:bg-gray-100 hover:text-text-main";
   const disabledClass = "text-gray-300 cursor-not-allowed";
 

@@ -79,7 +79,9 @@ export const ProcessModal = ({
         </button>
 
         <div className="text-center">
-          <span className="text-3xl font-qs-bold text-text-main">{years}</span>
+          <span className="text-3xl font-qs-semibold text-text-main">
+            {years}
+          </span>
           <span className="ml-2 text-gray-400 font-qs-medium text-sm">年</span>
         </div>
 
@@ -94,13 +96,13 @@ export const ProcessModal = ({
       <div className="flex gap-3">
         <button
           onClick={onClose}
-          className="flex-1 py-3 rounded-lg font-qs-bold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
+          className="flex-1 py-3 rounded-lg font-qs-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
         >
           取消
         </button>
         <button
           onClick={handleConfirm}
-          className="flex-1 py-3 rounded-lg font-qs-bold text-sm bg-link text-white hover:bg-link-hover shadow-lg shadow-link/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+          className="flex-1 py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover shadow-lg shadow-link/20 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
           {type === "register" ? "开始注册" : "确认续费"}
         </button>
@@ -159,7 +161,9 @@ export const ProcessModal = ({
           )}
         </div>
 
-        <h3 className="text-lg font-qs-bold text-text-main mb-1">{message}</h3>
+        <h3 className="text-lg font-qs-semibold text-text-main mb-1">
+          {message}
+        </h3>
         <p className="text-xs text-gray-500 mb-6 max-w-[85%] mx-auto">
           {subMessage}
         </p>
@@ -187,7 +191,7 @@ export const ProcessModal = ({
       <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 text-3xl mx-auto mb-4 border border-green-100">
         <FontAwesomeIcon icon={faCheckCircle} />
       </div>
-      <h3 className="text-xl font-qs-bold text-text-main mb-2">
+      <h3 className="text-xl font-qs-semibold text-text-main mb-2">
         {type === "register" ? "注册成功！" : "续费成功！"}
       </h3>
       <p className="text-sm text-gray-500 mb-6 px-4">
@@ -195,7 +199,7 @@ export const ProcessModal = ({
       </p>
       <button
         onClick={onClose}
-        className="w-full py-3 rounded-lg font-qs-bold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
+        className="w-full py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
       >
         完成
       </button>
@@ -236,7 +240,7 @@ export const ProcessModal = ({
             </p>
             <button
               onClick={onClose}
-              className="text-link text-sm font-qs-bold hover:underline"
+              className="text-link text-sm font-qs-semibold hover:underline"
             >
               关闭并重试
             </button>

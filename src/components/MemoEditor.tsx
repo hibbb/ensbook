@@ -103,7 +103,9 @@ export const MemoEditor = ({ label, context }: MemoEditorProps) => {
 
       <PopoverContent align="start" side="bottom" className="w-64 p-3">
         <div className="mb-2 flex justify-between items-center">
-          <span className="text-xs font-qs-bold text-gray-400">编辑备注</span>
+          <span className="text-xs font-qs-semibold text-gray-400">
+            编辑备注
+          </span>
           <span
             className={`text-[10px] ${
               editValue.length >= MAX_MEMO_LENGTH

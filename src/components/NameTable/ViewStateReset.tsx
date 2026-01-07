@@ -36,7 +36,7 @@ export const ViewStateReset = ({
           icon={faFilterCircleXmark}
           className="text-white transition-colors"
         />
-        <span className="text-sm font-qs-bold pr-1">重置视图</span>
+        <span className="text-sm font-qs-semibold pr-1">重置视图</span>
       </button>
     </div>
   );

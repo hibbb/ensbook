@@ -95,7 +95,7 @@ export const ReminderModal = ({
 
         {/* 到期时间提示 */}
         <div className="bg-orange-50/50 rounded-lg p-3 border border-orange-100 text-center">
-          <span className="text-xs text-orange-600 uppercase font-qs-bold tracking-wider block mb-1">
+          <span className="text-xs text-orange-600 uppercase font-qs-semibold tracking-wider block mb-1">
             Expiration Date
           </span>
           <span className="text-orange-900 font-qs-semibold">
@@ -105,7 +105,7 @@ export const ReminderModal = ({
 
         {/* 提醒选项 */}
         <div>
-          <label className="text-xs font-qs-bold text-gray-400 uppercase tracking-wider mb-3 block">
+          <label className="text-xs font-qs-semibold text-gray-400 uppercase tracking-wider mb-3 block">
             Remind me before
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -138,7 +138,7 @@ export const ReminderModal = ({
         <button
           onClick={handleDownloadICS}
           disabled={selectedReminders.length === 0}
-          className="w-full py-3 bg-text-main/90 text-white rounded-lg font-qs-bold text-sm hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+          className="w-full py-3 bg-text-main/90 text-white rounded-lg font-qs-semibold text-sm hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
         >
           <FontAwesomeIcon icon={faDownload} />
           下载日历文件 (.ics)
@@ -147,7 +147,7 @@ export const ReminderModal = ({
         {/* 次要按钮：Google Calendar */}
         <button
           onClick={handleGoogleCalendar}
-          className="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-qs-bold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 flex items-center justify-center gap-2"
+          className="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-qs-semibold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
           <FontAwesomeIcon icon={faGoogle} className="text-red-500" />
           添加到 Google 日历

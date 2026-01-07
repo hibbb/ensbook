@@ -97,7 +97,7 @@ export const MyCollectionSettings = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* 🚀 优化 2: 扁平化、简洁的引导说明 */}
       <div className="text-sm text-text-main/80">
-        <h4 className="font-qs-bold text-base text-black mb-2">
+        <h4 className="font-qs-semibold text-base text-black mb-2">
           <FontAwesomeIcon icon={faFeatherPointed} className="mr-2" />
           自由定义你的 ENS 视界
         </h4>
@@ -125,7 +125,9 @@ export const MyCollectionSettings = () => {
       {/* 🚀 优化 1: 修复错位、更标准的开关按钮 UI */}
       <div className="flex items-center justify-between py-1">
         <div className="flex flex-col">
-          <span className="font-qs-bold text-sm text-black">设为默认首页</span>
+          <span className="font-qs-semibold text-sm text-black">
+            设为默认首页
+          </span>
           <span className="text-xs text-gray-400 mt-0.5">
             打开 ENSBook 时默认显示 Mine 页面
           </span>
@@ -182,7 +184,7 @@ export const MyCollectionSettings = () => {
         <button
           onClick={handleSave}
           disabled={isValidating}
-          className={`flex items-center gap-2 px-6 py-2 rounded-full font-qs-bold text-white transition-all shadow-md transform
+          className={`flex items-center gap-2 px-6 py-2 rounded-full font-qs-semibold text-white transition-all shadow-md transform
             ${
               isValidating
                 ? "bg-gray-400 cursor-not-allowed opacity-80"

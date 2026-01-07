@@ -34,7 +34,7 @@ export const HomeSearchSection = ({
       }`}
     >
       {!hasContent && (
-        <h1 className="text-4xl font-qs-bold text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
+        <h1 className="text-4xl font-qs-semibold text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
           <span className="text-link">Search</span> ENS
         </h1>
       )}
