@@ -137,7 +137,7 @@ export const NameCell = ({ record, context }: NameCellProps) => {
         </div>
 
         {/* 第三行：引导提示 */}
-        <div className="pt-2 mt-1 border-t border-white/10 text-center">
+        <div className="pt-2 pb-1 mt-1 border-t border-white/10 text-center">
           <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
             点击前往 ENS APP 查看
           </span>
@@ -194,9 +194,23 @@ export const NameCell = ({ record, context }: NameCellProps) => {
               <div className="p-4 flex flex-col gap-1 text-xs">
                 <div className="flex items-center justify-between py-1.5 border-b border-gray-50">
                   <span className="text-gray-500 font-qs-medium">Length:</span>
-                  <span className="font-mono text-gray-700 font-bold">
+                  <span className="font-qs-semibold text-gray-700">
                     {metadata.length}
                   </span>
+                </div>
+
+                {/* 🚀 2. 新增：Wrapped 状态行 */}
+                <div className="flex items-center justify-between py-1.5 border-b border-gray-50">
+                  <span className="text-gray-500 font-qs-medium">State:</span>
+                  {record.wrapped ? (
+                    <div className="flex items-center font-qs-semibold gap-2">
+                      <span className="text-sm text-link">{"["}</span>
+                      Wrapped
+                      <span className="text-sm text-link">{"]"}</span>
+                    </div>
+                  ) : (
+                    "Unwrapped"
+                  )}
                 </div>
 
                 <MetadataRow

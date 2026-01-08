@@ -2,7 +2,7 @@
 
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleUser, faCopy } from "@fortawesome/free-regular-svg-icons";
+import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
 
@@ -70,6 +70,17 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
             </button>
           </div>
         )}
+
+        {/* 正好是当前连接的钱包 */}
+        {isMe && (
+          <div className="flex items-center justify-center gap-2 border-t border-white/10 pt-2 pb-1">
+            <span className="text-sm text-link">~</span>
+            <span className="font-qs-semibold text-[11px]">
+              这是当前连接的钱包
+            </span>
+            <span className="text-sm text-link">~</span>
+          </div>
+        )}
       </div>
     );
   };
@@ -77,9 +88,8 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
   return (
     <div className="h-12 flex items-center">
       {record.owner ? (
-        <div
-          className={`flex items-center gap-2 text-sm ${isMe ? "" : "text-text-main"}`}
-        >
+        <div className="flex items-center gap-1.5 text-sm">
+          {isMe && <span className="text-sm text-link">{"~"}</span>}
           <Tooltip content={renderTooltipContent()}>
             <span
               className={`cursor-default ${record.ownerPrimaryName ? "" : "text-gray-400"}`}
@@ -88,14 +98,7 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
                 `${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
             </span>
           </Tooltip>
-          {isMe && (
-            // 🚀 新增：为所有者图标添加 Tooltip
-            <Tooltip content="这是我的名称">
-              <span className="flex h-2 w-2 relative text-gray-400">
-                <FontAwesomeIcon icon={faCircleUser} size="xs" />
-              </span>
-            </Tooltip>
-          )}
+          {isMe && <span className="text-sm text-link">{"~"}</span>}
         </div>
       ) : (
         <span className="text-gray-300 text-xs">—</span>
