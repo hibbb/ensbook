@@ -11,6 +11,7 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
+// ❌ 移除: import { ViewStateReset } ...
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -22,7 +23,7 @@ import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { isRenewable } from "../utils/ens";
-import { updateLabelLevel } from "../services/storage/userStore";
+import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; // ✅ 新增
 
 // Types
 import type { NameRecord } from "../types/ensNames";
@@ -67,9 +68,6 @@ export const Mine = () => {
 
   const isLoading = isResolving || isQuerying;
   const isError = isResolveError || isQueryError;
-
-  // 🗑️ 删除：const hasContent = (records?.length || 0) > 0;
-  // 该变量已不再被使用，直接移除即可
 
   const {
     processedRecords,
@@ -116,6 +114,13 @@ export const Mine = () => {
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
+  // ✅ 使用新 Hook
+  const updateLevel = useOptimisticLevelUpdate();
+
+  const handleLevelChange = (record: NameRecord, newLevel: number) => {
+    updateLevel(record, newLevel);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setPendingLabels(getAllPendingLabels());
@@ -137,21 +142,6 @@ export const Mine = () => {
       };
     }
   }, [regStatus, renewalStatus, queryClient]);
-
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    updateLabelLevel(record.label, newLevel);
-
-    // 修正：模糊匹配
-    queryClient.setQueriesData<NameRecord[]>(
-      { queryKey: ["name-records"] },
-      (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((r) =>
-          r.label === record.label ? { ...r, level: newLevel } : r,
-        );
-      },
-    );
-  };
 
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();

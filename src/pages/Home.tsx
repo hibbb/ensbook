@@ -21,6 +21,7 @@ import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; // ✅ 复用 Hook
 
 import {
   getHomeLabels,
@@ -28,7 +29,7 @@ import {
   bulkUpdateHomeItems,
   bulkRemoveHomeItems,
   clearHomeItems,
-  updateLabelLevel, // 🚀 新增引入
+  // ❌ 移除不再直接使用的 updateLabelLevel
 } from "../services/storage/userStore";
 
 import { getAllPendingLabels } from "../services/storage/registration";
@@ -87,7 +88,7 @@ export const Home = () => {
     nameCounts,
     isViewStateDirty,
     resetViewState,
-    levelCounts, // 🚀 解构新增的 levelCounts
+    levelCounts,
   } = useNameTableView(validRecords, address, "home");
 
   const {
@@ -122,21 +123,12 @@ export const Home = () => {
     }
   }, [hasContent, isViewStateDirty, resetViewState]);
 
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    // 1. 写入本地存储
-    updateLabelLevel(record.label, newLevel);
+  // ✅ 1. 正确调用 Hook
+  const updateLevel = useOptimisticLevelUpdate();
 
-    // 2. 🔥 修正：使用 setQueriesData 进行模糊匹配
-    // 这样无论 queryKey 后面跟着什么参数（比如域名列表），都能匹配到并更新
-    queryClient.setQueriesData<NameRecord[]>(
-      { queryKey: ["name-records"] },
-      (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((r) =>
-          r.label === record.label ? { ...r, level: newLevel } : r,
-        );
-      },
-    );
+  // ✅ 2. 简化处理函数（无需传入 QueryKey）
+  const handleLevelChange = (record: NameRecord, newLevel: number) => {
+    updateLevel(record, newLevel);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -353,7 +345,6 @@ export const Home = () => {
             statusCounts={statusCounts}
             actionCounts={actionCounts}
             nameCounts={nameCounts}
-            // 🚀 核心更新：传入新参数
             levelCounts={levelCounts}
             isViewStateDirty={isViewStateDirty}
             onResetViewState={resetViewState}

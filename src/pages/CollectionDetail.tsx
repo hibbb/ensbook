@@ -19,7 +19,7 @@ import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { updateLabelLevel } from "../services/storage/userStore"; // 🚀 新增引入
+import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; // ✅ 新增 Hook
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -51,7 +51,7 @@ export const CollectionDetail = () => {
     nameCounts,
     isViewStateDirty,
     resetViewState,
-    levelCounts, // 🚀 解构
+    levelCounts,
   } = useNameTableView(records, address, "collection", id);
 
   const {
@@ -81,6 +81,13 @@ export const CollectionDetail = () => {
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
+  // ✅ 使用新 Hook
+  const updateLevel = useOptimisticLevelUpdate();
+
+  const handleLevelChange = (record: NameRecord, newLevel: number) => {
+    updateLevel(record, newLevel);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setPendingLabels(getAllPendingLabels());
@@ -104,32 +111,6 @@ export const CollectionDetail = () => {
       };
     }
   }, [regStatus, renewalStatus, queryClient]);
-
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    updateLabelLevel(record.label, newLevel);
-
-    // 1. 更新集合缓存 (模糊匹配 collection-records)
-    queryClient.setQueriesData<NameRecord[]>(
-      { queryKey: ["collection-records"] },
-      (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((r) =>
-          r.label === record.label ? { ...r, level: newLevel } : r,
-        );
-      },
-    );
-
-    // 2. 同步更新通用缓存 (模糊匹配 name-records)
-    queryClient.setQueriesData<NameRecord[]>(
-      { queryKey: ["name-records"] },
-      (oldData) => {
-        if (!oldData) return [];
-        return oldData.map((r) =>
-          r.label === record.label ? { ...r, level: newLevel } : r,
-        );
-      },
-    );
-  };
 
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
@@ -214,14 +195,11 @@ export const CollectionDetail = () => {
         statusCounts={statusCounts}
         actionCounts={actionCounts}
         nameCounts={nameCounts}
-        // 🚀 核心更新
         levelCounts={levelCounts}
         isViewStateDirty={isViewStateDirty}
         onResetViewState={resetViewState}
         onLevelChange={handleLevelChange}
       />
-
-      {/* ❌ 移除 ViewStateReset */}
 
       {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
@@ -235,7 +213,11 @@ export const CollectionDetail = () => {
             <button
               onClick={handleBatchRenewalTrigger}
               disabled={isRenewalBusy || !isConnected}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-qs-semibold transition-all shadow-sm ${isRenewalBusy || !isConnected ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"}`}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-qs-semibold transition-all shadow-sm ${
+                isRenewalBusy || !isConnected
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-link text-white hover:bg-link-hover hover:shadow-md active:scale-95"
+              }`}
             >
               <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
               批量续费

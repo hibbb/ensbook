@@ -94,7 +94,6 @@ export const useNameTableView = (
       filterConfig.wrappedType !== DEFAULT_FILTER.wrappedType ||
       (filterConfig.statusList?.length || 0) > 0 ||
       (filterConfig.lengthList?.length || 0) > 0 ||
-      // 🚀 补回这一行：检查等级筛选是否处于活动状态
       (filterConfig.levelList?.length || 0) > 0;
 
     return isSortDirty || isFilterDirty;
