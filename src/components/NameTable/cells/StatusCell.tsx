@@ -121,6 +121,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
   const premiumEthPrice = usePremiumEthPrice(
     record.status,
     record.releaseTime || 0,
+    now,
   );
 
   // 🚀 核心修改：将内容渲染逻辑拆分，根据状态返回不同的 UI 结构
