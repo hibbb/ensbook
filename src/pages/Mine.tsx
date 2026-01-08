@@ -11,7 +11,6 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
-import { ViewStateReset } from "../components/NameTable/ViewStateReset";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -19,16 +18,14 @@ import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-// 🚀 1. 移除 getMyCollectionSource，改为引入 Hook
 import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { isRenewable } from "../utils/ens";
+import { updateLabelLevel } from "../services/storage/userStore";
 
 // Types
 import type { NameRecord } from "../types/ensNames";
-
-// 🚀 2. 删除原有的 useMyCollectionSource 内部定义代码块 (原 30-44 行)
 
 // --- 🟢 内部 Hook: 解析 Source 为 Labels (带缓存) ---
 const useMyCollectionLabels = (source: string) => {
@@ -40,7 +37,7 @@ const useMyCollectionLabels = (source: string) => {
       return await fetchLabels(classified);
     },
     enabled: !!source,
-    staleTime: 1000 * 60 * 10, // 10分钟缓存
+    staleTime: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
   });
 };
@@ -49,21 +46,17 @@ export const Mine = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
-  // 1. 获取源字符串 (使用公共 Hook，支持跨页同步)
   const source = useMyCollectionSource();
   const hasSource = !!source && source.length > 0;
 
-  // 2. 动态标题
   useDocumentTitle("Mine");
 
-  // 3. 第一阶段：解析 (Resolving)
   const {
     data: labels,
     isLoading: isResolving,
     isError: isResolveError,
   } = useMyCollectionLabels(source);
 
-  // 4. 第二阶段：查询链上数据 (Querying)
   const labelsToQuery = isResolving ? [] : labels || [];
 
   const {
@@ -75,10 +68,9 @@ export const Mine = () => {
   const isLoading = isResolving || isQuerying;
   const isError = isResolveError || isQueryError;
 
-  // 辅助判断：是否有实际内容显示
-  const hasContent = (records?.length || 0) > 0;
+  // 🗑️ 删除：const hasContent = (records?.length || 0) > 0;
+  // 该变量已不再被使用，直接移除即可
 
-  // 5. 视图逻辑
   const {
     processedRecords,
     sortConfig,
@@ -94,6 +86,7 @@ export const Mine = () => {
     nameCounts,
     isViewStateDirty,
     resetViewState,
+    levelCounts,
   } = useNameTableView(records, address, "collection", "mine");
 
   const {
@@ -123,7 +116,6 @@ export const Mine = () => {
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
-  // 同步 Pending 状态
   useEffect(() => {
     const timer = setTimeout(() => {
       setPendingLabels(getAllPendingLabels());
@@ -131,7 +123,6 @@ export const Mine = () => {
     return () => clearTimeout(timer);
   }, [regStatus]);
 
-  // 交易成功后刷新
   useEffect(() => {
     if (regStatus === "success" || renewalStatus === "success") {
       const timer = setTimeout(() => {
@@ -146,6 +137,21 @@ export const Mine = () => {
       };
     }
   }, [regStatus, renewalStatus, queryClient]);
+
+  const handleLevelChange = (record: NameRecord, newLevel: number) => {
+    updateLabelLevel(record.label, newLevel);
+
+    // 修正：模糊匹配
+    queryClient.setQueriesData<NameRecord[]>(
+      { queryKey: ["name-records"] },
+      (oldData) => {
+        if (!oldData) return [];
+        return oldData.map((r) =>
+          r.label === record.label ? { ...r, level: newLevel } : r,
+        );
+      },
+    );
+  };
 
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
@@ -274,12 +280,10 @@ export const Mine = () => {
         statusCounts={statusCounts}
         actionCounts={actionCounts}
         nameCounts={nameCounts}
-      />
-
-      <ViewStateReset
-        isVisible={hasContent && isViewStateDirty}
-        onReset={resetViewState}
-        hasSelection={selectedLabels.size > 0}
+        levelCounts={levelCounts}
+        isViewStateDirty={isViewStateDirty}
+        onResetViewState={resetViewState}
+        onLevelChange={handleLevelChange}
       />
 
       {selectionCount > 0 && (

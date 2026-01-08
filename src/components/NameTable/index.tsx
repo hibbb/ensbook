@@ -5,8 +5,10 @@ import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import { SkeletonRow } from "./SkeletonRow";
 import { Pagination } from "../ui/Pagination";
-import { isRenewable } from "../../utils/ens";
+// 🚀 1. 重新引入 ViewStateReset
+import { ViewStateReset } from "./ViewStateReset";
 import { usePrimaryNames } from "../../hooks/usePrimaryNames";
+import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 import type {
   SortField,
@@ -16,7 +18,6 @@ import type {
 } from "./types";
 
 interface NameTableProps {
-  // 🚀 新增 prop：上下文
   context: "home" | "collection";
 
   records: NameRecord[] | undefined | null;
@@ -50,13 +51,16 @@ interface NameTableProps {
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
+
+  levelCounts?: Record<number, number>;
+  // 🚀 这些是从页面透传进来的关键参数
+  isViewStateDirty?: boolean;
+  onResetViewState?: () => void;
+  onLevelChange?: (record: NameRecord, newLevel: number) => void;
 }
 
 export const NameTable = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-
-  // ... (分页和时间逻辑保持不变) ...
-  // 分页状态
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 50;
 
@@ -67,10 +71,8 @@ export const NameTable = (props: NameTableProps) => {
     return () => clearInterval(timer);
   }, []);
 
-  // 缓存全量数据引用
   const safeRecords = useMemo(() => props.records || [], [props.records]);
 
-  // 状态镜像重置页码
   const [prevFilterConfig, setPrevFilterConfig] = useState(props.filterConfig);
   const [prevRecordsLen, setPrevRecordsLen] = useState(safeRecords.length);
 
@@ -83,16 +85,13 @@ export const NameTable = (props: NameTableProps) => {
     setCurrentPage(1);
   }
 
-  // 1. 切片
   const paginatedBasicRecords = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
 
-  // 2. 解析
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
-  // 3. 智能骨架屏
   const isDataStale =
     displayRecords &&
     displayRecords.length > 0 &&
@@ -105,7 +104,6 @@ export const NameTable = (props: NameTableProps) => {
   const showSkeleton = props.isLoading || isResolvingPage;
   const skeletonCount = props.skeletonRows || 8;
 
-  // 统计逻辑
   const myCount = safeRecords.filter(
     (r) =>
       props.currentAddress &&
@@ -154,6 +152,7 @@ export const NameTable = (props: NameTableProps) => {
             nameCounts={props.nameCounts}
             myCount={myCount}
             ownershipCounts={ownershipCounts}
+            levelCounts={props.levelCounts}
           />
           <tbody>
             {showSkeleton ? (
@@ -167,7 +166,6 @@ export const NameTable = (props: NameTableProps) => {
                   record={r}
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
-                  // 🚀 透传 context 给 TableRow
                   context={props.context}
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
@@ -179,6 +177,7 @@ export const NameTable = (props: NameTableProps) => {
                   onRenew={props.onRenew}
                   onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
+                  onLevelChange={props.onLevelChange}
                 />
               ))
             ) : (
@@ -203,6 +202,15 @@ export const NameTable = (props: NameTableProps) => {
           onPageChange={setCurrentPage}
         />
       )}
+
+      {/* 🚀 2. 补回 ViewStateReset 组件 */}
+      <ViewStateReset
+        isVisible={!!props.isViewStateDirty}
+        onReset={props.onResetViewState || (() => {})}
+        hasSelection={!!(props.selectedLabels && props.selectedLabels.size > 0)}
+        totalCount={props.totalRecordsCount ?? safeRecords.length}
+        filteredCount={safeRecords.length}
+      />
     </div>
   );
 };

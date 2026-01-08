@@ -1,24 +1,28 @@
 // src/components/NameTable/FilterDropdown.tsx
+
 import { useState, useRef, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
-import { Tooltip } from "../ui/Tooltip"; // 🚀 引入 Tooltip
+import { Tooltip } from "../ui/Tooltip";
 
 interface FilterDropdownProps {
   isActive: boolean;
   children: ReactNode;
   menuWidth?: string;
-  title?: string; // 🚀 新增 title 属性
-  disabled?: boolean; // 🚀 新增
+  title?: string;
+  disabled?: boolean;
+  // 🚀 新增: 支持对齐方式配置
+  align?: "start" | "end";
 }
 
 export const FilterDropdown = ({
   isActive,
   children,
   menuWidth = "w-48",
-  title = "筛选", // 🚀 默认值
-  disabled, // 🚀 解构
+  title = "筛选",
+  disabled,
+  align = "end", // 🚀 默认为 end (右对齐，保持原有行为)
 }: FilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,9 +57,20 @@ export const FilterDropdown = ({
     if (disabled) return;
     if (!isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
+
+      // 🚀 核心修改: 根据 align 计算 left 位置
+      let left = 0;
+      if (align === "end") {
+        // 右对齐：基准点设在按钮右侧 (配合 translateX(-100%))
+        left = rect.right;
+      } else {
+        // 左对齐：基准点设在按钮左侧
+        left = rect.left;
+      }
+
       setPosition({
         top: rect.bottom + 8,
-        left: rect.right,
+        left: left,
       });
     }
     setIsOpen(!isOpen);
@@ -63,15 +78,14 @@ export const FilterDropdown = ({
 
   return (
     <div className="relative inline-block" ref={containerRef}>
-      {/* 🚀 使用 Tooltip 包裹按钮 */}
       <Tooltip content={title}>
         <button
           type="button"
           onClick={toggleOpen}
-          disabled={disabled} // 🚀 绑定原生 disabled
+          disabled={disabled}
           className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-150 ${
             disabled
-              ? "text-gray-300 cursor-not-allowed" // 禁用样式
+              ? "text-gray-300 cursor-not-allowed"
               : isActive || isOpen
                 ? "bg-link text-white"
                 : "text-link hover:bg-gray-100"
@@ -88,7 +102,8 @@ export const FilterDropdown = ({
             style={{
               top: position.top,
               left: position.left,
-              transform: "translateX(-100%)",
+              // 🚀 核心修改: 只有 end (右对齐) 时才需要向左平移自身宽度
+              transform: align === "end" ? "translateX(-100%)" : "none",
             }}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={() => setIsOpen(false)}

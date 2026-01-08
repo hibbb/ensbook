@@ -311,3 +311,51 @@ export const importUserData = (
 
   saveFullUserData(mergedData);
 };
+
+/**
+ * 🚀 更新域名的等级 (Level)
+ * 这是一个“全局”更新操作：为了确保用户体验的一致性，
+ * 无论用户当前是在 Home 还是 Collection 视图操作，
+ * 我们都会尝试同步更新两个存储区中的元数据。
+ */
+export const updateLabelLevel = (label: string, level: number) => {
+  const data = getFullUserData();
+  const now = Date.now();
+  let hasChanges = false;
+
+  // 1. 如果该域名在 Home (关注列表) 中，更新它
+  if (data.home.items[label]) {
+    data.home.items[label] = {
+      ...data.home.items[label],
+      level,
+      updatedAt: now,
+    };
+    hasChanges = true;
+  }
+
+  // 2. 处理 Collections (元数据缓存) 存储
+  // 逻辑：为了确保跨视图一致性 (如在 Collection 视图能看到 Home 标记的颜色)，
+  // 我们总是将 Level 信息写入 collections 存储，除非它已经与 Home 数据完全一致且不需要冗余（简单起见，这里选择冗余存储以保证一致性）。
+  const existingCollectionItem = data.collections.items[label];
+
+  if (existingCollectionItem) {
+    // 如果已有记录，直接更新
+    data.collections.items[label] = {
+      ...existingCollectionItem,
+      level,
+      updatedAt: now,
+    };
+    hasChanges = true;
+  } else {
+    // 如果 Collection 中没有记录，我们需要判断是否要新建：
+    // A. 如果 Home 里也没有 -> 说明这是一个纯新的操作 (比如在搜索页或集合页标记)，必须新建。
+    // B. 如果 Home 里有 -> 为了让 Collection 视图也能读取到 (因为读取是隔离的)，我们也需要在 Collection 中新建副本。
+    // 结论：只要 label 涉及 level 变更，我们就确保它在 collections 存储中有一份拷贝。
+    data.collections.items[label] = createMeta({ level });
+    hasChanges = true;
+  }
+
+  if (hasChanges) {
+    saveFullUserData(data);
+  }
+};

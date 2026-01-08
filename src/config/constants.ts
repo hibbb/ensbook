@@ -3,8 +3,8 @@
  */
 
 // 🚀 定义默认时长常量（1年 = 31536000秒）
-export const DEFAULT_DURATION_SECONDS = 31536000n; // 1年
-export const SECONDS_PER_YEAR = 31536000n; // 365 * 24 * 60 * 60
+export const DEFAULT_DURATION_SECONDS = 365 * 24 * 60 * 60; // 1年
+export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60; // 365 * 24 * 60 * 60
 
 // ENS 协议相关的常量
 export const GRACE_PERIOD_DURATION = 90 * 24 * 60 * 60;

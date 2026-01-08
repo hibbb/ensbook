@@ -13,7 +13,6 @@ import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
 import { HomeFloatingBar } from "./Home/HomeFloatingBar";
-import { ViewStateReset } from "../components/NameTable/ViewStateReset";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -29,6 +28,7 @@ import {
   bulkUpdateHomeItems,
   bulkRemoveHomeItems,
   clearHomeItems,
+  updateLabelLevel, // 🚀 新增引入
 } from "../services/storage/userStore";
 
 import { getAllPendingLabels } from "../services/storage/registration";
@@ -41,7 +41,6 @@ export const Home = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
-  // 🚀 动态设置标题
   useDocumentTitle("Home");
 
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
@@ -73,7 +72,6 @@ export const Home = () => {
     return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
-  // 🚀 启用视图状态持久化
   const {
     processedRecords,
     sortConfig,
@@ -89,6 +87,7 @@ export const Home = () => {
     nameCounts,
     isViewStateDirty,
     resetViewState,
+    levelCounts, // 🚀 解构新增的 levelCounts
   } = useNameTableView(validRecords, address, "home");
 
   const {
@@ -117,13 +116,28 @@ export const Home = () => {
 
   const hasContent = resolvedLabels.length > 0;
 
-  // 🚀 UX 优化：当列表清空时（无论是批量删除还是逐个删除），自动重置视图状态
-  // 避免 "隐形筛选" 问题：列表变空后，筛选器自动归位，确保下次添加数据时立即可见
   useEffect(() => {
     if (!hasContent && isViewStateDirty) {
       resetViewState();
     }
   }, [hasContent, isViewStateDirty, resetViewState]);
+
+  const handleLevelChange = (record: NameRecord, newLevel: number) => {
+    // 1. 写入本地存储
+    updateLabelLevel(record.label, newLevel);
+
+    // 2. 🔥 修正：使用 setQueriesData 进行模糊匹配
+    // 这样无论 queryKey 后面跟着什么参数（比如域名列表），都能匹配到并更新
+    queryClient.setQueriesData<NameRecord[]>(
+      { queryKey: ["name-records"] },
+      (oldData) => {
+        if (!oldData) return [];
+        return oldData.map((r) =>
+          r.label === record.label ? { ...r, level: newLevel } : r,
+        );
+      },
+    );
+  };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -173,12 +187,8 @@ export const Home = () => {
 
     if (type === "all") {
       if (window.confirm("确定要清空所有历史记录吗？")) {
-        // 1. 清空存储中的数据
         clearHomeItems();
-        // 2. 清空当前页面的列表状态
-        // 注意：这将导致 hasContent 变为 false，从而触发上方的 useEffect 自动重置视图状态
         setResolvedLabels([]);
-        // 3. 清空勾选状态
         clearSelection();
       }
       return;
@@ -343,16 +353,16 @@ export const Home = () => {
             statusCounts={statusCounts}
             actionCounts={actionCounts}
             nameCounts={nameCounts}
+            // 🚀 核心更新：传入新参数
+            levelCounts={levelCounts}
+            isViewStateDirty={isViewStateDirty}
+            onResetViewState={resetViewState}
+            onLevelChange={handleLevelChange}
           />
         </div>
       )}
 
-      {/* 视图重置按钮：仅在有内容且视图被修改时显示 */}
-      <ViewStateReset
-        isVisible={hasContent && isViewStateDirty}
-        onReset={resetViewState}
-        hasSelection={selectedLabels.size > 0}
-      />
+      {/* ❌ 移除 ViewStateReset */}
 
       <HomeFloatingBar
         selectedCount={selectedLabels.size}

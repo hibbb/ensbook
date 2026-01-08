@@ -33,11 +33,12 @@ interface TableHeaderProps {
     lengthCounts: Record<number, number>;
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
-    // 🚀 新增字段
     memosCount?: number;
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
+  // 🚀 1. 新增参数
+  levelCounts?: Record<number, number>;
 }
 
 export const TableHeader = ({
@@ -65,13 +66,14 @@ export const TableHeader = ({
   },
   myCount = 0,
   ownershipCounts = { mine: 0, others: 0 },
+  // 🚀 2. 接收参数
+  levelCounts = {},
 }: TableHeaderProps) => {
   const headerStyle = {
     "--header-offset":
       typeof topOffset === "number" ? `${topOffset}px` : topOffset,
   } as React.CSSProperties;
 
-  // 🚀 核心逻辑：当总数 <= 1 时，禁用所有控制功能
   const isControlsDisabled = totalCount <= 1;
 
   return (
@@ -81,7 +83,12 @@ export const TableHeader = ({
     >
       <tr className="text-left">
         <th className="w-14 text-center">
-          <IndexHeader totalCount={totalCount} filteredCount={filteredCount} />
+          {/* 🚀 3. 更新 IndexHeader 的调用方式 */}
+          <IndexHeader
+            filterConfig={filterConfig}
+            onFilterChange={onFilterChange}
+            levelCounts={levelCounts}
+          />
         </th>
 
         <th>
@@ -91,10 +98,11 @@ export const TableHeader = ({
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
             nameCounts={nameCounts}
-            disabled={isControlsDisabled} // 🚀 传参
+            disabled={isControlsDisabled}
           />
         </th>
 
+        {/* ... 其他 Header 保持不变 ... */}
         <th>
           <StatusHeader
             sortConfig={sortConfig}
@@ -102,7 +110,7 @@ export const TableHeader = ({
             onSort={onSort}
             onFilterChange={onFilterChange}
             statusCounts={statusCounts}
-            disabled={isControlsDisabled} // 🚀 传参
+            disabled={isControlsDisabled}
           />
         </th>
 
@@ -115,7 +123,7 @@ export const TableHeader = ({
             onFilterChange={onFilterChange}
             myCount={myCount}
             listCount={filteredCount}
-            disabled={isControlsDisabled} // 🚀 传参
+            disabled={isControlsDisabled}
           />
         </th>
 
@@ -128,7 +136,7 @@ export const TableHeader = ({
             hasRenewable={hasRenewable}
             onToggleSelectAll={onToggleSelectAll}
             actionCounts={actionCounts}
-            disabled={isControlsDisabled} // 🚀 传参
+            disabled={isControlsDisabled}
           />
         </th>
 

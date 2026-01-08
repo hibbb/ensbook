@@ -12,7 +12,6 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
-import { ViewStateReset } from "../components/NameTable/ViewStateReset";
 
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
@@ -20,6 +19,7 @@ import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { updateLabelLevel } from "../services/storage/userStore"; // 🚀 新增引入
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -32,19 +32,10 @@ export const CollectionDetail = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
-  // 🚀 2. 动态设置标题
-  // 当 collection 变化时，标题自动更新为 "ENSBook - 999 Club" 样式
   useDocumentTitle(collection?.displayName);
 
-  // 1. 数据获取
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
 
-  // 🚀 定义 hasContent (辅助判断)
-  // 注意：这里判断的是原始数据是否有内容，而不是过滤后的 processedRecords
-  const hasContent = (records?.length || 0) > 0;
-
-  // 🚀 核心修改：传递 context="collection" 和 collectionId={id}
-  // 这样每个集合的筛选状态都会被独立保存
   const {
     processedRecords,
     sortConfig,
@@ -58,9 +49,9 @@ export const CollectionDetail = () => {
     statusCounts,
     actionCounts,
     nameCounts,
-    // 🚀 解构
     isViewStateDirty,
     resetViewState,
+    levelCounts, // 🚀 解构
   } = useNameTableView(records, address, "collection", id);
 
   const {
@@ -113,6 +104,32 @@ export const CollectionDetail = () => {
       };
     }
   }, [regStatus, renewalStatus, queryClient]);
+
+  const handleLevelChange = (record: NameRecord, newLevel: number) => {
+    updateLabelLevel(record.label, newLevel);
+
+    // 1. 更新集合缓存 (模糊匹配 collection-records)
+    queryClient.setQueriesData<NameRecord[]>(
+      { queryKey: ["collection-records"] },
+      (oldData) => {
+        if (!oldData) return [];
+        return oldData.map((r) =>
+          r.label === record.label ? { ...r, level: newLevel } : r,
+        );
+      },
+    );
+
+    // 2. 同步更新通用缓存 (模糊匹配 name-records)
+    queryClient.setQueriesData<NameRecord[]>(
+      { queryKey: ["name-records"] },
+      (oldData) => {
+        if (!oldData) return [];
+        return oldData.map((r) =>
+          r.label === record.label ? { ...r, level: newLevel } : r,
+        );
+      },
+    );
+  };
 
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
@@ -197,15 +214,14 @@ export const CollectionDetail = () => {
         statusCounts={statusCounts}
         actionCounts={actionCounts}
         nameCounts={nameCounts}
+        // 🚀 核心更新
+        levelCounts={levelCounts}
+        isViewStateDirty={isViewStateDirty}
+        onResetViewState={resetViewState}
+        onLevelChange={handleLevelChange}
       />
 
-      {/* 🚀 修复：增加 hasContent 判断 */}
-      {/* 避免在 Loading 状态或集合本身为空时显示重置按钮 */}
-      <ViewStateReset
-        isVisible={hasContent && isViewStateDirty}
-        onReset={resetViewState}
-        hasSelection={selectedLabels.size > 0}
-      />
+      {/* ❌ 移除 ViewStateReset */}
 
       {selectionCount > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">

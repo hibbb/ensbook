@@ -2,14 +2,16 @@
 
 export type DeleteType = "all" | "status" | "length" | "wrapped" | "owner";
 
-// 🚀 新增 "registered" 排序字段
 export type SortField =
   | "label"
   | "length"
   | "status"
   | "owner"
   | "registered"
+  // 🚀 新增: 支持按等级排序
+  | "level"
   | null;
+
 export type SortDirection = "asc" | "desc" | null;
 
 export interface DeleteCriteria {
@@ -24,12 +26,13 @@ export interface SortConfig {
 
 export interface FilterConfig {
   onlyMe: boolean;
-  // 🚀 新增 "仅显示有备注" 筛选配置
   onlyWithMemos: boolean;
   statusList: string[];
   actionType: "all" | "register" | "renew";
   lengthList: number[];
   wrappedType: "all" | "wrapped" | "unwrapped";
+  // 🚀 新增: 等级筛选列表 (存储选中的等级 0-3)
+  levelList: number[];
 }
 
 export const STATUS_OPTIONS = [
@@ -40,3 +43,11 @@ export const STATUS_OPTIONS = [
   "Released",
   "Unknown",
 ] as const;
+
+// 🚀 新增: Level 选项定义，方便复用
+export const LEVEL_OPTIONS = [
+  { value: 0, label: "Default", color: "bg-gray-100 text-gray-500" },
+  { value: 1, label: "Blue", color: "bg-blue-50 text-blue-600" },
+  { value: 2, label: "Yellow", color: "bg-yellow-50 text-yellow-600" },
+  { value: 3, label: "Red", color: "bg-red-50 text-red-600" },
+];

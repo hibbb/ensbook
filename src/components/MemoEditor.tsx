@@ -10,7 +10,6 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-// 🚀 核心修改：引入新的存储服务
 import {
   getItemByContext,
   updateHomeItem,
@@ -18,19 +17,16 @@ import {
 } from "../services/storage/userStore";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { Tooltip } from "./ui/Tooltip";
+import type { NameRecord } from "../types/ensNames"; // 🚀 引入类型以便 TS 推断
 
-// 简单的长度常量 (或者可以从 userStore 导出)
 const MAX_MEMO_LENGTH = 200;
 
 interface MemoEditorProps {
   label: string;
-  // 🚀 新增 prop：明确当前是在哪个页面编辑
   context: "home" | "collection";
 }
 
 export const MemoEditor = ({ label, context }: MemoEditorProps) => {
-  // 🚀 使用 Lazy Initialization 读取对应 context 的数据
-  // 这样保证初始值是准确的 (Home 读 Home 的，Collection 读 Collection 的)
   const [memo, setLocalMemo] = useState(() => {
     const meta = getItemByContext(context, label);
     return meta?.memo || "";
@@ -40,7 +36,6 @@ export const MemoEditor = ({ label, context }: MemoEditorProps) => {
   const [editValue, setEditValue] = useState("");
 
   const queryClient = useQueryClient();
-
   const hasMemo = !!memo;
 
   const handleOpenChange = (open: boolean) => {
@@ -52,20 +47,44 @@ export const MemoEditor = ({ label, context }: MemoEditorProps) => {
 
   const handleSave = () => {
     try {
-      // 🚀 根据上下文调用不同的更新函数
+      const newValue = editValue.trim();
+
+      // 🚀 核心优化：纯本地更新，零网络请求
       if (context === "home") {
-        updateHomeItem(label, { memo: editValue });
-        // 仅刷新 Home 列表
-        queryClient.invalidateQueries({ queryKey: ["name-records"] });
+        // 1. 写存储
+        updateHomeItem(label, { memo: newValue });
+
+        // 2. 写缓存 (Home)
+        queryClient.setQueryData<NameRecord[]>(["name-records"], (old) => {
+          if (!old) return [];
+          return old.map((r) =>
+            r.label === label ? { ...r, memo: newValue } : r,
+          );
+        });
       } else {
-        updateCollectionItem(label, { memo: editValue });
-        // 仅刷新集合列表
-        queryClient.invalidateQueries({ queryKey: ["collection-records"] });
+        // 1. 写存储
+        updateCollectionItem(label, { memo: newValue });
+
+        // 2. 写缓存 (Collection)
+        // 使用 setQueriesData 模糊匹配所有集合查询 (因为我们不知道具体 ID)
+        // 这会更新 ["collection-records", "999"] 等所有缓存
+        queryClient.setQueriesData<NameRecord[]>(
+          { queryKey: ["collection-records"] },
+          (old) => {
+            if (!old) return [];
+            return old.map((r) =>
+              r.label === label ? { ...r, memo: newValue } : r,
+            );
+          },
+        );
       }
 
-      setLocalMemo(editValue.trim());
+      // ❌ 彻底移除 invalidateQueries，斩断网络请求
+      // queryClient.invalidateQueries(...)
+
+      setLocalMemo(newValue);
       setIsOpen(false);
-      toast.success(editValue.trim() ? "备注已更新" : "备注已删除");
+      toast.success(newValue ? "备注已更新" : "备注已删除");
     } catch (e) {
       console.error(e);
       toast.error("保存失败：本地存储空间已满");

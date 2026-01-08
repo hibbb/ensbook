@@ -10,11 +10,11 @@ import { OwnerCell } from "./cells/OwnerCell";
 import { LookupsCell } from "./cells/LookupsCell";
 import { ActionCell } from "./cells/ActionCell";
 import { Tooltip } from "../ui/Tooltip";
+// 🚀 1. 引入新组件
+import { IndexCell } from "./cells/IndexCell";
 
 interface TableRowProps {
-  // 🚀 新增 prop
   context: "home" | "collection";
-
   record: NameRecord;
   index: number;
   now: number;
@@ -29,10 +29,12 @@ interface TableRowProps {
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
   isPending?: boolean;
+  // 🚀 2. 新增回调定义
+  onLevelChange?: (record: NameRecord, newLevel: number) => void;
 }
 
 export const TableRow = ({
-  context, // 🚀 解构
+  context,
   record,
   index,
   now,
@@ -47,17 +49,20 @@ export const TableRow = ({
   onRenew,
   onReminder,
   isPending = false,
+  onLevelChange, // 🚀 解构
 }: TableRowProps) => {
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-yellow-50 bg-table-row">
       <td className="w-14 text-center">
-        <div className="h-12 flex items-center justify-center">
-          <span className="text-xs text-gray-400">{index + 1}</span>
-        </div>
+        {/* 🚀 3. 替换旧的 span，使用 IndexCell */}
+        <IndexCell
+          index={index}
+          level={record.level || 0}
+          onLevelChange={(newLevel) => onLevelChange?.(record, newLevel)}
+        />
       </td>
 
       <td>
-        {/* 🚀 透传 context 给 NameCell (用于 MemoEditor) */}
         <NameCell record={record} context={context} />
       </td>
 
