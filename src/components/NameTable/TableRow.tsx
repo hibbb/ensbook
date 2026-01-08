@@ -14,7 +14,6 @@ import { Tooltip } from "../ui/Tooltip";
 import { IndexCell } from "./cells/IndexCell";
 
 interface TableRowProps {
-  context: "home" | "collection";
   record: NameRecord;
   index: number;
   now: number;
@@ -34,7 +33,6 @@ interface TableRowProps {
 }
 
 export const TableRow = ({
-  context,
   record,
   index,
   now,
@@ -63,7 +61,7 @@ export const TableRow = ({
       </td>
 
       <td>
-        <NameCell record={record} context={context} />
+        <NameCell record={record} />
       </td>
 
       <td>

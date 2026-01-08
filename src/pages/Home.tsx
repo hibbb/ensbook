@@ -25,10 +25,10 @@ import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; //
 
 import {
   getHomeLabels,
-  removeHomeItem,
-  bulkUpdateHomeItems,
-  bulkRemoveHomeItems,
-  clearHomeItems,
+  bulkAddToHome,
+  removeFromHome,
+  bulkRemoveFromHome,
+  clearHomeList,
   // ❌ 移除不再直接使用的 updateLabelLevel
 } from "../services/storage/userStore";
 
@@ -147,7 +147,7 @@ export const Home = () => {
         if (newUniqueLabels.length === 0) {
           toast("所有域名已存在列表中", { icon: "👌" });
         } else {
-          bulkUpdateHomeItems(newUniqueLabels);
+          bulkAddToHome(newUniqueLabels);
           setResolvedLabels(getHomeLabels());
           toast.success(`成功添加 ${newUniqueLabels.length} 个域名`);
           setInputValue("");
@@ -164,7 +164,7 @@ export const Home = () => {
   };
 
   const handleDelete = (record: NameRecord) => {
-    removeHomeItem(record.label);
+    removeFromHome(record.label);
     setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
     if (selectedLabels.has(record.label)) {
       toggleSelection(record.label);
@@ -179,7 +179,7 @@ export const Home = () => {
 
     if (type === "all") {
       if (window.confirm("确定要清空所有历史记录吗？")) {
-        clearHomeItems();
+        clearHomeList();
         setResolvedLabels([]);
         clearSelection();
       }
@@ -232,7 +232,7 @@ export const Home = () => {
 
     if (labelsToDelete.size === 0) return;
 
-    bulkRemoveHomeItems(Array.from(labelsToDelete));
+    bulkRemoveFromHome(Array.from(labelsToDelete));
     setResolvedLabels((prev) =>
       prev.filter((label) => !labelsToDelete.has(label)),
     );
@@ -320,7 +320,6 @@ export const Home = () => {
       {hasContent && (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
           <NameTable
-            context="home"
             records={processedRecords}
             isLoading={showSkeleton}
             currentAddress={address}

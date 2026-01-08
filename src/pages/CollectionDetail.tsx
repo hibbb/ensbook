@@ -174,7 +174,6 @@ export const CollectionDetail = () => {
 
       <NameTable
         key={id}
-        context="collection"
         records={processedRecords}
         isLoading={isLoading}
         currentAddress={address}

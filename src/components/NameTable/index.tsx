@@ -18,8 +18,6 @@ import type {
 } from "./types";
 
 interface NameTableProps {
-  context: "home" | "collection";
-
   records: NameRecord[] | undefined | null;
   isLoading: boolean;
   currentAddress?: string;
@@ -166,7 +164,6 @@ export const NameTable = (props: NameTableProps) => {
                   record={r}
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
-                  context={props.context}
                   currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}

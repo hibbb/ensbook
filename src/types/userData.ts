@@ -8,19 +8,16 @@ import type { SortConfig, FilterConfig } from "../components/NameTable/types";
 export interface UserDomainMeta {
   /**
    * 备注信息
-   * 必填字符串，无备注时存为 ""
    */
   memo: string;
 
   /**
-   * 关注等级
-   * 必填项，默认 0。
-   * 0: 无/默认, 1: 关注, 2: 重点...
+   * 关注等级 (0: Default, 1: Blue, 2: Yellow, 3: Red)
    */
   level: number;
 
   /**
-   * 创建时间 (加入列表或首次修改备注的时间)
+   * 创建时间 (首次产生交互的时间)
    */
   createdAt: number;
 
@@ -31,7 +28,7 @@ export interface UserDomainMeta {
 }
 
 /**
- * 页面视图状态 (用于恢复用户上次的筛选和排序)
+ * 页面视图状态
  */
 export interface PageViewState {
   sort?: SortConfig;
@@ -46,33 +43,28 @@ export interface UserSettings {
   locale: "zh" | "en";
   defaultDuration: number;
   myCollectionSource: string;
-  // 🚀 新增：是否将 Mine 设置为首页
   mineAsHomepage: boolean;
 }
 
 /**
- * 核心存储结构 (Root Object)
+ * 核心存储结构 (Root Object) - V2
  */
 export interface EnsBookUserData {
   version: number;
   timestamp: number;
 
-  // --- 上下文 A: Home (我的关注列表) ---
-  home: {
-    // Key: label (如 "001") -> Value: Meta
-    items: Record<string, UserDomainMeta>;
+  // 🟢 全局元数据池
+  // 存储所有被用户“触碰过”的域名信息 (Key: label)
+  metadata: Record<string, UserDomainMeta>;
 
-    // Home 页面的视图状态
-    viewState: PageViewState;
-  };
+  // 🟢 Home 关注列表
+  // 仅存储 Label 字符串，作为对 metadata 的引用
+  homeList: string[];
 
-  // --- 上下文 B: 集合浏览 (公共浏览记录) ---
-  collections: {
-    // Key: label -> Value: Meta
-    items: Record<string, UserDomainMeta>;
-
-    // 视图状态映射表: collectionId -> ViewState
-    viewStates: Record<string, PageViewState>;
+  // 视图状态
+  viewStates: {
+    home: PageViewState;
+    collections: Record<string, PageViewState>;
   };
 
   // 全局设置

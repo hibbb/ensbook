@@ -10,16 +10,12 @@ import {
   GRACE_PERIOD_DURATION,
   PREMIUM_PERIOD_DURATION,
 } from "../../config/constants";
-// 🚀 核心修改：引入新的用户数据存储服务
+// 🚀 引入新的存储服务
 import { getFullUserData } from "../../services/storage/userStore";
 
-// ============================================================================
-// 1. 内部逻辑常量与辅助函数
-// ============================================================================
-
+// ... (常量定义保持不变) ...
 const contracts = getContracts(1);
 const WRAPPER_ADDRESS = contracts.ENS_NAME_WRAPPER.toLowerCase();
-
 const CHUNK_SIZE = GRAPHQL_CONFIG.FETCH_LIMIT;
 
 const chunkArray = <T>(array: T[], size: number): T[][] => {
@@ -30,10 +26,7 @@ const chunkArray = <T>(array: T[], size: number): T[][] => {
   return chunks;
 };
 
-// ============================================================================
-// 2. 类型定义
-// ============================================================================
-
+// ... (类型定义和 deriveNameStatus 保持不变) ...
 interface SubgraphRegistration {
   id: string;
   labelName: string;
@@ -41,12 +34,10 @@ interface SubgraphRegistration {
   registrationDate: string;
   registrant: { id: string };
 }
-
 interface SubgraphWrappedDomain {
   name: string;
   owner: { id: string };
 }
-
 interface FetchResult {
   success: boolean;
   data: {
@@ -54,34 +45,25 @@ interface FetchResult {
     wrappedDomains: SubgraphWrappedDomain[];
   };
 }
-
 function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const graceEnd = expiryTimestamp + GRACE_PERIOD_DURATION;
   const premiumEnd = graceEnd + PREMIUM_PERIOD_DURATION;
-
   if (currentTimestamp <= expiryTimestamp) return "Active";
   if (currentTimestamp <= graceEnd) return "Grace";
   if (currentTimestamp <= premiumEnd) return "Premium";
   return "Released";
 }
 
-// ============================================================================
-// 3. 主函数
-// ============================================================================
-
+// 🚀 主函数：移除了 context 参数
 export async function fetchNameRecords(
   labels: string[],
-  // 🚀 新增参数：上下文 (决定从哪里读取备注和等级)
-  context: "home" | "collection",
 ): Promise<NameRecord[]> {
   if (!labels || labels.length === 0) return [];
 
-  // 🚀 1. 根据上下文一次性获取对应的元数据映射表
-  // 实现了 Home 和 Collection 数据的物理隔离
+  // 🚀 1. 读取全局元数据
   const userData = getFullUserData();
-  const metaMap =
-    context === "home" ? userData.home.items : userData.collections.items;
+  const metadata = userData.metadata;
 
   const validLabels = Array.from(
     new Set(
@@ -156,8 +138,8 @@ export async function fetchNameRecords(
     const records = validLabels.map((label) => {
       const isFetchSuccess = labelSuccessMap.get(label) ?? false;
 
-      // 🚀 2. 从上下文映射表中查找元数据
-      const meta = metaMap[label];
+      // 🚀 2. 统一从 metadata 读取
+      const meta = metadata[label];
       const memo = meta?.memo || "";
       const level = meta?.level || 0;
 
@@ -171,7 +153,7 @@ export async function fetchNameRecords(
       if (!isFetchSuccess) {
         return {
           ...baseInfo,
-          level: level, // 使用存储的等级
+          level,
           status: "Unknown",
           wrapped: false,
           registeredTime: 0,
@@ -179,7 +161,7 @@ export async function fetchNameRecords(
           releaseTime: 0,
           owner: null,
           ownerPrimaryName: undefined,
-          memo: memo, // 使用存储的备注
+          memo,
         };
       }
 
@@ -189,7 +171,7 @@ export async function fetchNameRecords(
       if (!registration) {
         return {
           ...baseInfo,
-          level: level,
+          level,
           status: "Available",
           wrapped: false,
           registeredTime: 0,
@@ -197,7 +179,7 @@ export async function fetchNameRecords(
           releaseTime: 0,
           owner: null,
           ownerPrimaryName: undefined,
-          memo: memo,
+          memo,
         };
       }
 
@@ -211,7 +193,7 @@ export async function fetchNameRecords(
 
       return {
         ...baseInfo,
-        level: level,
+        level,
         status: deriveNameStatus(expiryTime),
         wrapped: isWrapped,
         registeredTime: parseInt(registration.registrationDate),
@@ -219,20 +201,19 @@ export async function fetchNameRecords(
         releaseTime: expiryTime + GRACE_PERIOD_DURATION,
         owner: currentOwner,
         ownerPrimaryName: undefined,
-        memo: memo,
+        memo,
       };
     });
 
     return records as NameRecord[];
   } catch (error) {
     console.error("Critical error in fetchNameRecords:", error);
-    // 即使严重错误，也尝试返回带有元数据的 Unknown 记录
+    // 错误处理：从 metadata 读取
     const userData = getFullUserData();
-    const metaMap =
-      context === "home" ? userData.home.items : userData.collections.items;
+    const metadata = userData.metadata;
 
     return validLabels.map((label) => {
-      const meta = metaMap[label];
+      const meta = metadata[label];
       return {
         label,
         labelhash: labelhash(label),

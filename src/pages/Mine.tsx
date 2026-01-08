@@ -249,7 +249,6 @@ export const Mine = () => {
 
       <NameTable
         key="mine-table"
-        context="collection"
         records={processedRecords}
         isLoading={isLoading}
         currentAddress={address}

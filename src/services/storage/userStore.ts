@@ -4,30 +4,28 @@ import type {
   EnsBookUserData,
   UserDomainMeta,
   PageViewState,
+  UserSettings,
 } from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
-import type { UserSettings } from "../../types/userData";
 
-const STORAGE_KEY = "ensbook_user_data_v1";
+const STORAGE_KEY = "ensbook_user_data_v2"; // 🚀 升级 Key 以区分新旧结构
+const MAX_MEMO_LENGTH = 200;
 
-// 🚀 修改：初始化新增字段，确保数据完整性
+// 初始化默认数据
 const DEFAULT_DATA: EnsBookUserData = {
-  version: 1,
+  version: 2,
   timestamp: 0,
-  home: {
-    items: {},
-    viewState: {},
-  },
-  collections: {
-    items: {},
-    viewStates: {},
+  metadata: {},
+  homeList: [],
+  viewStates: {
+    home: {},
+    collections: {},
   },
   settings: {
     theme: "system",
     locale: "zh",
     defaultDuration: 31536000,
     myCollectionSource: "",
-    // 🚀 新增：默认为 false
     mineAsHomepage: false,
   },
 };
@@ -39,11 +37,12 @@ export const getFullUserData = (): EnsBookUserData => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return initUserData();
     const data = JSON.parse(raw);
-    // 🛡️ 健壮性：深度合并默认值，防止旧版本数据缺少新字段导致 crash
+    // 深度合并默认值，确保结构完整
     return {
       ...DEFAULT_DATA,
       ...data,
       settings: { ...DEFAULT_DATA.settings, ...data.settings },
+      viewStates: { ...DEFAULT_DATA.viewStates, ...data.viewStates },
     };
   } catch (e) {
     console.error("Failed to load user data:", e);
@@ -57,25 +56,8 @@ export const saveFullUserData = (data: EnsBookUserData) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.error("Failed to save user data:", e);
-    // 这里可以选择抛出异常，让 UI 层处理存储空间不足的情况
     throw e;
   }
-};
-
-// 🚀 新增：通用的设置更新方法 (或者你可以专门写一个 setMineAsHomepage)
-export const updateSettings = (updates: Partial<UserSettings>) => {
-  const data = getFullUserData();
-  data.settings = { ...data.settings, ...updates };
-  saveFullUserData(data);
-  // 触发更新事件，以便 UI 响应
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("user-settings-updated"));
-  }
-};
-
-// 🚀 新增：获取设置的辅助函数
-export const getUserSettings = (): UserSettings => {
-  return getFullUserData().settings;
 };
 
 const initUserData = (): EnsBookUserData => {
@@ -83,6 +65,7 @@ const initUserData = (): EnsBookUserData => {
   return DEFAULT_DATA;
 };
 
+// 辅助：创建新的元数据对象
 const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
   const now = Date.now();
   return {
@@ -94,129 +77,155 @@ const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
   };
 };
 
-// --- 核心业务操作 ---
+// --- 核心业务操作 (Global Metadata) ---
 
-export const getHomeLabels = (): string[] => {
+/**
+ * 获取单个域名的元数据 (Memo, Level)
+ */
+export const getDomainMeta = (label: string): UserDomainMeta | undefined => {
   const data = getFullUserData();
-  return Object.keys(data.home.items).sort(
-    (a, b) => data.home.items[b].createdAt - data.home.items[a].createdAt,
-  );
+  return data.metadata[label];
 };
 
-export const getHomeItem = (label: string): UserDomainMeta | undefined => {
-  const data = getFullUserData();
-  return data.home.items[label];
-};
-
-export const updateHomeItem = (
+/**
+ * 更新域名的元数据 (Memo, Level)
+ * 如果域名不存在于 metadata 中，会自动创建
+ */
+export const updateDomainMeta = (
   label: string,
   updates: Partial<UserDomainMeta>,
 ) => {
   const data = getFullUserData();
-  const existing = data.home.items[label];
-  if (existing) {
-    data.home.items[label] = { ...existing, ...updates, updatedAt: Date.now() };
-  } else {
-    data.home.items[label] = createMeta(updates);
+  const existing = data.metadata[label];
+
+  // 处理 Memo 字数限制
+  if (typeof updates.memo === "string") {
+    updates.memo = updates.memo.trim().slice(0, MAX_MEMO_LENGTH);
   }
-  saveFullUserData(data);
-};
 
-export const removeHomeItem = (label: string) => {
-  const data = getFullUserData();
-  if (data.home.items[label]) {
-    delete data.home.items[label];
-    saveFullUserData(data);
-  }
-};
-
-// 批量操作
-
-export const bulkUpdateHomeItems = (
-  labels: string[],
-  updates: Partial<UserDomainMeta> = {},
-) => {
-  if (labels.length === 0) return;
-  const data = getFullUserData();
-  const now = Date.now();
-  labels.forEach((label) => {
-    const existing = data.home.items[label];
-    if (existing) {
-      data.home.items[label] = { ...existing, ...updates, updatedAt: now };
-    } else {
-      data.home.items[label] = createMeta(updates);
-    }
-  });
-  saveFullUserData(data);
-};
-
-export const bulkRemoveHomeItems = (labels: string[]) => {
-  if (labels.length === 0) return;
-  const data = getFullUserData();
-  let hasChanges = false;
-  labels.forEach((label) => {
-    if (data.home.items[label]) {
-      delete data.home.items[label];
-      hasChanges = true;
-    }
-  });
-  if (hasChanges) saveFullUserData(data);
-};
-
-export const clearHomeItems = () => {
-  const data = getFullUserData();
-  data.home.items = {};
-  saveFullUserData(data);
-};
-
-export const updateCollectionItem = (
-  label: string,
-  updates: Partial<UserDomainMeta>,
-) => {
-  const data = getFullUserData();
-  const existing = data.collections.items[label];
   if (existing) {
-    data.collections.items[label] = {
+    data.metadata[label] = {
       ...existing,
       ...updates,
       updatedAt: Date.now(),
     };
   } else {
-    data.collections.items[label] = createMeta(updates);
+    data.metadata[label] = createMeta(updates);
   }
   saveFullUserData(data);
 };
 
-export const getCollectionItem = (
-  label: string,
-): UserDomainMeta | undefined => {
+// --- Home List 操作 (引用管理) ---
+
+/**
+ * 获取 Home 关注列表
+ * 返回按 metadata.createdAt 倒序排列的 label 数组
+ */
+export const getHomeLabels = (): string[] => {
   const data = getFullUserData();
-  return data.collections.items[label];
+  const { homeList, metadata } = data;
+
+  return [...homeList].sort((a, b) => {
+    const timeA = metadata[a]?.createdAt || 0;
+    const timeB = metadata[b]?.createdAt || 0;
+    return timeB - timeA; // 新的在前
+  });
 };
 
-export const getItemByContext = (
-  context: "home" | "collection",
-  label: string,
-): UserDomainMeta | undefined => {
-  return context === "home" ? getHomeItem(label) : getCollectionItem(label);
+/**
+ * 添加域名到 Home 列表
+ * 同时确保 metadata 中有记录
+ */
+export const addToHome = (label: string) => {
+  const data = getFullUserData();
+
+  // 1. 确保 metadata 存在
+  if (!data.metadata[label]) {
+    data.metadata[label] = createMeta();
+  }
+
+  // 2. 添加到列表 (去重)
+  if (!data.homeList.includes(label)) {
+    data.homeList.push(label);
+    saveFullUserData(data);
+  }
 };
 
-// 视图状态持久化逻辑
+/**
+ * 批量添加域名到 Home
+ */
+export const bulkAddToHome = (labels: string[]) => {
+  if (labels.length === 0) return;
+  const data = getFullUserData();
+  let hasChanges = false;
+
+  labels.forEach((label) => {
+    // 1. Init Metadata
+    if (!data.metadata[label]) {
+      data.metadata[label] = createMeta();
+    }
+    // 2. Add to List
+    if (!data.homeList.includes(label)) {
+      data.homeList.push(label);
+      hasChanges = true;
+    }
+  });
+
+  if (hasChanges) saveFullUserData(data);
+};
+
+/**
+ * 从 Home 列表移除域名
+ * 注意：不删除 metadata，保留备注以防用户以后重新添加
+ */
+export const removeFromHome = (label: string) => {
+  const data = getFullUserData();
+  const index = data.homeList.indexOf(label);
+  if (index > -1) {
+    data.homeList.splice(index, 1);
+    saveFullUserData(data);
+  }
+};
+
+/**
+ * 批量移除
+ */
+export const bulkRemoveFromHome = (labels: string[]) => {
+  if (labels.length === 0) return;
+  const data = getFullUserData();
+  const set = new Set(labels);
+
+  const initialLen = data.homeList.length;
+  data.homeList = data.homeList.filter((l) => !set.has(l));
+
+  if (data.homeList.length !== initialLen) {
+    saveFullUserData(data);
+  }
+};
+
+/**
+ * 清空 Home 列表
+ */
+export const clearHomeList = () => {
+  const data = getFullUserData();
+  data.homeList = [];
+  saveFullUserData(data);
+};
+
+// --- 视图状态操作 ---
 
 export const getHomeViewState = (): PageViewState => {
-  const data = getFullUserData();
-  return data.home.viewState || {};
+  return getFullUserData().viewStates.home || {};
 };
 
 export const saveHomeViewState = (viewState: PageViewState) => {
   const data = getFullUserData();
-  data.home.viewState = viewState;
+  data.viewStates.home = viewState;
   saveFullUserData(data);
 };
 
 export const getCollectionViewState = (collectionId: string): PageViewState => {
-  const data = getFullUserData();
-  return data.collections.viewStates[collectionId] || {};
+  return getFullUserData().viewStates.collections[collectionId] || {};
 };
 
 export const saveCollectionViewState = (
@@ -224,24 +233,33 @@ export const saveCollectionViewState = (
   viewState: PageViewState,
 ) => {
   const data = getFullUserData();
-  data.collections.viewStates[collectionId] = viewState;
+  data.viewStates.collections[collectionId] = viewState;
   saveFullUserData(data);
 };
 
-// 🚀 新增：自由飞翔功能 (My Collection) 存储逻辑
+// --- 设置操作 ---
+
+export const getUserSettings = (): UserSettings => {
+  return getFullUserData().settings;
+};
+
+export const updateSettings = (updates: Partial<UserSettings>) => {
+  const data = getFullUserData();
+  data.settings = { ...data.settings, ...updates };
+  saveFullUserData(data);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("user-settings-updated"));
+  }
+};
 
 export const getMyCollectionSource = (): string => {
-  const data = getFullUserData();
-  // 🛡️ 健壮性：确保返回值永远是字符串，即使数据损坏
-  return data.settings.myCollectionSource || "";
+  return getFullUserData().settings.myCollectionSource || "";
 };
 
 export const saveMyCollectionSource = (source: string) => {
   const data = getFullUserData();
   data.settings.myCollectionSource = source;
   saveFullUserData(data);
-
-  // 🔔 触发事件通知：让 Navbar 等组件知道数据变了，实时显示/隐藏入口
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("user-settings-updated"));
   }
@@ -263,99 +281,40 @@ export const importUserData = (
   // 合并模式
   const currentData = getFullUserData();
 
-  // 1. 合并 Home
-  const mergedHomeItems = {
-    ...currentData.home.items,
-    ...backup.home.items,
-  };
-  const mergedHomeViewState = {
-    ...currentData.home.viewState,
-    ...backup.home.viewState,
+  // 1. 合并 Metadata (覆盖式更新)
+  const mergedMetadata = {
+    ...currentData.metadata,
+    ...backup.metadata,
   };
 
-  // 2. 合并 Collection
-  const mergedCollectionItems = {
-    ...currentData.collections.items,
-    ...backup.collections.items,
-  };
-  const mergedCollectionViewStates = {
-    ...currentData.collections.viewStates,
-    ...backup.collections.viewStates,
+  // 2. 合并 HomeList (去重)
+  const mergedHomeList = Array.from(
+    new Set([...currentData.homeList, ...backup.homeList]),
+  );
+
+  // 3. 合并 ViewStates
+  const mergedViewStates = {
+    home: { ...currentData.viewStates.home, ...backup.viewStates.home },
+    collections: {
+      ...currentData.viewStates.collections,
+      ...backup.viewStates.collections,
+    },
   };
 
-  // 3. 合并设置
+  // 4. 合并 Settings
   const mergedSettings = {
     ...currentData.settings,
     ...backup.settings,
-    // 🚀 合并策略：如果备份中有自定义集合，优先使用备份的（或者你可以定义其他策略）
-    // 这里采用：如果备份有值，则覆盖；否则保留当前的
-    myCollectionSource:
-      backup.settings.myCollectionSource ||
-      currentData.settings.myCollectionSource,
   };
 
-  // 4. 构建最终数据
   const mergedData: EnsBookUserData = {
-    ...currentData,
-    home: {
-      items: mergedHomeItems,
-      viewState: mergedHomeViewState,
-    },
-    collections: {
-      items: mergedCollectionItems,
-      viewStates: mergedCollectionViewStates,
-    },
-    settings: mergedSettings,
+    version: 2,
     timestamp: Date.now(),
+    metadata: mergedMetadata,
+    homeList: mergedHomeList,
+    viewStates: mergedViewStates,
+    settings: mergedSettings,
   };
 
   saveFullUserData(mergedData);
-};
-
-/**
- * 🚀 更新域名的等级 (Level)
- * 这是一个“全局”更新操作：为了确保用户体验的一致性，
- * 无论用户当前是在 Home 还是 Collection 视图操作，
- * 我们都会尝试同步更新两个存储区中的元数据。
- */
-export const updateLabelLevel = (label: string, level: number) => {
-  const data = getFullUserData();
-  const now = Date.now();
-  let hasChanges = false;
-
-  // 1. 如果该域名在 Home (关注列表) 中，更新它
-  if (data.home.items[label]) {
-    data.home.items[label] = {
-      ...data.home.items[label],
-      level,
-      updatedAt: now,
-    };
-    hasChanges = true;
-  }
-
-  // 2. 处理 Collections (元数据缓存) 存储
-  // 逻辑：为了确保跨视图一致性 (如在 Collection 视图能看到 Home 标记的颜色)，
-  // 我们总是将 Level 信息写入 collections 存储，除非它已经与 Home 数据完全一致且不需要冗余（简单起见，这里选择冗余存储以保证一致性）。
-  const existingCollectionItem = data.collections.items[label];
-
-  if (existingCollectionItem) {
-    // 如果已有记录，直接更新
-    data.collections.items[label] = {
-      ...existingCollectionItem,
-      level,
-      updatedAt: now,
-    };
-    hasChanges = true;
-  } else {
-    // 如果 Collection 中没有记录，我们需要判断是否要新建：
-    // A. 如果 Home 里也没有 -> 说明这是一个纯新的操作 (比如在搜索页或集合页标记)，必须新建。
-    // B. 如果 Home 里有 -> 为了让 Collection 视图也能读取到 (因为读取是隔离的)，我们也需要在 Collection 中新建副本。
-    // 结论：只要 label 涉及 level 变更，我们就确保它在 collections 存储中有一份拷贝。
-    data.collections.items[label] = createMeta({ level });
-    hasChanges = true;
-  }
-
-  if (hasChanges) {
-    saveFullUserData(data);
-  }
 };

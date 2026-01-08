@@ -14,7 +14,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "../../ui/Popover";
 
 interface NameCellProps {
   record: NameRecord;
-  context: "home" | "collection";
 }
 
 // ... MetadataRow 组件保持不变 ...
@@ -51,7 +50,7 @@ const MetadataRow = ({
   );
 };
 
-export const NameCell = ({ record, context }: NameCellProps) => {
+export const NameCell = ({ record }: NameCellProps) => {
   const metadata = useMemo(() => {
     // ... metadata 计算逻辑保持不变 ...
     try {
@@ -239,7 +238,7 @@ export const NameCell = ({ record, context }: NameCellProps) => {
         )}
 
         {/* 3. 备注编辑器 */}
-        <MemoEditor label={record.label} context={context} />
+        <MemoEditor label={record.label} />
       </div>
     </div>
   );

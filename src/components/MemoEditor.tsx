@@ -10,25 +10,23 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-import {
-  getItemByContext,
-  updateHomeItem,
-  updateCollectionItem,
-} from "../services/storage/userStore";
+// 🚀 引入新的存储方法
+import { getDomainMeta, updateDomainMeta } from "../services/storage/userStore";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { Tooltip } from "./ui/Tooltip";
-import type { NameRecord } from "../types/ensNames"; // 🚀 引入类型以便 TS 推断
+import type { NameRecord } from "../types/ensNames";
 
 const MAX_MEMO_LENGTH = 200;
 
 interface MemoEditorProps {
   label: string;
-  context: "home" | "collection";
+  // 🚀 移除 context prop
 }
 
-export const MemoEditor = ({ label, context }: MemoEditorProps) => {
+export const MemoEditor = ({ label }: MemoEditorProps) => {
+  // 🚀 直接读取全局元数据
   const [memo, setLocalMemo] = useState(() => {
-    const meta = getItemByContext(context, label);
+    const meta = getDomainMeta(label);
     return meta?.memo || "";
   });
 
@@ -49,38 +47,20 @@ export const MemoEditor = ({ label, context }: MemoEditorProps) => {
     try {
       const newValue = editValue.trim();
 
-      // 🚀 核心优化：纯本地更新，零网络请求
-      if (context === "home") {
-        // 1. 写存储
-        updateHomeItem(label, { memo: newValue });
+      // 1. 更新全局存储
+      updateDomainMeta(label, { memo: newValue });
 
-        // 2. 写缓存 (Home)
-        queryClient.setQueryData<NameRecord[]>(["name-records"], (old) => {
-          if (!old) return [];
-          return old.map((r) =>
-            r.label === label ? { ...r, memo: newValue } : r,
-          );
-        });
-      } else {
-        // 1. 写存储
-        updateCollectionItem(label, { memo: newValue });
-
-        // 2. 写缓存 (Collection)
-        // 使用 setQueriesData 模糊匹配所有集合查询 (因为我们不知道具体 ID)
-        // 这会更新 ["collection-records", "999"] 等所有缓存
-        queryClient.setQueriesData<NameRecord[]>(
-          { queryKey: ["collection-records"] },
-          (old) => {
-            if (!old) return [];
-            return old.map((r) =>
-              r.label === label ? { ...r, memo: newValue } : r,
-            );
-          },
-        );
-      }
-
-      // ❌ 彻底移除 invalidateQueries，斩断网络请求
-      // queryClient.invalidateQueries(...)
+      // 2. 更新所有相关缓存 (Home, Collections, Mine)
+      // 使用 setQueriesData 模糊匹配所有包含 "records" 的查询
+      // 这样无论用户在哪里修改，所有视图都会同步更新
+      queryClient.setQueriesData<NameRecord[]>(
+        { queryKey: ["name-records"] }, // 匹配 Home
+        (old) => updateCache(old, label, newValue),
+      );
+      queryClient.setQueriesData<NameRecord[]>(
+        { queryKey: ["collection-records"] }, // 匹配 Collections & Mine
+        (old) => updateCache(old, label, newValue),
+      );
 
       setLocalMemo(newValue);
       setIsOpen(false);
@@ -89,6 +69,16 @@ export const MemoEditor = ({ label, context }: MemoEditorProps) => {
       console.error(e);
       toast.error("保存失败：本地存储空间已满");
     }
+  };
+
+  // 辅助函数：更新缓存列表
+  const updateCache = (
+    old: NameRecord[] | undefined,
+    label: string,
+    memo: string,
+  ) => {
+    if (!old) return [];
+    return old.map((r) => (r.label === label ? { ...r, memo } : r));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
