@@ -41,7 +41,6 @@ export async function fetchLabels(
   // 🗑️ 移除 linkOwners
   const { sameOwners, pureLabels, ethAddresses } = classified;
 
-  // 🚀 这里的 Promise.all 移除了 fetchLabelsFromLinkOwners
   const [fetchedFromSame, fetchedFromAddr] = await Promise.all([
     fetchLabelsFromSameOwners(sameOwners),
     fetchDomainsByAddresses(new Set(ethAddresses)),
@@ -156,5 +155,3 @@ async function fetchLabelsFromSameOwners(names: string[]): Promise<string[]> {
   });
   return fetchDomainsByAddresses(ownerAddresses);
 }
-
-// 🗑️ 已移除 fetchLabelsFromLinkOwners 函数

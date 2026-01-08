@@ -8,8 +8,11 @@ import type {
 } from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
 
-const STORAGE_KEY = "ensbook_user_data_v2"; // 🚀 升级 Key 以区分新旧结构
+const STORAGE_KEY = "ensbook_user_data_v2";
 const MAX_MEMO_LENGTH = 200;
+
+// 🚀 1. 定义内存缓存变量
+let cachedData: EnsBookUserData | null = null;
 
 // 初始化默认数据
 const DEFAULT_DATA: EnsBookUserData = {
@@ -30,20 +33,45 @@ const DEFAULT_DATA: EnsBookUserData = {
   },
 };
 
-// --- 基础读写 ---
+// --- 内部辅助：初始化并写入 ---
+const initUserData = (): EnsBookUserData => {
+  // 这里直接调用底层保存，避免循环依赖
+  try {
+    const data = DEFAULT_DATA;
+    data.timestamp = Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    cachedData = data; // 更新缓存
+    return data;
+  } catch (e) {
+    console.error("Failed to init user data:", e);
+    return DEFAULT_DATA;
+  }
+};
+
+// --- 基础读写 (核心优化部分) ---
 
 export const getFullUserData = (): EnsBookUserData => {
+  // 🚀 2. 优先读取内存缓存 (性能提升的关键)
+  if (cachedData) {
+    return cachedData;
+  }
+
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return initUserData();
-    const data = JSON.parse(raw);
+
+    const parsed = JSON.parse(raw);
     // 深度合并默认值，确保结构完整
-    return {
+    const data = {
       ...DEFAULT_DATA,
-      ...data,
-      settings: { ...DEFAULT_DATA.settings, ...data.settings },
-      viewStates: { ...DEFAULT_DATA.viewStates, ...data.viewStates },
+      ...parsed,
+      settings: { ...DEFAULT_DATA.settings, ...parsed.settings },
+      viewStates: { ...DEFAULT_DATA.viewStates, ...parsed.viewStates },
     };
+
+    // 🚀 3. 写入缓存
+    cachedData = data;
+    return data;
   } catch (e) {
     console.error("Failed to load user data:", e);
     return initUserData();
@@ -53,6 +81,11 @@ export const getFullUserData = (): EnsBookUserData => {
 export const saveFullUserData = (data: EnsBookUserData) => {
   try {
     data.timestamp = Date.now();
+
+    // 🚀 4. 更新内存缓存
+    cachedData = data;
+
+    // 写入硬盘
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.error("Failed to save user data:", e);
@@ -60,10 +93,20 @@ export const saveFullUserData = (data: EnsBookUserData) => {
   }
 };
 
-const initUserData = (): EnsBookUserData => {
-  saveFullUserData(DEFAULT_DATA);
-  return DEFAULT_DATA;
-};
+// 🚀 5. 监听跨标签页同步 (Cross-Tab Sync)
+// 当用户在 Tab A 修改数据时，Tab B 会收到 storage 事件
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === STORAGE_KEY) {
+      // 策略：直接清空缓存。下次读取时会重新从 LS 加载最新数据。
+      // 这样可以避免复杂的合并逻辑，且保证数据绝对新鲜。
+      cachedData = null;
+
+      // 触发应用内更新事件，通知 UI 刷新
+      window.dispatchEvent(new Event("user-settings-updated"));
+    }
+  });
+}
 
 // 辅助：创建新的元数据对象
 const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
@@ -79,18 +122,11 @@ const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
 
 // --- 核心业务操作 (Global Metadata) ---
 
-/**
- * 获取单个域名的元数据 (Memo, Level)
- */
 export const getDomainMeta = (label: string): UserDomainMeta | undefined => {
   const data = getFullUserData();
   return data.metadata[label];
 };
 
-/**
- * 更新域名的元数据 (Memo, Level)
- * 如果域名不存在于 metadata 中，会自动创建
- */
 export const updateDomainMeta = (
   label: string,
   updates: Partial<UserDomainMeta>,
@@ -98,7 +134,6 @@ export const updateDomainMeta = (
   const data = getFullUserData();
   const existing = data.metadata[label];
 
-  // 处理 Memo 字数限制
   if (typeof updates.memo === "string") {
     updates.memo = updates.memo.trim().slice(0, MAX_MEMO_LENGTH);
   }
@@ -115,12 +150,8 @@ export const updateDomainMeta = (
   saveFullUserData(data);
 };
 
-// --- Home List 操作 (引用管理) ---
+// --- Home List 操作 ---
 
-/**
- * 获取 Home 关注列表
- * 返回按 metadata.createdAt 倒序排列的 label 数组
- */
 export const getHomeLabels = (): string[] => {
   const data = getFullUserData();
   const { homeList, metadata } = data;
@@ -128,43 +159,32 @@ export const getHomeLabels = (): string[] => {
   return [...homeList].sort((a, b) => {
     const timeA = metadata[a]?.createdAt || 0;
     const timeB = metadata[b]?.createdAt || 0;
-    return timeB - timeA; // 新的在前
+    return timeB - timeA;
   });
 };
 
-/**
- * 添加域名到 Home 列表
- * 同时确保 metadata 中有记录
- */
 export const addToHome = (label: string) => {
   const data = getFullUserData();
 
-  // 1. 确保 metadata 存在
   if (!data.metadata[label]) {
     data.metadata[label] = createMeta();
   }
 
-  // 2. 添加到列表 (去重)
   if (!data.homeList.includes(label)) {
     data.homeList.push(label);
     saveFullUserData(data);
   }
 };
 
-/**
- * 批量添加域名到 Home
- */
 export const bulkAddToHome = (labels: string[]) => {
   if (labels.length === 0) return;
   const data = getFullUserData();
   let hasChanges = false;
 
   labels.forEach((label) => {
-    // 1. Init Metadata
     if (!data.metadata[label]) {
       data.metadata[label] = createMeta();
     }
-    // 2. Add to List
     if (!data.homeList.includes(label)) {
       data.homeList.push(label);
       hasChanges = true;
@@ -174,10 +194,6 @@ export const bulkAddToHome = (labels: string[]) => {
   if (hasChanges) saveFullUserData(data);
 };
 
-/**
- * 从 Home 列表移除域名
- * 注意：不删除 metadata，保留备注以防用户以后重新添加
- */
 export const removeFromHome = (label: string) => {
   const data = getFullUserData();
   const index = data.homeList.indexOf(label);
@@ -187,9 +203,6 @@ export const removeFromHome = (label: string) => {
   }
 };
 
-/**
- * 批量移除
- */
 export const bulkRemoveFromHome = (labels: string[]) => {
   if (labels.length === 0) return;
   const data = getFullUserData();
@@ -203,9 +216,6 @@ export const bulkRemoveFromHome = (labels: string[]) => {
   }
 };
 
-/**
- * 清空 Home 列表
- */
 export const clearHomeList = () => {
   const data = getFullUserData();
   data.homeList = [];
@@ -278,21 +288,17 @@ export const importUserData = (
     return;
   }
 
-  // 合并模式
   const currentData = getFullUserData();
 
-  // 1. 合并 Metadata (覆盖式更新)
   const mergedMetadata = {
     ...currentData.metadata,
     ...backup.metadata,
   };
 
-  // 2. 合并 HomeList (去重)
   const mergedHomeList = Array.from(
     new Set([...currentData.homeList, ...backup.homeList]),
   );
 
-  // 3. 合并 ViewStates
   const mergedViewStates = {
     home: { ...currentData.viewStates.home, ...backup.viewStates.home },
     collections: {
@@ -301,7 +307,6 @@ export const importUserData = (
     },
   };
 
-  // 4. 合并 Settings
   const mergedSettings = {
     ...currentData.settings,
     ...backup.settings,
