@@ -7,6 +7,7 @@ import type {
   UserSettings,
 } from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
+import i18n from "../../i18n/config"; // 🚀 引入 i18n 实例
 
 const STORAGE_KEY = "ensbook_user_data_v2";
 const MAX_MEMO_LENGTH = 200;
@@ -82,12 +83,16 @@ export const saveFullUserData = (data: EnsBookUserData) => {
   try {
     data.timestamp = Date.now();
 
-    // 🚀 4. 更新内存缓存
+    // 4. 更新内存缓存
     cachedData = data;
 
     // 写入硬盘
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      // 🚀 翻译错误信息
+      throw new Error(i18n.t("storage.quota_exceeded"));
+    }
     console.error("Failed to save user data:", e);
     throw e;
   }

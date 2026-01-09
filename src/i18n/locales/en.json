@@ -6,6 +6,7 @@
   },
   "settings": {
     "title": {
+      "language": "Language Settings",
       "backup": "Backup & Restore",
       "my_collection": "My Collection (Mine)",
       "about": "About ENSBook",
@@ -56,7 +57,7 @@
     },
     "import": {
       "title": "Restore Data",
-      "desc": "Support <b>Merge</b> or <b>Overwrite</b> with existing data.",
+      "desc": "Support Merge or Overwrite with existing data.",
       "warning": "Please ensure the file is a valid ENSBook backup",
       "btn": "Select Backup File"
     }
@@ -125,16 +126,15 @@
     "not_found": "Collection not found",
     "load_fail": "Failed to load"
   },
-  "process": {
-    "title": {
-      "register": "Set Registration Duration",
-      "renew": "Set Renewal Duration",
-      "batch_renew": "Batch Renew ({{count}} items)"
-    }
-  },
   "table": {
     "empty": "No data",
     "reset": "Reset",
+    "header": {
+      "name": "Name",
+      "status": "Status",
+      "owner": "Owner",
+      "action": "Action"
+    },
     "filter": {
       "default_title": "Filter",
       "sort_name": "Sort by Name",
@@ -271,6 +271,121 @@
       "commit_reverted": "Commit transaction failed, please restart",
       "reg_reverted": "Previous registration failed, please retry",
       "process_interrupted": "Process interrupted, check console"
+    }
+  },
+  "storage": {
+    "quota_exceeded": "Storage quota exceeded"
+  },
+  "memo": {
+    "edit_title": "Edit Memo",
+    "placeholder": "Enter memo...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "toast": {
+      "updated": "Memo updated",
+      "deleted": "Memo deleted",
+      "storage_full": "Save failed: Local storage full"
+    },
+    "tooltip": {
+      "add": "Add Memo"
+    }
+  },
+  "process": {
+    "year": "Year",
+    "cancel": "Cancel",
+    "btn": {
+      "start_register": "Start Registration",
+      "confirm_renew": "Confirm Renewal",
+      "finish": "Done",
+      "retry": "Close & Retry"
+    },
+    "status": {
+      "processing": "Processing...",
+      "confirm_wallet": "Please confirm in wallet"
+    },
+    "step": {
+      "commit_title": "Commit Request",
+      "commit_desc": "Step 1: Prevent front-running",
+      "wait_commit_title": "Waiting for Commit",
+      "wait_commit_desc": "Transaction sent, waiting for confirmation...",
+      "cooldown_title": "Cooldown Period",
+      "cooldown_desc": "Waiting 60s for security...",
+      "register_title": "Final Registration",
+      "register_desc": "Cooldown over, sending registration transaction",
+      "wait_register_title": "Confirming Registration",
+      "wait_register_desc": "Almost there!",
+      "loading_title": "Waiting for Wallet",
+      "loading_desc": "Please sign in wallet extension",
+      "processing_title": "Processing Transaction",
+      "processing_desc": "Broadcasted, waiting for confirmation..."
+    },
+    "result": {
+      "success_register": "Registration Successful!",
+      "success_renew": "Renewal Successful!",
+      "success_desc": "Confirmed on-chain. Data may take a few minutes to update.",
+      "error_title": "Operation Failed",
+      "error_desc": "Check network or rejection reason"
+    },
+    "title": {
+      "register": "Set Registration Duration",
+      "renew": "Set Renewal Duration",
+      "batch_renew": "Batch Renew ({{count}} items)",
+      "processing": "Processing",
+      "done": "Completed"
+    }
+  },
+  "reminder": {
+    "title": "Set Renewal Reminder",
+    "expiration_date": "Expiration Date",
+    "remind_before": "Remind me before",
+    "opt": {
+      "1m": "1 Month",
+      "1w": "1 Week",
+      "3d": "3 Days",
+      "1d": "1 Day"
+    },
+    "btn": {
+      "download": "Download .ics File",
+      "google": "Add to Google Calendar"
+    }
+  },
+  "search_help": {
+    "title": "Search Guide",
+    "desc": "ENSBook supports multiple advanced search modes.",
+    "mode": {
+      "batch": {
+        "title": "Batch Search",
+        "desc": "Enter names, separated by space or comma."
+      },
+      "owner": {
+        "title": "Search by Owner",
+        "desc": "Use \"@\" + ENS/Address format."
+      },
+      "address": {
+        "title": "Search by Address",
+        "desc": "Enter Ethereum address directly."
+      },
+      "mixed": {
+        "title": "Mixed Mode",
+        "desc": "Combine all formats above."
+      }
+    },
+    "btn": {
+      "got_it": "Got it"
+    }
+  },
+  "pagination": {
+    "first": "First",
+    "prev": "Prev",
+    "next": "Next",
+    "last": "Last",
+    "info": "Total {{total}} items / {{pages}} pages"
+  },
+  "language_view": {
+    "desc": "Choose your preferred interface language.",
+    "options": {
+      "en": "English",
+      "zh": "Chinese (Simplified)"
     }
   }
 }

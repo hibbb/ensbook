@@ -1,7 +1,10 @@
+// src/services/blockchain/recovery.ts
+
 import { type PublicClient } from "viem";
 import { type RegistrationStatus } from "../../types/ensRegistration";
 import { getRegistrationState } from "../storage/registration";
 import { checkTxStatus } from "./transaction";
+import i18n from "../../i18n/config"; // 🚀 引入 i18n 实例
 
 const MIN_COMMITMENT_AGE = 60;
 const MAX_COMMITMENT_AGE = 86400;
@@ -37,7 +40,8 @@ export async function checkRegStatus(
       return { status: "waiting_register", secondsLeft: 0, localState };
     }
     if (txStatus.state === "reverted") {
-      regErrorMessage = "上一次注册交易失败，请重试";
+      // 🚀 使用 i18n 翻译
+      regErrorMessage = i18n.t("hooks.registration.reg_reverted");
     }
   }
 
@@ -50,7 +54,7 @@ export async function checkRegStatus(
         status: "error",
         secondsLeft: 0,
         localState,
-        errorMessage: "Commit 交易失败，请重新开始",
+        errorMessage: i18n.t("hooks.registration.commit_reverted"), // 🚀
       };
     }
     if (txStatus.state === "pending" || txStatus.state === "not_found") {
@@ -65,7 +69,7 @@ export async function checkRegStatus(
           status: "idle",
           secondsLeft: 0,
           localState,
-          errorMessage: "Commit 已过期，请重新注册",
+          errorMessage: i18n.t("hooks.registration.commit_expired"), // 🚀
         };
       }
 

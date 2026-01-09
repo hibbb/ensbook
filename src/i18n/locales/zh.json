@@ -6,6 +6,7 @@
   },
   "settings": {
     "title": {
+      "language": "语言设置",
       "backup": "备份与恢复",
       "my_collection": "我的集合 (Mine)",
       "about": "关于 ENSBook",
@@ -56,7 +57,7 @@
     },
     "import": {
       "title": "恢复数据",
-      "desc": "支持与现有数据 <b>合并</b> 或 <b>完全覆盖</b>。",
+      "desc": "支持与现有数据合并或完全覆盖。",
       "warning": "请确保导入的是合法的 EnsBook 备份文件",
       "btn": "选择备份文件"
     }
@@ -125,16 +126,15 @@
     "not_found": "集合未找到",
     "load_fail": "加载失败"
   },
-  "process": {
-    "title": {
-      "register": "设置注册时长",
-      "renew": "设置续费时长",
-      "batch_renew": "批量续费 ({{count}}个)"
-    }
-  },
   "table": {
     "empty": "暂无数据",
     "reset": "重置",
+    "header": {
+      "name": "名称",
+      "status": "状态",
+      "owner": "所有者",
+      "action": "操作"
+    },
     "filter": {
       "default_title": "筛选",
       "sort_name": "按名称字母排序",
@@ -271,6 +271,121 @@
       "commit_reverted": "Commit 交易失败，请重新开始",
       "reg_reverted": "上一次注册交易失败，请重试",
       "process_interrupted": "流程中断，请检查控制台"
+    }
+  },
+  "storage": {
+    "quota_exceeded": "存储空间不足"
+  },
+  "memo": {
+    "edit_title": "编辑备注",
+    "placeholder": "输入备注信息...",
+    "save": "保存",
+    "cancel": "取消",
+    "toast": {
+      "updated": "备注已更新",
+      "deleted": "备注已删除",
+      "storage_full": "保存失败：本地存储空间已满"
+    },
+    "tooltip": {
+      "add": "添加备注"
+    }
+  },
+  "process": {
+    "year": "年",
+    "cancel": "取消",
+    "btn": {
+      "start_register": "开始注册",
+      "confirm_renew": "确认续费",
+      "finish": "完成",
+      "retry": "关闭并重试"
+    },
+    "status": {
+      "processing": "正在处理...",
+      "confirm_wallet": "请在钱包中确认交易"
+    },
+    "step": {
+      "commit_title": "提交 Commit 请求",
+      "commit_desc": "这是注册的第一步，防止域名被抢注",
+      "wait_commit_title": "等待 Commit 上链",
+      "wait_commit_desc": "交易已发出，等待区块链确认...",
+      "cooldown_title": "等待冷却期",
+      "cooldown_desc": "为了安全，以太坊网络要求等待 60 秒...",
+      "register_title": "最终注册",
+      "register_desc": "冷却结束，正在发起最终注册交易",
+      "wait_register_title": "等待注册确认",
+      "wait_register_desc": "马上就好，您的域名即将到手！",
+      "loading_title": "等待钱包签名",
+      "loading_desc": "请打开钱包插件进行确认",
+      "processing_title": "交易处理中",
+      "processing_desc": "交易已广播，等待节点确认..."
+    },
+    "result": {
+      "success_register": "注册成功！",
+      "success_renew": "续费成功！",
+      "success_desc": "您的操作已在链上确认，数据更新可能需要几分钟。",
+      "error_title": "操作失败",
+      "error_desc": "请检查网络连接或拒绝原因"
+    },
+    "title": {
+      "register": "设置注册时长",
+      "renew": "设置续费时长",
+      "batch_renew": "批量续费 ({{count}}个)",
+      "processing": "操作进行中",
+      "done": "操作完成"
+    }
+  },
+  "reminder": {
+    "title": "设置续费提醒",
+    "expiration_date": "过期时间",
+    "remind_before": "提前提醒时间",
+    "opt": {
+      "1m": "1 个月前",
+      "1w": "1 周前",
+      "3d": "3 天前",
+      "1d": "1 天前"
+    },
+    "btn": {
+      "download": "下载日历文件 (.ics)",
+      "google": "添加到 Google 日历"
+    }
+  },
+  "search_help": {
+    "title": "搜索功能指南",
+    "desc": "ENSBook 支持多种高级模式，助您快速批量发现域名。",
+    "mode": {
+      "batch": {
+        "title": "域名批量搜索",
+        "desc": "输入任意名称，支持空格或逗号分隔多个名称。"
+      },
+      "owner": {
+        "title": "名称所有者持仓查询",
+        "desc": "使用 “@ + ENS（或以太坊地址）” 的格式查询。"
+      },
+      "address": {
+        "title": "以太坊地址持仓查询",
+        "desc": "直接输入以太坊地址查询其 ENS 名称持仓情况。"
+      },
+      "mixed": {
+        "title": "混合模式",
+        "desc": "同时支持上述所有格式的混合输入。"
+      }
+    },
+    "btn": {
+      "got_it": "明白了"
+    }
+  },
+  "pagination": {
+    "first": "首页",
+    "prev": "上一页",
+    "next": "下一页",
+    "last": "末页",
+    "info": "共 {{total}} 条 / {{pages}} 页"
+  },
+  "language_view": {
+    "desc": "选择您偏好的界面语言。",
+    "options": {
+      "en": "English (英文)",
+      "zh": "简体中文"
     }
   }
 }

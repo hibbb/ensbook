@@ -7,6 +7,7 @@ import {
   faAnglesLeft,
   faAnglesRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 
 interface PaginationProps {
   currentPage: number;
@@ -22,24 +23,22 @@ export const Pagination = ({
   onPageChange,
 }: PaginationProps) => {
   const totalPages = Math.ceil(totalCount / pageSize);
+  const { t } = useTranslation(); // 🚀
 
   if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
-    // 🚀 修复：真正使用 maxVisible 来控制显示数量
     const maxVisible = 5;
-    const half = Math.floor(maxVisible / 2); // 2
+    const half = Math.floor(maxVisible / 2);
 
     let start = currentPage - half;
     let end = currentPage + half;
 
-    // 1. 处理头部越界：如果 start < 1，固定从 1 开始，并向后延伸窗口
     if (start < 1) {
       start = 1;
       end = Math.min(totalPages, start + maxVisible - 1);
     }
 
-    // 2. 处理尾部越界：如果 end > totalPages，固定在末页，并向前延伸窗口
     if (end > totalPages) {
       end = totalPages;
       start = Math.max(1, end - maxVisible + 1);
@@ -61,27 +60,24 @@ export const Pagination = ({
 
   return (
     <div className="flex items-center justify-center gap-2 py-6 select-none border-t border-gray-100 bg-white rounded-b-xl">
-      {/* 首页 */}
       <button
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
         className={`${btnClass} ${currentPage === 1 ? disabledClass : inactiveClass}`}
-        title="首页"
+        title={t("pagination.first")}
       >
         <FontAwesomeIcon icon={faAnglesLeft} size="xs" />
       </button>
 
-      {/* 上一页 */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className={`${btnClass} ${currentPage === 1 ? disabledClass : inactiveClass}`}
-        title="上一页"
+        title={t("pagination.prev")}
       >
         <FontAwesomeIcon icon={faChevronLeft} size="xs" />
       </button>
 
-      {/* 页码 */}
       {getPageNumbers().map((page) => (
         <button
           key={page}
@@ -92,29 +88,26 @@ export const Pagination = ({
         </button>
       ))}
 
-      {/* 下一页 */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className={`${btnClass} ${currentPage === totalPages ? disabledClass : inactiveClass}`}
-        title="下一页"
+        title={t("pagination.next")}
       >
         <FontAwesomeIcon icon={faChevronRight} size="xs" />
       </button>
 
-      {/* 末页 */}
       <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
         className={`${btnClass} ${currentPage === totalPages ? disabledClass : inactiveClass}`}
-        title="末页"
+        title={t("pagination.last")}
       >
         <FontAwesomeIcon icon={faAnglesRight} size="xs" />
       </button>
 
-      {/* 统计信息 */}
       <span className="text-xs text-gray-400 ml-4 font-qs-medium">
-        共 {totalCount} 条 / {totalPages} 页
+        {t("pagination.info", { total: totalCount, pages: totalPages })}
       </span>
     </div>
   );

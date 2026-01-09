@@ -13,7 +13,8 @@ import {
   faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 import { useChainId } from "wagmi";
-import { BaseModal } from "./ui/BaseModal"; // 🚀 引入 BaseModal
+import { useTranslation } from "react-i18next";
+import { BaseModal } from "./ui/BaseModal";
 import { DEFAULT_DURATION_SECONDS } from "../config/constants";
 
 const getExplorerLink = (chainId: number, hash: string) => {
@@ -46,8 +47,8 @@ export const ProcessModal = ({
 }: ProcessModalProps) => {
   const [years, setYears] = useState(1);
   const chainId = useChainId();
+  const { t } = useTranslation();
 
-  // 状态归类
   const isIdle = status === "idle";
   const isSuccess = status === "success";
   const isError = status === "error";
@@ -55,8 +56,6 @@ export const ProcessModal = ({
   const isWaitingWallet =
     status === "loading" || status === "registering" || status === "committing";
 
-  // 🚀 安全关闭逻辑：只有在 idle 状态下才允许通过背景/ESC 关闭
-  // (处理中或成功/失败状态下，需要用户点击特定按钮或完成按钮)
   const handleSafeClose = () => {
     if (isIdle) {
       onClose();
@@ -64,10 +63,10 @@ export const ProcessModal = ({
   };
 
   const handleConfirm = () => {
-    onConfirm(BigInt(years) * DEFAULT_DURATION_SECONDS);
+    // 🚀 修复：确保两个操作数都是 BigInt
+    onConfirm(BigInt(years) * BigInt(DEFAULT_DURATION_SECONDS));
   };
 
-  // 渲染内容：设置时长 (Step 1)
   const renderSettings = () => (
     <div className="animate-in slide-in-from-right-4 duration-300">
       <div className="flex items-center justify-between bg-white border border-gray-100 rounded-xl p-4 mb-6 shadow-sm">
@@ -82,7 +81,9 @@ export const ProcessModal = ({
           <span className="text-3xl font-qs-semibold text-text-main">
             {years}
           </span>
-          <span className="ml-2 text-gray-400 font-qs-medium text-sm">年</span>
+          <span className="ml-2 text-gray-400 font-qs-medium text-sm">
+            {t("process.year")}
+          </span>
         </div>
 
         <button
@@ -98,46 +99,47 @@ export const ProcessModal = ({
           onClick={onClose}
           className="flex-1 py-3 rounded-lg font-qs-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
         >
-          取消
+          {t("process.cancel")}
         </button>
         <button
           onClick={handleConfirm}
           className="flex-1 py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover shadow-lg shadow-link/20 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
-          {type === "register" ? "开始注册" : "确认续费"}
+          {type === "register"
+            ? t("process.btn.start_register")
+            : t("process.btn.confirm_renew")}
         </button>
       </div>
     </div>
   );
 
-  // 渲染内容：处理中 (Step 2)
   const renderProcessing = () => {
-    let message = "正在处理...";
-    let subMessage = "请在钱包中确认交易";
+    let message = t("process.status.processing");
+    let subMessage = t("process.status.confirm_wallet");
     let showTimer = false;
 
     if (status === "committing") {
-      message = "提交 Commit 请求";
-      subMessage = "这是注册的第一步，防止域名被抢注";
+      message = t("process.step.commit_title");
+      subMessage = t("process.step.commit_desc");
     } else if (status === "waiting_commit") {
-      message = "等待 Commit 上链";
-      subMessage = "交易已发出，等待区块链确认...";
+      message = t("process.step.wait_commit_title");
+      subMessage = t("process.step.wait_commit_desc");
     } else if (status === "counting_down") {
-      message = "等待冷却期";
-      subMessage = "为了安全，以太坊网络要求等待 60 秒...";
+      message = t("process.step.cooldown_title");
+      subMessage = t("process.step.cooldown_desc");
       showTimer = true;
     } else if (status === "registering") {
-      message = "最终注册";
-      subMessage = "冷却结束，正在发起最终注册交易";
+      message = t("process.step.register_title");
+      subMessage = t("process.step.register_desc");
     } else if (status === "waiting_register") {
-      message = "等待注册确认";
-      subMessage = "马上就好，您的域名即将到手！";
+      message = t("process.step.wait_register_title");
+      subMessage = t("process.step.wait_register_desc");
     } else if (status === "loading") {
-      message = "等待钱包签名";
-      subMessage = "请打开钱包插件进行确认";
+      message = t("process.step.loading_title");
+      subMessage = t("process.step.loading_desc");
     } else if (status === "processing") {
-      message = "交易处理中";
-      subMessage = "交易已广播，等待节点确认...";
+      message = t("process.step.processing_title");
+      subMessage = t("process.step.processing_desc");
     }
 
     return (
@@ -185,45 +187,48 @@ export const ProcessModal = ({
     );
   };
 
-  // 渲染内容：成功 (Step 3)
   const renderSuccess = () => (
     <div className="text-center py-6 animate-in zoom-in-95 duration-300">
       <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 text-3xl mx-auto mb-4 border border-green-100">
         <FontAwesomeIcon icon={faCheckCircle} />
       </div>
       <h3 className="text-xl font-qs-semibold text-text-main mb-2">
-        {type === "register" ? "注册成功！" : "续费成功！"}
+        {type === "register"
+          ? t("process.result.success_register")
+          : t("process.result.success_renew")}
       </h3>
       <p className="text-sm text-gray-500 mb-6 px-4">
-        您的操作已在链上确认，数据更新可能需要几分钟。
+        {t("process.result.success_desc")}
       </p>
       <button
         onClick={onClose}
         className="w-full py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
       >
-        完成
+        {t("process.btn.finish")}
       </button>
     </div>
   );
 
-  // 🚀 使用 BaseModal 包裹
   return (
     <BaseModal
       isOpen={isOpen}
-      onClose={handleSafeClose} // 仅在 idle 时响应关闭
+      onClose={handleSafeClose}
       maxWidth="max-w-sm"
-      // 动态标题逻辑
       title={
         <div className="flex items-center gap-2">
           {!isProcessing && !isSuccess && (
             <FontAwesomeIcon icon={faCalendarAlt} className="text-link" />
           )}
           <span>
-            {isProcessing ? "操作进行中" : isSuccess ? "操作完成" : title}
+            {isProcessing
+              ? t("process.title.processing")
+              : isSuccess
+                ? t("process.title.done")
+                : title}
           </span>
         </div>
       }
-      showCloseButton={isIdle} // 处理中不显示关闭按钮
+      showCloseButton={isIdle}
     >
       <div className="p-6">
         {isIdle && renderSettings()}
@@ -234,15 +239,17 @@ export const ProcessModal = ({
             <div className="text-red-500 text-3xl mb-3">
               <FontAwesomeIcon icon={faExclamationCircle} />
             </div>
-            <p className="text-text-main font-bold mb-1">操作失败</p>
+            <p className="text-text-main font-bold mb-1">
+              {t("process.result.error_title")}
+            </p>
             <p className="text-xs text-gray-500 mb-6">
-              请检查网络连接或拒绝原因
+              {t("process.result.error_desc")}
             </p>
             <button
               onClick={onClose}
               className="text-link text-sm font-qs-semibold hover:underline"
             >
-              关闭并重试
+              {t("process.btn.retry")}
             </button>
           </div>
         )}

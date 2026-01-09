@@ -6,8 +6,9 @@ import {
   faAt,
   faGears,
 } from "@fortawesome/free-solid-svg-icons";
-import { BaseModal } from "./ui/BaseModal"; // 🚀 引入 BaseModal
 import { faEthereum } from "@fortawesome/free-brands-svg-icons";
+import { useTranslation, Trans } from "react-i18next"; // 🚀
+import { BaseModal } from "./ui/BaseModal";
 
 interface SearchHelpModalProps {
   isOpen: boolean;
@@ -15,16 +16,18 @@ interface SearchHelpModalProps {
 }
 
 export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
+  const { t } = useTranslation(); // 🚀
+
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="搜索功能指南"
+      title={t("search_help.title")}
       maxWidth="max-w-lg"
     >
       <div className="p-6 space-y-6">
         <p className="text-sm text-gray-500 font-qs-medium">
-          ENSBook 支持多种高级模式，助您快速批量发现域名。
+          {t("search_help.desc")}
         </p>
 
         <div className="space-y-4">
@@ -35,10 +38,10 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                域名批量搜索
+                {t("search_help.mode.batch.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                输入任意名称或名称标签，支持空格或逗号分隔多个名称。
+                {t("search_help.mode.batch.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 abc.eth apple 999
@@ -53,11 +56,13 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                名称所有者持仓查询
+                {t("search_help.mode.owner.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                使用 “<span className="text-cyan-500 font-bold">@</span> +
-                ENS/标签” 的格式查询。
+                <Trans i18nKey="search_help.mode.owner.desc">
+                  使用 “<span className="text-cyan-500 font-bold">@</span> +
+                  ENS（或以太坊地址）” 的格式查询。
+                </Trans>
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 @vitalik.eth 或 @vitalik
@@ -72,10 +77,10 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                以太坊地址持仓查询
+                {t("search_help.mode.address.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                直接输入以太坊地址查询其 ENS 名称持仓情况。
+                {t("search_help.mode.address.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 0xd8dA...6045
@@ -90,10 +95,10 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                混合模式
+                {t("search_help.mode.mixed.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                同时支持上述所有格式的混合输入。
+                {t("search_help.mode.mixed.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 apple @vitalik.eth 0xd8...
@@ -103,13 +108,12 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
         </div>
       </div>
 
-      {/* 底部按钮 */}
       <div className="px-6 pb-6 pt-2">
         <button
           onClick={onClose}
           className="w-full py-3 bg-link text-white text-sm font-qs-semibold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
         >
-          明白了
+          {t("search_help.btn.got_it")}
         </button>
       </div>
     </BaseModal>

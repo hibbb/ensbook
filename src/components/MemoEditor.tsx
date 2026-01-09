@@ -9,8 +9,8 @@ import {
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next"; // 🚀
 
-// 🚀 引入新的存储方法
 import { getDomainMeta, updateDomainMeta } from "../services/storage/userStore";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { Tooltip } from "./ui/Tooltip";
@@ -20,11 +20,10 @@ const MAX_MEMO_LENGTH = 200;
 
 interface MemoEditorProps {
   label: string;
-  // 🚀 移除 context prop
 }
 
 export const MemoEditor = ({ label }: MemoEditorProps) => {
-  // 🚀 直接读取全局元数据
+  const { t } = useTranslation(); // 🚀
   const [memo, setLocalMemo] = useState(() => {
     const meta = getDomainMeta(label);
     return meta?.memo || "";
@@ -47,31 +46,28 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
     try {
       const newValue = editValue.trim();
 
-      // 1. 更新全局存储
       updateDomainMeta(label, { memo: newValue });
 
-      // 2. 更新所有相关缓存 (Home, Collections, Mine)
-      // 使用 setQueriesData 模糊匹配所有包含 "records" 的查询
-      // 这样无论用户在哪里修改，所有视图都会同步更新
       queryClient.setQueriesData<NameRecord[]>(
-        { queryKey: ["name-records"] }, // 匹配 Home
+        { queryKey: ["name-records"] },
         (old) => updateCache(old, label, newValue),
       );
       queryClient.setQueriesData<NameRecord[]>(
-        { queryKey: ["collection-records"] }, // 匹配 Collections & Mine
+        { queryKey: ["collection-records"] },
         (old) => updateCache(old, label, newValue),
       );
 
       setLocalMemo(newValue);
       setIsOpen(false);
-      toast.success(newValue ? "备注已更新" : "备注已删除");
+      toast.success(
+        newValue ? t("memo.toast.updated") : t("memo.toast.deleted"),
+      );
     } catch (e) {
       console.error(e);
-      toast.error("保存失败：本地存储空间已满");
+      toast.error(t("memo.toast.storage_full"));
     }
   };
 
-  // 辅助函数：更新缓存列表
   const updateCache = (
     old: NameRecord[] | undefined,
     label: string,
@@ -89,7 +85,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
 
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
-      <Tooltip content={hasMemo ? memo : "添加备注"}>
+      <Tooltip content={hasMemo ? memo : t("memo.tooltip.add")}>
         <PopoverTrigger asChild>
           <button
             className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 outline-none ml-1
@@ -113,7 +109,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
       <PopoverContent align="start" side="bottom" className="w-64 p-3">
         <div className="mb-2 flex justify-between items-center">
           <span className="text-xs font-qs-semibold text-gray-400">
-            编辑备注
+            {t("memo.edit_title")}
           </span>
           <span
             className={`text-[10px] ${
@@ -131,7 +127,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="输入备注信息..."
+          placeholder={t("memo.placeholder")}
           className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-qs-medium"
           maxLength={MAX_MEMO_LENGTH}
         />
@@ -141,13 +137,13 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
             onClick={handleSave}
             className="flex-1 bg-link text-white text-xs font-bold py-1.5 rounded-lg hover:bg-link-hover active:scale-95 transition-all flex items-center justify-center gap-1"
           >
-            <FontAwesomeIcon icon={faCheck} /> 保存
+            <FontAwesomeIcon icon={faCheck} /> {t("memo.save")}
           </button>
           <button
             onClick={() => setIsOpen(false)}
             className="px-3 bg-gray-100 text-gray-500 text-xs font-bold py-1.5 rounded-lg hover:bg-gray-200 hover:text-gray-700 active:scale-95 transition-all"
           >
-            取消
+            {t("memo.cancel")}
           </button>
         </div>
       </PopoverContent>
