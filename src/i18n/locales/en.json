@@ -168,7 +168,7 @@
       "filter_length_wrap": "Filter by Length / Wrap",
       "filter_status": "Filter by Status",
       "filter_action": "Filter by Action",
-      "filter_level": "Filter by Level",
+      "filter_level": "Filter by Marker",
       "by_length": "By Length",
       "by_wrap": "By Wrap State",
       "all_length": "All Lengths",
@@ -190,9 +190,9 @@
       "select_all_renewable": "Select all renewable",
       "level_options": {
         "0": "Default",
-        "1": "Blue",
-        "2": "Yellow",
-        "3": "Red"
+        "1": "Blue Marker",
+        "2": "Yellow Marker",
+        "3": "Red Marker"
       }
     },
     "delete": {
@@ -206,7 +206,7 @@
       "clear_all": "Clear All"
     },
     "cell": {
-      "index_tooltip": "Click to toggle level / Double click to reset",
+      "index_tooltip": "Click to toggle Marker / Double click to reset",
       "owner_addr": "Owner Address",
       "primary_name": "Primary Name",
       "copy_addr": "Copy Address",

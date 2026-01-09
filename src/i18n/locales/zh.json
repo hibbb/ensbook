@@ -168,7 +168,7 @@
       "filter_length_wrap": "按长度或包装筛选",
       "filter_status": "按状态筛选",
       "filter_action": "按操作类型筛选",
-      "filter_level": "按等级筛选",
+      "filter_level": "按标记筛选",
       "by_length": "按长度",
       "by_wrap": "按包装",
       "all_length": "全部长度",
@@ -190,9 +190,9 @@
       "select_all_renewable": "全选可续费域名",
       "level_options": {
         "0": "默认",
-        "1": "关注 (蓝)",
-        "2": "警示 (黄)",
-        "3": "紧急 (红)"
+        "1": "蓝色标记",
+        "2": "黄色标记",
+        "3": "红色标记"
       }
     },
     "delete": {
@@ -206,7 +206,7 @@
       "clear_all": "全部清空"
     },
     "cell": {
-      "index_tooltip": "单击切换级别 / 双击重置",
+      "index_tooltip": "单击标记颜色 / 双击重置",
       "owner_addr": "所有者地址",
       "primary_name": "主名称",
       "copy_addr": "复制地址",
