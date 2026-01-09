@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "../ui/Tooltip";
 
 interface FilterDropdownProps {
@@ -27,9 +27,9 @@ export const FilterDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
-  // 🚀 处理默认标题
+  // 🚀 替换: table.filter.default_title -> table.filter.default_title (保持不变)
   const displayTitle = title || t("table.filter.default_title");
 
   useEffect(() => {

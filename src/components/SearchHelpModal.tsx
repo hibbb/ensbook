@@ -7,7 +7,7 @@ import {
   faGears,
 } from "@fortawesome/free-solid-svg-icons";
 import { faEthereum } from "@fortawesome/free-brands-svg-icons";
-import { useTranslation, Trans } from "react-i18next"; // 🚀
+import { useTranslation, Trans } from "react-i18next";
 import { BaseModal } from "./ui/BaseModal";
 
 interface SearchHelpModalProps {
@@ -16,18 +16,20 @@ interface SearchHelpModalProps {
 }
 
 export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={t("search_help.title")}
+      // 🚀 替换: search_help.title -> search.guide.title
+      title={t("search.guide.title")}
       maxWidth="max-w-lg"
     >
       <div className="p-6 space-y-6">
         <p className="text-sm text-gray-500 font-qs-medium">
-          {t("search_help.desc")}
+          {/* 🚀 替换: search_help.desc -> search.guide.desc */}
+          {t("search.guide.desc")}
         </p>
 
         <div className="space-y-4">
@@ -38,10 +40,11 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                {t("search_help.mode.batch.title")}
+                {/* 🚀 替换: search_help.mode.batch.title -> search.guide.mode.batch.title */}
+                {t("search.guide.mode.batch.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                {t("search_help.mode.batch.desc")}
+                {t("search.guide.mode.batch.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 abc.eth apple 999
@@ -56,10 +59,11 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                {t("search_help.mode.owner.title")}
+                {t("search.guide.mode.owner.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                <Trans i18nKey="search_help.mode.owner.desc">
+                {/* 🚀 替换: search_help.mode.owner.desc -> search.guide.mode.owner.desc */}
+                <Trans i18nKey="search.guide.mode.owner.desc">
                   使用 “<span className="text-cyan-500 font-bold">@</span> +
                   ENS（或以太坊地址）” 的格式查询。
                 </Trans>
@@ -77,10 +81,10 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                {t("search_help.mode.address.title")}
+                {t("search.guide.mode.address.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                {t("search_help.mode.address.desc")}
+                {t("search.guide.mode.address.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 0xd8dA...6045
@@ -95,10 +99,10 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                {t("search_help.mode.mixed.title")}
+                {t("search.guide.mode.mixed.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                {t("search_help.mode.mixed.desc")}
+                {t("search.guide.mode.mixed.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
                 apple @vitalik.eth 0xd8...
@@ -113,7 +117,8 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
           onClick={onClose}
           className="w-full py-3 bg-link text-white text-sm font-qs-semibold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
         >
-          {t("search_help.btn.got_it")}
+          {/* 🚀 替换: search_help.btn.got_it -> common.got_it */}
+          {t("common.got_it")}
         </button>
       </div>
     </BaseModal>

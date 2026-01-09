@@ -5,7 +5,7 @@ import { FilterDropdown } from "../FilterDropdown";
 import type { FilterConfig } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "../../ui/Tooltip";
 
 interface ActionHeaderProps {
@@ -29,7 +29,7 @@ export const ActionHeader = ({
   actionCounts = { all: 0, register: 0, renew: 0 },
   disabled,
 }: ActionHeaderProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   return (
     <ThWrapper>
@@ -39,10 +39,13 @@ export const ActionHeader = ({
             <Tooltip
               content={
                 !isConnected
-                  ? t("table.filter.connect_wallet")
+                  ? // 🚀 替换: table.filter.connect_wallet -> common.connect_wallet
+                    t("common.connect_wallet")
                   : !hasRenewable
-                    ? t("table.filter.no_renewable")
-                    : t("table.filter.select_all_renewable")
+                    ? // 🚀 替换: table.filter.no_renewable -> table.filter.no_renewable (保持不变)
+                      t("table.filter.no_renewable")
+                    : // 🚀 替换: table.filter.select_all_renewable -> table.filter.select_all_renewable (保持不变)
+                      t("table.filter.select_all_renewable")
               }
             >
               <input
@@ -60,10 +63,12 @@ export const ActionHeader = ({
           </div>
         )}
         <div className="flex items-center gap-2">
+          {/* 🚀 替换: table.header.action -> table.header.action (保持不变) */}
           <span>{t("table.header.action")}</span>
           <FilterDropdown
             isActive={filterConfig.actionType !== "all"}
             menuWidth="w-40 right-0"
+            // 🚀 替换: table.filter.filter_action -> table.filter.filter_action (保持不变)
             title={t("table.filter.filter_action")}
             disabled={disabled}
           >

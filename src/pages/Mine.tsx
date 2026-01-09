@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faFeatherPointed } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation, Trans } from "react-i18next"; // 🚀
+import { useTranslation, Trans } from "react-i18next";
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -45,7 +45,7 @@ const useMyCollectionLabels = (source: string) => {
 export const Mine = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   const source = useMyCollectionSource();
   const hasSource = !!source && source.length > 0;
@@ -192,12 +192,12 @@ export const Mine = () => {
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
   const getModalTitle = () => {
-    if (activeType === "register") return t("process.title.register");
+    if (activeType === "register") return t("transaction.title.register");
     if (activeType === "batch")
-      return t("process.title.batch_renew", {
+      return t("transaction.title.batch_renew", {
         count: durationTarget?.labels?.length,
       });
-    return t("process.title.renew");
+    return t("transaction.title.renew");
   };
 
   // --- Render Logic ---
@@ -212,7 +212,6 @@ export const Mine = () => {
           {t("mine.empty_state.title")}
         </h2>
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
-          {/* 🚀 使用 Trans 处理换行 */}
           <Trans i18nKey="mine.empty_state.desc">
             Mine 页面允许你通过自定义规则
             <br />
@@ -222,7 +221,6 @@ export const Mine = () => {
           </Trans>
         </p>
         <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-400 mb-8 font-mono">
-          {/* 🚀 使用 Trans 处理嵌套标签 */}
           <Trans i18nKey="mine.empty_state.guide">
             请前往 <span className="text-text-main">设置 {">"} 我的集合</span>{" "}
             进行配置
@@ -310,7 +308,7 @@ export const Mine = () => {
               onClick={clearSelection}
               className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
             >
-              {t("home.floating_bar.cancel")}
+              {t("common.cancel")}
             </button>
           </div>
         </div>

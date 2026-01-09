@@ -5,7 +5,7 @@ import { usePublicClient, useAccount, useChainId } from "wagmi";
 import { normalize } from "viem/ens";
 import { type Hex } from "viem";
 import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { REFERRER_ADDRESS_HASH } from "../config/env";
 import {
   useWriteEthControllerV3,
@@ -29,7 +29,7 @@ export function useEnsRenewal() {
   const { address } = useAccount();
   const chainId = useChainId();
   const contracts = getContracts(chainId);
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   const { writeContractAsync: writeEthController } = useWriteEthControllerV3();
   const { writeContractAsync: writeBulkRenewal } = useWriteBulkRenewal();
@@ -42,7 +42,8 @@ export function useEnsRenewal() {
   const renewSingle = useCallback(
     async (rawLabel: string, duration: bigint) => {
       if (!publicClient || !address) {
-        toast.error(t("hooks.renewal.connect_wallet"));
+        // 🚀 替换: hooks.renewal.connect_wallet -> common.connect_wallet
+        toast.error(t("common.connect_wallet"));
         return;
       }
 
@@ -73,9 +74,12 @@ export function useEnsRenewal() {
         setTxHash(hash);
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
-          loading: t("hooks.renewal.confirming"),
-          success: t("hooks.renewal.success", { label }),
-          error: t("hooks.renewal.failed"),
+          // 🚀 替换: hooks.renewal.confirming -> transaction.toast.confirming
+          loading: t("transaction.toast.confirming"),
+          // 🚀 替换: hooks.renewal.success -> transaction.toast.success
+          success: t("transaction.toast.success"),
+          // 🚀 替换: hooks.renewal.failed -> transaction.toast.failed
+          error: t("transaction.toast.failed"),
         });
 
         setStatus("success");
@@ -86,7 +90,8 @@ export function useEnsRenewal() {
         toast.error(
           error.shortMessage ||
             error.message ||
-            t("hooks.renewal.unknown_error"),
+            // 🚀 替换: hooks.renewal.unknown_error -> transaction.toast.unknown_error
+            t("transaction.toast.unknown_error"),
         );
       }
     },
@@ -96,11 +101,13 @@ export function useEnsRenewal() {
   const renewBatch = useCallback(
     async (rawLabels: string[], duration: bigint) => {
       if (!publicClient || !address) {
-        toast.error(t("hooks.renewal.connect_wallet"));
+        // 🚀 替换: hooks.renewal.connect_wallet -> common.connect_wallet
+        toast.error(t("common.connect_wallet"));
         return;
       }
       if (rawLabels.length === 0) {
-        toast.error(t("hooks.renewal.select_one"));
+        // 🚀 替换: hooks.renewal.select_one -> transaction.toast.select_one
+        toast.error(t("transaction.toast.select_one"));
         return;
       }
 
@@ -127,11 +134,14 @@ export function useEnsRenewal() {
 
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
-          loading: t("hooks.renewal.batch_confirming", {
+          // 🚀 替换: hooks.renewal.batch_confirming -> transaction.toast.batch_confirming
+          loading: t("transaction.toast.batch_confirming", {
             count: labels.length,
           }),
-          success: t("hooks.renewal.batch_success"),
-          error: t("hooks.renewal.batch_failed"),
+          // 🚀 替换: hooks.renewal.batch_success -> transaction.toast.success
+          success: t("transaction.toast.success"),
+          // 🚀 替换: hooks.renewal.batch_failed -> transaction.toast.failed
+          error: t("transaction.toast.failed"),
         });
 
         setStatus("success");
@@ -142,7 +152,8 @@ export function useEnsRenewal() {
         toast.error(
           error.shortMessage ||
             error.message ||
-            t("hooks.renewal.batch_unknown_error"),
+            // 🚀 替换: hooks.renewal.batch_unknown_error -> transaction.toast.unknown_error
+            t("transaction.toast.unknown_error"),
         );
       }
     },

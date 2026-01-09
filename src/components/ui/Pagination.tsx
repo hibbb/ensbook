@@ -7,7 +7,7 @@ import {
   faAnglesLeft,
   faAnglesRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 interface PaginationProps {
   currentPage: number;
@@ -23,7 +23,7 @@ export const Pagination = ({
   onPageChange,
 }: PaginationProps) => {
   const totalPages = Math.ceil(totalCount / pageSize);
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   if (totalPages <= 1) return null;
 

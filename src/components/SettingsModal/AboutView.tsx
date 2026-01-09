@@ -2,10 +2,10 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 export const AboutView = () => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -21,12 +21,12 @@ export const AboutView = () => {
       </div>
 
       <p className="text-sm text-gray-600 leading-relaxed font-qs-regular text-center px-8">
-        {t("about.description")}
+        {t("settings.about.description")}
       </p>
 
       <div>
         <h5 className="text-xs font-qs-semibold text-gray-400 uppercase tracking-wider px-1 mb-2 border-b border-gray-100 pb-2">
-          {t("about.connect")}
+          {t("settings.about.connect")}
         </h5>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -43,7 +43,7 @@ export const AboutView = () => {
             />
             <div className="flex-1 min-w-0">
               <div className="text-sm font-qs-semibold text-text-main group-hover:text-link transition-colors">
-                {t("about.author")}
+                {t("settings.about.author")}
               </div>
               <div className="text-xs text-gray-500">@forlbb</div>
             </div>
@@ -60,10 +60,10 @@ export const AboutView = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-qs-semibold text-text-main group-hover:text-link transition-colors">
-                {t("about.github")}
+                {t("settings.about.github")}
               </div>
               <div className="text-xs text-gray-500">
-                {t("about.open_source")}
+                {t("settings.about.open_source")}
               </div>
             </div>
           </a>

@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -32,7 +32,7 @@ export const CollectionDetail = () => {
   const collection = id ? ENS_COLLECTIONS[id] : null;
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   useDocumentTitle(collection?.displayName);
 
@@ -163,12 +163,12 @@ export const CollectionDetail = () => {
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
   const getModalTitle = () => {
-    if (activeType === "register") return t("process.title.register");
+    if (activeType === "register") return t("transaction.title.register");
     if (activeType === "batch")
-      return t("process.title.batch_renew", {
+      return t("transaction.title.batch_renew", {
         count: durationTarget?.labels?.length,
       });
-    return t("process.title.renew");
+    return t("transaction.title.renew");
   };
 
   if (!collection)
@@ -183,8 +183,10 @@ export const CollectionDetail = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 pb-24 relative">
       <header className="mb-10">
-        <h1 className="text-4xl font-qs-semibold">{collection.displayName}</h1>
-        <p className="text-gray-400 mt-2">{collection.description}</p>
+        <h1 className="text-4xl font-qs-semibold">
+          {t(collection.displayName)}
+        </h1>
+        <p className="text-gray-400 mt-2">{t(collection.description)}</p>
       </header>
 
       <NameTable
@@ -238,7 +240,7 @@ export const CollectionDetail = () => {
               onClick={clearSelection}
               className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
             >
-              {t("home.floating_bar.cancel")}
+              {t("common.cancel")}
             </button>
           </div>
         </div>

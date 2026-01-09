@@ -4,7 +4,6 @@ import { type PublicClient } from "viem";
 import { type RegistrationStatus } from "../../types/ensRegistration";
 import { getRegistrationState } from "../storage/registration";
 import { checkTxStatus } from "./transaction";
-import i18n from "../../i18n/config"; // 🚀 引入 i18n 实例
 
 const MIN_COMMITMENT_AGE = 60;
 const MAX_COMMITMENT_AGE = 86400;
@@ -40,8 +39,8 @@ export async function checkRegStatus(
       return { status: "waiting_register", secondsLeft: 0, localState };
     }
     if (txStatus.state === "reverted") {
-      // 🚀 使用 i18n 翻译
-      regErrorMessage = i18n.t("hooks.registration.reg_reverted");
+      // 🚀 替换: hooks.registration.reg_reverted -> transaction.toast.failed
+      regErrorMessage = "transaction.result.error_desc";
     }
   }
 
@@ -54,7 +53,8 @@ export async function checkRegStatus(
         status: "error",
         secondsLeft: 0,
         localState,
-        errorMessage: i18n.t("hooks.registration.commit_reverted"), // 🚀
+        // 🚀 替换: hooks.registration.commit_reverted -> transaction.step.commit_failed
+        errorMessage: "transaction.step.commit_failed",
       };
     }
     if (txStatus.state === "pending" || txStatus.state === "not_found") {
@@ -69,7 +69,8 @@ export async function checkRegStatus(
           status: "idle",
           secondsLeft: 0,
           localState,
-          errorMessage: i18n.t("hooks.registration.commit_expired"), // 🚀
+          // 🚀 替换: hooks.registration.commit_expired -> transaction.toast.commit_expired
+          errorMessage: "transaction.toast.commit_expired",
         };
       }
 

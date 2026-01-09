@@ -17,7 +17,6 @@ import { BaseModal } from "../ui/BaseModal";
 import { DataBackupView } from "./DataBackupView";
 import { AboutView } from "./AboutView";
 import { MyCollectionSettings } from "./MyCollectionSettings";
-// 🚀 引入新组件
 import { LanguageView } from "./LanguageView";
 import pkg from "../../../package.json";
 
@@ -26,10 +25,9 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-// 🚀 1. 增加 language 类型
 type SettingsTab =
-  | "general" // 这里的 general 实际上对应的是 Language 按钮，建议改名或映射
-  | "language" // 我们显式增加一个 language 类型
+  | "general"
+  | "language"
   | "registration"
   | "data"
   | "about"
@@ -89,7 +87,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         return t("settings.title.my_collection");
       case "about":
         return t("settings.title.about");
-      // 🚀 2. 增加标题映射
       case "language":
         return t("settings.title.language");
       default:
@@ -109,7 +106,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         <div className="w-56 bg-white border-r border-gray-100 flex flex-col shrink-0">
           <div className="p-6">
             <h3 className="text-xl font-qs-semibold text-text-main tracking-tight">
-              Settings
+              {/* 🚀 替换: Settings -> settings.title.default */}
+              {t("settings.title.default")}
             </h3>
           </div>
           <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto custom-scrollbar flex flex-col">
@@ -136,13 +134,11 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                 onClick={() => setActiveTab("data")}
               />
 
-              {/* 🚀 3. 启用语言按钮 */}
               <SidebarItem
                 icon={faGlobe}
                 label={t("settings.sidebar.language")}
                 active={activeTab === "language"}
                 onClick={() => setActiveTab("language")}
-                // 移除 disabled 和 badge
               />
 
               <SidebarItem
@@ -191,7 +187,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             {activeTab === "data" && <DataBackupView onClose={onClose} />}
             {activeTab === "about" && <AboutView />}
             {activeTab === "my-collection" && <MyCollectionSettings />}
-            {/* 🚀 4. 渲染语言视图 */}
             {activeTab === "language" && <LanguageView />}
           </div>
         </div>

@@ -6,7 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import type { SortConfig, SortField, FilterConfig } from "../types";
@@ -33,7 +33,7 @@ export const OwnerHeader = ({
   listCount = 0,
   disabled,
 }: OwnerHeaderProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
   const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
@@ -48,19 +48,25 @@ export const OwnerHeader = ({
     (isAllMine && !filterConfig.onlyMe);
 
   const getTooltipContent = () => {
-    if (!isConnected) return t("table.filter.connect_wallet");
+    // 🚀 替换: table.filter.connect_wallet -> common.connect_wallet
+    if (!isConnected) return t("common.connect_wallet");
+    // 🚀 替换: table.filter.no_mine -> table.filter.no_mine (保持不变)
     if (myCount === 0) return t("table.filter.no_mine");
 
+    // 🚀 替换: table.filter.show_all -> table.filter.show_all (保持不变)
     if (filterConfig.onlyMe) return t("table.filter.show_all");
 
+    // 🚀 替换: table.filter.all_mine -> table.filter.all_mine (保持不变)
     if (isAllMine) return t("table.filter.all_mine");
 
+    // 🚀 替换: table.filter.only_mine -> table.filter.only_mine (保持不变)
     return t("table.filter.only_mine", { count: myCount });
   };
 
   return (
     <ThWrapper>
       <div className="flex items-center gap-2">
+        {/* 🚀 替换: table.header.owner -> table.header.owner (保持不变) */}
         <span>{t("table.header.owner")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton
@@ -70,6 +76,7 @@ export const OwnerHeader = ({
             defaultIcon={faSortAlphaDown}
             ascIcon={faSortAlphaDown}
             descIcon={faSortAlphaUp}
+            // 🚀 替换: table.filter.sort_owner -> table.filter.sort_owner (保持不变)
             title={t("table.filter.sort_owner")}
             disabled={disabled}
           />

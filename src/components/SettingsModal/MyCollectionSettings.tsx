@@ -8,7 +8,7 @@ import {
   faFeatherPointed,
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 import {
   getMyCollectionSource,
@@ -24,7 +24,7 @@ export const MyCollectionSettings = () => {
   const [input, setInput] = useState(getMyCollectionSource());
   const [isValidating, setIsValidating] = useState(false);
   const [isHomepage, setIsHomepage] = useState(false);
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   useEffect(() => {
     const settings = getUserSettings();
@@ -37,8 +37,8 @@ export const MyCollectionSettings = () => {
     updateSettings({ mineAsHomepage: newValue });
     toast.success(
       newValue
-        ? t("my_collection.toast.home_set")
-        : t("my_collection.toast.home_unset"),
+        ? t("settings.my_collection.toast.home_set")
+        : t("settings.my_collection.toast.home_unset"),
     );
   };
 
@@ -48,22 +48,22 @@ export const MyCollectionSettings = () => {
 
     if (!trimmed) {
       if (currentStored) {
-        if (window.confirm(t("my_collection.confirm.clear"))) {
+        if (window.confirm(t("settings.my_collection.confirm.clear"))) {
           saveMyCollectionSource("");
           saveCollectionViewState("mine", {});
           setInput("");
-          toast.success(t("my_collection.toast.cleared"));
+          toast.success(t("settings.my_collection.toast.cleared"));
         } else {
           setInput(currentStored);
         }
       } else {
-        toast(t("my_collection.toast.already_empty"), { icon: "👻" });
+        toast(t("settings.my_collection.toast.already_empty"), { icon: "👻" });
       }
       return;
     }
 
     setIsValidating(true);
-    const toastId = toast.loading(t("my_collection.toast.validating"));
+    const toastId = toast.loading(t("settings.my_collection.toast.validating"));
 
     try {
       const classified = parseAndClassifyInputs(trimmed);
@@ -73,7 +73,9 @@ export const MyCollectionSettings = () => {
         classified.ethAddresses.length;
 
       if (totalCandidates === 0) {
-        toast.error(t("my_collection.toast.no_valid_format"), { id: toastId });
+        toast.error(t("settings.my_collection.toast.no_valid_format"), {
+          id: toastId,
+        });
         return;
       }
 
@@ -82,17 +84,23 @@ export const MyCollectionSettings = () => {
       if (labels.length > 0) {
         saveMyCollectionSource(trimmed);
         toast.success(
-          t("my_collection.toast.save_success", { count: labels.length }),
+          t("settings.my_collection.toast.save_success", {
+            count: labels.length,
+          }),
           {
             id: toastId,
           },
         );
       } else {
-        toast.error(t("my_collection.toast.no_valid_found"), { id: toastId });
+        toast.error(t("settings.my_collection.toast.no_valid_found"), {
+          id: toastId,
+        });
       }
     } catch (error) {
       console.error("验证失败:", error);
-      toast.error(t("my_collection.toast.network_error"), { id: toastId });
+      toast.error(t("settings.my_collection.toast.network_error"), {
+        id: toastId,
+      });
     } finally {
       setIsValidating(false);
     }
@@ -103,9 +111,11 @@ export const MyCollectionSettings = () => {
       <div className="text-sm text-text-main/80">
         <h4 className="font-qs-semibold text-base text-black mb-2">
           <FontAwesomeIcon icon={faFeatherPointed} className="mr-2" />
-          {t("my_collection.ui.title")}
+          {t("settings.my_collection.ui.title")}
         </h4>
-        <p className="leading-relaxed mb-3">{t("my_collection.ui.desc")}</p>
+        <p className="leading-relaxed mb-3">
+          {t("settings.my_collection.ui.desc")}
+        </p>
         <div className="flex flex-wrap gap-2 font-mono text-xs">
           <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
             abc, hello, 123
@@ -124,10 +134,10 @@ export const MyCollectionSettings = () => {
       <div className="flex items-center justify-between py-1">
         <div className="flex flex-col">
           <span className="font-qs-semibold text-sm text-black">
-            {t("my_collection.ui.set_home")}
+            {t("settings.my_collection.ui.set_home")}
           </span>
           <span className="text-xs text-gray-400 mt-0.5">
-            {t("my_collection.ui.set_home_desc")}
+            {t("settings.my_collection.ui.set_home_desc")}
           </span>
         </div>
 
@@ -146,7 +156,7 @@ export const MyCollectionSettings = () => {
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={t("my_collection.ui.placeholder")}
+          placeholder={t("settings.my_collection.ui.placeholder")}
           rows={5}
           className="w-full p-4 bg-white border border-gray-200 rounded-xl font-mono text-sm text-text-main
             focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all resize-none shadow-sm
@@ -163,16 +173,16 @@ export const MyCollectionSettings = () => {
           {isValidating ? (
             <span className="flex items-center gap-2 text-link animate-pulse">
               <FontAwesomeIcon icon={faSpinner} spin />
-              {t("my_collection.ui.status_validating")}
+              {t("settings.my_collection.ui.status_validating")}
             </span>
           ) : getMyCollectionSource() ? (
             <span className="text-emerald-600 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              {t("my_collection.ui.status_active")}
+              {t("settings.my_collection.ui.status_active")}
             </span>
           ) : (
             <span className="text-gray-400">
-              {t("my_collection.ui.status_inactive")}
+              {t("settings.my_collection.ui.status_inactive")}
             </span>
           )}
         </div>
@@ -188,11 +198,11 @@ export const MyCollectionSettings = () => {
             }`}
         >
           {isValidating ? (
-            t("my_collection.ui.btn_validating")
+            t("settings.my_collection.ui.btn_validating")
           ) : (
             <>
               <FontAwesomeIcon icon={faCheck} />
-              {t("my_collection.ui.btn_save")}
+              {t("settings.my_collection.ui.btn_save")}
             </>
           )}
         </button>

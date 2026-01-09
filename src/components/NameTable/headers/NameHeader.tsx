@@ -7,7 +7,7 @@ import {
   faCommentDots,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import { FilterDropdown } from "../FilterDropdown";
@@ -36,12 +36,13 @@ export const NameHeader = ({
   nameCounts = {
     lengthCounts: {},
     availableLengths: [],
+    // 🟢 修复：将 number 改为 0
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
     memosCount: 0,
   },
   disabled,
 }: NameHeaderProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const isActive =
     filterConfig.lengthList.length > 0 || filterConfig.wrappedType !== "all";
 

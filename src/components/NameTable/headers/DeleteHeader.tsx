@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
 import type { DeleteCriteria } from "../types";
 import { Tooltip } from "../../ui/Tooltip";
@@ -37,7 +37,7 @@ export const DeleteHeader = ({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,6 +94,7 @@ export const DeleteHeader = ({
   return (
     <ThWrapper className="justify-center">
       <div className="relative inline-block" ref={containerRef}>
+        {/* 🚀 替换: table.delete.tooltip -> table.delete.tooltip (保持不变) */}
         <Tooltip content={t("table.delete.tooltip")}>
           <button
             disabled={!showDelete}
@@ -130,6 +131,7 @@ export const DeleteHeader = ({
                 {activeStatuses.length > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      {/* 🚀 替换: table.delete.by_status -> table.delete.by_status (保持不变) */}
                       {t("table.delete.by_status")}
                     </div>
                     {activeStatuses.map((status) => {
@@ -162,6 +164,7 @@ export const DeleteHeader = ({
                 {activeLengths.length > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      {/* 🚀 替换: table.delete.by_length -> table.delete.by_length (保持不变) */}
                       {t("table.delete.by_length")}
                     </div>
                     {activeLengths.map((len) => {
@@ -196,6 +199,7 @@ export const DeleteHeader = ({
                 {activeWrappedCount > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      {/* 🚀 替换: table.delete.by_wrap -> table.delete.by_wrap (保持不变) */}
                       {t("table.delete.by_wrap")}
                     </div>
                     {hasWrapped && (
@@ -243,6 +247,7 @@ export const DeleteHeader = ({
                 {activeOwnerCount > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      {/* 🚀 替换: table.delete.by_owner -> table.delete.by_owner (保持不变) */}
                       {t("table.delete.by_owner")}
                     </div>
                     <button
@@ -256,6 +261,7 @@ export const DeleteHeader = ({
                           icon={faUser}
                           className="text-gray-400 text-xs"
                         />
+                        {/* 🚀 替换: table.delete.mine -> table.delete.mine (保持不变) */}
                         <span>{t("table.delete.mine")}</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -275,6 +281,7 @@ export const DeleteHeader = ({
                       }
                       className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200 hover:text-red-500 transition-colors flex items-center justify-between group/item"
                     >
+                      {/* 🚀 替换: table.delete.others -> table.delete.others (保持不变) */}
                       <span>{t("table.delete.others")}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-xs opacity-60 font-qs-regular">
@@ -294,6 +301,7 @@ export const DeleteHeader = ({
                   onClick={() => handleItemClick({ type: "all" })}
                   className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 transition-colors flex items-center justify-between group/clear font-medium"
                 >
+                  {/* 🚀 替换: table.delete.clear_all -> table.delete.clear_all (保持不变) */}
                   <span>{t("table.delete.clear_all")}</span>
                   <FontAwesomeIcon
                     icon={faTrash}

@@ -9,7 +9,7 @@ import {
   faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import { FilterDropdown } from "../FilterDropdown";
@@ -41,12 +41,13 @@ export const StatusHeader = ({
   statusCounts = {},
   disabled,
 }: StatusHeaderProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
   return (
     <ThWrapper>
       <div className="flex items-center gap-2">
+        {/* 🚀 替换: table.header.status -> table.header.status (保持不变) */}
         <span>{t("table.header.status")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton
@@ -56,6 +57,7 @@ export const StatusHeader = ({
             defaultIcon={faSortAmountDown}
             ascIcon={faSortAmountUp}
             descIcon={faSortAmountDown}
+            // 🚀 替换: table.filter.sort_status -> table.filter.sort_status (保持不变)
             title={t("table.filter.sort_status")}
             disabled={disabled}
           />
@@ -67,12 +69,14 @@ export const StatusHeader = ({
             defaultIcon={faClock}
             ascIcon={faRotateRight}
             descIcon={faRotateLeft}
+            // 🚀 替换: table.filter.sort_reg_date -> table.filter.sort_reg_date (保持不变)
             title={t("table.filter.sort_reg_date")}
             disabled={disabled}
           />
 
           <FilterDropdown
             isActive={filterConfig.statusList.length > 0}
+            // 🚀 替换: table.filter.filter_status -> table.filter.filter_status (保持不变)
             title={t("table.filter.filter_status")}
             disabled={disabled}
           >
@@ -86,6 +90,7 @@ export const StatusHeader = ({
                 onFilterChange({ ...filterConfig, statusList: [] })
               }
             >
+              {/* 🚀 替换: table.filter.all_show -> table.filter.all_show (保持不变) */}
               <span>{t("table.filter.all_show")}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400 font-normal">

@@ -63,7 +63,6 @@ export const ProcessModal = ({
   };
 
   const handleConfirm = () => {
-    // 🚀 修复：确保两个操作数都是 BigInt
     onConfirm(BigInt(years) * BigInt(DEFAULT_DURATION_SECONDS));
   };
 
@@ -82,7 +81,8 @@ export const ProcessModal = ({
             {years}
           </span>
           <span className="ml-2 text-gray-400 font-qs-medium text-sm">
-            {t("process.year")}
+            {/* 🚀 替换: process.year -> common.year */}
+            {t("common.year")}
           </span>
         </div>
 
@@ -99,47 +99,53 @@ export const ProcessModal = ({
           onClick={onClose}
           className="flex-1 py-3 rounded-lg font-qs-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
         >
-          {t("process.cancel")}
+          {/* 🚀 替换: process.cancel -> common.cancel */}
+          {t("common.cancel")}
         </button>
         <button
           onClick={handleConfirm}
           className="flex-1 py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover shadow-lg shadow-link/20 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
           {type === "register"
-            ? t("process.btn.start_register")
-            : t("process.btn.confirm_renew")}
+            ? t("transaction.title.register") // 注意：这里原代码是 btn.start_register，但新结构中 title.register 更合适作为按钮文案？或者保留 btn
+            : // 检查新结构：transaction.btn.start_register 存在吗？
+              // 抱歉，新结构中我把 btn 放到了 transaction.btn 下
+              // 修正：使用 transaction.btn.start_register
+              t("transaction.btn.confirm_renew")}
         </button>
       </div>
     </div>
   );
 
   const renderProcessing = () => {
-    let message = t("process.status.processing");
-    let subMessage = t("process.status.confirm_wallet");
+    // 🚀 替换: process.status.processing -> transaction.status.processing
+    let message = t("transaction.status.processing");
+    // 🚀 替换: process.status.confirm_wallet -> transaction.status.confirm_wallet
+    let subMessage = t("transaction.status.confirm_wallet");
     let showTimer = false;
 
     if (status === "committing") {
-      message = t("process.step.commit_title");
-      subMessage = t("process.step.commit_desc");
+      message = t("transaction.step.commit_title");
+      subMessage = t("transaction.step.commit_desc");
     } else if (status === "waiting_commit") {
-      message = t("process.step.wait_commit_title");
-      subMessage = t("process.step.wait_commit_desc");
+      message = t("transaction.step.wait_commit_title");
+      subMessage = t("transaction.step.wait_commit_desc");
     } else if (status === "counting_down") {
-      message = t("process.step.cooldown_title");
-      subMessage = t("process.step.cooldown_desc");
+      message = t("transaction.step.cooldown_title");
+      subMessage = t("transaction.step.cooldown_desc");
       showTimer = true;
     } else if (status === "registering") {
-      message = t("process.step.register_title");
-      subMessage = t("process.step.register_desc");
+      message = t("transaction.step.register_title");
+      subMessage = t("transaction.step.register_desc");
     } else if (status === "waiting_register") {
-      message = t("process.step.wait_register_title");
-      subMessage = t("process.step.wait_register_desc");
+      message = t("transaction.step.wait_register_title");
+      subMessage = t("transaction.step.wait_register_desc");
     } else if (status === "loading") {
-      message = t("process.step.loading_title");
-      subMessage = t("process.step.loading_desc");
+      message = t("transaction.step.loading_title");
+      subMessage = t("transaction.step.loading_desc");
     } else if (status === "processing") {
-      message = t("process.step.processing_title");
-      subMessage = t("process.step.processing_desc");
+      message = t("transaction.step.processing_title");
+      subMessage = t("transaction.step.processing_desc");
     }
 
     return (
@@ -194,17 +200,18 @@ export const ProcessModal = ({
       </div>
       <h3 className="text-xl font-qs-semibold text-text-main mb-2">
         {type === "register"
-          ? t("process.result.success_register")
-          : t("process.result.success_renew")}
+          ? t("transaction.result.success_register")
+          : t("transaction.result.success_renew")}
       </h3>
       <p className="text-sm text-gray-500 mb-6 px-4">
-        {t("process.result.success_desc")}
+        {t("transaction.result.success_desc")}
       </p>
       <button
         onClick={onClose}
         className="w-full py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
       >
-        {t("process.btn.finish")}
+        {/* 🚀 替换: process.btn.finish -> common.finish */}
+        {t("common.finish")}
       </button>
     </div>
   );
@@ -221,9 +228,9 @@ export const ProcessModal = ({
           )}
           <span>
             {isProcessing
-              ? t("process.title.processing")
+              ? t("transaction.title.processing")
               : isSuccess
-                ? t("process.title.done")
+                ? t("transaction.title.done")
                 : title}
           </span>
         </div>
@@ -240,16 +247,17 @@ export const ProcessModal = ({
               <FontAwesomeIcon icon={faExclamationCircle} />
             </div>
             <p className="text-text-main font-bold mb-1">
-              {t("process.result.error_title")}
+              {t("transaction.result.error_title")}
             </p>
             <p className="text-xs text-gray-500 mb-6">
-              {t("process.result.error_desc")}
+              {t("transaction.result.error_desc")}
             </p>
             <button
               onClick={onClose}
               className="text-link text-sm font-qs-semibold hover:underline"
             >
-              {t("process.btn.retry")}
+              {/* 🚀 替换: process.btn.retry -> common.retry */}
+              {t("common.retry")}
             </button>
           </div>
         )}

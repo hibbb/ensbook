@@ -10,6 +10,7 @@ import { ActionHeader } from "./headers/ActionHeader";
 import { DeleteHeader } from "./headers/DeleteHeader";
 
 import type { DeleteCriteria } from "./types";
+import { useTranslation } from "react-i18next";
 
 interface TableHeaderProps {
   sortConfig: SortConfig;
@@ -75,6 +76,7 @@ export const TableHeader = ({
   } as React.CSSProperties;
 
   const isControlsDisabled = totalCount <= 1;
+  const { t } = useTranslation(); // 确保这一行存在
 
   return (
     <thead
@@ -141,7 +143,7 @@ export const TableHeader = ({
         </th>
 
         <th>
-          <ThWrapper>信息</ThWrapper>
+          <ThWrapper>{t("table.header.info")}</ThWrapper>
         </th>
 
         <th className="text-center w-14 relative">

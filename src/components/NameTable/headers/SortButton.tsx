@@ -13,7 +13,7 @@ interface SortButtonProps {
   ascIcon: IconDefinition;
   descIcon: IconDefinition;
   title?: string;
-  disabled?: boolean; // 🚀 新增
+  disabled?: boolean;
 }
 
 export const SortButton = ({
@@ -24,7 +24,7 @@ export const SortButton = ({
   ascIcon,
   descIcon,
   title,
-  disabled, // 🚀 解构
+  disabled,
 }: SortButtonProps) => {
   const isActive =
     currentSort.field === field && currentSort.direction !== null;
@@ -34,7 +34,6 @@ export const SortButton = ({
   const buttonBaseClass =
     "w-6 h-6 flex items-center justify-center rounded-md transition-all";
 
-  // 🚀 样式逻辑更新
   let stateClass = "";
   if (disabled) {
     stateClass = "text-gray-300 cursor-not-allowed";
@@ -47,7 +46,7 @@ export const SortButton = ({
   const buttonContent = (
     <button
       onClick={() => !disabled && onSort(field)}
-      disabled={disabled} // 🚀 绑定原生 disabled
+      disabled={disabled}
       className={`${buttonBaseClass} ${stateClass}`}
     >
       <FontAwesomeIcon

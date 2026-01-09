@@ -10,14 +10,14 @@ import {
   faLayerGroup,
   faFeatherPointed,
 } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀 引入 Hook
+import { useTranslation } from "react-i18next";
 import { SettingsModal } from "./SettingsModal";
 import { Tooltip } from "./ui/Tooltip";
 
 export const NavBar = () => {
   const location = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { t } = useTranslation(); // 🚀 初始化
+  const { t } = useTranslation();
 
   const getLinkClass = (path: string) => {
     const isActive = location.pathname === path;
@@ -52,14 +52,17 @@ export const NavBar = () => {
               to="/collection/999"
               className={getLinkClass("/collection/999")}
             >
-              <FontAwesomeIcon icon={faLayerGroup} /> 999
+              {/* 🚀 替换: collection.999.name -> collection.999.name (保持不变) */}
+              <FontAwesomeIcon icon={faLayerGroup} /> {t("collection.999.name")}
             </Link>
 
             <Link
               to="/collection/bip39"
               className={getLinkClass("/collection/bip39")}
             >
-              <FontAwesomeIcon icon={faLayerGroup} /> BIP39
+              {/* 🚀 替换: collection.bip39.name -> collection.bip39.name (保持不变) */}
+              <FontAwesomeIcon icon={faLayerGroup} />{" "}
+              {t("collection.bip39.name")}
             </Link>
           </div>
         </div>

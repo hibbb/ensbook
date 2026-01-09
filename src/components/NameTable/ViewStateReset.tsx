@@ -2,7 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilterCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 interface ViewStateResetProps {
   isVisible: boolean;
@@ -19,7 +19,7 @@ export const ViewStateReset = ({
   totalCount,
   filteredCount,
 }: ViewStateResetProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   if (!isVisible) return null;
 
@@ -54,7 +54,8 @@ export const ViewStateReset = ({
             transition-all duration-200 group
           "
         >
-          <span className="text-sm font-qs-semibold">{t("table.reset")}</span>
+          {/* 🚀 替换: table.reset -> common.reset */}
+          <span className="text-sm font-qs-semibold">{t("common.reset")}</span>
           <FontAwesomeIcon
             icon={faFilterCircleXmark}
             className="text-white/90 group-hover:rotate-90 transition-transform duration-300"

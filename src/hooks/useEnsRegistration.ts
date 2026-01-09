@@ -5,7 +5,7 @@ import { usePublicClient, useAccount } from "wagmi";
 import { type Hex, type Address } from "viem";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import {
   type RegistrationStruct,
   type RegistrationStatus,
@@ -29,7 +29,7 @@ export function useEnsRegistration() {
   const [status, setStatus] = useState<RegistrationStatus>("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [currentHash, setCurrentHash] = useState<Hex | null>(null);
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   const registrationDataRef = useRef<RegistrationStruct | null>(null);
 
@@ -86,11 +86,12 @@ export function useEnsRegistration() {
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: registerHash }),
           {
-            loading: t("hooks.registration.register_confirming"),
-            success: t("hooks.registration.register_success", {
-              label: params.label,
-            }),
-            error: t("hooks.registration.register_failed"),
+            // 🚀 替换: hooks.registration.register_confirming -> transaction.toast.confirming
+            loading: t("transaction.toast.confirming"),
+            // 🚀 替换: hooks.registration.register_success -> transaction.result.success_register
+            success: t("transaction.result.success_register"),
+            // 🚀 替换: hooks.registration.register_failed -> transaction.toast.failed
+            error: t("transaction.toast.failed"),
           },
         );
 
@@ -103,12 +104,13 @@ export function useEnsRegistration() {
           const error = err as Error & { shortMessage?: string };
 
           if (error.shortMessage?.includes("User rejected")) {
-            toast.error(t("hooks.registration.register_rejected"));
+            // 🚀 替换: hooks.registration.register_rejected -> transaction.toast.register_rejected
+            toast.error(t("transaction.toast.register_rejected"));
           } else {
             toast.error(
-              t("hooks.registration.register_error", {
-                message: error.shortMessage || error.message,
-              }),
+              t("transaction.result.error_title") +
+                ": " +
+                (error.shortMessage || error.message),
             );
           }
         }
@@ -130,9 +132,8 @@ export function useEnsRegistration() {
           removeRegistrationState(label);
 
           if (result.errorMessage) {
-            // 这里 errorMessage 可能是硬编码的，如果 checkRegStatus 也支持 i18n 最好
-            // 但为了简化，我们假设它返回的是 key 或者直接显示
-            toast.error(result.errorMessage);
+            // checkRegStatus 返回的是 Key，直接翻译
+            toast.error(t(result.errorMessage));
           }
           setStatus("idle");
           return;
@@ -153,7 +154,7 @@ export function useEnsRegistration() {
 
           setStatus(result.status);
           if (result.errorMessage) {
-            toast.error(result.errorMessage);
+            toast.error(t(result.errorMessage));
           }
 
           if (result.status === "counting_down") {
@@ -170,7 +171,8 @@ export function useEnsRegistration() {
         }
       } catch (e) {
         console.error("恢复检查失败", e);
-        toast.error(t("hooks.registration.recovery_failed"));
+        // 🚀 替换: hooks.registration.recovery_failed -> transaction.toast.recovery_failed
+        toast.error(t("transaction.toast.recovery_failed"));
       }
     },
     [publicClient, executeRegister, t],
@@ -180,7 +182,8 @@ export function useEnsRegistration() {
     if (registrationDataRef.current) {
       executeRegister(registrationDataRef.current);
     } else {
-      toast.error(t("hooks.registration.recovery_error"));
+      // 🚀 替换: hooks.registration.recovery_error -> transaction.toast.recovery_failed
+      toast.error(t("transaction.toast.recovery_failed"));
       resetStatus();
     }
   }, [executeRegister, resetStatus, t]);
@@ -188,7 +191,8 @@ export function useEnsRegistration() {
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint) => {
       if (!address || !publicClient) {
-        toast.error(t("hooks.registration.connect_wallet"));
+        // 🚀 替换: hooks.registration.connect_wallet -> common.connect_wallet
+        toast.error(t("common.connect_wallet"));
         return;
       }
 
@@ -246,9 +250,12 @@ export function useEnsRegistration() {
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: commitHash }),
           {
-            loading: t("hooks.registration.commit_confirming"),
-            success: t("hooks.registration.commit_success"),
-            error: t("hooks.registration.commit_failed"),
+            // 🚀 替换: hooks.registration.commit_confirming -> transaction.toast.confirming
+            loading: t("transaction.toast.confirming"),
+            // 🚀 替换: hooks.registration.commit_success -> transaction.step.commit_success
+            success: t("transaction.step.commit_success"),
+            // 🚀 替换: hooks.registration.commit_failed -> transaction.step.commit_failed
+            error: t("transaction.step.commit_failed"),
           },
         );
 
@@ -268,9 +275,11 @@ export function useEnsRegistration() {
 
           const error = err as Error & { shortMessage?: string };
           if (error.shortMessage?.includes("User rejected")) {
-            toast(t("hooks.registration.commit_rejected"));
+            // 🚀 替换: hooks.registration.commit_rejected -> transaction.toast.commit_rejected
+            toast(t("transaction.toast.commit_rejected"));
           } else {
-            toast.error(t("hooks.registration.process_interrupted"));
+            // 🚀 替换: hooks.registration.process_interrupted -> transaction.toast.process_interrupted
+            toast.error(t("transaction.toast.process_interrupted"));
           }
         }
       }

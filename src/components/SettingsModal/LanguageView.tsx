@@ -10,34 +10,31 @@ export const LanguageView = () => {
   const { t, i18n } = useTranslation();
 
   const handleLanguageChange = (lang: "en" | "zh") => {
-    // 1. 切换语言
     i18n.changeLanguage(lang);
-
-    // 2. 持久化
     updateSettings({ locale: lang });
 
-    // 🚀 3. 修复：使用静态映射，确保提示语与目标语言绝对一致
     const messages = {
       en: "Language switched to English",
       zh: "已切换为简体中文",
     };
 
-    // 立即显示，无需 setTimeout
     toast.success(messages[lang], { id: "lang-switch" });
   };
 
   const currentLang = i18n.language;
 
   const languages = [
-    { code: "en", label: t("language_view.options.en"), flag: "🇺🇸" },
-    { code: "zh", label: t("language_view.options.zh"), flag: "🇨🇳" },
+    // 🚀 替换: language_view.options.* -> settings.language.options.*
+    { code: "en", label: t("settings.language.options.en"), flag: "🇺🇸" },
+    { code: "zh", label: t("settings.language.options.zh"), flag: "🇨🇳" },
   ] as const;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
       <div>
         <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
-          {t("language_view.desc")}
+          {/* 🚀 替换: language_view.desc -> settings.language.desc */}
+          {t("settings.language.desc")}
         </p>
 
         <div className="grid grid-cols-1 gap-3">

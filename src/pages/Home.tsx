@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -41,7 +41,7 @@ import type { DeleteCriteria } from "../components/NameTable/types";
 export const Home = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   useDocumentTitle("Home");
 
@@ -213,7 +213,7 @@ export const Home = () => {
       }
       case "owner": {
         if (!address) {
-          toast.error("请先连接钱包以识别所有权"); // 这里也可以i18n，但属于通用错误，暂留
+          toast.error(t("common.connect_wallet")); // 🚀 复用 common
           return;
         }
         const isDeletingMine = value === "mine";
@@ -307,14 +307,13 @@ export const Home = () => {
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
-  // 🚀 动态生成标题
   const getModalTitle = () => {
-    if (activeType === "register") return t("process.title.register");
+    if (activeType === "register") return t("transaction.title.register");
     if (activeType === "batch")
-      return t("process.title.batch_renew", {
+      return t("transaction.title.batch_renew", {
         count: durationTarget?.labels?.length,
       });
-    return t("process.title.renew");
+    return t("transaction.title.renew");
   };
 
   return (
@@ -382,7 +381,7 @@ export const Home = () => {
         status={activeStatus}
         txHash={activeTxHash}
         secondsLeft={secondsLeft}
-        title={getModalTitle()} // 🚀 使用动态标题
+        title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
       />

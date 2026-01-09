@@ -1,10 +1,11 @@
 // src/utils/lookupProvider.ts
+
 import type { NameRecord } from "../types/ensNames";
 import { getContracts } from "../config/contracts";
 import * as ensUtils from "./ens";
+// 🚀 1. 引入 i18next 类型
+import type { TFunction } from "i18next";
 
-// 🚀 1. 静态引入所有图片资源
-// Vite 会自动将这些 import 解析为构建后的 URL 字符串
 import web3bioIcon from "../assets/lookups/web3bio-dark.svg";
 import etherscanIcon from "../assets/lookups/etherscan-dark.svg";
 import openseaIcon from "../assets/lookups/opensea-dark.svg";
@@ -18,8 +19,9 @@ import dnsIcon from "../assets/lookups/dnssearch-dark.svg";
  */
 interface LookupItem {
   key: string;
-  getLabel: (record: NameRecord) => string;
-  icon: string; // 🚀 2. 新增 icon 字段
+  // 🚀 2. 修改签名：接收 t 函数
+  getLabel: (record: NameRecord, t: TFunction) => string;
+  icon: string;
   getLink: (record: NameRecord, chainId?: number) => string;
   shouldShow: (record: NameRecord, chainId?: number) => boolean;
 }
@@ -32,15 +34,16 @@ const getTokenId = (record: NameRecord): string => {
 export const LOOKUP_LINKS: LookupItem[] = [
   {
     key: "Web3bio",
-    getLabel: (r) => `${r.label}.eth profile on Web3.bio`,
-    icon: web3bioIcon, // 🚀 3. 绑定图片变量
+    // 🚀 3. 使用 t 函数翻译
+    getLabel: (r, t) => t("lookup.web3bio", { label: r.label }),
+    icon: web3bioIcon,
     shouldShow: (r, cid) =>
       ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
     getLink: (r) => `https://web3.bio/${r.label}.eth`,
   },
   {
     key: "EtherScan",
-    getLabel: (r) => `${r.label}.eth records on Etherscan`,
+    getLabel: (r, t) => t("lookup.etherscan", { label: r.label }),
     icon: etherscanIcon,
     shouldShow: (r) => !ensUtils.isAvailable(r.status),
     getLink: (r, cid) => {
@@ -54,7 +57,7 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "Opensea",
-    getLabel: (r) => `${r.label}.eth on OpenSea`,
+    getLabel: (r, t) => t("lookup.opensea", { label: r.label }),
     icon: openseaIcon,
     shouldShow: (r, cid) =>
       ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
@@ -66,28 +69,28 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
   {
     key: "ENSVision",
-    getLabel: (r) => `${r.label}.eth on Vision`,
+    getLabel: (r, t) => t("lookup.vision", { label: r.label }),
     icon: envisionIcon,
     shouldShow: (_, cid) => ensUtils.isMainnet(cid),
     getLink: (r) => `https://ensvision.com/name/${r.label}.eth`,
   },
   {
     key: "Grails",
-    getLabel: (r) => `${r.label}.eth on Grails`,
+    getLabel: (r, t) => t("lookup.grails", { label: r.label }),
     icon: grailsIcon,
     shouldShow: (_, cid) => ensUtils.isMainnet(cid),
     getLink: (r) => `https://grails.app/${r.label}.eth`,
   },
   {
     key: "LinkETH",
-    getLabel: (r) => `${r.label}.eth.limo`,
+    getLabel: (r, t) => t("lookup.limo", { label: r.label }),
     icon: limoIcon,
     shouldShow: (r) => ensUtils.isActive(r.status),
     getLink: (r) => `https://${r.label}.eth.limo/`,
   },
   {
     key: "DNSRelated",
-    getLabel: (r) => `DNS registrations of ${r.label}`,
+    getLabel: (r, t) => t("lookup.dns", { label: r.label }),
     icon: dnsIcon,
     shouldShow: () => true,
     getLink: (r) =>

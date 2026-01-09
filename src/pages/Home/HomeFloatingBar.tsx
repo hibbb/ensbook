@@ -2,7 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 interface HomeFloatingBarProps {
   selectedCount: number;
@@ -19,7 +19,7 @@ export const HomeFloatingBar = ({
   onBatchRenew,
   onClearSelection,
 }: HomeFloatingBarProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   if (selectedCount === 0) return null;
 
@@ -48,7 +48,8 @@ export const HomeFloatingBar = ({
           onClick={onClearSelection}
           className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
         >
-          {t("home.floating_bar.cancel")}
+          {/* 🚀 替换: home.floating_bar.cancel -> common.cancel */}
+          {t("common.cancel")}
         </button>
       </div>
     </div>
