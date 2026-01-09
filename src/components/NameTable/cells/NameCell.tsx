@@ -14,7 +14,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "../../ui/Popover";
 
 interface NameCellProps {
   record: NameRecord;
-  context: "home" | "collection";
 }
 
 const MetadataRow = ({
