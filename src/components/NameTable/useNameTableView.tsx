@@ -209,8 +209,14 @@ export const useNameTableView = (
         unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
       };
 
-      const recordsWithMemos = baseRecords.filter((r) =>
-        passOthers(r, ["memo"]),
+      // 🟢 修正代码：
+      const recordsWithMemos = baseRecords.filter(
+        (r) =>
+          // 1. 符合其他所有筛选条件
+          passOthers(r, ["memo"]) &&
+          // 2. 并且确实拥有备注
+          !!r.memo &&
+          r.memo.trim().length > 0,
       );
       const memosCount = recordsWithMemos.length;
 
