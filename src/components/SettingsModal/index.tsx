@@ -9,13 +9,13 @@ import {
   faClock,
   faPalette,
   faCircleInfo,
-  faFeatherPointed, // 🚀 新增图标
+  faFeatherPointed,
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 import { BaseModal } from "../ui/BaseModal";
 import { DataBackupView } from "./DataBackupView";
 import { AboutView } from "./AboutView";
-// 🚀 引入新组件
 import { MyCollectionSettings } from "./MyCollectionSettings";
 import pkg from "../../../package.json";
 
@@ -24,7 +24,6 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-// 🚀 扩展 Tab 类型
 type SettingsTab =
   | "general"
   | "registration"
@@ -38,6 +37,7 @@ interface SidebarItemProps {
   active?: boolean;
   onClick?: () => void;
   disabled?: boolean;
+  badge?: string; // 🚀 增加 badge prop 方便传参
 }
 
 const SidebarItem = ({
@@ -46,13 +46,14 @@ const SidebarItem = ({
   active,
   onClick,
   disabled,
+  badge,
 }: SidebarItemProps) => (
   <button
     onClick={onClick}
     disabled={disabled}
     className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-qs-medium transition-colors duration-150 rounded-md ${
       active
-        ? "bg-gray-100 text-black font-qs-semibold" // 激活态样式微调为黑色，更显沉稳
+        ? "bg-gray-100 text-black font-qs-semibold"
         : disabled
           ? "text-gray-300 cursor-not-allowed"
           : "text-gray-500 hover:bg-gray-50 hover:text-text-main"
@@ -64,28 +65,28 @@ const SidebarItem = ({
       <FontAwesomeIcon icon={icon} />
     </div>
     <span>{label}</span>
-    {disabled && (
+    {disabled && badge && (
       <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-qs-semibold">
-        Soon
+        {badge}
       </span>
     )}
   </button>
 );
 
 export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
-  // 🚀 默认 Tab 建议先保持 data 或 about，或者也可以改成 my-collection 方便调试
   const [activeTab, setActiveTab] = useState<SettingsTab>("my-collection");
+  const { t } = useTranslation(); // 🚀
 
   const getTitle = () => {
     switch (activeTab) {
       case "data":
-        return "备份与恢复";
+        return t("settings.title.backup");
       case "my-collection":
-        return "我的集合 (Mine)"; // 🚀 对应标题
+        return t("settings.title.my_collection");
       case "about":
-        return "关于 ENSBook";
+        return t("settings.title.about");
       default:
-        return "设置";
+        return t("settings.title.default");
     }
   };
 
@@ -106,14 +107,13 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             </h3>
           </div>
           <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto custom-scrollbar flex flex-col">
-            {/* 🚀 新增入口：我的集合 */}
             <div className="mb-2">
               <div className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">
-                Features
+                {t("settings.section.features")}
               </div>
               <SidebarItem
                 icon={faFeatherPointed}
-                label="我的集合"
+                label={t("settings.sidebar.my_collection")}
                 active={activeTab === "my-collection"}
                 onClick={() => setActiveTab("my-collection")}
               />
@@ -121,33 +121,40 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
             <div className="mb-2">
               <div className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">
-                System
+                {t("settings.section.system")}
               </div>
               <SidebarItem
                 icon={faDatabase}
-                label="数据管理"
+                label={t("settings.sidebar.data")}
                 active={activeTab === "data"}
                 onClick={() => setActiveTab("data")}
               />
               <SidebarItem
                 icon={faGlobe}
-                label="语言"
+                label={t("settings.sidebar.language")}
                 active={activeTab === "general"}
                 disabled
+                badge={t("settings.badge.soon")}
               />
               <SidebarItem
                 icon={faClock}
-                label="注册偏好"
+                label={t("settings.sidebar.registration")}
                 active={activeTab === "registration"}
                 disabled
+                badge={t("settings.badge.soon")}
               />
-              <SidebarItem icon={faPalette} label="外观" disabled />
+              <SidebarItem
+                icon={faPalette}
+                label={t("settings.sidebar.appearance")}
+                disabled
+                badge={t("settings.badge.soon")}
+              />
             </div>
 
             <div className="flex-1"></div>
             <SidebarItem
               icon={faCircleInfo}
-              label="关于"
+              label={t("settings.sidebar.about")}
               active={activeTab === "about"}
               onClick={() => setActiveTab("about")}
             />
@@ -175,7 +182,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
           <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
             {activeTab === "data" && <DataBackupView onClose={onClose} />}
             {activeTab === "about" && <AboutView />}
-            {/* 🚀 渲染新组件 */}
             {activeTab === "my-collection" && <MyCollectionSettings />}
           </div>
         </div>

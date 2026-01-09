@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -19,7 +20,7 @@ import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; // ✅ 新增 Hook
+import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -31,6 +32,7 @@ export const CollectionDetail = () => {
   const collection = id ? ENS_COLLECTIONS[id] : null;
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
+  const { t } = useTranslation(); // 🚀
 
   useDocumentTitle(collection?.displayName);
 
@@ -81,7 +83,6 @@ export const CollectionDetail = () => {
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
-  // ✅ 使用新 Hook
   const updateLevel = useOptimisticLevelUpdate();
 
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
@@ -161,9 +162,23 @@ export const CollectionDetail = () => {
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
-  if (!collection) return <div className="p-20 text-center">集合未找到</div>;
+  const getModalTitle = () => {
+    if (activeType === "register") return t("process.title.register");
+    if (activeType === "batch")
+      return t("process.title.batch_renew", {
+        count: durationTarget?.labels?.length,
+      });
+    return t("process.title.renew");
+  };
+
+  if (!collection)
+    return <div className="p-20 text-center">{t("collection.not_found")}</div>;
   if (isError)
-    return <div className="p-20 text-center text-red-500">加载失败</div>;
+    return (
+      <div className="p-20 text-center text-red-500">
+        {t("collection.load_fail")}
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 pb-24 relative">
@@ -204,9 +219,7 @@ export const CollectionDetail = () => {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
             <span className="text-sm font-qs-medium text-text-main">
-              已选择{" "}
-              <span className="text-link font-bold">{selectionCount}</span>{" "}
-              个域名
+              {t("home.floating_bar.selected", { count: selectionCount })}
             </span>
             <div className="h-4 w-px bg-gray-300 mx-1" />
             <button
@@ -219,13 +232,13 @@ export const CollectionDetail = () => {
               }`}
             >
               <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
-              批量续费
+              {t("home.floating_bar.renew_batch")}
             </button>
             <button
               onClick={clearSelection}
               className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
             >
-              取消
+              {t("home.floating_bar.cancel")}
             </button>
           </div>
         </div>
@@ -237,13 +250,7 @@ export const CollectionDetail = () => {
         status={activeStatus}
         txHash={activeTxHash}
         secondsLeft={secondsLeft}
-        title={
-          activeType === "register"
-            ? "设置注册时长"
-            : activeType === "batch"
-              ? `批量续费 (${durationTarget?.labels?.length}个)`
-              : "设置续费时长"
-        }
+        title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
       />

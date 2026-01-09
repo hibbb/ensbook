@@ -5,7 +5,8 @@ import { FilterDropdown } from "../FilterDropdown";
 import type { FilterConfig } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { Tooltip } from "../../ui/Tooltip"; // 🚀 引入 Tooltip
+import { useTranslation } from "react-i18next"; // 🚀
+import { Tooltip } from "../../ui/Tooltip";
 
 interface ActionHeaderProps {
   filterConfig: FilterConfig;
@@ -15,7 +16,7 @@ interface ActionHeaderProps {
   hasRenewable?: boolean;
   onToggleSelectAll?: () => void;
   actionCounts?: { all: number; register: number; renew: number };
-  disabled?: boolean; // 🚀 新增
+  disabled?: boolean;
 }
 
 export const ActionHeader = ({
@@ -26,21 +27,22 @@ export const ActionHeader = ({
   hasRenewable,
   onToggleSelectAll,
   actionCounts = { all: 0, register: 0, renew: 0 },
-  disabled, // 🚀 解构
+  disabled,
 }: ActionHeaderProps) => {
+  const { t } = useTranslation(); // 🚀
+
   return (
     <ThWrapper>
       <div className="flex items-center gap-2">
         {onToggleSelectAll && (
           <div className="flex items-center">
-            {/* 🚀 使用 Tooltip 包裹 */}
             <Tooltip
               content={
                 !isConnected
-                  ? "请先连接钱包"
+                  ? t("table.filter.connect_wallet")
                   : !hasRenewable
-                    ? "无可续费域名"
-                    : "全选可续费域名"
+                    ? t("table.filter.no_renewable")
+                    : t("table.filter.select_all_renewable")
               }
             >
               <input
@@ -53,23 +55,28 @@ export const ActionHeader = ({
                 }`}
                 checked={isAllSelected}
                 onChange={onToggleSelectAll}
-                // ❌ 移除 title
               />
             </Tooltip>
           </div>
         )}
         <div className="flex items-center gap-2">
-          <span>操作</span>
+          <span>{t("table.header.action")}</span>
           <FilterDropdown
             isActive={filterConfig.actionType !== "all"}
             menuWidth="w-40 right-0"
-            title="按操作类型筛选"
-            disabled={disabled} // 🚀
+            title={t("table.filter.filter_action")}
+            disabled={disabled}
           >
             {(["all", "register", "renew"] as const).map((type) => {
               const count = actionCounts[type];
               const isSelected = filterConfig.actionType === type;
               const isDisabled = type !== "all" && count === 0;
+
+              let label = "";
+              if (type === "all") label = t("table.filter.all_show");
+              else if (type === "register")
+                label = t("table.filter.registerable");
+              else label = t("table.filter.renewable");
 
               return (
                 <div
@@ -88,13 +95,7 @@ export const ActionHeader = ({
                     onFilterChange({ ...filterConfig, actionType: type })
                   }
                 >
-                  <span>
-                    {type === "all"
-                      ? "全部显示"
-                      : type === "register"
-                        ? "可注册"
-                        : "可续费"}
-                  </span>
+                  <span>{label}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400 font-qs-regular">
                       ({count})

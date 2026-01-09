@@ -1,0 +1,276 @@
+{
+  "nav": {
+    "home": "Home",
+    "mine": "Mine",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": {
+      "backup": "Backup & Restore",
+      "my_collection": "My Collection (Mine)",
+      "about": "About ENSBook",
+      "default": "Settings"
+    },
+    "section": {
+      "features": "Features",
+      "system": "System"
+    },
+    "sidebar": {
+      "my_collection": "My Collection",
+      "data": "Data Management",
+      "language": "Language",
+      "registration": "Registration Prefs",
+      "appearance": "Appearance",
+      "about": "About"
+    },
+    "badge": {
+      "soon": "Soon"
+    }
+  },
+  "about": {
+    "description": "ENSBook is an efficient ENS domain management tool designed to help users manage, monitor, and record their Ethereum domain assets more conveniently.",
+    "connect": "Connect",
+    "author": "Author",
+    "github": "GitHub",
+    "open_source": "Open Source Project"
+  },
+  "backup": {
+    "toast": {
+      "empty_export": "List is empty, nothing to export",
+      "export_success": "Successfully exported {{count}} items",
+      "export_fail": "Export failed",
+      "invalid_format": "Invalid backup file or incompatible version",
+      "no_data": "No domain data found in backup file",
+      "import_success": "Import successful! Refreshing...",
+      "parse_fail": "Failed to parse file"
+    },
+    "confirm": {
+      "content": "Backup contains:\n- Watchlist: {{homeCount}} items\n- Collection Records: {{colCount}} items\n\nClick [OK] to 'Merge' (Keep existing data, overwrite conflicts)\nClick [Cancel] to 'Overwrite' (Clear existing data and replace)",
+      "warning": "⚠️ Warning: This will clear all your current data! Are you sure?"
+    },
+    "export": {
+      "title": "Backup Data",
+      "desc": "Generate a JSON file containing your watchlist, memos, and settings.",
+      "count": "(Current: {{count}} items)",
+      "btn": "Download Backup (.json)"
+    },
+    "import": {
+      "title": "Restore Data",
+      "desc": "Support <b>Merge</b> or <b>Overwrite</b> with existing data.",
+      "warning": "Please ensure the file is a valid ENSBook backup",
+      "btn": "Select Backup File"
+    }
+  },
+  "my_collection": {
+    "toast": {
+      "home_set": "Mine set as default homepage",
+      "home_unset": "Default homepage restored",
+      "cleared": "Custom collection cleared",
+      "already_empty": "It's already empty here",
+      "validating": "Parsing and validating domains...",
+      "no_valid_format": "No valid domain format detected",
+      "save_success": "Saved! Contains {{count}} valid domains",
+      "no_valid_found": "No valid domains found, please check input rules",
+      "network_error": "Network error during validation"
+    },
+    "confirm": {
+      "clear": "Are you sure you want to clear 'My Collection'?\nThis will remove all custom domains from the Mine page."
+    },
+    "ui": {
+      "title": "Define Your ENS Vision",
+      "desc": "Here you can combine any ENS domains you are interested in into an exclusive collection (Mine). Supports mixed input:",
+      "set_home": "Set as Default Homepage",
+      "set_home_desc": "Show Mine page by default when opening ENSBook",
+      "placeholder": "Enter index string here... (Comma, space, or newline separated)",
+      "status_validating": "Parsing blockchain data...",
+      "status_active": "Status: Active",
+      "status_inactive": "Status: Not Configured",
+      "btn_validating": "Validating",
+      "btn_save": "Save Collection"
+    }
+  },
+  "home": {
+    "toast": {
+      "all_exist": "All domains already exist in the list",
+      "add_success": "Successfully added {{count}} domains",
+      "no_valid": "No valid ENS domains found",
+      "parse_error": "Error parsing input",
+      "delete_success": "Deleted successfully",
+      "clear_confirm": "Are you sure you want to clear all history?"
+    },
+    "search": {
+      "title": "Search",
+      "placeholder_empty": "Enter names, addresses, or tags, or check 💡 for help",
+      "placeholder_content": "Continue adding names...",
+      "help_tooltip": "Search Help"
+    },
+    "floating_bar": {
+      "selected": "Selected {{count}} domains",
+      "renew_batch": "Batch Renew",
+      "cancel": "Cancel"
+    }
+  },
+  "mine": {
+    "title": "Mine",
+    "subtitle": "CUSTOM",
+    "custom_collection": "Custom Collection",
+    "empty_state": {
+      "title": "Open Your ENS Vision",
+      "desc": "The Mine page allows you to create an exclusive domain collection through custom rules\n(e.g., \"abc, hello, 12345\", \"@vitalik.eth\", or Ethereum addresses).",
+      "guide": "Please go to Settings > My Collection to configure"
+    },
+    "error": "Failed to load, please check network or configuration rules"
+  },
+  "collection": {
+    "not_found": "Collection not found",
+    "load_fail": "Failed to load"
+  },
+  "process": {
+    "title": {
+      "register": "Set Registration Duration",
+      "renew": "Set Renewal Duration",
+      "batch_renew": "Batch Renew ({{count}} items)"
+    }
+  },
+  "table": {
+    "empty": "No data",
+    "reset": "Reset",
+    "filter": {
+      "default_title": "Filter",
+      "sort_name": "Sort by Name",
+      "sort_status": "Sort by Status",
+      "sort_reg_date": "Sort by Registration Date",
+      "sort_owner": "Sort by Owner",
+      "filter_length_wrap": "Filter by Length / Wrap",
+      "filter_status": "Filter by Status",
+      "filter_action": "Filter by Action",
+      "filter_level": "Filter by Level",
+      "by_length": "By Length",
+      "by_wrap": "By Wrap State",
+      "all_length": "All Lengths",
+      "char": "chars",
+      "all_states": "All States",
+      "all_show": "Show All",
+      "wrapped": "Wrapped",
+      "unwrapped": "Unwrapped",
+      "registerable": "Registerable",
+      "renewable": "Renewable",
+      "only_mine": "Show Mine Only ({{count}})",
+      "show_all": "Show All",
+      "no_mine": "No names owned by connected wallet",
+      "all_mine": "All names owned by connected wallet",
+      "connect_wallet": "Connect Wallet",
+      "no_memos": "No memos found",
+      "all_memos": "All names have memos",
+      "only_memos": "Show with Memos ({{count}})",
+      "no_renewable": "No renewable names",
+      "select_all_renewable": "Select all renewable",
+      "level_options": {
+        "0": "Default",
+        "1": "Blue",
+        "2": "Yellow",
+        "3": "Red"
+      }
+    },
+    "delete": {
+      "tooltip": "Category Delete",
+      "by_status": "Delete by Status",
+      "by_length": "Delete by Length",
+      "by_wrap": "Delete by Wrap",
+      "by_owner": "Delete by Owner",
+      "mine": "Mine",
+      "others": "Others",
+      "clear_all": "Clear All"
+    },
+    "cell": {
+      "index_tooltip": "Click to toggle level / Double click to reset",
+      "copy_success": "Copied {{label}}",
+      "owner_addr": "Owner Address",
+      "primary_name": "Primary Name",
+      "copy_addr": "Copy Address",
+      "copy_primary": "Copy Primary Name",
+      "is_me": "This is the connected wallet",
+      "unknown_status": "Data fetch failed, status unknown",
+      "reg_time": "Registered",
+      "exp_time": "Expires",
+      "release_time": "Released",
+      "current_time": "Current",
+      "premium_end": "Premium Ends",
+      "unknown": "Unknown",
+      "not_connected": "Not Connected",
+      "renew": "Renew",
+      "set_reminder": "Set Reminder",
+      "continue": "Continue",
+      "reg_pending": "Registration pending, click to continue",
+      "register": "Register",
+      "select_renew": "Select to renew",
+      "connect_wallet_tooltip": "Connect Wallet",
+      "label": "Label",
+      "name": "Name",
+      "copy_label": "Copy Label",
+      "copy_name": "Copy Name",
+      "ens_app_link": "Click to view on ENS APP",
+      "meta_tooltip": "Metadata Details",
+      "meta_title": "Metadata",
+      "length": "Length",
+      "state": "State",
+      "copy_full": "Copy full value",
+      "delete_item": "Delete {{label}}.eth",
+      "cannot_delete": "Cannot delete"
+    }
+  },
+  "status": {
+    "available": "Available",
+    "premium": "Premium",
+    "grace": "Grace",
+    "active": "Active",
+    "released": "Released",
+    "unknown": "Unknown"
+  },
+  "utils": {
+    "validate": {
+      "empty": "Domain name cannot be empty",
+      "subdomain": "Only second-level domains (e.g., alice.eth) are supported",
+      "too_short": "ENS domain must be at least 3 characters"
+    },
+    "parse": {
+      "norm_error": "\"{{snippet}}...\" contains invalid characters and was excluded."
+    },
+    "ens": {
+      "invalid_format": "Invalid domain format: {{message}}"
+    }
+  },
+  "hooks": {
+    "renewal": {
+      "connect_wallet": "Please connect wallet first",
+      "select_one": "Please select at least one domain",
+      "confirming": "Confirming renewal transaction...",
+      "success": "Renewal successful! {{label}}.eth renewed.",
+      "failed": "Renewal transaction failed",
+      "unknown_error": "Unknown error during renewal",
+      "batch_confirming": "Batch renewing {{count}} domains...",
+      "batch_success": "Batch renewal successful!",
+      "batch_failed": "Batch renewal transaction failed",
+      "batch_unknown_error": "Unknown error during batch renewal"
+    },
+    "registration": {
+      "connect_wallet": "Please connect wallet first",
+      "price_buffer": "Price buffer applied (+10%)",
+      "commit_confirming": "Confirming Commit...",
+      "commit_success": "Commit on-chain",
+      "commit_failed": "Commit failed",
+      "commit_rejected": "You rejected the Commit transaction",
+      "register_confirming": "Confirming registration...",
+      "register_success": "Congratulations! {{label}}.eth registered!",
+      "register_failed": "Registration failed",
+      "register_rejected": "You rejected the transaction, please retry",
+      "register_error": "Registration failed: {{message}}",
+      "recovery_failed": "Failed to recover registration progress",
+      "recovery_error": "Failed to resume registration",
+      "commit_expired": "Commit expired, please restart",
+      "commit_reverted": "Commit transaction failed, please restart",
+      "reg_reverted": "Previous registration failed, please retry",
+      "process_interrupted": "Process interrupted, check console"
+    }
+  }
+}

@@ -1,11 +1,11 @@
 // src/components/NameTable/index.tsx
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next"; // 🚀
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 import { SkeletonRow } from "./SkeletonRow";
 import { Pagination } from "../ui/Pagination";
-// 🚀 1. 重新引入 ViewStateReset
 import { ViewStateReset } from "./ViewStateReset";
 import { usePrimaryNames } from "../../hooks/usePrimaryNames";
 import { isRenewable } from "../../utils/ens";
@@ -18,6 +18,7 @@ import type {
 } from "./types";
 
 interface NameTableProps {
+  context: "home" | "collection";
   records: NameRecord[] | undefined | null;
   isLoading: boolean;
   currentAddress?: string;
@@ -49,9 +50,7 @@ interface NameTableProps {
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
-
   levelCounts?: Record<number, number>;
-  // 🚀 这些是从页面透传进来的关键参数
   isViewStateDirty?: boolean;
   onResetViewState?: () => void;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
@@ -61,6 +60,7 @@ export const NameTable = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 50;
+  const { t } = useTranslation(); // 🚀
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -182,7 +182,7 @@ export const NameTable = (props: NameTableProps) => {
                 <td colSpan={7}>
                   <div className="px-6 py-24 text-center">
                     <div className="text-gray-300 text-4xl mb-3">∅</div>
-                    <p className="text-gray-400 text-sm">暂无数据</p>
+                    <p className="text-gray-400 text-sm">{t("table.empty")}</p>
                   </div>
                 </td>
               </tr>
@@ -200,7 +200,6 @@ export const NameTable = (props: NameTableProps) => {
         />
       )}
 
-      {/* 🚀 2. 补回 ViewStateReset 组件 */}
       <ViewStateReset
         isVisible={!!props.isViewStateDirty}
         onReset={props.onResetViewState || (() => {})}

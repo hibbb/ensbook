@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 import { Tooltip } from "../ui/Tooltip";
 
 interface FilterDropdownProps {
@@ -12,7 +13,6 @@ interface FilterDropdownProps {
   menuWidth?: string;
   title?: string;
   disabled?: boolean;
-  // 🚀 新增: 支持对齐方式配置
   align?: "start" | "end";
 }
 
@@ -20,13 +20,17 @@ export const FilterDropdown = ({
   isActive,
   children,
   menuWidth = "w-48",
-  title = "筛选",
+  title,
   disabled,
-  align = "end", // 🚀 默认为 end (右对齐，保持原有行为)
+  align = "end",
 }: FilterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const { t } = useTranslation(); // 🚀
+
+  // 🚀 处理默认标题
+  const displayTitle = title || t("table.filter.default_title");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,17 +61,12 @@ export const FilterDropdown = ({
     if (disabled) return;
     if (!isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
-
-      // 🚀 核心修改: 根据 align 计算 left 位置
       let left = 0;
       if (align === "end") {
-        // 右对齐：基准点设在按钮右侧 (配合 translateX(-100%))
         left = rect.right;
       } else {
-        // 左对齐：基准点设在按钮左侧
         left = rect.left;
       }
-
       setPosition({
         top: rect.bottom + 8,
         left: left,
@@ -78,7 +77,7 @@ export const FilterDropdown = ({
 
   return (
     <div className="relative inline-block" ref={containerRef}>
-      <Tooltip content={title}>
+      <Tooltip content={disabled ? "" : displayTitle}>
         <button
           type="button"
           onClick={toggleOpen}
@@ -102,7 +101,6 @@ export const FilterDropdown = ({
             style={{
               top: position.top,
               left: position.left,
-              // 🚀 核心修改: 只有 end (右对齐) 时才需要向左平移自身宽度
               transform: align === "end" ? "translateX(-100%)" : "none",
             }}
             onMouseDown={(e) => e.stopPropagation()}

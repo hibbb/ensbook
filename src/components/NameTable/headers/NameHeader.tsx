@@ -7,6 +7,7 @@ import {
   faCommentDots,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next"; // 🚀
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import { FilterDropdown } from "../FilterDropdown";
@@ -40,6 +41,7 @@ export const NameHeader = ({
   },
   disabled,
 }: NameHeaderProps) => {
+  const { t } = useTranslation(); // 🚀
   const isActive =
     filterConfig.lengthList.length > 0 || filterConfig.wrappedType !== "all";
 
@@ -49,29 +51,23 @@ export const NameHeader = ({
   );
 
   const memosCount = nameCounts.memosCount || 0;
-  // 当前视图下的总数
   const totalCount = nameCounts.wrappedCounts.all;
 
   const isNoMemos = memosCount === 0;
   const isAllMemos = totalCount > 0 && memosCount === totalCount;
 
-  // 🚀 修复 Bug：
-  // 只有在 "所有都有备注" 且 "当前并未开启筛选" 时才禁用。
-  // 如果当前 filterConfig.onlyWithMemos 为 true，按钮必须保持可用，以便用户取消筛选。
   const isDisabled =
     disabled || isNoMemos || (isAllMemos && !filterConfig.onlyWithMemos);
 
-  // 🚀 同步修复 Tooltip 逻辑
   let tooltipContent = "";
   if (isNoMemos) {
-    tooltipContent = "没有任何备注";
+    tooltipContent = t("table.filter.no_memos");
   } else if (isAllMemos && !filterConfig.onlyWithMemos) {
-    // 只有在未筛选状态下，才提示"全都有备注"
-    tooltipContent = "所有名称都进行了备注";
+    tooltipContent = t("table.filter.all_memos");
   } else {
     tooltipContent = filterConfig.onlyWithMemos
-      ? "显示所有名称" // 激活状态下提示取消
-      : `仅显示有备注的 (${memosCount}) 个`;
+      ? t("table.filter.show_all")
+      : t("table.filter.only_memos", { count: memosCount });
   }
 
   const buttonBaseClass =
@@ -89,7 +85,7 @@ export const NameHeader = ({
   return (
     <ThWrapper>
       <div className="flex items-center gap-2">
-        <span>名称</span>
+        <span>{t("table.header.name")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton
             field="label"
@@ -98,7 +94,7 @@ export const NameHeader = ({
             defaultIcon={faSortAlphaDown}
             ascIcon={faSortAlphaDown}
             descIcon={faSortAlphaUp}
-            title="按名称字母排序"
+            title={t("table.filter.sort_name")}
             disabled={disabled}
           />
 
@@ -121,15 +117,13 @@ export const NameHeader = ({
           <FilterDropdown
             isActive={isActive}
             menuWidth="w-48"
-            title="按长度或包装筛选"
+            title={t("table.filter.filter_length_wrap")}
             disabled={disabled}
           >
-            {/* 1. 长度筛选 */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-              按长度
+              {t("table.filter.by_length")}
             </div>
 
-            {/* 全部长度 */}
             <div
               className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
                 filterConfig.lengthList.length === 0
@@ -140,7 +134,7 @@ export const NameHeader = ({
                 onFilterChange({ ...filterConfig, lengthList: [] })
               }
             >
-              <span>全部长度</span>
+              <span>{t("table.filter.all_length")}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400 font-normal">
                   ({totalLengthCount})
@@ -151,7 +145,6 @@ export const NameHeader = ({
               </div>
             </div>
 
-            {/* 长度列表 */}
             {nameCounts.availableLengths.map((len) => {
               const count = nameCounts.lengthCounts[len] || 0;
               const isSelected = filterConfig.lengthList.includes(len);
@@ -176,7 +169,9 @@ export const NameHeader = ({
                     onFilterChange({ ...filterConfig, lengthList: newList });
                   }}
                 >
-                  <span>{len} 字符</span>
+                  <span>
+                    {len} {t("table.filter.char")}
+                  </span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400 font-qs-regular">
                       ({count})
@@ -191,15 +186,19 @@ export const NameHeader = ({
 
             <div className="h-px bg-gray-100 my-1 mx-2" />
 
-            {/* 2. 包装状态 */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-              按包装
+              {t("table.filter.by_wrap")}
             </div>
 
             {(["all", "wrapped", "unwrapped"] as const).map((type) => {
               const count = nameCounts.wrappedCounts[type];
               const isSelected = filterConfig.wrappedType === type;
               const isDisabledOption = type !== "all" && count === 0;
+
+              let label = "";
+              if (type === "all") label = t("table.filter.all_states");
+              else if (type === "wrapped") label = t("table.filter.wrapped");
+              else label = t("table.filter.unwrapped");
 
               return (
                 <div
@@ -217,13 +216,7 @@ export const NameHeader = ({
                       onFilterChange({ ...filterConfig, wrappedType: type });
                   }}
                 >
-                  <span>
-                    {type === "all"
-                      ? "全部状态"
-                      : type === "wrapped"
-                        ? "Wrapped"
-                        : "Unwrapped"}
-                  </span>
+                  <span>{label}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400 font-qs-regular">
                       ({count})

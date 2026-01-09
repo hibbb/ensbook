@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next"; // 🚀
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -21,7 +22,7 @@ import { useEnsRegistration } from "../hooks/useEnsRegistration";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; // ✅ 复用 Hook
+import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 
 import {
   getHomeLabels,
@@ -29,7 +30,6 @@ import {
   removeFromHome,
   bulkRemoveFromHome,
   clearHomeList,
-  // ❌ 移除不再直接使用的 updateLabelLevel
 } from "../services/storage/userStore";
 
 import { getAllPendingLabels } from "../services/storage/registration";
@@ -41,6 +41,7 @@ import type { DeleteCriteria } from "../components/NameTable/types";
 export const Home = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
+  const { t } = useTranslation(); // 🚀
 
   useDocumentTitle("Home");
 
@@ -123,10 +124,8 @@ export const Home = () => {
     }
   }, [hasContent, isViewStateDirty, resetViewState]);
 
-  // ✅ 1. 正确调用 Hook
   const updateLevel = useOptimisticLevelUpdate();
 
-  // ✅ 2. 简化处理函数（无需传入 QueryKey）
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
   };
@@ -145,19 +144,21 @@ export const Home = () => {
         const newUniqueLabels = fetchedLabels.filter((l) => !currentSet.has(l));
 
         if (newUniqueLabels.length === 0) {
-          toast("所有域名已存在列表中", { icon: "👌" });
+          toast(t("home.toast.all_exist"), { icon: "👌" });
         } else {
           bulkAddToHome(newUniqueLabels);
           setResolvedLabels(getHomeLabels());
-          toast.success(`成功添加 ${newUniqueLabels.length} 个域名`);
+          toast.success(
+            t("home.toast.add_success", { count: newUniqueLabels.length }),
+          );
           setInputValue("");
         }
       } else {
-        toast("未找到有效的 ENS 域名", { icon: "🤔" });
+        toast(t("home.toast.no_valid"), { icon: "🤔" });
       }
     } catch (error) {
       console.error("解析失败:", error);
-      toast.error("解析输入时出错");
+      toast.error(t("home.toast.parse_error"));
     } finally {
       setIsResolving(false);
     }
@@ -178,7 +179,7 @@ export const Home = () => {
     const { type, value } = criteria;
 
     if (type === "all") {
-      if (window.confirm("确定要清空所有历史记录吗？")) {
+      if (window.confirm(t("home.toast.clear_confirm"))) {
         clearHomeList();
         setResolvedLabels([]);
         clearSelection();
@@ -212,7 +213,7 @@ export const Home = () => {
       }
       case "owner": {
         if (!address) {
-          toast.error("请先连接钱包以识别所有权");
+          toast.error("请先连接钱包以识别所有权"); // 这里也可以i18n，但属于通用错误，暂留
           return;
         }
         const isDeletingMine = value === "mine";
@@ -244,7 +245,7 @@ export const Home = () => {
         }
       });
     }
-    toast.success("删除成功");
+    toast.success(t("home.toast.delete_success"));
   };
 
   const handleSingleRegister = async (record: NameRecord) => {
@@ -306,6 +307,16 @@ export const Home = () => {
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
+  // 🚀 动态生成标题
+  const getModalTitle = () => {
+    if (activeType === "register") return t("process.title.register");
+    if (activeType === "batch")
+      return t("process.title.batch_renew", {
+        count: durationTarget?.labels?.length,
+      });
+    return t("process.title.renew");
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
       <HomeSearchSection
@@ -352,8 +363,6 @@ export const Home = () => {
         </div>
       )}
 
-      {/* ❌ 移除 ViewStateReset */}
-
       <HomeFloatingBar
         selectedCount={selectedLabels.size}
         isBusy={isRenewalBusy}
@@ -373,13 +382,7 @@ export const Home = () => {
         status={activeStatus}
         txHash={activeTxHash}
         secondsLeft={secondsLeft}
-        title={
-          activeType === "register"
-            ? "设置注册时长"
-            : activeType === "batch"
-              ? `批量续费 (${durationTarget?.labels?.length}个)`
-              : "设置续费时长"
-        }
+        title={getModalTitle()} // 🚀 使用动态标题
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
       />

@@ -10,7 +10,7 @@ import {
   faTriangleExclamation,
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-// 🚀 引入新函数 isRegistrable
+import { useTranslation } from "react-i18next"; // 🚀
 import { isRenewable, isRegistrable } from "../../../utils/ens";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
@@ -47,36 +47,34 @@ export const ActionCell = ({
   onRenew,
   onReminder,
 }: ActionCellProps) => {
+  const { t } = useTranslation(); // 🚀
   const renewable = isRenewable(record.status);
 
   const config = useMemo<ActionConfig>(() => {
-    // 1. 未连接
     if (!isConnected) {
       return {
-        text: "未连接",
+        text: t("table.cell.not_connected"),
         style: "text-gray-400 cursor-not-allowed bg-transparent",
         disabled: true,
         action: () => {},
       };
     }
 
-    // 2. Unknown 状态处理
     if (record.status === "Unknown") {
       return {
-        text: "未知",
+        text: t("table.cell.unknown"),
         style: "text-gray-300 cursor-not-allowed bg-transparent",
         disabled: true,
         action: () => {},
         sideIcon: faTriangleExclamation,
         sideIconClass: "text-gray-300",
-        sideTooltip: "数据获取失败，无法操作",
+        sideTooltip: t("table.cell.unknown_status"),
       };
     }
 
-    // 3. 可续费 (Renew)
     if (renewable) {
       return {
-        text: "续费",
+        text: t("table.cell.renew"),
         style:
           "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover",
         disabled: false,
@@ -84,30 +82,27 @@ export const ActionCell = ({
         sideIcon: faBell,
         sideIconClass:
           "text-gray-300 hover:text-link transition-colors cursor-pointer",
-        sideTooltip: "设置续费提醒",
+        sideTooltip: t("table.cell.set_reminder"),
         sideAction: () => onReminder?.(record),
       };
     }
 
-    // 4. 挂起状态 (Continue)
     if (isPending) {
       return {
-        text: "继续",
+        text: t("table.cell.continue"),
         style:
           "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-0.5 rounded-lg hover:bg-orange-100 font-qs-semibold shadow-sm transition-all active:scale-95",
         disabled: false,
         action: () => onRegister?.(record),
         sideIcon: faClock,
         sideIconClass: "text-orange-400 animate-pulse cursor-help",
-        sideTooltip: "注册未完成，点击继续",
+        sideTooltip: t("table.cell.reg_pending"),
       };
     }
 
-    // 🚀 5. 显式可注册状态 (Available / Released / Premium)
-    // 使用 isRegistrable 统一判断，包含 Premium
     if (isRegistrable(record.status)) {
       return {
-        text: "注册",
+        text: t("table.cell.register"),
         style:
           "bg-inherit text-link border-b border-b-white/0 hover:text-link-hover hover:border-b hover:border-link-hover",
         disabled: false,
@@ -115,7 +110,6 @@ export const ActionCell = ({
       };
     }
 
-    // 6. 其他情况 (兜底)
     return {
       text: "—",
       style: "text-gray-300 cursor-not-allowed",
@@ -126,10 +120,11 @@ export const ActionCell = ({
     isConnected,
     renewable,
     isPending,
-    record, // record.status 变化会触发重新计算
+    record,
     onRenew,
     onRegister,
     onReminder,
+    t, // 🚀
   ]);
 
   const handleAction = (e: React.MouseEvent) => {
@@ -141,9 +136,8 @@ export const ActionCell = ({
 
   return (
     <div className="h-12 flex items-center justify-start gap-3">
-      {/* Checkbox: 仅在可续费且连接时显示 */}
       {onToggleSelection && isConnected && renewable && (
-        <Tooltip content="Select to renew">
+        <Tooltip content={t("table.cell.select_renew")}>
           <input
             type="checkbox"
             disabled={!isConnected}
@@ -155,7 +149,6 @@ export const ActionCell = ({
         </Tooltip>
       )}
 
-      {/* 占位符: 仅在不可续费但已连接时显示 (保持对齐) */}
       {onToggleSelection &&
         isConnected &&
         !renewable &&
@@ -166,7 +159,7 @@ export const ActionCell = ({
         )}
 
       {!isConnected && (
-        <Tooltip content="Connect Wallet">
+        <Tooltip content={t("table.cell.connect_wallet_tooltip")}>
           <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
             <FontAwesomeIcon icon={faWallet} size="2xs" />
           </div>

@@ -5,13 +5,13 @@ import { useAccount } from "wagmi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faFeatherPointed } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation, Trans } from "react-i18next"; // 🚀
 
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
-// ❌ 移除: import { ViewStateReset } ...
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -23,12 +23,11 @@ import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { isRenewable } from "../utils/ens";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate"; // ✅ 新增
+import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 
 // Types
 import type { NameRecord } from "../types/ensNames";
 
-// --- 🟢 内部 Hook: 解析 Source 为 Labels (带缓存) ---
 const useMyCollectionLabels = (source: string) => {
   return useQuery({
     queryKey: ["my-collection-labels", source],
@@ -46,6 +45,7 @@ const useMyCollectionLabels = (source: string) => {
 export const Mine = () => {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
+  const { t } = useTranslation(); // 🚀
 
   const source = useMyCollectionSource();
   const hasSource = !!source && source.length > 0;
@@ -114,7 +114,6 @@ export const Mine = () => {
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
-  // ✅ 使用新 Hook
   const updateLevel = useOptimisticLevelUpdate();
 
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
@@ -192,6 +191,15 @@ export const Mine = () => {
   const activeStatus = activeType === "register" ? regStatus : renewalStatus;
   const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
 
+  const getModalTitle = () => {
+    if (activeType === "register") return t("process.title.register");
+    if (activeType === "batch")
+      return t("process.title.batch_renew", {
+        count: durationTarget?.labels?.length,
+      });
+    return t("process.title.renew");
+  };
+
   // --- Render Logic ---
 
   if (!hasSource) {
@@ -201,18 +209,24 @@ export const Mine = () => {
           <FontAwesomeIcon icon={faFeatherPointed} size="2x" />
         </div>
         <h2 className="text-2xl font-qs-semibold text-gray-800 mb-3">
-          开启你的 ENS 自由视界
+          {t("mine.empty_state.title")}
         </h2>
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
-          Mine 页面允许你通过自定义规则
-          <br />
-          （如 "abc, hello, 12345"、"@vitalik.eth" 或以太坊地址）
-          <br />
-          来创建一个专属的域名集合。
+          {/* 🚀 使用 Trans 处理换行 */}
+          <Trans i18nKey="mine.empty_state.desc">
+            Mine 页面允许你通过自定义规则
+            <br />
+            （如 "abc, hello, 12345"、"@vitalik.eth" 或以太坊地址）
+            <br />
+            来创建一个专属的域名集合。
+          </Trans>
         </p>
         <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-400 mb-8 font-mono">
-          请前往 <span className="text-text-main">设置 {">"} 我的集合</span>{" "}
-          进行配置
+          {/* 🚀 使用 Trans 处理嵌套标签 */}
+          <Trans i18nKey="mine.empty_state.guide">
+            请前往 <span className="text-text-main">设置 {">"} 我的集合</span>{" "}
+            进行配置
+          </Trans>
         </div>
       </div>
     );
@@ -220,9 +234,7 @@ export const Mine = () => {
 
   if (isError) {
     return (
-      <div className="p-20 text-center text-red-500">
-        加载失败，请检查网络或配置规则
-      </div>
+      <div className="p-20 text-center text-red-500">{t("mine.error")}</div>
     );
   }
 
@@ -231,14 +243,14 @@ export const Mine = () => {
       <header className="mb-10 flex items-end justify-between">
         <div>
           <h1 className="text-4xl font-qs-semibold flex items-center gap-3">
-            Mine
+            {t("mine.title")}
             <span className="text-sm bg-black text-white px-2 py-1 rounded-md font-bold tracking-wide transform -translate-y-4">
-              CUSTOM
+              {t("mine.subtitle")}
             </span>
           </h1>
           <p className="text-gray-400 mt-2 flex items-center gap-2">
             <FontAwesomeIcon icon={faFeatherPointed} className="text-xs" />
-            <span>自定义集合</span>
+            <span>{t("mine.custom_collection")}</span>
             <span className="w-1 h-1 rounded-full bg-gray-300 mx-1"></span>
             <span className="font-mono text-xs opacity-70 truncate max-w-[300px]">
               {source}
@@ -279,9 +291,7 @@ export const Mine = () => {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-full px-6 py-3 flex items-center gap-4">
             <span className="text-sm font-qs-medium text-text-main">
-              已选择{" "}
-              <span className="text-link font-bold">{selectionCount}</span>{" "}
-              个域名
+              {t("home.floating_bar.selected", { count: selectionCount })}
             </span>
             <div className="h-4 w-px bg-gray-300 mx-1" />
             <button
@@ -294,13 +304,13 @@ export const Mine = () => {
               }`}
             >
               <FontAwesomeIcon icon={faRotate} spin={isRenewalBusy} />
-              批量续费
+              {t("home.floating_bar.renew_batch")}
             </button>
             <button
               onClick={clearSelection}
               className="ml-2 text-xs text-gray-400 hover:text-text-main underline decoration-gray-300 underline-offset-2"
             >
-              取消
+              {t("home.floating_bar.cancel")}
             </button>
           </div>
         </div>
@@ -312,13 +322,7 @@ export const Mine = () => {
         status={activeStatus}
         txHash={activeTxHash}
         secondsLeft={secondsLeft}
-        title={
-          activeType === "register"
-            ? "设置注册时长"
-            : activeType === "batch"
-              ? `批量续费 (${durationTarget?.labels?.length}个)`
-              : "设置续费时长"
-        }
+        title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
       />

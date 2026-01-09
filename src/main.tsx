@@ -1,4 +1,5 @@
 // src/main.tsx
+import "./i18n/config"; // 👈 新增这一行
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";

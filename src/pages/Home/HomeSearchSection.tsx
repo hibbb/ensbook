@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 import { Tooltip } from "../../components/ui/Tooltip";
 
 interface HomeSearchSectionProps {
@@ -21,6 +22,8 @@ export const HomeSearchSection = ({
   onSubmit,
   onOpenHelp,
 }: HomeSearchSectionProps) => {
+  const { t } = useTranslation(); // 🚀
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") onSubmit();
   };
@@ -35,7 +38,7 @@ export const HomeSearchSection = ({
     >
       {!hasContent && (
         <h1 className="text-4xl font-qs-regular text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
-          <span className="text-link">Search</span> ENS
+          <span className="text-link">{t("home.search.title")}</span> ENS
         </h1>
       )}
 
@@ -45,7 +48,7 @@ export const HomeSearchSection = ({
         }`}
       >
         <div className="relative group">
-          <Tooltip content="搜索帮助">
+          <Tooltip content={t("home.search.help_tooltip")}>
             <button
               onClick={onOpenHelp}
               className="absolute left-2 top-2 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-yellow-100 hover:text-yellow-400 transition-all active:scale-95 z-10"
@@ -58,8 +61,8 @@ export const HomeSearchSection = ({
             className="w-full h-14 pl-14 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
             placeholder={
               hasContent
-                ? "继续添加名称..."
-                : "输入名称标签、地址、特殊标记，或先从左侧 💡 处查看帮助"
+                ? t("home.search.placeholder_content")
+                : t("home.search.placeholder_empty")
             }
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}

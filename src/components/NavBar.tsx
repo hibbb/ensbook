@@ -10,18 +10,14 @@ import {
   faLayerGroup,
   faFeatherPointed,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀 引入 Hook
 import { SettingsModal } from "./SettingsModal";
-// 🗑️ 移除不再需要的 Hook 引用
-// import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { Tooltip } from "./ui/Tooltip";
 
 export const NavBar = () => {
   const location = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-  // 🗑️ 移除数据源检查逻辑
-  // const source = useMyCollectionSource();
-  // const hasMine = !!source;
+  const { t } = useTranslation(); // 🚀 初始化
 
   const getLinkClass = (path: string) => {
     const isActive = location.pathname === path;
@@ -35,7 +31,6 @@ export const NavBar = () => {
   return (
     <>
       <nav className="relative z-50 flex justify-between items-center mb-5 pb-6 border-b border-table-border">
-        {/* 左侧：Logo 与 页面链接 */}
         <div className="flex items-center gap-8">
           <Link
             to="/"
@@ -45,15 +40,12 @@ export const NavBar = () => {
           </Link>
 
           <div className="hidden md:flex gap-6">
-            {/* 🚀 注意：在第二步中，我们将把这里的 "/" 改为 "/home" */}
-            {/* 🚀 关键变更：Home 菜单项必须显式指向 /home */}
             <Link to="/home" className={getLinkClass("/home")}>
-              <FontAwesomeIcon icon={faMagnifyingGlass} /> Home
+              <FontAwesomeIcon icon={faMagnifyingGlass} /> {t("nav.home")}
             </Link>
 
-            {/* 🚀 变更：移除条件渲染，默认显示 Mine */}
             <Link to="/mine" className={getLinkClass("/mine")}>
-              <FontAwesomeIcon icon={faFeatherPointed} /> Mine
+              <FontAwesomeIcon icon={faFeatherPointed} /> {t("nav.mine")}
             </Link>
 
             <Link
@@ -72,9 +64,8 @@ export const NavBar = () => {
           </div>
         </div>
 
-        {/* 右侧：功能区 */}
         <div className="flex items-center gap-3">
-          <Tooltip content="设置">
+          <Tooltip content={t("nav.settings")}>
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-link hover:text-link-hover hover:bg-gray-100 transition-all active:scale-95 group"

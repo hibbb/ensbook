@@ -3,8 +3,9 @@
 import { useState, useCallback } from "react";
 import { usePublicClient, useAccount, useChainId } from "wagmi";
 import { normalize } from "viem/ens";
-import { type Hex } from "viem"; // 引入 Hex 类型
+import { type Hex } from "viem";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next"; // 🚀
 import { REFERRER_ADDRESS_HASH } from "../config/env";
 import {
   useWriteEthControllerV3,
@@ -16,37 +17,32 @@ import { getContracts } from "../config/contracts";
 
 export type RenewalStatus =
   | "idle"
-  | "loading" // 正在估价或等待钱包签名
-  | "processing" // 交易已发出，等待上链
+  | "loading"
+  | "processing"
   | "success"
   | "error";
 
 export function useEnsRenewal() {
   const [status, setStatus] = useState<RenewalStatus>("idle");
-  const [txHash, setTxHash] = useState<Hex | null>(null); // 🚀 新增：交易哈希状态
+  const [txHash, setTxHash] = useState<Hex | null>(null);
   const publicClient = usePublicClient();
-  const { address } = useAccount(); // ⚡️ 优化2：获取当前用户地址
+  const { address } = useAccount();
   const chainId = useChainId();
   const contracts = getContracts(chainId);
+  const { t } = useTranslation(); // 🚀
 
-  // 使用生成的 Write Hooks
   const { writeContractAsync: writeEthController } = useWriteEthControllerV3();
   const { writeContractAsync: writeBulkRenewal } = useWriteBulkRenewal();
 
-  // ⚡️ 优化3：提供重置状态的方法，方便 UI 重试
   const resetStatus = useCallback(() => {
     setStatus("idle");
-    setTxHash(null); // 重置哈希
+    setTxHash(null);
   }, []);
 
-  /**
-   * 单域名续费 (EthControllerV3)
-   */
   const renewSingle = useCallback(
     async (rawLabel: string, duration: bigint) => {
-      // ⚡️ 优化2：增加对 address 的检查
       if (!publicClient || !address) {
-        toast.error("请先连接钱包");
+        toast.error(t("hooks.renewal.connect_wallet"));
         return;
       }
 
@@ -58,7 +54,6 @@ export function useEnsRenewal() {
         const label = normalize(rawLabel).replace(/\.eth$/, "");
         const referrer = REFERRER_ADDRESS_HASH;
 
-        // 估价
         const priceData = (await publicClient.readContract({
           address: contractAddress,
           abi: ethControllerV3Abi,
@@ -67,21 +62,20 @@ export function useEnsRenewal() {
         })) as { base: bigint; premium: bigint };
 
         const totalPrice = priceData.base + priceData.premium;
-        const valueWithBuffer = (totalPrice * 110n) / 100n; // +10% 缓冲
+        const valueWithBuffer = (totalPrice * 110n) / 100n;
 
-        // 发送交易
         const hash = await writeEthController({
           functionName: "renew",
           args: [label, duration, referrer],
           value: valueWithBuffer,
         });
 
-        setTxHash(hash); // 🚀 保存哈希
+        setTxHash(hash);
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
-          loading: "续费交易确认中...",
-          success: `续费成功！${label}.eth 已续费。`,
-          error: "续费交易失败",
+          loading: t("hooks.renewal.confirming"),
+          success: t("hooks.renewal.success", { label }),
+          error: t("hooks.renewal.failed"),
         });
 
         setStatus("success");
@@ -89,23 +83,24 @@ export function useEnsRenewal() {
         console.error("单域名续费失败:", err);
         setStatus("error");
         const error = err as Error & { shortMessage?: string };
-        toast.error(error.shortMessage || error.message || "续费发生未知错误");
+        toast.error(
+          error.shortMessage ||
+            error.message ||
+            t("hooks.renewal.unknown_error"),
+        );
       }
     },
-    [publicClient, address, writeEthController, contracts], // 依赖列表现在是准确的
+    [publicClient, address, writeEthController, contracts, t],
   );
 
-  /**
-   * 批量续费 (BulkRenewal)
-   */
   const renewBatch = useCallback(
     async (rawLabels: string[], duration: bigint) => {
       if (!publicClient || !address) {
-        toast.error("请先连接钱包");
+        toast.error(t("hooks.renewal.connect_wallet"));
         return;
       }
       if (rawLabels.length === 0) {
-        toast.error("请至少选择一个域名");
+        toast.error(t("hooks.renewal.select_one"));
         return;
       }
 
@@ -115,7 +110,6 @@ export function useEnsRenewal() {
       try {
         const labels = rawLabels.map((l) => normalize(l).replace(/\.eth$/, ""));
 
-        // 估价 (BulkRenewal 直接返回总价)
         const totalPrice = (await publicClient.readContract({
           address: contractAddress,
           abi: bulkRenewalAbi,
@@ -125,7 +119,6 @@ export function useEnsRenewal() {
 
         const valueWithBuffer = (totalPrice * 110n) / 100n;
 
-        // 发送交易
         const hash = await writeBulkRenewal({
           functionName: "renewAll",
           args: [labels, duration],
@@ -134,9 +127,11 @@ export function useEnsRenewal() {
 
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
-          loading: `正在批量续费 ${labels.length} 个域名...`,
-          success: "批量续费成功！",
-          error: "批量续费交易失败",
+          loading: t("hooks.renewal.batch_confirming", {
+            count: labels.length,
+          }),
+          success: t("hooks.renewal.batch_success"),
+          error: t("hooks.renewal.batch_failed"),
         });
 
         setStatus("success");
@@ -145,19 +140,21 @@ export function useEnsRenewal() {
         setStatus("error");
         const error = err as Error & { shortMessage?: string };
         toast.error(
-          error.shortMessage || error.message || "批量续费发生未知错误",
+          error.shortMessage ||
+            error.message ||
+            t("hooks.renewal.batch_unknown_error"),
         );
       }
     },
-    [publicClient, address, writeBulkRenewal, contracts],
+    [publicClient, address, writeBulkRenewal, contracts, t],
   );
 
   return {
     status,
-    txHash, // 🚀 导出哈希
+    txHash,
     renewSingle,
     renewBatch,
-    resetStatus, // 导出重置方法
+    resetStatus,
     isBusy: status === "loading" || status === "processing",
   };
 }

@@ -4,11 +4,12 @@ import {
   faSortAmountDown,
   faSortAmountUp,
   faCheck,
-  faClock, // 🚀 引入时钟图标
+  faClock,
   faRotateLeft,
   faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next"; // 🚀
 import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import { FilterDropdown } from "../FilterDropdown";
@@ -29,7 +30,7 @@ interface StatusHeaderProps {
   onSort: (field: SortField) => void;
   onFilterChange: (config: FilterConfig) => void;
   statusCounts?: Record<string, number>;
-  disabled?: boolean; // 🚀 新增
+  disabled?: boolean;
 }
 
 export const StatusHeader = ({
@@ -38,14 +39,15 @@ export const StatusHeader = ({
   onSort,
   onFilterChange,
   statusCounts = {},
-  disabled, // 🚀 解构
+  disabled,
 }: StatusHeaderProps) => {
+  const { t } = useTranslation(); // 🚀
   const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
   return (
     <ThWrapper>
       <div className="flex items-center gap-2">
-        <span>状态</span>
+        <span>{t("table.header.status")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton
             field="status"
@@ -54,28 +56,26 @@ export const StatusHeader = ({
             defaultIcon={faSortAmountDown}
             ascIcon={faSortAmountUp}
             descIcon={faSortAmountDown}
-            title="按状态排序"
-            disabled={disabled} // 🚀
+            title={t("table.filter.sort_status")}
+            disabled={disabled}
           />
 
-          {/* 🚀 新增：按注册时间排序 */}
           <SortButton
             field="registered"
             currentSort={sortConfig}
             onSort={onSort}
-            defaultIcon={faClock} // 默认显示时钟
+            defaultIcon={faClock}
             ascIcon={faRotateRight}
             descIcon={faRotateLeft}
-            title="按注册时间排序"
-            disabled={disabled} // 🚀
+            title={t("table.filter.sort_reg_date")}
+            disabled={disabled}
           />
 
           <FilterDropdown
             isActive={filterConfig.statusList.length > 0}
-            title="按状态筛选"
-            disabled={disabled} // 🚀
+            title={t("table.filter.filter_status")}
+            disabled={disabled}
           >
-            {/* 全部显示选项 */}
             <div
               className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
                 filterConfig.statusList.length === 0
@@ -86,7 +86,7 @@ export const StatusHeader = ({
                 onFilterChange({ ...filterConfig, statusList: [] })
               }
             >
-              <span>全部显示</span>
+              <span>{t("table.filter.all_show")}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400 font-normal">
                   ({totalCount})
@@ -97,7 +97,6 @@ export const StatusHeader = ({
               </div>
             </div>
 
-            {/* 状态列表 */}
             {STATUS_OPTIONS.map((s) => {
               const count = statusCounts[s] || 0;
 
@@ -132,7 +131,8 @@ export const StatusHeader = ({
                     });
                   }}
                 >
-                  <span>{s}</span>
+                  {/* 🚀 翻译状态 */}
+                  <span>{t(`status.${s.toLowerCase()}`)}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400 font-qs-regular">
                       ({count})

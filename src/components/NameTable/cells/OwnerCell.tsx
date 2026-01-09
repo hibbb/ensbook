@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
 
@@ -12,71 +13,71 @@ interface OwnerCellProps {
 }
 
 export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
+  const { t } = useTranslation(); // 🚀
   const isMe =
     currentAddress &&
     record.owner?.toLowerCase() === currentAddress.toLowerCase();
 
-  // 复制处理函数
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`已复制 ${label}`);
+    toast.success(t("table.cell.copy_success", { label }));
   };
 
-  // 构建富文本 Tooltip 内容
   const renderTooltipContent = () => {
-    // 1. 在渲染前进行空值检查
     if (!record.owner) return null;
 
     return (
       <div className="flex flex-col gap-2 min-w-[200px]">
-        {/* 所有者地址 */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
-              Owner Address
+              {t("table.cell.owner_addr")}
             </span>
             <span className="font-qs-medium text-xs">
               {record.owner.slice(0, 6)}...{record.owner.slice(-4)}
             </span>
           </div>
           <button
-            // 🚀 修复：使用 record.owner! 断言，因为上方已检查 if (!record.owner)
-            onClick={() => handleCopy(record.owner!, "地址")}
+            onClick={() =>
+              handleCopy(record.owner!, t("table.cell.owner_addr"))
+            }
             className="text-gray-400 hover:text-white transition-colors p-1"
-            title="Copy Address"
+            title={t("table.cell.copy_addr")}
           >
             <FontAwesomeIcon icon={faCopy} />
           </button>
         </div>
 
-        {/* 主名称 (如果有) */}
         {record.ownerPrimaryName && (
           <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
             <div className="flex flex-col">
               <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
-                Primary Name
+                {t("table.cell.primary_name")}
               </span>
               <span className="font-qs-medium text-xs">
                 {record.ownerPrimaryName}
               </span>
             </div>
             <button
-              // 🚀 修复：同样使用 ! 断言，因为 record.ownerPrimaryName 可能是 undefined
-              onClick={() => handleCopy(record.ownerPrimaryName!, "主名称")}
+              onClick={() =>
+                handleCopy(
+                  record.ownerPrimaryName!,
+                  t("table.cell.primary_name"),
+                )
+              }
               className="text-gray-400 hover:text-white transition-colors p-1"
-              title="Copy Primary Name"
+              title={t("table.cell.copy_primary")}
             >
               <FontAwesomeIcon icon={faCopy} />
             </button>
           </div>
         )}
 
-        {/* 正好是当前连接的钱包 */}
         {isMe && (
           <div className="flex items-center justify-center gap-2 border-t border-white/10 pt-2 pb-1">
             <span className="text-sm text-link">~</span>
             <span className="font-qs-semibold text-[11px]">
-              这是当前连接的钱包
+              {t("table.cell.is_me")}
             </span>
             <span className="text-sm text-link">~</span>
           </div>

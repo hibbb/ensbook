@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEthereum } from "@fortawesome/free-brands-svg-icons";
+import { useTranslation } from "react-i18next"; // 🚀
 import { usePremiumEthPrice } from "../../../hooks/usePremiumEthPrice";
 import {
   PREMIUM_PERIOD_DURATION,
@@ -11,7 +12,6 @@ import {
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
 
-// 1. 高效的时间格式化函数
 const formatDate = (timestamp: number) => {
   if (!timestamp) return "-";
   return new Intl.DateTimeFormat("zh-CN", {
@@ -25,7 +25,6 @@ const formatDate = (timestamp: number) => {
   }).format(new Date(timestamp * 1000));
 };
 
-// 辅助函数：格式化剩余时间
 const formatRemainingTime = (seconds: number) => {
   if (seconds <= 0) return "Over";
   const days = Math.floor(seconds / 86400);
@@ -41,62 +40,56 @@ interface StatusCellProps {
 }
 
 export const StatusCell = ({ record, now }: StatusCellProps) => {
-  // 🚀 1. 样式逻辑优化：直接使用常量配置
-  // 由于 constants.ts 已经包含了 "Unknown"，这里不再需要手动判断
+  const { t } = useTranslation(); // 🚀
   const bgClass = STATUS_COLOR_BG[record.status] || "bg-gray-50";
   const textClass = STATUS_COLOR_TEXT[record.status] || "text-text-main";
   const statusClass = `${bgClass} ${textClass} border-table-border`;
 
-  // 2. 构建 Tooltip 内容逻辑
   const getTooltipContent = () => {
-    // 🚀 2. 针对 Unknown 状态显示友好提示
     if (record.status === "Unknown") {
       return (
         <div className="px-2 py-1 text-xs text-gray-300">
-          数据获取失败，无法确定状态
+          {t("table.cell.unknown_status")}
         </div>
       );
     }
 
     const timePoints = [
       {
-        label: "注册时间",
+        label: t("table.cell.reg_time"),
         time: record.registeredTime,
         show: !!record.registeredTime,
       },
       {
-        label: "过期时间",
+        label: t("table.cell.exp_time"),
         time: record.expiryTime,
         show: !!record.expiryTime,
       },
       {
-        label: "释放时间",
+        label: t("table.cell.release_time"),
         time: record.releaseTime,
         show: !!record.releaseTime,
       },
       {
-        label: "当前时间",
+        label: t("table.cell.current_time"),
         time: now,
         show: true,
         isCurrent: true,
       },
     ];
 
-    // 如果是 Premium 状态，添加溢价结束时间 (Release + 21天)
     if (record.status === "Premium" && record.releaseTime) {
       timePoints.push({
-        label: "溢价结束",
+        label: t("table.cell.premium_end"),
         time: record.releaseTime + PREMIUM_PERIOD_DURATION,
         show: true,
       });
     }
 
-    // 过滤并排序
     const sortedPoints = timePoints
       .filter((p) => p.show && p.time && p.time > 0)
       .sort((a, b) => (a.time || 0) - (b.time || 0));
 
-    // 3. 渲染现代化的时间轴列表
     return (
       <div className="flex flex-col px-1 py-1 gap-1 min-w-[220px]">
         {sortedPoints.map((point) => (
@@ -104,7 +97,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
             key={point.label}
             className={`flex py-0.5 justify-between items-center gap-4 text-xs ${
               point.isCurrent
-                ? "text-white font-qs-semibold border-l-2 border-link pl-2 -ml-2.5" // 高亮当前时间
+                ? "text-white font-qs-semibold border-l-2 border-link pl-2 -ml-2.5"
                 : "text-gray-300 font-qs-medium"
             }`}
           >
@@ -124,12 +117,10 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
     now,
   );
 
-  // 🚀 核心修改：将内容渲染逻辑拆分，根据状态返回不同的 UI 结构
   const renderContent = () => {
-    // 1. Unknown 处理
-    if (record.status === "Unknown") return <span>Unknown</span>;
+    if (record.status === "Unknown")
+      return <span>{t("table.cell.unknown")}</span>;
 
-    // 2. Premium 特殊处理 (价格标签模式)
     if (record.status === "Premium") {
       const remaining = record.releaseTime
         ? formatRemainingTime(
@@ -139,22 +130,16 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
 
       return (
         <div className="flex items-center gap-1.5 font-qs-medium">
-          {/* 使用 ETH 图标或 💎 作为“状态指示符” */}
           <div className="flex items-center gap-0.5">
             <FontAwesomeIcon icon={faEthereum} className="text-[10px]" />
             <span>{premiumEthPrice || "-"}</span>
           </div>
-
-          {/* 分隔符 */}
           <span className="opacity-50 text-[10px]">|</span>
-
-          {/* 剩余时间 (紧凑显示) */}
           <span className="font-mono text-[10px] opacity-90">{remaining}</span>
         </div>
       );
     }
 
-    // 3. 常规状态处理 (Active, Grace, etc.)
     const remainingTime = (() => {
       if (now === 0) return null;
       if (record.status === "Active" && record.expiryTime)
@@ -166,7 +151,8 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
 
     return (
       <>
-        <span>{record.status}</span>
+        {/* 🚀 翻译状态文本 */}
+        <span>{t(`status.${record.status.toLowerCase()}`)}</span>
         {remainingTime && (
           <span className="leading-none ml-1.5 font-mono opacity-80 border-l border-current pl-1.5 text-[10px]">
             {remainingTime}
