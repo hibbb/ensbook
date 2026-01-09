@@ -34,7 +34,7 @@ export const CollectionDetail = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  useDocumentTitle(collection?.displayName);
+  useDocumentTitle(collection ? t(collection.displayName) : undefined);
 
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
 

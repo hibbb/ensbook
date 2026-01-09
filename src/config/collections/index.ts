@@ -8,7 +8,7 @@ export const ENS_COLLECTIONS: Record<string, EnsCollection> = {
   "999": {
     id: "999",
     // 🚀 替换: "999 Club" -> "collection.999.name"
-    displayName: "collection.999.name",
+    displayName: "collection.999.title",
     // 🚀 替换: "ENS most representative..." -> "collection.999.desc"
     description: "collection.999.desc",
     labels: COLLECTION_999_LABELS,
@@ -16,7 +16,7 @@ export const ENS_COLLECTIONS: Record<string, EnsCollection> = {
   bip39: {
     id: "bip39",
     // 🚀 替换: "BIP39 Club" -> "collection.bip39.name"
-    displayName: "collection.bip39.name",
+    displayName: "collection.bip39.title",
     // 🚀 替换: "The 2048 foundational..." -> "collection.bip39.desc"
     // // "There are only 2048 keys to the crypto world. Do you own one?",
     description: "collection.bip39.desc",

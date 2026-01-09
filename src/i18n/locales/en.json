@@ -345,10 +345,12 @@
     "load_fail": "Failed to load",
     "999": {
       "name": "999",
+      "title": "999 Club",
       "desc": "The most representative digital collection in ENS, containing 000.eth to 999.eth."
     },
     "bip39": {
       "name": "BIP39",
+      "title": "BIP39 Club",
       "desc": "The 2048 foundational words of crypto wallets (Mnemonic Seeds)."
     }
   },
