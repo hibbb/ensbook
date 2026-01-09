@@ -1,6 +1,6 @@
 // src/components/NameTable/cells/LookupsCell.tsx
 
-import { useTranslation } from "react-i18next"; // 🚀 引入 Hook
+import { useTranslation } from "react-i18next";
 import { getAvailableLookups } from "../../../utils/lookupProvider";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
@@ -11,13 +11,12 @@ interface LookupsCellProps {
 }
 
 export const LookupsCell = ({ record, chainId }: LookupsCellProps) => {
-  const { t } = useTranslation(); // 🚀 获取 t 函数
+  const { t } = useTranslation();
   const availableLookups = getAvailableLookups(record, chainId);
 
   return (
     <div className="h-12 flex items-center justify-start gap-1.5">
       {availableLookups.map((item) => (
-        // 🚀 关键修改：传入 t 函数
         <Tooltip key={item.key} content={item.getLabel(record, t)}>
           <a
             href={item.getLink(record, chainId)}

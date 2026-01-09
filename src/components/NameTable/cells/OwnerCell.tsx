@@ -3,7 +3,7 @@
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
 
@@ -13,14 +13,15 @@ interface OwnerCellProps {
 }
 
 export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const isMe =
     currentAddress &&
     record.owner?.toLowerCase() === currentAddress.toLowerCase();
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(t("table.cell.copy_success", { label }));
+    // 🚀 替换: table.cell.copy_success -> common.copy_success
+    toast.success(t("common.copy_success", { label }));
   };
 
   const renderTooltipContent = () => {

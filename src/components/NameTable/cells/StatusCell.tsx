@@ -2,7 +2,7 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEthereum } from "@fortawesome/free-brands-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { usePremiumEthPrice } from "../../../hooks/usePremiumEthPrice";
 import {
   PREMIUM_PERIOD_DURATION,
@@ -40,7 +40,7 @@ interface StatusCellProps {
 }
 
 export const StatusCell = ({ record, now }: StatusCellProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const bgClass = STATUS_COLOR_BG[record.status] || "bg-gray-50";
   const textClass = STATUS_COLOR_TEXT[record.status] || "text-text-main";
   const statusClass = `${bgClass} ${textClass} border-table-border`;
@@ -119,7 +119,8 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
 
   const renderContent = () => {
     if (record.status === "Unknown")
-      return <span>{t("table.cell.unknown")}</span>;
+      // 🚀 替换: table.cell.unknown -> common.unknown
+      return <span>{t("common.unknown")}</span>;
 
     if (record.status === "Premium") {
       const remaining = record.releaseTime

@@ -1,6 +1,6 @@
 // src/components/NameTable/cells/IndexCell.tsx
 
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "../../ui/Tooltip";
 
 interface IndexCellProps {
@@ -21,7 +21,7 @@ export const IndexCell = ({
   level = 0,
   onLevelChange,
 }: IndexCellProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const currentStyle = LEVEL_STYLES[level] || LEVEL_STYLES[0];
 
   const handleClick = (e: React.MouseEvent) => {

@@ -5,7 +5,7 @@ import { namehash, keccak256, stringToBytes } from "viem";
 import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faFileLines } from "@fortawesome/free-regular-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 
 import type { NameRecord } from "../../../types/ensNames";
 import { MemoEditor } from "../../MemoEditor";
@@ -25,10 +25,11 @@ const MetadataRow = ({
   value: string;
   fullValue?: string;
 }) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const handleCopy = () => {
     navigator.clipboard.writeText(fullValue || value);
-    toast.success(t("table.cell.copy_success", { label }));
+    // 🚀 替换: table.cell.copy_success -> common.copy_success
+    toast.success(t("common.copy_success", { label }));
   };
 
   return (
@@ -51,7 +52,7 @@ const MetadataRow = ({
 };
 
 export const NameCell = ({ record }: NameCellProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
 
   const metadata = useMemo(() => {
     try {
@@ -88,7 +89,8 @@ export const NameCell = ({ record }: NameCellProps) => {
     e.preventDefault();
     e.stopPropagation();
     navigator.clipboard.writeText(text);
-    toast.success(t("table.cell.copy_success", { label }));
+    // 🚀 替换: table.cell.copy_success -> common.copy_success
+    toast.success(t("common.copy_success", { label }));
   };
 
   const renderNameTooltip = () => {

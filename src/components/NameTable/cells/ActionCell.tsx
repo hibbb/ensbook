@@ -10,7 +10,7 @@ import {
   faTriangleExclamation,
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-import { useTranslation } from "react-i18next"; // 🚀
+import { useTranslation } from "react-i18next";
 import { isRenewable, isRegistrable } from "../../../utils/ens";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
@@ -47,13 +47,14 @@ export const ActionCell = ({
   onRenew,
   onReminder,
 }: ActionCellProps) => {
-  const { t } = useTranslation(); // 🚀
+  const { t } = useTranslation();
   const renewable = isRenewable(record.status);
 
   const config = useMemo<ActionConfig>(() => {
     if (!isConnected) {
       return {
-        text: t("table.cell.not_connected"),
+        // 🚀 替换: table.cell.not_connected -> common.not_connected
+        text: t("common.not_connected"),
         style: "text-gray-400 cursor-not-allowed bg-transparent",
         disabled: true,
         action: () => {},
@@ -62,7 +63,8 @@ export const ActionCell = ({
 
     if (record.status === "Unknown") {
       return {
-        text: t("table.cell.unknown"),
+        // 🚀 替换: table.cell.unknown -> common.unknown
+        text: t("common.unknown"),
         style: "text-gray-300 cursor-not-allowed bg-transparent",
         disabled: true,
         action: () => {},
@@ -124,7 +126,7 @@ export const ActionCell = ({
     onRenew,
     onRegister,
     onReminder,
-    t, // 🚀
+    t,
   ]);
 
   const handleAction = (e: React.MouseEvent) => {
