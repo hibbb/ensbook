@@ -50,4 +50,7 @@ export default defineConfig({
     // 🚀 新增：注入作者链接常量
     __APP_AUTHOR_URL__: JSON.stringify(getAuthorUrl(packageJson.author)),
   },
+  build: {
+    sourcemap: false, // 生产环境关闭源码映射
+  },
 });
