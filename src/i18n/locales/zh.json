@@ -126,7 +126,7 @@
   "search": {
     "placeholder_empty": "输入名称标签、地址、特殊标记，或先从左侧 💡 处查看帮助",
     "placeholder_content": "继续添加名称...",
-    "help_tooltip": "搜索帮助",
+    "help_tooltip": "搜索指南",
     "guide": {
       "title": "搜索功能指南",
       "desc": "ENSBook 支持多种高级模式，助您快速批量发现域名。",
@@ -137,7 +137,7 @@
         },
         "owner": {
           "title": "名称所有者持仓查询",
-          "desc": "使用 “@ + ENS（或以太坊地址）” 的格式查询。"
+          "desc": "使用 “@ + ENS” 的格式查询。"
         },
         "address": {
           "title": "以太坊地址持仓查询",

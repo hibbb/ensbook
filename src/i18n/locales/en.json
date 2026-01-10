@@ -124,9 +124,9 @@
     }
   },
   "search": {
-    "placeholder_empty": "Enter names, addresses, or tags, or check 💡 for help",
+    "placeholder_empty": "Enter names, addresses, or labels, or check 💡 for help",
     "placeholder_content": "Continue adding names...",
-    "help_tooltip": "Search Help",
+    "help_tooltip": "Search Guide",
     "guide": {
       "title": "Search Guide",
       "desc": "ENSBook supports multiple advanced search modes.",
@@ -137,7 +137,7 @@
         },
         "owner": {
           "title": "Search by Owner",
-          "desc": "Use \"@\" + ENS/Address format."
+          "desc": "Use \"@\" + ENS format."
         },
         "address": {
           "title": "Search by Address",
