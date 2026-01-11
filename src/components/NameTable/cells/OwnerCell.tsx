@@ -16,7 +16,7 @@ interface OwnerCellProps {
 
 export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
   const { t } = useTranslation();
-  const isMe =
+  const isConnectedWallet =
     currentAddress &&
     record.owner?.toLowerCase() === currentAddress.toLowerCase();
 
@@ -80,18 +80,18 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
           </div>
         )}
 
-        {isMe && (
-          <div className="flex items-center justify-center gap-2 border-t border-white/10 pt-2 pb-1">
+        {isConnectedWallet && (
+          <div className="flex items-center justify-center gap-2 border-t border-white/10 pt-2">
             <span className="text-sm text-link">~</span>
-            <span className="font-qs-semibold text-[11px]">
-              {t("table.cell.is_me")}
+            <span className="font-qs-medium text-[10px]">
+              {t("table.cell.is_connected_wallet")}
             </span>
             <span className="text-sm text-link">~</span>
           </div>
         )}
 
         {/* 🚀 底部提示：点击查看持仓 */}
-        <div className="pt-2 pb-1 mt-1 border-t border-white/10 text-center">
+        <div className="pt-2 pb-1 border-t border-white/10 text-center">
           <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
             {t("table.cell.view_portfolio")}
           </span>
@@ -107,7 +107,9 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
     <div className="h-12 flex items-center">
       {record.owner ? (
         <div className="flex items-center gap-1.5 text-sm">
-          {isMe && <span className="text-sm text-link">{"~"}</span>}
+          {isConnectedWallet && (
+            <span className="text-sm text-link">{"~"}</span>
+          )}
           <Tooltip content={renderTooltipContent()}>
             <Link
               to={`/account/${linkTarget}`}
@@ -120,7 +122,9 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
               {record.ownerPrimaryName || truncateAddress(record.owner)}
             </Link>
           </Tooltip>
-          {isMe && <span className="text-sm text-link">{"~"}</span>}
+          {isConnectedWallet && (
+            <span className="text-sm text-link">{"~"}</span>
+          )}
         </div>
       ) : (
         <span className="text-gray-300 text-xs">—</span>

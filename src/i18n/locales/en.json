@@ -212,7 +212,7 @@
       "copy_addr": "Copy Address",
       "copy_primary": "Copy Primary Name",
       "view_portfolio": "Click to view account portfolio",
-      "is_me": "This is the connected wallet",
+      "is_connected_wallet": "This is the connected wallet",
       "unknown_status": "Data fetch failed, status unknown",
       "reg_time": "Registered",
       "exp_time": "Expires",

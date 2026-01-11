@@ -99,7 +99,7 @@ export const NameCell = ({ record }: NameCellProps) => {
       <div className="flex flex-col gap-2 min-w-[200px]">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-medium">
               {t("table.cell.label")}
             </span>
             <span className="font-qs-medium text-xs text-white">
@@ -117,7 +117,7 @@ export const NameCell = ({ record }: NameCellProps) => {
 
         <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-medium">
               {t("table.cell.name")}
             </span>
             <span className="font-qs-medium text-xs text-white">

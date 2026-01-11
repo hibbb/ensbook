@@ -212,7 +212,7 @@
       "copy_addr": "复制地址",
       "copy_primary": "复制主名称",
       "view_portfolio": "点击查看该账户持仓",
-      "is_me": "这是当前连接的钱包",
+      "is_connected_wallet": "这是当前连接的钱包",
       "unknown_status": "数据获取失败，无法确定状态",
       "reg_time": "注册时间",
       "exp_time": "过期时间",
