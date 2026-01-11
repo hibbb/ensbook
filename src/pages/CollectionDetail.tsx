@@ -174,6 +174,8 @@ export const CollectionDetail = () => {
     return t("transaction.title.renew");
   };
 
+  const currentExpiry = durationTarget?.record?.expiryTime;
+
   if (!collection)
     return <div className="p-20 text-center">{t("collection.not_found")}</div>;
   if (isError)
@@ -238,6 +240,7 @@ export const CollectionDetail = () => {
         title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
+        currentExpiry={currentExpiry}
       />
       <ReminderModal
         isOpen={!!reminderTarget}

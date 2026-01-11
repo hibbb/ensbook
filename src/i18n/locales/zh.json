@@ -12,7 +12,8 @@
     "loading": "加载中...",
     "unknown": "未知",
     "copy_success": "已复制 {{label}}",
-    "year": "年"
+    "year": "年",
+    "day": "天"
   },
   "app": {
     "not_found": "404 | 页面不存在"
@@ -247,6 +248,10 @@
       "processing": "操作进行中",
       "done": "操作完成"
     },
+    "btn": {
+      "start_register": "开始注册",
+      "confirm_renew": "确认续费"
+    },
     "status": {
       "processing": "正在处理...",
       "confirm_wallet": "请在钱包中确认交易"
@@ -302,6 +307,16 @@
         "download": "下载日历文件 (.ics)",
         "google": "添加到 Google 日历"
       }
+    },
+    "mode": {
+      "duration": "时长模式",
+      "until": "日期模式"
+    },
+    "error": {
+      "min_duration": "注册时长至少为 28 天",
+      "invalid_date": "无效的日期",
+      "past_date": "日期必须是未来时间",
+      "before_expiry": "日期必须晚于当前过期时间"
     }
   },
   "memo": {

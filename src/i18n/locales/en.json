@@ -12,7 +12,8 @@
     "loading": "Loading...",
     "unknown": "Unknown",
     "copy_success": "Copied {{label}}",
-    "year": "Year"
+    "year": "Year",
+    "day": "Day"
   },
   "app": {
     "not_found": "404 | Page Not Found"
@@ -247,6 +248,10 @@
       "processing": "Processing",
       "done": "Completed"
     },
+    "btn": {
+      "start_register": "Start Registration",
+      "confirm_renew": "Confirm Renewal"
+    },
     "status": {
       "processing": "Processing...",
       "confirm_wallet": "Please confirm in wallet"
@@ -302,6 +307,16 @@
         "download": "Download .ics File",
         "google": "Add to Google Calendar"
       }
+    },
+    "mode": {
+      "duration": "Duration",
+      "until": "Until Date"
+    },
+    "error": {
+      "min_duration": "Registration must be at least 28 days",
+      "invalid_date": "Invalid date",
+      "past_date": "Date must be in the future",
+      "before_expiry": "Date must be after current expiry"
     }
   },
   "memo": {

@@ -5,8 +5,10 @@
 // 🚀 定义默认时长常量（1年 = 31536000秒）
 export const DEFAULT_DURATION_SECONDS = 365 * 24 * 60 * 60; // 1年
 export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60; // 365 * 24 * 60 * 60
+export const SECONDS_PER_DAY = 24 * 60 * 60;
 
 // ENS 协议相关的常量
+export const MIN_REGISTRATION_DURATION = 28 * 24 * 60 * 60; // 2419200 秒
 export const GRACE_PERIOD_DURATION = 90 * 24 * 60 * 60;
 export const PREMIUM_PERIOD_DURATION = 21 * 24 * 60 * 60;
 export const ETH_PARENT_HASH =

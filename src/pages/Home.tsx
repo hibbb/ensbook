@@ -317,6 +317,11 @@ export const Home = () => {
     return t("transaction.title.renew");
   };
 
+  // 🚀 传递 currentExpiry
+  // 如果是单域名续费，取 record.expiryTime
+  // 如果是批量续费，则是统一时长，我们在 ProcessModal 页面针对批量续费隐藏了截止日期续费法（批量续费合约目前仅支持统一增加时长）
+  const currentExpiry = durationTarget?.record?.expiryTime;
+
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
       <HomeSearchSection
@@ -386,6 +391,7 @@ export const Home = () => {
         title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
+        currentExpiry={currentExpiry}
       />
 
       <ReminderModal

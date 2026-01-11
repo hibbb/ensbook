@@ -202,6 +202,8 @@ export const Mine = () => {
     return t("transaction.title.renew");
   };
 
+  const currentExpiry = durationTarget?.record?.expiryTime;
+
   // --- Render Logic ---
 
   if (!hasSource) {
@@ -305,6 +307,7 @@ export const Mine = () => {
         title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
+        currentExpiry={currentExpiry}
       />
       <ReminderModal
         isOpen={!!reminderTarget}

@@ -251,6 +251,8 @@ export const Account = () => {
     return t("transaction.title.renew");
   };
 
+  const currentExpiry = durationTarget?.record?.expiryTime;
+
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("common.copy_success", { label }));
@@ -409,6 +411,7 @@ export const Account = () => {
         title={getModalTitle()}
         onClose={handleCloseModal}
         onConfirm={onDurationConfirm}
+        currentExpiry={currentExpiry}
       />
       <ReminderModal
         isOpen={!!reminderTarget}
