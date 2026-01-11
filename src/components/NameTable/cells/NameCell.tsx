@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faFileLines } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
+import { truncateAddress } from "../../../utils/format";
 
 import type { NameRecord } from "../../../types/ensNames";
 import { MemoEditor } from "../../MemoEditor";
@@ -63,9 +64,6 @@ export const NameCell = ({ record }: NameCellProps) => {
       const labelHashDec = BigInt(labelHashHex).toString();
       const nameHashDec = BigInt(nameHashHex).toString();
 
-      const truncate = (str: string, len = 6) =>
-        `${str.slice(0, len)}...${str.slice(-4)}`;
-
       return {
         length: record.label.length,
         nameHashHex,
@@ -73,10 +71,11 @@ export const NameCell = ({ record }: NameCellProps) => {
         labelHashHex,
         labelHashDec,
         display: {
-          nameHashHex: truncate(nameHashHex),
-          nameHashDec: truncate(nameHashDec),
-          labelHashHex: truncate(labelHashHex),
-          labelHashDec: truncate(labelHashDec),
+          // 🚀 使用全局 truncateAddress (虽然名字叫 Address，但逻辑通用，也可以用于 Hash)
+          nameHashHex: truncateAddress(nameHashHex),
+          nameHashDec: truncateAddress(nameHashDec),
+          labelHashHex: truncateAddress(labelHashHex),
+          labelHashDec: truncateAddress(labelHashDec),
         },
       };
     } catch (e) {

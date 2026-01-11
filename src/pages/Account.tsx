@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { isAddress, type Address } from "viem";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast"; // 🚀 引入 toast
+import { truncateAddress } from "../utils/format";
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -33,12 +34,6 @@ import { isRenewable } from "../utils/ens";
 
 // Types
 import type { NameRecord } from "../types/ensNames";
-
-// --- 辅助函数：截短地址 ---
-const truncateAddress = (addr: string) => {
-  if (!addr || addr.length < 10) return addr;
-  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-};
 
 // --- 🟢 内部 Hook: 解析输入为地址 ---
 const useResolveInput = (input: string | undefined) => {

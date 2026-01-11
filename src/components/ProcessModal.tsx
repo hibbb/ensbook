@@ -16,6 +16,7 @@ import { useChainId } from "wagmi";
 import { useTranslation } from "react-i18next";
 import { BaseModal } from "./ui/BaseModal";
 import { DEFAULT_DURATION_SECONDS } from "../config/constants";
+import { truncateAddress } from "../utils/format";
 
 const getExplorerLink = (chainId: number, hash: string) => {
   const prefix = chainId === 11155111 ? "sepolia." : "";
@@ -180,9 +181,7 @@ export const ProcessModal = ({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-md text-xs text-link hover:text-link-hover hover:bg-gray-100 transition-colors border border-gray-100"
           >
-            <span>
-              {txHash.slice(0, 10)}...{txHash.slice(-8)}
-            </span>
+            <span>{truncateAddress(txHash, 10, 8)}</span>
             <FontAwesomeIcon icon={faExternalLinkAlt} />
           </a>
         )}

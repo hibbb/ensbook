@@ -6,6 +6,7 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
 import type { NameRecord } from "../../../types/ensNames";
 import { Tooltip } from "../../ui/Tooltip";
+import { truncateAddress } from "../../../utils/format";
 
 interface OwnerCellProps {
   record: NameRecord;
@@ -35,7 +36,7 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
               {t("table.cell.owner_addr")}
             </span>
             <span className="font-qs-medium text-xs">
-              {record.owner.slice(0, 6)}...{record.owner.slice(-4)}
+              {truncateAddress(record.owner)}
             </span>
           </div>
           <button
@@ -96,8 +97,7 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
             <span
               className={`cursor-default ${record.ownerPrimaryName ? "" : "text-gray-400"}`}
             >
-              {record.ownerPrimaryName ||
-                `${record.owner.slice(0, 6)}...${record.owner.slice(-4)}`}
+              {record.ownerPrimaryName || truncateAddress(record.owner)}
             </span>
           </Tooltip>
           {isMe && <span className="text-sm text-link">{"~"}</span>}
