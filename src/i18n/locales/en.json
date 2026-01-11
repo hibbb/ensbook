@@ -390,5 +390,15 @@
     "summary": "[ENS] {{domain}} Renewal Reminder",
     "description": "Your ENS domain {{domain}} will expire on {{date}}.\\nPlease renew in time to prevent release.\\n\\nManage Link: https://app.ens.domains/{{domain}}",
     "alarm_desc": "{{domain}} expires in {{days}} days"
+  },
+  "account": {
+    "title": "Account Portfolio",
+    "resolving": "Resolving address...",
+    "fetching": "Fetching domains...",
+    "error_resolve": "Could not resolve address",
+    "error_fetch": "Failed to fetch domains",
+    "empty": "No ENS domains found for this account",
+    "address_label": "Address",
+    "name_label": "Input Name"
   }
 }

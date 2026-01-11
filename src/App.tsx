@@ -2,11 +2,13 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { useTranslation } from "react-i18next"; // 🚀 引入 Hook
+import { useTranslation } from "react-i18next";
 import { NavBar } from "./components/NavBar";
 import { Home } from "./pages/Home";
 import { CollectionDetail } from "./pages/CollectionDetail";
 import { Mine } from "./pages/Mine";
+// 🚀 引入新页面
+import { Account } from "./pages/Account";
 import { getUserSettings } from "./services/storage/userStore";
 
 const IndexRedirect = () => {
@@ -16,7 +18,7 @@ const IndexRedirect = () => {
 };
 
 export default function App() {
-  const { t } = useTranslation(); // 🚀 初始化
+  const { t } = useTranslation();
 
   return (
     <BrowserRouter>
@@ -30,11 +32,14 @@ export default function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/mine" element={<Mine />} />
               <Route path="/collection/:id" element={<CollectionDetail />} />
+
+              {/* 🚀 新增 Account 路由 */}
+              <Route path="/account/:input" element={<Account />} />
+
               <Route
                 path="*"
                 element={
                   <div className="text-center py-20 text-gray-400">
-                    {/* 🚀 翻译 404 */}
                     {t("app.not_found")}
                   </div>
                 }

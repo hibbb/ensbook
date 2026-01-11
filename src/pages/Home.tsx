@@ -13,7 +13,8 @@ import { SearchHelpModal } from "../components/SearchHelpModal";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
-import { HomeFloatingBar } from "./Home/HomeFloatingBar";
+// 🚀 引入通用组件
+import { FloatingBar } from "../components/FloatingBar";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
@@ -362,7 +363,8 @@ export const Home = () => {
         </div>
       )}
 
-      <HomeFloatingBar
+      {/* 🚀 使用通用 FloatingBar */}
+      <FloatingBar
         selectedCount={selectedLabels.size}
         isBusy={isRenewalBusy}
         isConnected={isConnected}

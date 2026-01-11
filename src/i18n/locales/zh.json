@@ -390,5 +390,15 @@
     "summary": "[ENS] {{domain}} 续费提醒",
     "description": "您的 ENS 域名 {{domain}} 将于 {{date}} 到期。\\n请及时续费以防止域名被释放。\\n\\n管理链接: https://app.ens.domains/{{domain}}",
     "alarm_desc": "{{domain}} 将于 {{days}} 天后到期"
+  },
+  "account": {
+    "title": "账户持仓",
+    "resolving": "正在解析地址...",
+    "fetching": "正在获取域名...",
+    "error_resolve": "无法解析地址或名称无效",
+    "error_fetch": "获取域名失败",
+    "empty": "该账户下未找到 ENS 域名",
+    "address_label": "钱包地址",
+    "name_label": "输入名称"
   }
 }
