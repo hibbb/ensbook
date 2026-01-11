@@ -211,6 +211,7 @@
       "primary_name": "Primary Name",
       "copy_addr": "Copy Address",
       "copy_primary": "Copy Primary Name",
+      "view_portfolio": "Click to view account portfolio",
       "is_me": "This is the connected wallet",
       "unknown_status": "Data fetch failed, status unknown",
       "reg_time": "Registered",
@@ -399,6 +400,7 @@
     "error_fetch": "Failed to fetch domains",
     "empty": "No ENS domains found for this account",
     "address_label": "Address",
-    "name_label": "Input Name"
+    "name_label": "Input Name",
+    "total_label": "Total Holdings"
   }
 }

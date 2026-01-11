@@ -1,6 +1,7 @@
 // src/components/NameTable/cells/OwnerCell.tsx
 
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom"; // 🚀 引入 Link
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
@@ -19,9 +20,10 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
     currentAddress &&
     record.owner?.toLowerCase() === currentAddress.toLowerCase();
 
-  const handleCopy = (text: string, label: string) => {
+  const handleCopy = (e: React.MouseEvent, text: string, label: string) => {
+    e.preventDefault(); // 防止触发 Link 跳转
+    e.stopPropagation();
     navigator.clipboard.writeText(text);
-    // 🚀 替换: table.cell.copy_success -> common.copy_success
     toast.success(t("common.copy_success", { label }));
   };
 
@@ -30,6 +32,7 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
 
     return (
       <div className="flex flex-col gap-2 min-w-[200px]">
+        {/* 所有者地址 */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
@@ -40,8 +43,8 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
             </span>
           </div>
           <button
-            onClick={() =>
-              handleCopy(record.owner!, t("table.cell.owner_addr"))
+            onClick={(e) =>
+              handleCopy(e, record.owner!, t("table.cell.owner_addr"))
             }
             className="text-gray-400 hover:text-white transition-colors p-1"
             title={t("table.cell.copy_addr")}
@@ -50,6 +53,7 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
           </button>
         </div>
 
+        {/* 主名称 (如果有) */}
         {record.ownerPrimaryName && (
           <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
             <div className="flex flex-col">
@@ -61,8 +65,9 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
               </span>
             </div>
             <button
-              onClick={() =>
+              onClick={(e) =>
                 handleCopy(
+                  e,
                   record.ownerPrimaryName!,
                   t("table.cell.primary_name"),
                 )
@@ -84,9 +89,19 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
             <span className="text-sm text-link">~</span>
           </div>
         )}
+
+        {/* 🚀 底部提示：点击查看持仓 */}
+        <div className="pt-2 pb-1 mt-1 border-t border-white/10 text-center">
+          <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
+            {t("table.cell.view_portfolio")}
+          </span>
+        </div>
       </div>
     );
   };
+
+  // 🚀 优先使用 ENS 名称作为链接参数
+  const linkTarget = record.ownerPrimaryName || record.owner;
 
   return (
     <div className="h-12 flex items-center">
@@ -94,11 +109,16 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
         <div className="flex items-center gap-1.5 text-sm">
           {isMe && <span className="text-sm text-link">{"~"}</span>}
           <Tooltip content={renderTooltipContent()}>
-            <span
-              className={`cursor-default ${record.ownerPrimaryName ? "" : "text-gray-400"}`}
+            <Link
+              to={`/account/${linkTarget}`}
+              className={`
+                transition-colors duration-200
+                hover:underline decoration-text-main/30 underline-offset-2
+                ${record.ownerPrimaryName ? "text-text-main hover:text-text-main" : "text-text-main/50  hover:text-text-main/70"}
+              `}
             >
               {record.ownerPrimaryName || truncateAddress(record.owner)}
-            </span>
+            </Link>
           </Tooltip>
           {isMe && <span className="text-sm text-link">{"~"}</span>}
         </div>

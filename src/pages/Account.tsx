@@ -5,23 +5,27 @@ import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWallet, faUserTag } from "@fortawesome/free-solid-svg-icons";
-// 🚀 引入新的图标 (复制、眼睛)
+import {
+  faWallet,
+  faUserTag,
+  faWarehouse, // 🚀 1. 引入新图标
+} from "@fortawesome/free-solid-svg-icons";
 import { faCopy, faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
 import { isAddress, type Address } from "viem";
 import { normalize } from "viem/ens";
-import toast from "react-hot-toast"; // 🚀 引入 toast
+import toast from "react-hot-toast";
+
 import { truncateAddress } from "../utils/format";
 
-// Components
+// ... (Components imports 保持不变)
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { ProcessModal, type ProcessType } from "../components/ProcessModal";
 import { ReminderModal } from "../components/ReminderModal";
 import { FloatingBar } from "../components/FloatingBar";
 
-// Hooks & Services
+// ... (Hooks & Services imports 保持不变)
 import { useNameRecords } from "../hooks/useEnsData";
 import { useEnsRenewal } from "../hooks/useEnsRenewal";
 import { useEnsRegistration } from "../hooks/useEnsRegistration";
@@ -32,19 +36,16 @@ import { fetchLabels } from "../services/graph/fetchLabels";
 import { publicClient } from "../utils/client";
 import { isRenewable } from "../utils/ens";
 
-// Types
+// ... (Types imports 保持不变)
 import type { NameRecord } from "../types/ensNames";
 
-// --- 🟢 内部 Hook: 解析输入为地址 ---
+// ... (useResolveInput 和 useAccountLabels Hooks 保持不变) ...
 const useResolveInput = (input: string | undefined) => {
   return useQuery({
     queryKey: ["resolve-account", input],
     queryFn: async (): Promise<Address | null> => {
       if (!input) return null;
-
-      if (isAddress(input)) {
-        return input;
-      }
+      if (isAddress(input)) return input;
 
       let nameToResolve = input;
       if (!input.includes(".")) {
@@ -68,7 +69,6 @@ const useResolveInput = (input: string | undefined) => {
   });
 };
 
-// --- 🟢 内部 Hook: 获取地址持仓 ---
 const useAccountLabels = (address: Address | null | undefined) => {
   return useQuery({
     queryKey: ["account-labels", address],
@@ -91,7 +91,6 @@ export const Account = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  // 🚀 新增状态：控制完整地址显示
   const [showFullAddress, setShowFullAddress] = useState(false);
 
   const {
@@ -142,6 +141,7 @@ export const Account = () => {
     resolvedAddress || "unknown",
   );
 
+  // ... (交易相关 Hooks 保持不变) ...
   const {
     renewSingle,
     renewBatch,
@@ -192,6 +192,7 @@ export const Account = () => {
     }
   }, [regStatus, renewalStatus, queryClient]);
 
+  // ... (批量操作逻辑保持不变) ...
   const renewableLabelSet = useMemo(() => {
     if (!processedRecords) return new Set<string>();
     return new Set(
@@ -250,13 +251,11 @@ export const Account = () => {
     return t("transaction.title.renew");
   };
 
-  // 🚀 复制功能
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("common.copy_success", { label }));
   };
 
-  // 🚀 计算显示用的名称和完整名称
   const { displayName, fullNameToCopy } = useMemo(() => {
     if (!input) return { displayName: "", fullNameToCopy: "" };
     if (isAddress(input)) {
@@ -265,7 +264,6 @@ export const Account = () => {
         fullNameToCopy: input,
       };
     }
-    // 如果不含点，补全 .eth
     const full = input.includes(".") ? input : `${input}.eth`;
     return {
       displayName: full,
@@ -301,17 +299,14 @@ export const Account = () => {
           )}
         </div>
 
-        {/* 🚀 优化后的信息卡片 */}
-        <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 px-4 py-3">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 p-4 rounded-xl">
           {/* 1. 输入名称区域 */}
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faUserTag} className="text-gray-400" />
             <span className="font-qs-regular text-gray-500">
               {t("account.name_label")}:
             </span>
-            {/* 值使用 font-qs-medium */}
             <span className="font-qs-medium text-text-main">{displayName}</span>
-            {/* 复制按钮 */}
             <button
               onClick={() => handleCopy(fullNameToCopy, "Name")}
               className="text-gray-400 hover:text-link transition-colors p-1"
@@ -330,14 +325,11 @@ export const Account = () => {
                 <span className="font-qs-regular text-gray-500">
                   {t("account.address_label")}:
                 </span>
-                {/* 值使用 font-qs-regular (默认) */}
                 <span className="text-text-main">
                   {showFullAddress
                     ? resolvedAddress
                     : truncateAddress(resolvedAddress)}
                 </span>
-
-                {/* 展开/收起按钮 */}
                 <button
                   onClick={() => setShowFullAddress(!showFullAddress)}
                   className="text-gray-400 hover:text-link transition-colors p-1"
@@ -347,8 +339,6 @@ export const Account = () => {
                     icon={showFullAddress ? faEyeSlash : faEye}
                   />
                 </button>
-
-                {/* 复制按钮 */}
                 <button
                   onClick={() => handleCopy(resolvedAddress, "Address")}
                   className="text-gray-400 hover:text-link transition-colors p-1"
@@ -356,6 +346,18 @@ export const Account = () => {
                 >
                   <FontAwesomeIcon icon={faCopy} />
                 </button>
+              </div>
+
+              {/* 🚀 3. 新增：持仓总数区域 */}
+              <div className="hidden md:block w-px h-4 bg-gray-300"></div>
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={faWarehouse} className="text-gray-400" />
+                <span className="font-qs-regular text-gray-500">
+                  {t("account.total_label")}:
+                </span>
+                <span className="font-qs-medium text-text-main">
+                  {labels?.length || 0}
+                </span>
               </div>
             </>
           )}
