@@ -172,7 +172,7 @@ export const ProcessModal = ({
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
         {mode === "duration" ? (
           <div className="flex items-center gap-4">
             {/* 年份 */}
@@ -194,7 +194,7 @@ export const ProcessModal = ({
                     onChange={(e) =>
                       setYears(Math.max(0, parseInt(e.target.value) || 0))
                     }
-                    className="w-full text-center text-3xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
+                    className="w-full text-center text-2xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
                   />
                   <span className="block text-center text-xs text-gray-400 font-qs-medium mt-1">
                     {/* 🚀 修复引用: common.year */}
@@ -232,7 +232,7 @@ export const ProcessModal = ({
                     onChange={(e) =>
                       setDays(Math.max(0, parseInt(e.target.value) || 0))
                     }
-                    className="w-full text-center text-3xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
+                    className="w-full text-center text-2xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
                   />
                   <span className="block text-center text-xs text-gray-400 font-qs-medium mt-1">
                     {/* 🚀 修复引用: common.day */}
@@ -420,7 +420,7 @@ export const ProcessModal = ({
       }
       showCloseButton={isIdle}
     >
-      <div className="p-6">
+      <div className="p-4">
         {isIdle && renderSettings()}
         {isProcessing && renderProcessing()}
         {isSuccess && renderSuccess()}

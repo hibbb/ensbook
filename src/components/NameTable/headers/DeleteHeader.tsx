@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
 import type { DeleteCriteria } from "../types";
@@ -257,12 +257,7 @@ export const DeleteHeader = ({
                       className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200 hover:text-red-500 transition-colors flex items-center justify-between group/item"
                     >
                       <div className="flex items-center gap-2">
-                        <FontAwesomeIcon
-                          icon={faUser}
-                          className="text-gray-400 text-xs"
-                        />
-                        {/* 🚀 替换: table.delete.mine -> table.delete.mine (保持不变) */}
-                        <span>{t("table.delete.mine")}</span>
+                        <span>{t("table.delete.connected_wallet")}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs opacity-60 font-qs-regular">

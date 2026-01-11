@@ -4,7 +4,7 @@ import {
   faSortAlphaDown,
   faSortAlphaUp,
 } from "@fortawesome/free-solid-svg-icons";
-import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { faWallet } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
@@ -50,17 +50,17 @@ export const OwnerHeader = ({
   const getTooltipContent = () => {
     // 🚀 替换: table.filter.connect_wallet -> common.connect_wallet
     if (!isConnected) return t("common.connect_wallet");
-    // 🚀 替换: table.filter.no_mine -> table.filter.no_mine (保持不变)
-    if (myCount === 0) return t("table.filter.no_mine");
+    // 🚀 替换: table.filter.no_connected_wallet -> table.filter.no_connected_wallet (保持不变)
+    if (myCount === 0) return t("table.filter.no_connected_wallet");
 
     // 🚀 替换: table.filter.show_all -> table.filter.show_all (保持不变)
     if (filterConfig.onlyMe) return t("table.filter.show_all");
 
-    // 🚀 替换: table.filter.all_mine -> table.filter.all_mine (保持不变)
-    if (isAllMine) return t("table.filter.all_mine");
+    // 🚀 替换: table.filter.all_connected_wallet -> table.filter.all_connected_wallet (保持不变)
+    if (isAllMine) return t("table.filter.all_connected_wallet");
 
-    // 🚀 替换: table.filter.only_mine -> table.filter.only_mine (保持不变)
-    return t("table.filter.only_mine", { count: myCount });
+    // 🚀 替换: table.filter.only_connected_wallet -> table.filter.only_connected_wallet (保持不变)
+    return t("table.filter.only_connected_wallet", { count: myCount });
   };
 
   return (
@@ -99,7 +99,7 @@ export const OwnerHeader = ({
                     : buttonInactiveClass
               }`}
             >
-              <FontAwesomeIcon icon={faCircleUser} size="sm" />
+              <FontAwesomeIcon icon={faWallet} size="sm" />
             </button>
           </Tooltip>
         </div>
