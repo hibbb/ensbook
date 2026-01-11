@@ -5,25 +5,7 @@ import { useMemo } from "react";
 import { useReadEthPriceFeedLatestAnswer } from "../wagmi-generated/index";
 import { fetchPremiumPrice, isPremium } from "../utils/ens";
 import type { NameRecord } from "../types/ensNames";
-
-const displayNumber = (n: number) => {
-  if (n < 0.9995) {
-    return parseFloat(n.toFixed(3)).toString();
-  }
-  const i = n < 999.5 ? 0 : n < 999500 ? 1 : 2;
-  const suffix = ["", "K", "M"][i];
-  const scaled = n / [1, 1000, 1000000][i];
-  const precision = scaled < 9.995 ? 2 : scaled < 99.95 ? 1 : 0;
-
-  let result;
-  if (precision > 0) {
-    result = parseFloat(scaled.toFixed(precision)).toString();
-  } else {
-    result = scaled.toFixed(0);
-  }
-
-  return suffix ? `${result}${suffix}` : result;
-};
+import { displayNumber } from "../utils/format";
 
 /**
  * Hook: 计算 Premium 状态域名的实时 ETH 价格
