@@ -1,7 +1,7 @@
 // src/hooks/useEnsRenewal.ts
 
 import { useState, useCallback } from "react";
-import { usePublicClient, useAccount, useChainId } from "wagmi";
+import { usePublicClient, useAccount } from "wagmi";
 import { normalize } from "viem/ens";
 import { type Hex } from "viem";
 import toast from "react-hot-toast";
@@ -13,7 +13,7 @@ import {
   ethControllerV3Abi,
   bulkRenewalAbi,
 } from "../wagmi-generated";
-import { getContracts } from "../config/contracts";
+import { MAINNET_CONTRACTS } from "../config/contracts";
 
 export type RenewalStatus =
   | "idle"
@@ -27,8 +27,6 @@ export function useEnsRenewal() {
   const [txHash, setTxHash] = useState<Hex | null>(null);
   const publicClient = usePublicClient();
   const { address } = useAccount();
-  const chainId = useChainId();
-  const contracts = getContracts(chainId);
   const { t } = useTranslation();
 
   const { writeContractAsync: writeEthController } = useWriteEthControllerV3();
@@ -49,7 +47,7 @@ export function useEnsRenewal() {
 
       setStatus("loading");
       setTxHash(null);
-      const contractAddress = contracts.ETH_CONTROLLER_V3;
+      const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
 
       try {
         const label = normalize(rawLabel).replace(/\.eth$/, "");
@@ -95,7 +93,7 @@ export function useEnsRenewal() {
         );
       }
     },
-    [publicClient, address, writeEthController, contracts, t],
+    [publicClient, address, writeEthController, t],
   );
 
   const renewBatch = useCallback(
@@ -112,7 +110,7 @@ export function useEnsRenewal() {
       }
 
       setStatus("loading");
-      const contractAddress = contracts.BULK_RENEWAL;
+      const contractAddress = MAINNET_CONTRACTS.BULK_RENEWAL;
 
       try {
         const labels = rawLabels.map((l) => normalize(l).replace(/\.eth$/, ""));
@@ -157,7 +155,7 @@ export function useEnsRenewal() {
         );
       }
     },
-    [publicClient, address, writeBulkRenewal, contracts, t],
+    [publicClient, address, writeBulkRenewal, t],
   );
 
   return {

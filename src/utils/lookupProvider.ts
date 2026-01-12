@@ -1,9 +1,8 @@
 // src/utils/lookupProvider.ts
 
 import type { NameRecord } from "../types/ensNames";
-import { getContracts } from "../config/contracts";
+import { MAINNET_CONTRACTS } from "../config/contracts";
 import * as ensUtils from "./ens";
-// 🚀 1. 引入 i18next 类型
 import type { TFunction } from "i18next";
 
 import web3bioIcon from "../assets/lookups/web3bio-dark.svg";
@@ -22,8 +21,8 @@ interface LookupItem {
   // 🚀 2. 修改签名：接收 t 函数
   getLabel: (record: NameRecord, t: TFunction) => string;
   icon: string;
-  getLink: (record: NameRecord, chainId?: number) => string;
-  shouldShow: (record: NameRecord, chainId?: number) => boolean;
+  getLink: (record: NameRecord) => string;
+  shouldShow: (record: NameRecord) => boolean;
 }
 
 const getTokenId = (record: NameRecord): string => {
@@ -37,8 +36,7 @@ export const LOOKUP_LINKS: LookupItem[] = [
     // 🚀 3. 使用 t 函数翻译
     getLabel: (r, t) => t("lookup.web3bio", { label: r.label }),
     icon: web3bioIcon,
-    shouldShow: (r, cid) =>
-      ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
+    shouldShow: (r) => ensUtils.isRenewable(r.status),
     getLink: (r) => `https://web3.bio/${r.label}.eth`,
   },
   {
@@ -46,12 +44,11 @@ export const LOOKUP_LINKS: LookupItem[] = [
     getLabel: (r, t) => t("lookup.etherscan", { label: r.label }),
     icon: etherscanIcon,
     shouldShow: (r) => !ensUtils.isAvailable(r.status),
-    getLink: (r, cid) => {
-      const addr = getContracts(cid);
-      const contract = r.wrapped ? addr.ENS_NAME_WRAPPER : addr.ETH_REGISTRAR;
-      const baseUrl = ensUtils.isMainnet(cid)
-        ? "https://etherscan.io"
-        : "https://sepolia.etherscan.io";
+    getLink: (r) => {
+      const contract = r.wrapped
+        ? MAINNET_CONTRACTS.ENS_NAME_WRAPPER
+        : MAINNET_CONTRACTS.ETH_REGISTRAR;
+      const baseUrl = "https://etherscan.io";
       return `${baseUrl}/nft/${contract}/${getTokenId(r)}`;
     },
   },
@@ -59,11 +56,11 @@ export const LOOKUP_LINKS: LookupItem[] = [
     key: "Opensea",
     getLabel: (r, t) => t("lookup.opensea", { label: r.label }),
     icon: openseaIcon,
-    shouldShow: (r, cid) =>
-      ensUtils.isMainnet(cid) && ensUtils.isRenewable(r.status),
-    getLink: (r, cid) => {
-      const addr = getContracts(cid);
-      const contract = r.wrapped ? addr.ENS_NAME_WRAPPER : addr.ETH_REGISTRAR;
+    shouldShow: (r) => !ensUtils.isAvailable(r.status),
+    getLink: (r) => {
+      const contract = r.wrapped
+        ? MAINNET_CONTRACTS.ENS_NAME_WRAPPER
+        : MAINNET_CONTRACTS.ETH_REGISTRAR;
       return `https://opensea.io/assets/ethereum/${contract}/${getTokenId(r)}`;
     },
   },
@@ -71,14 +68,14 @@ export const LOOKUP_LINKS: LookupItem[] = [
     key: "ENSVision",
     getLabel: (r, t) => t("lookup.vision", { label: r.label }),
     icon: envisionIcon,
-    shouldShow: (_, cid) => ensUtils.isMainnet(cid),
+    shouldShow: (r) => !ensUtils.isAvailable(r.status),
     getLink: (r) => `https://ensvision.com/name/${r.label}.eth`,
   },
   {
     key: "Grails",
     getLabel: (r, t) => t("lookup.grails", { label: r.label }),
     icon: grailsIcon,
-    shouldShow: (_, cid) => ensUtils.isMainnet(cid),
+    shouldShow: (r) => !ensUtils.isAvailable(r.status),
     getLink: (r) => `https://grails.app/${r.label}.eth`,
   },
   {
@@ -98,9 +95,6 @@ export const LOOKUP_LINKS: LookupItem[] = [
   },
 ];
 
-export const getAvailableLookups = (
-  record: NameRecord,
-  chainId?: number,
-): LookupItem[] => {
-  return LOOKUP_LINKS.filter((item) => item.shouldShow(record, chainId));
+export const getAvailableLookups = (record: NameRecord): LookupItem[] => {
+  return LOOKUP_LINKS.filter((item) => item.shouldShow(record));
 };

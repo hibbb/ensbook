@@ -14,7 +14,6 @@ import {
   faClock,
   faCalendarDay,
 } from "@fortawesome/free-solid-svg-icons";
-import { useChainId } from "wagmi";
 import { useTranslation } from "react-i18next";
 import { BaseModal } from "./ui/BaseModal";
 import {
@@ -23,11 +22,6 @@ import {
   SECONDS_PER_YEAR,
 } from "../config/constants";
 import { truncateAddress } from "../utils/format";
-
-const getExplorerLink = (chainId: number, hash: string) => {
-  const prefix = chainId === 11155111 ? "sepolia." : "";
-  return `https://${prefix}etherscan.io/tx/${hash}`;
-};
 
 const formatDateInput = (date: Date) => {
   return date.toISOString().split("T")[0];
@@ -58,7 +52,6 @@ export const ProcessModal = ({
   title,
   currentExpiry,
 }: ProcessModalProps) => {
-  const chainId = useChainId();
   const { t } = useTranslation();
 
   const [mode, setMode] = useState<"duration" | "until">("duration");
@@ -361,7 +354,7 @@ export const ProcessModal = ({
 
         {txHash && (
           <a
-            href={getExplorerLink(chainId, txHash)}
+            href={`https://etherscan.io/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-md text-xs text-link hover:text-link-hover hover:bg-gray-100 transition-colors border border-gray-100"

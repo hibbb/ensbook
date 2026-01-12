@@ -15,13 +15,12 @@ import {
   removeRegistrationState,
 } from "../services/storage/registration";
 import { checkRegStatus } from "../services/blockchain/recovery";
-import { useChainId } from "wagmi";
 import {
   useWriteEthControllerV3,
   ethControllerV3Abi,
 } from "../wagmi-generated";
 import { REFERRER_ADDRESS_HASH } from "../config/env";
-import { getContracts } from "../config/contracts";
+import { MAINNET_CONTRACTS } from "../config/contracts";
 import { parseLabel, generateSecret } from "../utils/ens";
 import { validateLabel } from "../utils/validate";
 
@@ -36,8 +35,6 @@ export function useEnsRegistration() {
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteEthControllerV3();
-  const chainId = useChainId();
-  const contracts = getContracts(chainId);
 
   const isMounted = useRef(true);
   useEffect(() => {
@@ -60,7 +57,7 @@ export function useEnsRegistration() {
 
       setStatus("registering");
       setCurrentHash(null);
-      const contractAddress = contracts.ETH_CONTROLLER_V3;
+      const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
 
       try {
         const priceData = (await publicClient.readContract({
@@ -116,7 +113,7 @@ export function useEnsRegistration() {
         }
       }
     },
-    [address, publicClient, writeContractAsync, contracts, t],
+    [address, publicClient, writeContractAsync, t],
   );
 
   const checkAndResume = useCallback(
@@ -216,7 +213,7 @@ export function useEnsRegistration() {
         owner: address as Address,
         duration,
         secret,
-        resolver: contracts.ENS_PUBLIC_RESOLVER,
+        resolver: MAINNET_CONTRACTS.ENS_PUBLIC_RESOLVER,
         data: [],
         reverseRecord: 0,
         referrer,
@@ -225,7 +222,7 @@ export function useEnsRegistration() {
       registrationDataRef.current = params;
       saveRegistrationState(label, { registration: params });
 
-      const contractAddress = contracts.ETH_CONTROLLER_V3;
+      const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
 
       try {
         const commitment = (await publicClient.readContract({
@@ -284,7 +281,7 @@ export function useEnsRegistration() {
         }
       }
     },
-    [address, publicClient, writeContractAsync, executeRegister, contracts, t],
+    [address, publicClient, writeContractAsync, executeRegister, t],
   );
 
   const startCountdown = (seconds: number, onFinish: () => void) => {

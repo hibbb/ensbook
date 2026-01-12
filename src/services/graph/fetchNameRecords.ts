@@ -4,7 +4,7 @@ import { labelhash, namehash } from "viem";
 import { normalize } from "viem/ens";
 import { queryData, type GraphQLQueryCode } from "./client";
 import type { NameRecord } from "../../types/ensNames";
-import { getContracts } from "../../config/contracts";
+import { MAINNET_CONTRACTS } from "../../config/contracts";
 import {
   GRAPHQL_CONFIG,
   GRACE_PERIOD_DURATION,
@@ -14,8 +14,7 @@ import {
 import { getFullUserData } from "../../services/storage/userStore";
 
 // ... (常量定义保持不变) ...
-const contracts = getContracts(1);
-const WRAPPER_ADDRESS = contracts.ENS_NAME_WRAPPER.toLowerCase();
+const WRAPPER_ADDRESS = MAINNET_CONTRACTS.ENS_NAME_WRAPPER.toLowerCase();
 const CHUNK_SIZE = GRAPHQL_CONFIG.FETCH_LIMIT;
 
 const chunkArray = <T>(array: T[], size: number): T[][] => {

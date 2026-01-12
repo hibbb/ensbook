@@ -8,9 +8,9 @@ import {
   GRAPHQL_CONFIG,
 } from "../../config/constants";
 import type { ClassifiedInputs } from "../../utils/parseInputs";
-import { MAINNET_ADDR } from "../../config/contracts";
+import { MAINNET_CONTRACTS } from "../../config/contracts";
 
-const NAME_WRAPPER_ADDRESS = MAINNET_ADDR.ENS_NAME_WRAPPER.toLowerCase();
+const NAME_WRAPPER_ADDRESS = MAINNET_CONTRACTS.ENS_NAME_WRAPPER.toLowerCase();
 
 interface DomainMetaResponse {
   domains: {

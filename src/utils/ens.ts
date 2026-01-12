@@ -2,7 +2,6 @@
 import { type Hex, toHex } from "viem";
 import { normalize } from "viem/ens";
 import type { NameRecord } from "../types/ensNames";
-import { mainnet } from "viem/chains";
 import i18n from "../i18n/config"; // 🚀
 
 export function parseLabel(rawLabel: string): string {
@@ -21,10 +20,6 @@ export function generateSecret(): Hex {
   const randomValues = crypto.getRandomValues(new Uint8Array(32));
   return toHex(randomValues) as unknown as Hex;
 }
-
-export const isMainnet = (chainId?: number): boolean => {
-  return !chainId || chainId === mainnet.id;
-};
 
 export const isActive = (status: NameRecord["status"]) => status === "Active";
 export const isGrace = (status: NameRecord["status"]) => status === "Grace";

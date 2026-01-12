@@ -19,7 +19,6 @@ interface TableRowProps {
   now: number;
   currentAddress?: string;
   isConnected: boolean;
-  chainId?: number;
   canDelete?: boolean;
   isSelected?: boolean;
   onToggleSelection?: (label: string) => void;
@@ -38,7 +37,6 @@ export const TableRow = ({
   now,
   currentAddress,
   isConnected,
-  chainId,
   canDelete = true,
   onDelete,
   isSelected,
@@ -86,7 +84,7 @@ export const TableRow = ({
       </td>
 
       <td className="text-center">
-        <LookupsCell record={record} chainId={chainId} />
+        <LookupsCell record={record} />
       </td>
 
       <td className="text-center">
