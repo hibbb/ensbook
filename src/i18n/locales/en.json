@@ -69,7 +69,8 @@
         "invalid_format": "Invalid backup file or incompatible version",
         "no_data": "No domain data found in backup file",
         "import_success": "Import successful! Refreshing...",
-        "parse_fail": "Failed to parse file"
+        "parse_fail": "Failed to parse file",
+        "reset_success": "Data cleared, refreshing..."
       },
       "confirm": {
         "content": "Backup contains:\n- Watchlist: {{homeCount}} items\n- Collection Records: {{colCount}} items\n\nClick [OK] to 'Merge' (Keep existing data, overwrite conflicts)\nClick [Cancel] to 'Overwrite' (Clear existing data and replace)",
@@ -78,7 +79,6 @@
       "export": {
         "title": "Backup Data",
         "desc": "Generate a JSON file containing your watchlist, memos, and settings.",
-        "count": "(Current: {{count}} items)",
         "btn": "Download Backup (.json)"
       },
       "import": {
@@ -86,6 +86,14 @@
         "desc": "Support Merge or Overwrite with existing data.",
         "warning": "Please ensure the file is a valid ENSBook backup",
         "btn": "Select Backup File"
+      },
+      "reset": {
+        "title": "Factory Reset",
+        "desc": "This will perform a factory reset. Watchlists, memos, markers, view states, and [System Settings] will be permanently deleted.",
+        "btn": "Reset All...",
+        "warning": "Warning: You are performing a critical operation! The app will revert to its initial state. Data cannot be recovered.",
+        "type_delete": "Type 'DELETE' to confirm.",
+        "confirm_btn": "Confirm Reset"
       }
     },
     "my_collection": {

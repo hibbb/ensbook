@@ -328,3 +328,19 @@ export const importUserData = (
 
   saveFullUserData(mergedData);
 };
+
+/**
+ * 🚀 危险操作：重置所有用户数据 (Factory Reset)
+ * 彻底清空 Metadata, HomeList, ViewStates 以及 Settings (语言/主题/自定义集合等)
+ * 恢复到应用刚安装时的初始状态。
+ */
+export const resetUserCustomData = () => {
+  // 直接使用 DEFAULT_DATA 进行全量覆盖
+  // 注意：需要克隆对象并更新时间戳，防止引用污染
+  const resetData: EnsBookUserData = {
+    ...DEFAULT_DATA,
+    timestamp: Date.now(),
+  };
+
+  saveFullUserData(resetData);
+};
