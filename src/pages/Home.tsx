@@ -1,30 +1,25 @@
 // src/pages/Home.tsx
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { SearchHelpModal } from "../components/SearchHelpModal";
-import { ProcessModal, type ProcessType } from "../components/ProcessModal";
-import { ReminderModal } from "../components/ReminderModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
-// 🚀 引入通用组件
-import { FloatingBar } from "../components/FloatingBar";
+import { FloatingBar } from "../components/FloatingBar"; // 🚀 使用通用组件
+import { ActionModals } from "../components/ActionModals"; // 🚀 使用通用组件
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsRenewal } from "../hooks/useEnsRenewal";
-import { useEnsRegistration } from "../hooks/useEnsRegistration";
-import { parseAndClassifyInputs } from "../utils/parseInputs";
-import { fetchLabels } from "../services/graph/fetchLabels";
+import { useEnsActions } from "../hooks/useEnsActions"; // 🚀 引入新 Hook
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
-
+import { parseAndClassifyInputs } from "../utils/parseInputs";
+import { fetchLabels } from "../services/graph/fetchLabels";
 import {
   getHomeLabels,
   bulkAddToHome,
@@ -33,19 +28,17 @@ import {
   clearHomeList,
 } from "../services/storage/userStore";
 
-import { getAllPendingLabels } from "../services/storage/registration";
-
 // Types
 import type { NameRecord } from "../types/ensNames";
 import type { DeleteCriteria } from "../components/NameTable/types";
 
 export const Home = () => {
+  // --- 1. 基础 Hooks ---
   const { address, isConnected } = useAccount();
-  const queryClient = useQueryClient();
   const { t } = useTranslation();
-
   useDocumentTitle("Home");
 
+  // --- 2. 本地状态 ---
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getHomeLabels(),
   );
@@ -53,21 +46,12 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  const [durationTarget, setDurationTarget] = useState<{
-    type: ProcessType;
-    record?: NameRecord;
-    labels?: string[];
-  } | null>(null);
-  const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
-
-  useEffect(() => {
-    queryClient.removeQueries({ queryKey: ["name-records"] });
-  }, [queryClient]);
-
+  // --- 3. 数据获取 ---
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
   const showSkeleton = isQuerying || isResolving;
+  const hasContent = resolvedLabels.length > 0;
 
   const validRecords = useMemo(() => {
     if (!records || resolvedLabels.length === 0) return [];
@@ -75,6 +59,7 @@ export const Home = () => {
     return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
+  // --- 4. 表格视图逻辑 ---
   const {
     processedRecords,
     sortConfig,
@@ -88,48 +73,22 @@ export const Home = () => {
     statusCounts,
     actionCounts,
     nameCounts,
+    levelCounts,
     isViewStateDirty,
     resetViewState,
-    levelCounts,
   } = useNameTableView(validRecords, address, "home");
 
-  const {
-    renewSingle,
-    renewBatch,
-    status: renewalStatus,
-    txHash: renewalTxHash,
-    resetStatus: resetRenewal,
-    isBusy: isRenewalBusy,
-  } = useEnsRenewal();
+  // --- 5. 核心业务逻辑 (注册/续费/提醒) ---
+  // 🚀 一行代码接管所有交易流程
+  const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
-  const {
-    startRegistration,
-    checkAndResume,
-    status: regStatus,
-    secondsLeft,
-    currentHash: regTxHash,
-    resetStatus: resetReg,
-  } = useEnsRegistration();
-
-  const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    setPendingLabels(getAllPendingLabels());
-  }, [resolvedLabels, regStatus]);
-
-  const hasContent = resolvedLabels.length > 0;
-
-  useEffect(() => {
-    if (!hasContent && isViewStateDirty) {
-      resetViewState();
-    }
-  }, [hasContent, isViewStateDirty, resetViewState]);
-
+  // --- 6. 辅助逻辑 (Level 更新) ---
   const updateLevel = useOptimisticLevelUpdate();
-
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
   };
+
+  // --- 7. 事件处理 ---
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -214,7 +173,7 @@ export const Home = () => {
       }
       case "owner": {
         if (!address) {
-          toast.error(t("common.connect_wallet")); // 🚀 复用 common
+          toast.error(t("common.connect_wallet"));
           return;
         }
         const isDeletingMine = value === "mine";
@@ -249,78 +208,7 @@ export const Home = () => {
     toast.success(t("home.toast.delete_success"));
   };
 
-  const handleSingleRegister = async (record: NameRecord) => {
-    if (pendingLabels.has(record.label)) {
-      setDurationTarget({ type: "register", record });
-      await checkAndResume(record.label);
-    } else {
-      setDurationTarget({ type: "register", record });
-    }
-  };
-
-  const handleSingleRenew = (record: NameRecord) => {
-    setDurationTarget({ type: "renew", record });
-  };
-
-  const handleSetReminder = (record: NameRecord) => {
-    setReminderTarget(record);
-  };
-
-  const handleBatchRenewalTrigger = () => {
-    if (selectedLabels.size === 0) return;
-    setDurationTarget({ type: "batch", labels: Array.from(selectedLabels) });
-  };
-
-  const onDurationConfirm = (duration: bigint) => {
-    if (!durationTarget) return;
-
-    if (durationTarget.type === "register" && durationTarget.record) {
-      startRegistration(durationTarget.record.label, duration);
-    } else if (durationTarget.type === "renew" && durationTarget.record) {
-      renewSingle(durationTarget.record.label, duration);
-    } else if (durationTarget.type === "batch" && durationTarget.labels) {
-      renewBatch(durationTarget.labels, duration);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setDurationTarget(null);
-    resetRenewal();
-    resetReg();
-  };
-
-  useEffect(() => {
-    if (regStatus === "success" || renewalStatus === "success") {
-      const timer = setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["name-records"] });
-      }, 2000);
-      const deepTimer = setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["name-records"] });
-      }, 10000);
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(deepTimer);
-      };
-    }
-  }, [regStatus, renewalStatus, queryClient]);
-
-  const activeType = durationTarget?.type || "renew";
-  const activeStatus = activeType === "register" ? regStatus : renewalStatus;
-  const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
-
-  const getModalTitle = () => {
-    if (activeType === "register") return t("transaction.title.register");
-    if (activeType === "batch")
-      return t("transaction.title.batch_renew", {
-        count: durationTarget?.labels?.length,
-      });
-    return t("transaction.title.renew");
-  };
-
-  // 🚀 传递 currentExpiry
-  // 如果是单域名续费，取 record.expiryTime
-  // 如果是批量续费，则是统一时长，我们在 ProcessModal 页面针对批量续费隐藏了截止日期续费法（批量续费合约目前仅支持统一增加时长）
-  const currentExpiry = durationTarget?.record?.expiryTime;
+  // --- 8. 渲染 ---
 
   return (
     <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
@@ -351,9 +239,9 @@ export const Home = () => {
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}
             pendingLabels={pendingLabels}
-            onRegister={handleSingleRegister}
-            onRenew={handleSingleRenew}
-            onReminder={handleSetReminder}
+            onRegister={actions.onRegister} // 🚀
+            onRenew={actions.onRenew} // 🚀
+            onReminder={actions.onReminder} // 🚀
             skeletonRows={5}
             headerTop="88px"
             totalRecordsCount={validRecords?.length || 0}
@@ -368,12 +256,11 @@ export const Home = () => {
         </div>
       )}
 
-      {/* 🚀 使用通用 FloatingBar */}
       <FloatingBar
         selectedCount={selectedLabels.size}
-        isBusy={isRenewalBusy}
+        isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={handleBatchRenewalTrigger}
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
         onClearSelection={clearSelection}
       />
 
@@ -382,23 +269,8 @@ export const Home = () => {
         onClose={() => setIsHelpOpen(false)}
       />
 
-      <ProcessModal
-        isOpen={!!durationTarget}
-        type={activeType}
-        status={activeStatus}
-        txHash={activeTxHash}
-        secondsLeft={secondsLeft}
-        title={getModalTitle()}
-        onClose={handleCloseModal}
-        onConfirm={onDurationConfirm}
-        currentExpiry={currentExpiry}
-      />
-
-      <ReminderModal
-        isOpen={!!reminderTarget}
-        onClose={() => setReminderTarget(null)}
-        record={reminderTarget}
-      />
+      {/* 🚀 统一模态框 */}
+      <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
 };

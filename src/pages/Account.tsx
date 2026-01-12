@@ -1,14 +1,14 @@
 // src/pages/Account.tsx
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faWallet,
   faUserTag,
-  faWarehouse, // 🚀 1. 引入新图标
+  faWarehouse,
 } from "@fortawesome/free-solid-svg-icons";
 import { faCopy, faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
@@ -18,28 +18,24 @@ import toast from "react-hot-toast";
 
 import { truncateAddress } from "../utils/format";
 
-// ... (Components imports 保持不变)
+// Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { ProcessModal, type ProcessType } from "../components/ProcessModal";
-import { ReminderModal } from "../components/ReminderModal";
-import { FloatingBar } from "../components/FloatingBar";
+import { FloatingBar } from "../components/FloatingBar"; // 🚀
+import { ActionModals } from "../components/ActionModals"; // 🚀
 
-// ... (Hooks & Services imports 保持不变)
+// Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsRenewal } from "../hooks/useEnsRenewal";
-import { useEnsRegistration } from "../hooks/useEnsRegistration";
-import { getAllPendingLabels } from "../services/storage/registration";
+import { useEnsActions } from "../hooks/useEnsActions"; // 🚀
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { publicClient } from "../utils/client";
-import { isRenewable } from "../utils/ens";
 
-// ... (Types imports 保持不变)
+// Types
 import type { NameRecord } from "../types/ensNames";
 
-// ... (useResolveInput 和 useAccountLabels Hooks 保持不变) ...
+// --- 内部 Hook: 解析输入为地址 ---
 const useResolveInput = (input: string | undefined) => {
   return useQuery({
     queryKey: ["resolve-account", input],
@@ -69,6 +65,7 @@ const useResolveInput = (input: string | undefined) => {
   });
 };
 
+// --- 内部 Hook: 获取地址持仓 ---
 const useAccountLabels = (address: Address | null | undefined) => {
   return useQuery({
     queryKey: ["account-labels", address],
@@ -86,13 +83,15 @@ const useAccountLabels = (address: Address | null | undefined) => {
 };
 
 export const Account = () => {
+  // --- 1. 基础 Hooks ---
   const { input } = useParams<{ input: string }>();
   const { address: myAddress, isConnected } = useAccount();
-  const queryClient = useQueryClient();
   const { t } = useTranslation();
 
+  // --- 2. 本地状态 ---
   const [showFullAddress, setShowFullAddress] = useState(false);
 
+  // --- 3. 数据获取 ---
   const {
     data: resolvedAddress,
     isLoading: isResolving,
@@ -118,6 +117,7 @@ export const Account = () => {
     isFetchError ||
     (resolvedAddress === null && !isResolving);
 
+  // --- 4. 表格视图逻辑 ---
   const {
     processedRecords,
     sortConfig,
@@ -131,9 +131,9 @@ export const Account = () => {
     statusCounts,
     actionCounts,
     nameCounts,
+    levelCounts,
     isViewStateDirty,
     resetViewState,
-    levelCounts,
   } = useNameTableView(
     records,
     myAddress,
@@ -141,117 +141,16 @@ export const Account = () => {
     resolvedAddress || "unknown",
   );
 
-  // ... (交易相关 Hooks 保持不变) ...
-  const {
-    renewSingle,
-    renewBatch,
-    status: renewalStatus,
-    txHash: renewalTxHash,
-    resetStatus: resetRenewal,
-    isBusy: isRenewalBusy,
-  } = useEnsRenewal();
+  // --- 5. 核心业务逻辑 ---
+  const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
-  const {
-    startRegistration,
-    checkAndResume,
-    status: regStatus,
-    secondsLeft,
-    currentHash: regTxHash,
-    resetStatus: resetReg,
-  } = useEnsRegistration();
-
-  const [durationTarget, setDurationTarget] = useState<{
-    type: ProcessType;
-    record?: NameRecord;
-    labels?: string[];
-  } | null>(null);
-
-  const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
-  const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
-
+  // --- 6. 辅助逻辑 ---
   const updateLevel = useOptimisticLevelUpdate();
-
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPendingLabels(getAllPendingLabels());
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [regStatus]);
-
-  useEffect(() => {
-    if (regStatus === "success" || renewalStatus === "success") {
-      const timer = setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["name-records"] });
-        queryClient.invalidateQueries({ queryKey: ["account-labels"] });
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [regStatus, renewalStatus, queryClient]);
-
-  // ... (批量操作逻辑保持不变) ...
-  const renewableLabelSet = useMemo(() => {
-    if (!processedRecords) return new Set<string>();
-    return new Set(
-      processedRecords.filter((r) => isRenewable(r.status)).map((r) => r.label),
-    );
-  }, [processedRecords]);
-
-  const validSelection = useMemo(() => {
-    if (selectedLabels.size === 0) return [];
-    return Array.from(selectedLabels).filter((label) =>
-      renewableLabelSet.has(label),
-    );
-  }, [selectedLabels, renewableLabelSet]);
-  const selectionCount = validSelection.length;
-
-  const handleSingleRegister = async (record: NameRecord) => {
-    if (pendingLabels.has(record.label)) {
-      setDurationTarget({ type: "register", record });
-      await checkAndResume(record.label);
-    } else {
-      setDurationTarget({ type: "register", record });
-    }
-  };
-  const handleSingleRenew = (r: NameRecord) =>
-    setDurationTarget({ type: "renew", record: r });
-  const handleSetReminder = (r: NameRecord) => setReminderTarget(r);
-  const handleBatchRenewalTrigger = () => {
-    if (selectionCount > 0)
-      setDurationTarget({ type: "batch", labels: validSelection });
-  };
-  const handleCloseModal = () => {
-    setDurationTarget(null);
-    resetRenewal();
-    resetReg();
-  };
-  const onDurationConfirm = (d: bigint) => {
-    if (!durationTarget) return;
-    if (durationTarget.type === "register" && durationTarget.record)
-      startRegistration(durationTarget.record.label, d);
-    else if (durationTarget.type === "renew" && durationTarget.record)
-      renewSingle(durationTarget.record.label, d);
-    else if (durationTarget.type === "batch" && durationTarget.labels)
-      renewBatch(durationTarget.labels, d);
-  };
-
-  const activeType = durationTarget?.type || "renew";
-  const activeStatus = activeType === "register" ? regStatus : renewalStatus;
-  const activeTxHash = activeType === "register" ? regTxHash : renewalTxHash;
-
-  const getModalTitle = () => {
-    if (activeType === "register") return t("transaction.title.register");
-    if (activeType === "batch")
-      return t("transaction.title.batch_renew", {
-        count: durationTarget?.labels?.length,
-      });
-    return t("transaction.title.renew");
-  };
-
-  const currentExpiry = durationTarget?.record?.expiryTime;
+  const selectionCount = selectedLabels.size;
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -273,6 +172,8 @@ export const Account = () => {
     };
   }, [input]);
 
+  // --- 7. 渲染 ---
+
   if (isError) {
     return (
       <div className="p-20 text-center flex flex-col items-center gap-4 animate-in fade-in">
@@ -283,7 +184,7 @@ export const Account = () => {
           <h2 className="text-lg font-qs-semibold text-gray-800">
             {t("account.error_resolve")}
           </h2>
-          <p className="text-sm text-gray-400 mt-1">{input}</p>
+          <p className="text-sm text-gray-400 mt-1 font-mono">{input}</p>
         </div>
       </div>
     );
@@ -302,7 +203,7 @@ export const Account = () => {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 p-4 rounded-xl">
-          {/* 1. 输入名称区域 */}
+          {/* 输入名称区域 */}
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faUserTag} className="text-gray-400" />
             <span className="font-qs-regular text-gray-500">
@@ -321,7 +222,7 @@ export const Account = () => {
           {resolvedAddress && (
             <>
               <div className="hidden md:block w-px h-4 bg-gray-300"></div>
-              {/* 2. 钱包地址区域 */}
+              {/* 钱包地址区域 */}
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faWallet} className="text-gray-400" />
                 <span className="font-qs-regular text-gray-500">
@@ -350,7 +251,7 @@ export const Account = () => {
                 </button>
               </div>
 
-              {/* 🚀 3. 新增：持仓总数区域 */}
+              {/* 持仓总数区域 */}
               <div className="hidden md:block w-px h-4 bg-gray-300"></div>
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faWarehouse} className="text-gray-400" />
@@ -380,9 +281,9 @@ export const Account = () => {
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
-        onRegister={handleSingleRegister}
-        onRenew={handleSingleRenew}
-        onReminder={handleSetReminder}
+        onRegister={actions.onRegister} // 🚀
+        onRenew={actions.onRenew} // 🚀
+        onReminder={actions.onReminder} // 🚀
         pendingLabels={pendingLabels}
         totalRecordsCount={records?.length || 0}
         statusCounts={statusCounts}
@@ -396,28 +297,14 @@ export const Account = () => {
 
       <FloatingBar
         selectedCount={selectionCount}
-        isBusy={isRenewalBusy}
+        isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={handleBatchRenewalTrigger}
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
         onClearSelection={clearSelection}
       />
 
-      <ProcessModal
-        isOpen={!!durationTarget}
-        type={activeType}
-        status={activeStatus}
-        txHash={activeTxHash}
-        secondsLeft={secondsLeft}
-        title={getModalTitle()}
-        onClose={handleCloseModal}
-        onConfirm={onDurationConfirm}
-        currentExpiry={currentExpiry}
-      />
-      <ReminderModal
-        isOpen={!!reminderTarget}
-        onClose={() => setReminderTarget(null)}
-        record={reminderTarget}
-      />
+      {/* 🚀 统一模态框 */}
+      <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
 };
