@@ -106,9 +106,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
   );
 
   const renderContent = () => {
-    if (record.status === "Unknown")
-      // 🚀 替换: table.cell.unknown -> common.unknown
-      return <span>{t("common.unknown")}</span>;
+    if (record.status === "Unknown") return <span>{t("common.unknown")}</span>;
 
     if (record.status === "Premium") {
       const remaining = record.releaseTime

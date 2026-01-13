@@ -40,7 +40,6 @@ export function useEnsRenewal() {
   const renewSingle = useCallback(
     async (rawLabel: string, duration: bigint) => {
       if (!publicClient || !address) {
-        // 🚀 替换: hooks.renewal.connect_wallet -> common.connect_wallet
         toast.error(t("common.connect_wallet"));
         return;
       }
@@ -72,11 +71,8 @@ export function useEnsRenewal() {
         setTxHash(hash);
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
-          // 🚀 替换: hooks.renewal.confirming -> transaction.toast.confirming
           loading: t("transaction.toast.confirming"),
-          // 🚀 替换: hooks.renewal.success -> transaction.toast.success
           success: t("transaction.toast.success"),
-          // 🚀 替换: hooks.renewal.failed -> transaction.toast.failed
           error: t("transaction.toast.failed"),
         });
 
@@ -88,7 +84,6 @@ export function useEnsRenewal() {
         toast.error(
           error.shortMessage ||
             error.message ||
-            // 🚀 替换: hooks.renewal.unknown_error -> transaction.toast.unknown_error
             t("transaction.toast.unknown_error"),
         );
       }
@@ -99,12 +94,10 @@ export function useEnsRenewal() {
   const renewBatch = useCallback(
     async (rawLabels: string[], duration: bigint) => {
       if (!publicClient || !address) {
-        // 🚀 替换: hooks.renewal.connect_wallet -> common.connect_wallet
         toast.error(t("common.connect_wallet"));
         return;
       }
       if (rawLabels.length === 0) {
-        // 🚀 替换: hooks.renewal.select_one -> transaction.toast.select_one
         toast.error(t("transaction.toast.select_one"));
         return;
       }
@@ -132,13 +125,10 @@ export function useEnsRenewal() {
 
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {
-          // 🚀 替换: hooks.renewal.batch_confirming -> transaction.toast.batch_confirming
           loading: t("transaction.toast.batch_confirming", {
             count: labels.length,
           }),
-          // 🚀 替换: hooks.renewal.batch_success -> transaction.toast.success
           success: t("transaction.toast.success"),
-          // 🚀 替换: hooks.renewal.batch_failed -> transaction.toast.failed
           error: t("transaction.toast.failed"),
         });
 
@@ -150,7 +140,6 @@ export function useEnsRenewal() {
         toast.error(
           error.shortMessage ||
             error.message ||
-            // 🚀 替换: hooks.renewal.batch_unknown_error -> transaction.toast.unknown_error
             t("transaction.toast.unknown_error"),
         );
       }

@@ -29,7 +29,6 @@ export const FilterDropdown = ({
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const { t } = useTranslation();
 
-  // 🚀 替换: table.filter.default_title -> table.filter.default_title (保持不变)
   const displayTitle = title || t("table.filter.default_title");
 
   useEffect(() => {

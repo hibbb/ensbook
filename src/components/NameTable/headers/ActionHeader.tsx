@@ -39,13 +39,10 @@ export const ActionHeader = ({
             <Tooltip
               content={
                 !isConnected
-                  ? // 🚀 替换: table.filter.connect_wallet -> common.connect_wallet
-                    t("common.connect_wallet")
+                  ? t("common.connect_wallet")
                   : !hasRenewable
-                    ? // 🚀 替换: table.filter.no_renewable -> table.filter.no_renewable (保持不变)
-                      t("table.filter.no_renewable")
-                    : // 🚀 替换: table.filter.select_all_renewable -> table.filter.select_all_renewable (保持不变)
-                      t("table.filter.select_all_renewable")
+                    ? t("table.filter.no_renewable")
+                    : t("table.filter.select_all_renewable")
               }
             >
               <input
@@ -63,12 +60,10 @@ export const ActionHeader = ({
           </div>
         )}
         <div className="flex items-center gap-2">
-          {/* 🚀 替换: table.header.action -> table.header.action (保持不变) */}
           <span>{t("table.header.action")}</span>
           <FilterDropdown
             isActive={filterConfig.actionType !== "all"}
             menuWidth="w-40 right-0"
-            // 🚀 替换: table.filter.filter_action -> table.filter.filter_action (保持不变)
             title={t("table.filter.filter_action")}
             disabled={disabled}
           >

@@ -53,7 +53,6 @@ export const ActionCell = ({
   const config = useMemo<ActionConfig>(() => {
     if (!isConnected) {
       return {
-        // 🚀 替换: table.cell.not_connected -> common.not_connected
         text: t("common.not_connected"),
         style: "text-gray-400 cursor-not-allowed bg-transparent",
         disabled: true,
@@ -63,7 +62,6 @@ export const ActionCell = ({
 
     if (record.status === "Unknown") {
       return {
-        // 🚀 替换: table.cell.unknown -> common.unknown
         text: t("common.unknown"),
         style: "text-gray-300 cursor-not-allowed bg-transparent",
         disabled: true,

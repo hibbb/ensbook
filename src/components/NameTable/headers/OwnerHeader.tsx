@@ -18,8 +18,8 @@ interface OwnerHeaderProps {
   isConnected: boolean;
   onSort: (field: SortField) => void;
   onFilterChange: (config: FilterConfig) => void;
-  myCount?: number;
-  listCount?: number;
+  // 🚀 修改 props: 引入 ownershipCounts，移除旧的 count
+  ownershipCounts: { mine: number; others: number };
   disabled?: boolean;
 }
 
@@ -29,8 +29,7 @@ export const OwnerHeader = ({
   isConnected,
   onSort,
   onFilterChange,
-  myCount = 0,
-  listCount = 0,
+  ownershipCounts,
   disabled,
 }: OwnerHeaderProps) => {
   const { t } = useTranslation();
@@ -39,34 +38,17 @@ export const OwnerHeader = ({
   const buttonActiveClass = "bg-link text-white hover:bg-link-hover";
   const buttonInactiveClass = "text-link hover:bg-gray-50";
 
-  const isAllMine = listCount > 0 && myCount === listCount;
-
-  const isDisabled =
-    disabled ||
-    !isConnected ||
-    myCount === 0 ||
-    (isAllMine && !filterConfig.onlyMe);
-
-  const getTooltipContent = () => {
-    // 🚀 替换: table.filter.connect_wallet -> common.connect_wallet
-    if (!isConnected) return t("common.connect_wallet");
-    // 🚀 替换: table.filter.no_connected_wallet -> table.filter.no_connected_wallet (保持不变)
-    if (myCount === 0) return t("table.filter.no_connected_wallet");
-
-    // 🚀 替换: table.filter.show_all -> table.filter.show_all (保持不变)
-    if (filterConfig.onlyMe) return t("table.filter.show_all");
-
-    // 🚀 替换: table.filter.all_connected_wallet -> table.filter.all_connected_wallet (保持不变)
-    if (isAllMine) return t("table.filter.all_connected_wallet");
-
-    // 🚀 替换: table.filter.only_connected_wallet -> table.filter.only_connected_wallet (保持不变)
-    return t("table.filter.only_connected_wallet", { count: myCount });
-  };
+  // 🚀 核心逻辑简化：
+  // 显示条件：已连接钱包 AND ( 当前处于筛选状态 OR 表格中存在混合归属 )
+  // 这样既符合"仅在混合时显示"，又防止了筛选后按钮消失无法取消的问题
+  const showFilterButton =
+    isConnected &&
+    (filterConfig.onlyMe ||
+      (ownershipCounts.mine > 0 && ownershipCounts.others > 0));
 
   return (
     <ThWrapper>
       <div className="flex items-center gap-2 whitespace-nowrap">
-        {/* 🚀 替换: table.header.owner -> table.header.owner (保持不变) */}
         <span>{t("table.header.owner")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton
@@ -76,32 +58,37 @@ export const OwnerHeader = ({
             defaultIcon={faSortAlphaDown}
             ascIcon={faSortAlphaDown}
             descIcon={faSortAlphaUp}
-            // 🚀 替换: table.filter.sort_owner -> table.filter.sort_owner (保持不变)
             title={t("table.filter.sort_owner")}
             disabled={disabled}
           />
 
-          <Tooltip content={getTooltipContent()}>
-            <button
-              disabled={isDisabled}
-              onClick={() =>
-                !isDisabled &&
-                onFilterChange({
-                  ...filterConfig,
-                  onlyMe: !filterConfig.onlyMe,
-                })
+          {showFilterButton && (
+            <Tooltip
+              content={
+                filterConfig.onlyMe
+                  ? t("table.filter.show_all")
+                  : t("table.filter.only_connected_wallet", {
+                      count: ownershipCounts.mine,
+                    })
               }
-              className={`${buttonBaseClass} ${
-                isDisabled
-                  ? "cursor-not-allowed text-gray-300"
-                  : filterConfig.onlyMe
-                    ? buttonActiveClass
-                    : buttonInactiveClass
-              }`}
             >
-              <FontAwesomeIcon icon={faWallet} size="sm" />
-            </button>
-          </Tooltip>
+              <button
+                disabled={disabled}
+                onClick={() =>
+                  !disabled &&
+                  onFilterChange({
+                    ...filterConfig,
+                    onlyMe: !filterConfig.onlyMe,
+                  })
+                }
+                className={`${buttonBaseClass} ${
+                  filterConfig.onlyMe ? buttonActiveClass : buttonInactiveClass
+                }`}
+              >
+                <FontAwesomeIcon icon={faWallet} size="sm" />
+              </button>
+            </Tooltip>
+          )}
         </div>
       </div>
     </ThWrapper>

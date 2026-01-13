@@ -22,13 +22,11 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      // 🚀 替换: search_help.title -> search.guide.title
       title={t("search.guide.title")}
       maxWidth="max-w-lg"
     >
       <div className="p-6 space-y-6">
         <p className="text-sm text-gray-500 font-qs-medium">
-          {/* 🚀 替换: search_help.desc -> search.guide.desc */}
           {t("search.guide.desc")}
         </p>
 
@@ -40,7 +38,6 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
             </div>
             <div>
               <h4 className="font-qs-semibold text-text-main text-sm">
-                {/* 🚀 替换: search_help.mode.batch.title -> search.guide.mode.batch.title */}
                 {t("search.guide.mode.batch.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
@@ -62,7 +59,6 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 {t("search.guide.mode.owner.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
-                {/* 🚀 替换: search_help.mode.owner.desc -> search.guide.mode.owner.desc */}
                 <Trans i18nKey="search.guide.mode.owner.desc">
                   使用 “<span className="text-cyan-500 font-bold">@</span> +
                   ENS（或以太坊地址）” 的格式查询。
@@ -117,7 +113,6 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
           onClick={onClose}
           className="w-full py-3 bg-link text-white text-sm font-qs-semibold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
         >
-          {/* 🚀 替换: search_help.btn.got_it -> common.got_it */}
           {t("common.got_it")}
         </button>
       </div>

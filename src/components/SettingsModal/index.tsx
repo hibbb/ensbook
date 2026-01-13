@@ -106,7 +106,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         <div className="w-56 bg-white border-r border-gray-100 flex flex-col shrink-0">
           <div className="p-6">
             <h3 className="text-xl font-qs-semibold text-text-main tracking-tight">
-              {/* 🚀 替换: Settings -> settings.title.default */}
               {t("settings.title.default")}
             </h3>
           </div>

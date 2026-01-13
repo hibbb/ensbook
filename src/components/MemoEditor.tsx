@@ -64,7 +64,6 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
       );
     } catch (e) {
       console.error(e);
-      // 🚀 替换: memo.toast.storage_full -> storage.quota_exceeded
       toast.error(t("storage.quota_exceeded"));
     }
   };
@@ -138,14 +137,12 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
             onClick={handleSave}
             className="flex-1 bg-link text-white text-xs font-bold py-1.5 rounded-lg hover:bg-link-hover active:scale-95 transition-all flex items-center justify-center gap-1"
           >
-            {/* 🚀 替换: memo.save -> common.save */}
             <FontAwesomeIcon icon={faCheck} /> {t("common.save")}
           </button>
           <button
             onClick={() => setIsOpen(false)}
             className="px-3 bg-gray-100 text-gray-500 text-xs font-bold py-1.5 rounded-lg hover:bg-gray-200 hover:text-gray-700 active:scale-95 transition-all"
           >
-            {/* 🚀 替换: memo.cancel -> common.cancel */}
             {t("common.cancel")}
           </button>
         </div>

@@ -190,8 +190,6 @@
       "renewable": "Renewable",
       "only_connected_wallet": "Show Only ({{count}}) Owned by Connected Wallet",
       "show_all": "Show All",
-      "no_connected_wallet": "No names owned by connected wallet",
-      "all_connected_wallet": "All names owned by connected wallet",
       "no_memos": "No memos found",
       "all_memos": "All names have memos",
       "only_memos": "Show with Memos ({{count}})",
@@ -332,8 +330,7 @@
     "placeholder": "Enter memo...",
     "toast": {
       "updated": "Memo updated",
-      "deleted": "Memo deleted",
-      "storage_full": "Save failed: Local storage full"
+      "deleted": "Memo deleted"
     },
     "tooltip": {
       "add": "Add Memo"

@@ -52,7 +52,6 @@ export const NavBar = () => {
               to="/collection/999"
               className={getLinkClass("/collection/999")}
             >
-              {/* 🚀 替换: collection.999.name -> collection.999.name (保持不变) */}
               <FontAwesomeIcon icon={faLayerGroup} /> {t("collection.999.name")}
             </Link>
 
@@ -60,7 +59,6 @@ export const NavBar = () => {
               to="/collection/bip39"
               className={getLinkClass("/collection/bip39")}
             >
-              {/* 🚀 替换: collection.bip39.name -> collection.bip39.name (保持不变) */}
               <FontAwesomeIcon icon={faLayerGroup} />{" "}
               {t("collection.bip39.name")}
             </Link>
