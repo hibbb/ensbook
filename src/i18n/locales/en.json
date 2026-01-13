@@ -4,6 +4,7 @@
     "save": "Save",
     "confirm": "Confirm",
     "reset": "Reset",
+    "clear": "Clear",
     "finish": "Done",
     "retry": "Retry",
     "got_it": "Got it",
@@ -120,8 +121,7 @@
         "status_validating": "Parsing blockchain data...",
         "status_active": "Status: Active",
         "status_inactive": "Status: Not Configured",
-        "btn_validating": "Validating",
-        "btn_save": "Save Collection"
+        "btn_validating": "Validating"
       }
     },
     "about": {

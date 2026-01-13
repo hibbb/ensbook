@@ -143,6 +143,9 @@ export const Home = () => {
         clearHomeList();
         setResolvedLabels([]);
         clearSelection();
+        // 🚀 视图状态清除：调用 hook 暴露的方法，重置排序和筛选
+        // 这确保了用户下次添加数据时，表格处于默认展示状态
+        resetViewState();
       }
       return;
     }

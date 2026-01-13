@@ -4,6 +4,7 @@
     "save": "保存",
     "confirm": "确认",
     "reset": "重置",
+    "clear": "清空",
     "finish": "完成",
     "retry": "重试",
     "got_it": "明白了",
@@ -120,8 +121,7 @@
         "status_validating": "正在解析区块链数据...",
         "status_active": "当前状态：已生效",
         "status_inactive": "当前状态：未配置",
-        "btn_validating": "验证中",
-        "btn_save": "保存集合"
+        "btn_validating": "验证中"
       }
     },
     "about": {

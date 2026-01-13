@@ -1,5 +1,6 @@
 // src/pages/Mine.tsx
 
+import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,12 +10,12 @@ import { useTranslation, Trans } from "react-i18next";
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar"; // 🚀
-import { ActionModals } from "../components/ActionModals"; // 🚀
+import { FloatingBar } from "../components/FloatingBar";
+import { ActionModals } from "../components/ActionModals";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions"; // 🚀
+import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
@@ -84,6 +85,15 @@ export const Mine = () => {
     isViewStateDirty,
     resetViewState,
   } = useNameTableView(records, address, "collection", "mine");
+
+  // 🚀 核心修复：监听数据源状态变化
+  // 当 source 被清空时 (hasSource -> false)，强制重置 Hook 内存中的视图状态。
+  // 这防止了旧的筛选器配置在组件重新活跃时覆盖 Store 中的清理操作。
+  useEffect(() => {
+    if (!hasSource) {
+      resetViewState();
+    }
+  }, [hasSource, resetViewState]);
 
   // --- 4. 核心业务逻辑 ---
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
@@ -167,9 +177,9 @@ export const Mine = () => {
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister} // 🚀
-        onRenew={actions.onRenew} // 🚀
-        onReminder={actions.onReminder} // 🚀
+        onRegister={actions.onRegister}
+        onRenew={actions.onRenew}
+        onReminder={actions.onReminder}
         pendingLabels={pendingLabels}
         totalRecordsCount={records?.length || 0}
         statusCounts={statusCounts}
@@ -185,11 +195,10 @@ export const Mine = () => {
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels)}
         onClearSelection={clearSelection}
       />
 
-      {/* 🚀 统一模态框 */}
       <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
