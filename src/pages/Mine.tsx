@@ -100,7 +100,7 @@ export const Mine = () => {
 
   if (!hasSource) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="max-w-7xl mx-auto lg:px-4 py-20 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
           <FontAwesomeIcon icon={faFeatherPointed} size="2x" />
         </div>
@@ -133,7 +133,7 @@ export const Mine = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 pb-24 relative">
+    <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10 flex items-end justify-between">
         <div>
           <h1 className="text-4xl font-qs-semibold flex items-center gap-3">

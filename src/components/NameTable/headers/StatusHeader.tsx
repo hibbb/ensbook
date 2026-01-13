@@ -46,7 +46,7 @@ export const StatusHeader = ({
 
   return (
     <ThWrapper>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 whitespace-nowrap">
         {/* 🚀 替换: table.header.status -> table.header.status (保持不变) */}
         <span>{t("table.header.status")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">

@@ -33,7 +33,7 @@ export const ActionHeader = ({
 
   return (
     <ThWrapper>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 whitespace-nowrap">
         {onToggleSelectAll && (
           <div className="flex items-center">
             <Tooltip

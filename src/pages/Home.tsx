@@ -211,7 +211,7 @@ export const Home = () => {
   // --- 8. 渲染 ---
 
   return (
-    <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
+    <div className="max-w-7xl mx-auto lg:px-4 relative min-h-[85vh] flex flex-col">
       <HomeSearchSection
         hasContent={hasContent}
         inputValue={inputValue}

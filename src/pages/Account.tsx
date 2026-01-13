@@ -191,7 +191,7 @@ export const Account = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 pb-24 relative">
+    <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-4xl font-qs-semibold">{t("account.title")}</h1>

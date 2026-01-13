@@ -144,7 +144,7 @@ export const NameCell = ({ record }: NameCellProps) => {
 
   return (
     <div className="h-12 flex items-center">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 whitespace-nowrap">
         <Tooltip content={renderNameTooltip()}>
           <a
             href={`https://app.ens.domains/${record.label}.eth`}
