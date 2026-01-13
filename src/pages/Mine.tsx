@@ -1,6 +1,5 @@
 // src/pages/Mine.tsx
 
-import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -85,15 +84,6 @@ export const Mine = () => {
     isViewStateDirty,
     resetViewState,
   } = useNameTableView(records, address, "collection", "mine");
-
-  // 🚀 核心修复：监听数据源状态变化
-  // 当 source 被清空时 (hasSource -> false)，强制重置 Hook 内存中的视图状态。
-  // 这防止了旧的筛选器配置在组件重新活跃时覆盖 Store 中的清理操作。
-  useEffect(() => {
-    if (!hasSource) {
-      resetViewState();
-    }
-  }, [hasSource, resetViewState]);
 
   // --- 4. 核心业务逻辑 ---
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();

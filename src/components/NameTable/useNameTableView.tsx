@@ -1,6 +1,6 @@
 // src/components/NameTable/useNameTableView.tsx
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type { NameRecord } from "../../types/ensNames";
 import { isRenewable, isRegistrable } from "../../utils/ens";
 import type { SortField, SortConfig, FilterConfig } from "./types";
@@ -58,9 +58,16 @@ export const useNameTableView = (
     setPrevKey(currentKey);
   }
 
+  // 🚀 Fix 1: 使用 Ref 标记是否为当前 Hook 触发的写入
+  // 防止 "Hook Update -> Write -> Event -> Hook Read" 的死循环
+  const isInternalWrite = useRef(false);
+
   useEffect(() => {
     if (!context) return;
     const viewState: PageViewState = { sort: sortConfig, filter: filterConfig };
+
+    // 标记开始写入
+    isInternalWrite.current = true;
     try {
       if (context === "home") {
         saveHomeViewState(viewState);
@@ -69,13 +76,51 @@ export const useNameTableView = (
       }
     } catch (e) {
       console.warn("Failed to save view state:", e);
+    } finally {
+      // 写入完成后（事件触发后），释放标记
+      // 使用 setTimeout 确保在当前事件循环结束后执行，
+      // 这样能保证 user-settings-updated 的监听器已经被触发并处理完毕
+      setTimeout(() => {
+        isInternalWrite.current = false;
+      }, 0);
     }
   }, [sortConfig, filterConfig, context, collectionId]);
 
+  // 🚀 Fix 2: 监听外部存储更新 (解决脏回写问题的根源)
+  useEffect(() => {
+    const handleExternalUpdate = () => {
+      // 如果这次更新是我们自己触发的，直接忽略
+      if (isInternalWrite.current) return;
+
+      const saved = getSavedState();
+
+      // 检查存储是否被“重置” (例如被 clearHomeList 或 saveMyCollectionSource("") 清空)
+      // 如果存储中没有任何 filter/sort 记录，说明它被重置了
+      const isStorageReset = !saved.filter && !saved.sort;
+
+      if (isStorageReset) {
+        // 强制重置内存状态，与硬盘同步
+        setSortConfig(DEFAULT_SORT);
+        setFilterConfig(DEFAULT_FILTER);
+      }
+    };
+
+    window.addEventListener("user-settings-updated", handleExternalUpdate);
+    window.addEventListener("storage", (e) => {
+      // 兼容跨标签页同步
+      if (e.key && e.key.includes("ensbook_user_data")) {
+        handleExternalUpdate();
+      }
+    });
+
+    return () => {
+      window.removeEventListener("user-settings-updated", handleExternalUpdate);
+      window.removeEventListener("storage", handleExternalUpdate);
+    };
+  }, [getSavedState]);
+
   // 🚀 核心修复：更新脏检查逻辑
   const isViewStateDirty = useMemo(() => {
-    // 1. 排序脏检查 (优化版)
-    // 如果当前没有排序方向 (direction === null)，无论 field 是什么，都视为"未修改"
     const isSortDirty = (() => {
       if (sortConfig.direction === null && DEFAULT_SORT.direction === null) {
         return false;
@@ -86,7 +131,6 @@ export const useNameTableView = (
       );
     })();
 
-    // 2. 筛选脏检查
     const isFilterDirty =
       filterConfig.onlyMe !== DEFAULT_FILTER.onlyMe ||
       filterConfig.onlyWithMemos !== DEFAULT_FILTER.onlyWithMemos ||
@@ -209,14 +253,8 @@ export const useNameTableView = (
         unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
       };
 
-      // 🟢 修正代码：
       const recordsWithMemos = baseRecords.filter(
-        (r) =>
-          // 1. 符合其他所有筛选条件
-          passOthers(r, ["memo"]) &&
-          // 2. 并且确实拥有备注
-          !!r.memo &&
-          r.memo.trim().length > 0,
+        (r) => passOthers(r, ["memo"]) && !!r.memo && r.memo.trim().length > 0,
       );
       const memosCount = recordsWithMemos.length;
 
