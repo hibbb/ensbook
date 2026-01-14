@@ -11,14 +11,10 @@ import { truncateAddress } from "../../../utils/format";
 
 interface OwnerCellProps {
   record: NameRecord;
-  currentAddress?: string;
 }
 
-export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
+export const OwnerCell = ({ record }: OwnerCellProps) => {
   const { t } = useTranslation();
-  const isConnectedWallet =
-    currentAddress &&
-    record.owner?.toLowerCase() === currentAddress.toLowerCase();
 
   const handleCopy = (e: React.MouseEvent, text: string, label: string) => {
     e.preventDefault(); // 防止触发 Link 跳转
@@ -80,16 +76,6 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
           </div>
         )}
 
-        {isConnectedWallet && (
-          <div className="flex items-center justify-center gap-2 border-t border-white/10 pt-2">
-            <span className="text-sm text-link">~</span>
-            <span className="font-qs-medium text-[10px]">
-              {t("table.cell.is_connected_wallet")}
-            </span>
-            <span className="text-sm text-link">~</span>
-          </div>
-        )}
-
         {/* 🚀 底部提示：点击查看持仓 */}
         <div className="pt-2 pb-1 border-t border-white/10 text-center">
           <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
@@ -107,9 +93,6 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
     <div className="h-12 flex items-center">
       {record.owner ? (
         <div className="flex items-center gap-1.5 text-sm">
-          {isConnectedWallet && (
-            <span className="text-sm text-link">{"~"}</span>
-          )}
           <Tooltip content={renderTooltipContent()}>
             <Link
               to={`/account/${linkTarget}`}
@@ -122,9 +105,6 @@ export const OwnerCell = ({ record, currentAddress }: OwnerCellProps) => {
               {record.ownerPrimaryName || truncateAddress(record.owner)}
             </Link>
           </Tooltip>
-          {isConnectedWallet && (
-            <span className="text-sm text-link">{"~"}</span>
-          )}
         </div>
       ) : (
         <span className="text-gray-300 text-xs">—</span>

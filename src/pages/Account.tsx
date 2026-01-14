@@ -129,8 +129,9 @@ export const Account = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
-    ownerCounts, // 🚀
-    ownerStats, // 🚀
+    ownerCounts,
+    ownerStats,
+    ownershipCounts,
   } = useNameTableView(
     records,
     myAddress,
@@ -299,8 +300,9 @@ export const Account = () => {
         isViewStateDirty={isViewStateDirty}
         onResetViewState={resetViewState}
         onLevelChange={handleLevelChange}
-        ownerCounts={ownerCounts} // 🚀
-        ownerStats={ownerStats} // 🚀
+        ownerCounts={ownerCounts}
+        ownerStats={ownerStats}
+        ownershipCounts={ownershipCounts}
       />
 
       <FloatingBar

@@ -74,6 +74,7 @@ export const Home = () => {
     resetViewState,
     ownerCounts, // 🚀
     ownerStats, // 🚀
+    ownershipCounts, // 🚀 1. 从 Hook 解构
   } = useNameTableView(validRecords, address, "home");
 
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
@@ -246,6 +247,7 @@ export const Home = () => {
             onLevelChange={handleLevelChange}
             ownerCounts={ownerCounts} // 🚀
             ownerStats={ownerStats} // 🚀
+            ownershipCounts={ownershipCounts} // 🚀 2. 传递给组件
           />
         </div>
       )}

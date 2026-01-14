@@ -47,13 +47,11 @@ interface NameTableProps {
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
   };
-  myCount?: number;
   ownershipCounts?: { mine: number; others: number };
   levelCounts?: Record<number, number>;
   isViewStateDirty?: boolean;
   onResetViewState?: () => void;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
-  // 🚀 修复：增加 isMyself 字段以匹配 TableHeader 的类型要求
   ownerCounts?: {
     count: number;
     label: string;
@@ -109,16 +107,7 @@ export const NameTable = (props: NameTableProps) => {
   const showSkeleton = props.isLoading || isResolvingPage;
   const skeletonCount = props.skeletonRows || 8;
 
-  const myCount = safeRecords.filter(
-    (r) =>
-      props.currentAddress &&
-      r.owner?.toLowerCase() === props.currentAddress.toLowerCase(),
-  ).length;
-
-  const ownershipCounts = {
-    mine: myCount,
-    others: safeRecords.length - myCount,
-  };
+  const ownershipCounts = props.ownershipCounts || { mine: 0, others: 0 };
 
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
   const hasRenewableRecords = renewableRecords.length > 0;
@@ -155,7 +144,6 @@ export const NameTable = (props: NameTableProps) => {
             statusCounts={props.statusCounts}
             actionCounts={props.actionCounts}
             nameCounts={props.nameCounts}
-            myCount={myCount}
             ownershipCounts={ownershipCounts}
             levelCounts={props.levelCounts}
             ownerCounts={props.ownerCounts}
@@ -173,7 +161,6 @@ export const NameTable = (props: NameTableProps) => {
                   record={r}
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
-                  currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}
                   onDelete={props.onDelete}

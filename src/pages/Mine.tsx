@@ -80,8 +80,9 @@ export const Mine = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
-    ownerCounts, // 🚀
-    ownerStats, // 🚀
+    ownerCounts,
+    ownerStats,
+    ownershipCounts,
   } = useNameTableView(records, address, "collection", "mine");
 
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
@@ -176,6 +177,7 @@ export const Mine = () => {
         onLevelChange={handleLevelChange}
         ownerCounts={ownerCounts} // 🚀
         ownerStats={ownerStats} // 🚀
+        ownershipCounts={ownershipCounts} // 🚀 2. 传递给组件
       />
 
       <FloatingBar

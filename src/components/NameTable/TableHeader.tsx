@@ -36,7 +36,6 @@ interface TableHeaderProps {
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
   };
-  myCount?: number;
   ownershipCounts?: { mine: number; others: number };
   levelCounts?: Record<number, number>;
   ownerCounts?: {

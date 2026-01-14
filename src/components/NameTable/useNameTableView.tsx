@@ -154,7 +154,8 @@ export const useNameTableView = (
     nameCounts,
     levelCounts,
     rawSortedOwners,
-    ownerStats, // 🚀 导出统计数据
+    ownerStats,
+    ownershipCounts, // 🚀 导出
   } = useMemo(() => {
     const checkStatus = (r: NameRecord) =>
       statusList.length === 0 || statusList.includes(r.status);
@@ -258,11 +259,21 @@ export const useNameTableView = (
     >();
     const myAddressLower = currentAddress?.toLowerCase();
 
+    // 🚀 新增计数器
+    let mineCount = 0;
+    let totalOwnerRecords = 0;
+
     baseRecords
       .filter((r) => passOthers(r, ["owner"]))
       .forEach((r) => {
         if (!r.owner) return;
         const key = r.owner.toLowerCase();
+
+        // 🚀 顺便统计
+        totalOwnerRecords++;
+        if (key === myAddressLower) {
+          mineCount++;
+        }
 
         let current = ownerMap.get(key);
         if (!current) {
@@ -283,7 +294,6 @@ export const useNameTableView = (
         ownerMap.set(key, current);
       });
 
-    // 🚀 1. 统计总数
     const totalOwnersCount = ownerMap.size;
 
     const sortedOwners = Array.from(ownerMap.values())
@@ -292,7 +302,7 @@ export const useNameTableView = (
         if (!a.isMyself && b.isMyself) return 1;
         return b.count - a.count;
       })
-      .slice(0, 50); // Top 50
+      .slice(0, 50);
 
     return {
       statusCounts,
@@ -305,10 +315,14 @@ export const useNameTableView = (
       },
       levelCounts,
       rawSortedOwners: sortedOwners,
-      // 🚀 2. 返回统计对象
       ownerStats: {
         total: totalOwnersCount,
         displayed: sortedOwners.length,
+      },
+      // 🚀 导出 ownershipCounts
+      ownershipCounts: {
+        mine: mineCount,
+        others: totalOwnerRecords - mineCount,
       },
     };
   }, [
@@ -323,7 +337,6 @@ export const useNameTableView = (
     currentAddress,
   ]);
 
-  // Lazy Resolution
   useEffect(() => {
     if (rawSortedOwners.length === 0) return;
 
@@ -422,6 +435,7 @@ export const useNameTableView = (
     resetViewState,
     levelCounts,
     ownerCounts,
-    ownerStats, // 🚀 3. 导出给组件使用
+    ownerStats,
+    ownershipCounts, // 🚀 导出
   };
 };

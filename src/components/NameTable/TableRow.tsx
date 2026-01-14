@@ -17,7 +17,6 @@ interface TableRowProps {
   record: NameRecord;
   index: number;
   now: number;
-  currentAddress?: string;
   isConnected: boolean;
   canDelete?: boolean;
   isSelected?: boolean;
@@ -35,7 +34,6 @@ export const TableRow = ({
   record,
   index,
   now,
-  currentAddress,
   isConnected,
   canDelete = true,
   onDelete,
@@ -67,7 +65,7 @@ export const TableRow = ({
       </td>
 
       <td>
-        <OwnerCell record={record} currentAddress={currentAddress} />
+        <OwnerCell record={record} />
       </td>
 
       <td className="text-right">
