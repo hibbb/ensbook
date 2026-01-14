@@ -32,6 +32,7 @@ export const useNameTableView = (
   context?: "home" | "collection",
   collectionId?: string,
 ) => {
+  // ... (useState 初始化逻辑保持不变，省略以节省篇幅，请保留原代码) ...
   const getSavedState = useCallback((): PageViewState => {
     if (context === "home") return getHomeViewState();
     if (context === "collection" && collectionId)
@@ -61,6 +62,7 @@ export const useNameTableView = (
 
   const isInternalWrite = useRef(false);
 
+  // ... (useEffect for saving state 保持不变) ...
   useEffect(() => {
     if (!context) return;
     const viewState: PageViewState = { sort: sortConfig, filter: filterConfig };
@@ -80,6 +82,7 @@ export const useNameTableView = (
     }
   }, [sortConfig, filterConfig, context, collectionId]);
 
+  // ... (useEffect for syncing storage 保持不变) ...
   useEffect(() => {
     const handleExternalUpdate = () => {
       if (isInternalWrite.current) return;
@@ -104,6 +107,7 @@ export const useNameTableView = (
     };
   }, [getSavedState]);
 
+  // ... (isViewStateDirty 保持不变) ...
   const isViewStateDirty = useMemo(() => {
     const isSortDirty = (() => {
       if (sortConfig.direction === null && DEFAULT_SORT.direction === null) {
@@ -155,8 +159,9 @@ export const useNameTableView = (
     levelCounts,
     rawSortedOwners,
     ownerStats,
-    ownershipCounts, // 🚀 导出
+    ownershipCounts,
   } = useMemo(() => {
+    // ... (check functions & passOthers 保持不变，省略以节省篇幅) ...
     const checkStatus = (r: NameRecord) =>
       statusList.length === 0 || statusList.includes(r.status);
     const checkAction = (r: NameRecord) => {
@@ -259,7 +264,6 @@ export const useNameTableView = (
     >();
     const myAddressLower = currentAddress?.toLowerCase();
 
-    // 🚀 新增计数器
     let mineCount = 0;
     let totalOwnerRecords = 0;
 
@@ -269,7 +273,6 @@ export const useNameTableView = (
         if (!r.owner) return;
         const key = r.owner.toLowerCase();
 
-        // 🚀 顺便统计
         totalOwnerRecords++;
         if (key === myAddressLower) {
           mineCount++;
@@ -296,13 +299,24 @@ export const useNameTableView = (
 
     const totalOwnersCount = ownerMap.size;
 
-    const sortedOwners = Array.from(ownerMap.values())
-      .sort((a, b) => {
-        if (a.isMyself && !b.isMyself) return -1;
-        if (!a.isMyself && b.isMyself) return 1;
-        return b.count - a.count;
-      })
-      .slice(0, 50);
+    // 🚀 逻辑修复 1: 确保 "我自己" 始终在列表中
+    // 如果我拥有域名 (mineCount > 0)，但可能因为数量太少被 slice(0, 50) 截掉
+    // 我们需要强制保留我。
+    const allOwners = Array.from(ownerMap.values()).sort((a, b) => {
+      if (a.isMyself && !b.isMyself) return -1;
+      if (!a.isMyself && b.isMyself) return 1;
+      return b.count - a.count;
+    });
+
+    // 简单截取 Top 50
+    const sortedOwners = allOwners.slice(0, 50);
+
+    // 检查截取后的列表中是否包含 "我自己"
+    // (由于上面已经把 isMyself 排到第一位了，所以如果我有持仓，我一定在 allOwners[0])
+    // (slice(0, 50) 肯定会包含 allOwners[0]，除非数组为空)
+    // 所以，只要我的 count > 0，上面的排序逻辑已经保证了我会在 Top 50 里。
+    // 这个逻辑修复其实主要依赖于上面的 .sort 逻辑 (MySelf first)。
+    // 只要 mineCount > 0，我就一定在 sortedOwners[0]。完美。
 
     return {
       statusCounts,
@@ -319,7 +333,6 @@ export const useNameTableView = (
         total: totalOwnersCount,
         displayed: sortedOwners.length,
       },
-      // 🚀 导出 ownershipCounts
       ownershipCounts: {
         mine: mineCount,
         others: totalOwnerRecords - mineCount,
@@ -337,14 +350,20 @@ export const useNameTableView = (
     currentAddress,
   ]);
 
+  // 🚀 性能优化 2: 延迟/错峰解析 (Debounce)
   useEffect(() => {
     if (rawSortedOwners.length === 0) return;
 
+    // 筛选出需要解析的
     const targetsToResolve = rawSortedOwners
       .filter((o) => o.label.startsWith("0x") && !resolvedOwnerNames[o.address])
       .map((o) => o.address);
 
-    if (targetsToResolve.length > 0) {
+    if (targetsToResolve.length === 0) return;
+
+    // 设置一个 1.5秒 的定时器
+    // 这让 Table 组件有时间先发起它的 50 个请求，渲染出首屏
+    const timer = setTimeout(() => {
       fetchPrimaryNames(targetsToResolve).then((newMap) => {
         if (newMap.size > 0) {
           setResolvedOwnerNames((prev) => {
@@ -360,8 +379,10 @@ export const useNameTableView = (
           });
         }
       });
-    }
-  }, [rawSortedOwners, resolvedOwnerNames]);
+    }, 1500); // 1500ms 延迟
+
+    return () => clearTimeout(timer);
+  }, [rawSortedOwners, resolvedOwnerNames]); // 注意：这会随着 filters 变化而触发，是预期的
 
   const ownerCounts = useMemo(() => {
     return rawSortedOwners.map((item) => {
@@ -378,6 +399,7 @@ export const useNameTableView = (
     [baseRecords, sortConfig, filterConfig],
   );
 
+  // ... (handleSort, etc. 保持不变) ...
   const handleSort = useCallback((field: SortField) => {
     setSortConfig((prev) => {
       if (prev.field !== field) return { field, direction: "asc" };
@@ -436,6 +458,6 @@ export const useNameTableView = (
     levelCounts,
     ownerCounts,
     ownerStats,
-    ownershipCounts, // 🚀 导出
+    ownershipCounts,
   };
 };
