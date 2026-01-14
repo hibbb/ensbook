@@ -7,12 +7,12 @@ import { useTranslation } from "react-i18next";
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar"; // 🚀
-import { ActionModals } from "../components/ActionModals"; // 🚀
+import { FloatingBar } from "../components/FloatingBar";
+import { ActionModals } from "../components/ActionModals";
 
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions"; // 🚀
+import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 
@@ -21,7 +21,6 @@ import { ENS_COLLECTIONS } from "../config/collections";
 import type { NameRecord } from "../types/ensNames";
 
 export const CollectionDetail = () => {
-  // --- 1. 基础 Hooks ---
   const { id } = useParams<{ id: string }>();
   const collection = id ? ENS_COLLECTIONS[id] : null;
   const { address, isConnected } = useAccount();
@@ -29,10 +28,8 @@ export const CollectionDetail = () => {
 
   useDocumentTitle(collection ? t(collection.displayName) : undefined);
 
-  // --- 2. 数据获取 ---
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
 
-  // --- 3. 表格视图逻辑 ---
   const {
     processedRecords,
     sortConfig,
@@ -49,20 +46,18 @@ export const CollectionDetail = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
+    ownerCounts, // 🚀
+    ownerStats, // 🚀
   } = useNameTableView(records, address, "collection", id);
 
-  // --- 4. 核心业务逻辑 ---
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
-  // --- 5. 辅助逻辑 ---
   const updateLevel = useOptimisticLevelUpdate();
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
   };
 
   const selectionCount = selectedLabels.size;
-
-  // --- 6. 渲染 ---
 
   if (!collection)
     return <div className="p-20 text-center">{t("collection.not_found")}</div>;
@@ -96,9 +91,9 @@ export const CollectionDetail = () => {
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister} // 🚀
-        onRenew={actions.onRenew} // 🚀
-        onReminder={actions.onReminder} // 🚀
+        onRegister={actions.onRegister}
+        onRenew={actions.onRenew}
+        onReminder={actions.onReminder}
         pendingLabels={pendingLabels}
         totalRecordsCount={records?.length || 0}
         statusCounts={statusCounts}
@@ -108,17 +103,18 @@ export const CollectionDetail = () => {
         isViewStateDirty={isViewStateDirty}
         onResetViewState={resetViewState}
         onLevelChange={handleLevelChange}
+        ownerCounts={ownerCounts} // 🚀
+        ownerStats={ownerStats} // 🚀
       />
 
       <FloatingBar
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels)}
         onClearSelection={clearSelection}
       />
 
-      {/* 🚀 统一模态框 */}
       <ActionModals modalState={modalState} actions={actions} />
     </div>
   );

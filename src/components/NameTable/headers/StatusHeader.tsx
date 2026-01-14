@@ -79,7 +79,7 @@ export const StatusHeader = ({
             <div
               className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
                 filterConfig.statusList.length === 0
-                  ? "text-link font-bold"
+                  ? "text-link"
                   : "text-gray-500"
               }`}
               onClick={() =>

@@ -128,7 +128,7 @@ export const NameHeader = ({
             <div
               className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
                 filterConfig.lengthList.length === 0
-                  ? "text-link font-bold"
+                  ? "text-link"
                   : "text-gray-500"
               }`}
               onClick={() =>
@@ -160,7 +160,7 @@ export const NameHeader = ({
                         ? "opacity-40 cursor-not-allowed bg-gray-50"
                         : "cursor-pointer hover:bg-gray-200"
                     }
-                    ${isSelected ? "text-link font-bold" : "text-gray-500"}
+                    ${isSelected ? "text-link" : "text-gray-500"}
                   `}
                   onClick={() => {
                     if (isDisabledOption) return;
@@ -210,7 +210,7 @@ export const NameHeader = ({
                         ? "opacity-40 cursor-not-allowed bg-gray-50"
                         : "cursor-pointer hover:bg-gray-200"
                     }
-                    ${isSelected ? "text-link font-bold" : "text-gray-500"}
+                    ${isSelected ? "text-link" : "text-gray-500"}
                   `}
                   onClick={() => {
                     if (!isDisabledOption)

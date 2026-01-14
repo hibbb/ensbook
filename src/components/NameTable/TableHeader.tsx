@@ -39,6 +39,14 @@ interface TableHeaderProps {
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
   levelCounts?: Record<number, number>;
+  ownerCounts?: {
+    count: number;
+    label: string;
+    address: string;
+    isMyself: boolean;
+  }[];
+  // 🚀 新增: 接收统计数据
+  ownerStats?: { total: number; displayed: number };
 }
 
 export const TableHeader = ({
@@ -65,6 +73,9 @@ export const TableHeader = ({
   },
   ownershipCounts = { mine: 0, others: 0 },
   levelCounts = {},
+  ownerCounts = [],
+  // 🚀 解构 ownerStats，给予默认值
+  ownerStats = { total: 0, displayed: 0 },
 }: TableHeaderProps) => {
   const headerStyle = {
     "--header-offset":
@@ -111,14 +122,14 @@ export const TableHeader = ({
         </th>
 
         <th>
-          {/* 🚀 更新 OwnerHeader 调用 */}
           <OwnerHeader
             sortConfig={sortConfig}
             filterConfig={filterConfig}
             isConnected={isConnected}
             onSort={onSort}
             onFilterChange={onFilterChange}
-            ownershipCounts={ownershipCounts}
+            ownerCounts={ownerCounts}
+            ownerStats={ownerStats} // 🚀 传递给 OwnerHeader
             disabled={isControlsDisabled}
           />
         </th>

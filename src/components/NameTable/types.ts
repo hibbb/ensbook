@@ -25,14 +25,13 @@ export interface SortConfig {
 }
 
 export interface FilterConfig {
-  onlyMe: boolean;
   onlyWithMemos: boolean;
   statusList: string[];
   actionType: "all" | "register" | "renew";
   lengthList: number[];
   wrappedType: "all" | "wrapped" | "unwrapped";
-  // 🚀 新增: 等级筛选列表 (存储选中的等级 0-3)
   levelList: number[];
+  ownerList: string[];
 }
 
 export const STATUS_OPTIONS = [

@@ -88,7 +88,7 @@ export const ActionHeader = ({
                         ? "opacity-50 cursor-not-allowed text-gray-400 bg-gray-50"
                         : "cursor-pointer hover:bg-gray-200"
                     }
-                    ${isSelected ? "text-link font-bold" : "text-gray-500"}
+                    ${isSelected ? "text-link" : "text-gray-500"}
                   `}
                   onClick={() =>
                     !isDisabled &&

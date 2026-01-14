@@ -53,6 +53,14 @@ interface NameTableProps {
   isViewStateDirty?: boolean;
   onResetViewState?: () => void;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
+  // 🚀 修复：增加 isMyself 字段以匹配 TableHeader 的类型要求
+  ownerCounts?: {
+    count: number;
+    label: string;
+    address: string;
+    isMyself: boolean;
+  }[];
+  ownerStats?: { total: number; displayed: number };
 }
 
 export const NameTable = (props: NameTableProps) => {
@@ -150,6 +158,8 @@ export const NameTable = (props: NameTableProps) => {
             myCount={myCount}
             ownershipCounts={ownershipCounts}
             levelCounts={props.levelCounts}
+            ownerCounts={props.ownerCounts}
+            ownerStats={props.ownerStats}
           />
           <tbody>
             {showSkeleton ? (

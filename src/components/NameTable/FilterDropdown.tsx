@@ -96,7 +96,16 @@ export const FilterDropdown = ({
       {isOpen &&
         createPortal(
           <div
-            className={`fixed bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999] animate-in fade-in zoom-in duration-150 ${menuWidth}`}
+            // 🚀 核心修复：
+            // 1. max-h-[60vh]: 限制最大高度为视口高度的 60%
+            // 2. overflow-y-auto: 内容过多时显示垂直滚动条
+            // 3. custom-scrollbar: 应用我们在 index.css 里定义的滚动条样式
+            className={`
+                    fixed bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999]
+                    animate-in fade-in zoom-in duration-150
+                    max-h-[60vh] overflow-y-auto custom-scrollbar
+                    ${menuWidth}
+                  `}
             style={{
               top: position.top,
               left: position.left,

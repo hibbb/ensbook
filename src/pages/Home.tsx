@@ -10,12 +10,12 @@ import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
 import { SearchHelpModal } from "../components/SearchHelpModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
-import { FloatingBar } from "../components/FloatingBar"; // 🚀 使用通用组件
-import { ActionModals } from "../components/ActionModals"; // 🚀 使用通用组件
+import { FloatingBar } from "../components/FloatingBar";
+import { ActionModals } from "../components/ActionModals";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions"; // 🚀 引入新 Hook
+import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
@@ -33,12 +33,10 @@ import type { NameRecord } from "../types/ensNames";
 import type { DeleteCriteria } from "../components/NameTable/types";
 
 export const Home = () => {
-  // --- 1. 基础 Hooks ---
   const { address, isConnected } = useAccount();
   const { t } = useTranslation();
   useDocumentTitle("Home");
 
-  // --- 2. 本地状态 ---
   const [resolvedLabels, setResolvedLabels] = useState<string[]>(() =>
     getHomeLabels(),
   );
@@ -46,7 +44,6 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // --- 3. 数据获取 ---
   const { data: records, isLoading: isQuerying } =
     useNameRecords(resolvedLabels);
 
@@ -59,7 +56,6 @@ export const Home = () => {
     return records.filter((r) => currentLabelSet.has(r.label));
   }, [records, resolvedLabels]);
 
-  // --- 4. 表格视图逻辑 ---
   const {
     processedRecords,
     sortConfig,
@@ -76,19 +72,16 @@ export const Home = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
+    ownerCounts, // 🚀
+    ownerStats, // 🚀
   } = useNameTableView(validRecords, address, "home");
 
-  // --- 5. 核心业务逻辑 (注册/续费/提醒) ---
-  // 🚀 一行代码接管所有交易流程
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
-  // --- 6. 辅助逻辑 (Level 更新) ---
   const updateLevel = useOptimisticLevelUpdate();
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
   };
-
-  // --- 7. 事件处理 ---
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -143,8 +136,6 @@ export const Home = () => {
         clearHomeList();
         setResolvedLabels([]);
         clearSelection();
-        // 🚀 视图状态清除：调用 hook 暴露的方法，重置排序和筛选
-        // 这确保了用户下次添加数据时，表格处于默认展示状态
         resetViewState();
       }
       return;
@@ -211,8 +202,6 @@ export const Home = () => {
     toast.success(t("home.toast.delete_success"));
   };
 
-  // --- 8. 渲染 ---
-
   return (
     <div className="max-w-7xl mx-auto lg:px-4 relative min-h-[85vh] flex flex-col">
       <HomeSearchSection
@@ -242,9 +231,9 @@ export const Home = () => {
             onToggleSelection={toggleSelection}
             onToggleSelectAll={toggleSelectAll}
             pendingLabels={pendingLabels}
-            onRegister={actions.onRegister} // 🚀
-            onRenew={actions.onRenew} // 🚀
-            onReminder={actions.onReminder} // 🚀
+            onRegister={actions.onRegister}
+            onRenew={actions.onRenew}
+            onReminder={actions.onReminder}
             skeletonRows={5}
             headerTop="88px"
             totalRecordsCount={validRecords?.length || 0}
@@ -255,6 +244,8 @@ export const Home = () => {
             isViewStateDirty={isViewStateDirty}
             onResetViewState={resetViewState}
             onLevelChange={handleLevelChange}
+            ownerCounts={ownerCounts} // 🚀
+            ownerStats={ownerStats} // 🚀
           />
         </div>
       )}
@@ -263,7 +254,7 @@ export const Home = () => {
         selectedCount={selectedLabels.size}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels)}
         onClearSelection={clearSelection}
       />
 
@@ -272,7 +263,6 @@ export const Home = () => {
         onClose={() => setIsHelpOpen(false)}
       />
 
-      {/* 🚀 统一模态框 */}
       <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
