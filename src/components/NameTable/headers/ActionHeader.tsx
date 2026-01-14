@@ -90,10 +90,16 @@ export const ActionHeader = ({
                     }
                     ${isSelected ? "text-link" : "text-gray-500"}
                   `}
-                  onClick={() =>
-                    !isDisabled &&
-                    onFilterChange({ ...filterConfig, actionType: type })
-                  }
+                  onClick={() => {
+                    if (isDisabled) return;
+
+                    // 🚀 核心修改：实现 Toggle 逻辑
+                    // 如果当前点击的正是已选中的类型，且不是 "all"，则重置为 "all"
+                    // 否则切换到点击的类型
+                    const newType = isSelected && type !== "all" ? "all" : type;
+
+                    onFilterChange({ ...filterConfig, actionType: newType });
+                  }}
                 >
                   <span>{label}</span>
                   <div className="flex items-center gap-2">

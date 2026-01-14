@@ -35,22 +35,49 @@ export const DeleteHeader = ({
   ownershipCounts = { mine: 0, others: 0 },
 }: DeleteHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Ref 1: 触发按钮
   const containerRef = useRef<HTMLDivElement>(null);
+  // 🚀 Ref 2: 菜单内容 (新增)
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const { t } = useTranslation();
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (isOpen) setIsOpen(false);
+    const handleScroll = (event: Event) => {
+      if (!isOpen) return;
+
+      // 🚀 修复滚动关闭 Bug:
+      // 如果滚动的目标在菜单内部，说明用户正在查看长列表，不关闭。
+      if (
+        menuRef.current &&
+        event.target instanceof Node &&
+        menuRef.current.contains(event.target)
+      ) {
+        return;
+      }
+
+      // 只有页面背景滚动时，才关闭
+      setIsOpen(false);
     };
+
     const handleClickOutside = (e: MouseEvent) => {
+      // 🚀 逻辑同步:
+      // 点击 按钮本身 或 菜单内部 都不触发 Outside 关闭
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        containerRef.current.contains(e.target as Node)
       ) {
-        setIsOpen(false);
+        return;
       }
+      if (menuRef.current && menuRef.current.contains(e.target as Node)) {
+        return;
+      }
+
+      setIsOpen(false);
     };
+
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       window.addEventListener("scroll", handleScroll, true);
@@ -115,7 +142,9 @@ export const DeleteHeader = ({
           onBatchDelete &&
           createPortal(
             <div
-              className="fixed text-sm bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999] animate-in fade-in zoom-in duration-150 w-48 origin-top-right overflow-hidden"
+              ref={menuRef} // 🚀 绑定 Ref
+              // 🚀 样式更新: 增加 max-h-[60vh] 和 overflow-y-auto custom-scrollbar
+              className="fixed text-sm bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999] animate-in fade-in zoom-in duration-150 w-48 origin-top-right overflow-y-auto custom-scrollbar max-h-[60vh]"
               style={{
                 top: position.top,
                 left: position.left,
@@ -123,10 +152,9 @@ export const DeleteHeader = ({
               }}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              <div
-                className="overflow-y-auto"
-                style={{ maxHeight: `calc(100vh - ${position.top}px - 20px)` }}
-              >
+              <div>
+                {" "}
+                {/* 移除内部的 overflow-y-auto，由外层统一控制 */}
                 {activeStatuses.length > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -158,7 +186,6 @@ export const DeleteHeader = ({
                     <div className="h-px bg-gray-100 my-1 mx-2" />
                   </>
                 )}
-
                 {activeLengths.length > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -192,7 +219,6 @@ export const DeleteHeader = ({
                     <div className="h-px bg-gray-100 my-1 mx-2" />
                   </>
                 )}
-
                 {activeWrappedCount > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -239,7 +265,6 @@ export const DeleteHeader = ({
                     <div className="h-px bg-gray-100 my-1 mx-2" />
                   </>
                 )}
-
                 {activeOwnerCount > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -285,7 +310,6 @@ export const DeleteHeader = ({
                     <div className="h-px bg-gray-100 my-1 mx-2" />
                   </>
                 )}
-
                 <button
                   onClick={() => handleItemClick({ type: "all" })}
                   className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 transition-colors flex items-center justify-between group/clear font-medium"

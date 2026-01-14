@@ -108,13 +108,7 @@ export const OwnerHeader = ({
 
                 // 动态样式：自己高亮
                 let containerClass =
-                  "px-4 py-2 text-sm flex justify-between items-center transition-colors cursor-pointer ";
-                if (item.isMyself) {
-                  containerClass +=
-                    "bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 ";
-                } else {
-                  containerClass += "hover:bg-gray-50 text-text-main ";
-                }
+                  "px-4 py-2 text-sm flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-50 text-text-main ";
 
                 if (isSelected) {
                   containerClass += "font-qs-bold ";
@@ -139,7 +133,7 @@ export const OwnerHeader = ({
                   >
                     <div className="flex items-center gap-2 overflow-hidden">
                       <div
-                        className={`w-5 flex justify-center ${item.isMyself ? "text-blue-500" : "text-gray-400"}`}
+                        className={`w-5 flex justify-center ${item.isMyself ? "text-link" : "text-gray-400"}`}
                       >
                         {/* 动态图标：自己显示 Wallet */}
                         <FontAwesomeIcon
@@ -152,15 +146,12 @@ export const OwnerHeader = ({
                         title={item.label}
                       >
                         {item.label}
-                        {item.isMyself && (
-                          <span className="ml-1 opacity-70 text-xs">(You)</span>
-                        )}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 pl-2">
                       <span
-                        className={`text-xs font-qs-regular ${item.isMyself ? "text-blue-400" : "text-gray-400"}`}
+                        className={`text-xs font-qs-regular ${item.isMyself ? "text-link" : "text-gray-400"}`}
                       >
                         ({item.count})
                       </span>
