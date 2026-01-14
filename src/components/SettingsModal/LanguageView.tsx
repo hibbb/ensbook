@@ -24,7 +24,6 @@ export const LanguageView = () => {
   const currentLang = i18n.language;
 
   const languages = [
-    // 🚀 替换: language_view.options.* -> settings.language.options.*
     { code: "en", label: t("settings.language.options.en"), flag: "🇺🇸" },
     { code: "zh", label: t("settings.language.options.zh"), flag: "🇨🇳" },
   ] as const;
@@ -33,7 +32,6 @@ export const LanguageView = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
       <div>
         <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
-          {/* 🚀 替换: language_view.desc -> settings.language.desc */}
           {t("settings.language.desc")}
         </p>
 

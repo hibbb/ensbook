@@ -85,7 +85,7 @@ export const NameHeader = ({
 
   return (
     <ThWrapper>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 whitespace-nowrap">
         <span>{t("table.header.name")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton

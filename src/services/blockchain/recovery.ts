@@ -39,7 +39,6 @@ export async function checkRegStatus(
       return { status: "waiting_register", secondsLeft: 0, localState };
     }
     if (txStatus.state === "reverted") {
-      // 🚀 替换: hooks.registration.reg_reverted -> transaction.toast.failed
       regErrorMessage = "transaction.result.error_desc";
     }
   }
@@ -53,7 +52,6 @@ export async function checkRegStatus(
         status: "error",
         secondsLeft: 0,
         localState,
-        // 🚀 替换: hooks.registration.commit_reverted -> transaction.step.commit_failed
         errorMessage: "transaction.step.commit_failed",
       };
     }
@@ -69,7 +67,6 @@ export async function checkRegStatus(
           status: "idle",
           secondsLeft: 0,
           localState,
-          // 🚀 替换: hooks.registration.commit_expired -> transaction.toast.commit_expired
           errorMessage: "transaction.toast.commit_expired",
         };
       }

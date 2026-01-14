@@ -1,7 +1,8 @@
 // src/pages/Account.tsx
 
 import { useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+// 🚀 1. 引入路由钩子
+import { useParams, useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +10,7 @@ import {
   faWallet,
   faUserTag,
   faWarehouse,
+  faArrowLeft, // 🚀 2. 引入返回图标
 } from "@fortawesome/free-solid-svg-icons";
 import { faCopy, faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
@@ -172,6 +174,19 @@ export const Account = () => {
     };
   }, [input]);
 
+  const navigate = useNavigate();
+  const handleBack = () => {
+    // 判断依据：
+    // location.key !== "default" 通常意味着是由路由跳转进来的（有历史）
+    // window.history.state.idx > 0 也是一种判断方式
+    // 这里采用更稳健的策略：如果 state.idx > 0，说明有内部历史
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1); // 返回上一页
+    } else {
+      navigate("/"); // 如果没有上一页（比如直接打开链接），则回首页
+    }
+  };
+
   // --- 7. 渲染 ---
 
   if (isError) {
@@ -191,9 +206,17 @@ export const Account = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 pb-24 relative">
+    <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10">
         <div className="flex items-center gap-3 mb-2">
+          {/* 🚀 5. 新增返回按钮 */}
+          <button
+            onClick={handleBack}
+            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-400 hover:text-text-main hover:bg-gray-100 transition-all active:scale-95 outline-none"
+            title="返回"
+          >
+            <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+          </button>
           <h1 className="text-4xl font-qs-semibold">{t("account.title")}</h1>
           {isLoading && (
             <span className="text-sm text-link animate-pulse">
@@ -202,7 +225,7 @@ export const Account = () => {
           )}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 p-4 rounded-xl">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 p-4">
           {/* 输入名称区域 */}
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faUserTag} className="text-gray-400" />

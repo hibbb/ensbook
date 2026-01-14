@@ -4,6 +4,7 @@
     "save": "保存",
     "confirm": "确认",
     "reset": "重置",
+    "clear": "清空",
     "finish": "完成",
     "retry": "重试",
     "got_it": "明白了",
@@ -120,8 +121,7 @@
         "status_validating": "正在解析区块链数据...",
         "status_active": "当前状态：已生效",
         "status_inactive": "当前状态：未配置",
-        "btn_validating": "验证中",
-        "btn_save": "保存集合"
+        "btn_validating": "验证中"
       }
     },
     "about": {
@@ -190,8 +190,6 @@
       "renewable": "可续费",
       "only_connected_wallet": "仅显示已连接钱包的 ({{count}}) 个",
       "show_all": "显示所有名称",
-      "no_connected_wallet": "列表中没有属于已连接钱包的名称",
-      "all_connected_wallet": "列表中全部属于已连接钱包的名称",
       "no_memos": "没有任何备注",
       "all_memos": "所有名称都进行了备注",
       "only_memos": "仅显示有备注的 ({{count}})",
@@ -332,8 +330,7 @@
     "placeholder": "输入备注信息...",
     "toast": {
       "updated": "备注已更新",
-      "deleted": "备注已删除",
-      "storage_full": "保存失败：本地存储空间已满"
+      "deleted": "备注已删除"
     },
     "tooltip": {
       "add": "添加备注"

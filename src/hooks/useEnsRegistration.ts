@@ -83,11 +83,8 @@ export function useEnsRegistration() {
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: registerHash }),
           {
-            // 🚀 替换: hooks.registration.register_confirming -> transaction.toast.confirming
             loading: t("transaction.toast.confirming"),
-            // 🚀 替换: hooks.registration.register_success -> transaction.result.success_register
             success: t("transaction.result.success_register"),
-            // 🚀 替换: hooks.registration.register_failed -> transaction.toast.failed
             error: t("transaction.toast.failed"),
           },
         );
@@ -101,7 +98,6 @@ export function useEnsRegistration() {
           const error = err as Error & { shortMessage?: string };
 
           if (error.shortMessage?.includes("User rejected")) {
-            // 🚀 替换: hooks.registration.register_rejected -> transaction.toast.register_rejected
             toast.error(t("transaction.toast.register_rejected"));
           } else {
             toast.error(
@@ -168,7 +164,6 @@ export function useEnsRegistration() {
         }
       } catch (e) {
         console.error("恢复检查失败", e);
-        // 🚀 替换: hooks.registration.recovery_failed -> transaction.toast.recovery_failed
         toast.error(t("transaction.toast.recovery_failed"));
       }
     },
@@ -179,7 +174,6 @@ export function useEnsRegistration() {
     if (registrationDataRef.current) {
       executeRegister(registrationDataRef.current);
     } else {
-      // 🚀 替换: hooks.registration.recovery_error -> transaction.toast.recovery_failed
       toast.error(t("transaction.toast.recovery_failed"));
       resetStatus();
     }
@@ -188,7 +182,6 @@ export function useEnsRegistration() {
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint) => {
       if (!address || !publicClient) {
-        // 🚀 替换: hooks.registration.connect_wallet -> common.connect_wallet
         toast.error(t("common.connect_wallet"));
         return;
       }
@@ -247,11 +240,8 @@ export function useEnsRegistration() {
         await toast.promise(
           publicClient.waitForTransactionReceipt({ hash: commitHash }),
           {
-            // 🚀 替换: hooks.registration.commit_confirming -> transaction.toast.confirming
             loading: t("transaction.toast.confirming"),
-            // 🚀 替换: hooks.registration.commit_success -> transaction.step.commit_success
             success: t("transaction.step.commit_success"),
-            // 🚀 替换: hooks.registration.commit_failed -> transaction.step.commit_failed
             error: t("transaction.step.commit_failed"),
           },
         );
@@ -272,10 +262,8 @@ export function useEnsRegistration() {
 
           const error = err as Error & { shortMessage?: string };
           if (error.shortMessage?.includes("User rejected")) {
-            // 🚀 替换: hooks.registration.commit_rejected -> transaction.toast.commit_rejected
             toast(t("transaction.toast.commit_rejected"));
           } else {
-            // 🚀 替换: hooks.registration.process_interrupted -> transaction.toast.process_interrupted
             toast.error(t("transaction.toast.process_interrupted"));
           }
         }

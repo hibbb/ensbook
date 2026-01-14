@@ -29,7 +29,6 @@ const MetadataRow = ({
   const { t } = useTranslation();
   const handleCopy = () => {
     navigator.clipboard.writeText(fullValue || value);
-    // 🚀 替换: table.cell.copy_success -> common.copy_success
     toast.success(t("common.copy_success", { label }));
   };
 
@@ -88,7 +87,6 @@ export const NameCell = ({ record }: NameCellProps) => {
     e.preventDefault();
     e.stopPropagation();
     navigator.clipboard.writeText(text);
-    // 🚀 替换: table.cell.copy_success -> common.copy_success
     toast.success(t("common.copy_success", { label }));
   };
 
@@ -144,7 +142,7 @@ export const NameCell = ({ record }: NameCellProps) => {
 
   return (
     <div className="h-12 flex items-center">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 whitespace-nowrap">
         <Tooltip content={renderNameTooltip()}>
           <a
             href={`https://app.ens.domains/${record.label}.eth`}

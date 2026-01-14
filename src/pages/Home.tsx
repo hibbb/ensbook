@@ -143,6 +143,9 @@ export const Home = () => {
         clearHomeList();
         setResolvedLabels([]);
         clearSelection();
+        // 🚀 视图状态清除：调用 hook 暴露的方法，重置排序和筛选
+        // 这确保了用户下次添加数据时，表格处于默认展示状态
+        resetViewState();
       }
       return;
     }
@@ -211,7 +214,7 @@ export const Home = () => {
   // --- 8. 渲染 ---
 
   return (
-    <div className="max-w-7xl mx-auto px-4 relative min-h-[85vh] flex flex-col">
+    <div className="max-w-7xl mx-auto lg:px-4 relative min-h-[85vh] flex flex-col">
       <HomeSearchSection
         hasContent={hasContent}
         inputValue={inputValue}

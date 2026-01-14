@@ -38,7 +38,6 @@ interface TableHeaderProps {
   };
   myCount?: number;
   ownershipCounts?: { mine: number; others: number };
-  // 🚀 1. 新增参数
   levelCounts?: Record<number, number>;
 }
 
@@ -56,7 +55,6 @@ export const TableHeader = ({
   onBatchDelete,
   uniqueStatuses,
   totalCount = 0,
-  filteredCount = 0,
   statusCounts = {},
   actionCounts = { all: 0, register: 0, renew: 0 },
   nameCounts = {
@@ -65,9 +63,7 @@ export const TableHeader = ({
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
     memosCount: 0,
   },
-  myCount = 0,
   ownershipCounts = { mine: 0, others: 0 },
-  // 🚀 2. 接收参数
   levelCounts = {},
 }: TableHeaderProps) => {
   const headerStyle = {
@@ -76,7 +72,7 @@ export const TableHeader = ({
   } as React.CSSProperties;
 
   const isControlsDisabled = totalCount <= 1;
-  const { t } = useTranslation(); // 确保这一行存在
+  const { t } = useTranslation();
 
   return (
     <thead
@@ -85,7 +81,6 @@ export const TableHeader = ({
     >
       <tr className="text-left">
         <th className="w-14 text-center">
-          {/* 🚀 3. 更新 IndexHeader 的调用方式 */}
           <IndexHeader
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
@@ -104,7 +99,6 @@ export const TableHeader = ({
           />
         </th>
 
-        {/* ... 其他 Header 保持不变 ... */}
         <th>
           <StatusHeader
             sortConfig={sortConfig}
@@ -117,14 +111,14 @@ export const TableHeader = ({
         </th>
 
         <th>
+          {/* 🚀 更新 OwnerHeader 调用 */}
           <OwnerHeader
             sortConfig={sortConfig}
             filterConfig={filterConfig}
             isConnected={isConnected}
             onSort={onSort}
             onFilterChange={onFilterChange}
-            myCount={myCount}
-            listCount={filteredCount}
+            ownershipCounts={ownershipCounts}
             disabled={isControlsDisabled}
           />
         </th>

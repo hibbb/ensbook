@@ -224,6 +224,11 @@ export const bulkRemoveFromHome = (labels: string[]) => {
 export const clearHomeList = () => {
   const data = getFullUserData();
   data.homeList = [];
+
+  // 🚀 新增：清空 Home 列表时，同时重置 Home 的视图状态
+  // 这样用户重新添加数据时，不会因为之前的筛选器而看不到数据
+  data.viewStates.home = {};
+
   saveFullUserData(data);
 };
 
@@ -274,6 +279,12 @@ export const getMyCollectionSource = (): string => {
 export const saveMyCollectionSource = (source: string) => {
   const data = getFullUserData();
   data.settings.myCollectionSource = source;
+
+  // 🚀 新增：如果 Source 被清空，同时也重置 Mine 的视图状态
+  if (!source) {
+    data.viewStates.collections["mine"] = {};
+  }
+
   saveFullUserData(data);
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("user-settings-updated"));

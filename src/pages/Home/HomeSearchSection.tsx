@@ -38,9 +38,6 @@ export const HomeSearchSection = ({
     >
       {!hasContent && (
         <h1 className="text-4xl font-qs-regular text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
-          {/* 🚀 替换: home.search.title -> search.title (注意这里我假设你把 search.title 放在了 search 根下，或者你可以用 common.search) */}
-          {/* 检查 JSON: "search": { "title": "Search" ... } */}
-          {/* 修正：JSON 中没有 search.title，只有 search.guide.title */}
           {/* 建议在 search 下加一个 title: "Search" */}
           {/* 暂时使用 "Search" 字符串，或者添加 key */}
           <span className="text-link">Search</span> ENS

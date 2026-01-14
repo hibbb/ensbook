@@ -26,7 +26,6 @@ export const IndexHeader = ({
     <ThWrapper className="justify-center">
       <FilterDropdown
         isActive={levelList.length > 0}
-        // 🚀 替换: table.filter.filter_level -> table.filter.filter_level (保持不变)
         title={t("table.filter.filter_level")}
         menuWidth="w-40"
         align="start"
@@ -37,7 +36,6 @@ export const IndexHeader = ({
           }`}
           onClick={() => onFilterChange({ ...filterConfig, levelList: [] })}
         >
-          {/* 🚀 替换: table.filter.all_show -> table.filter.all_show (保持不变) */}
           <span>{t("table.filter.all_show")}</span>
           {levelList.length === 0 && <FontAwesomeIcon icon={faCheck} />}
         </div>
@@ -81,7 +79,6 @@ export const IndexHeader = ({
             >
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${dotColor}`} />
-                {/* 🚀 替换: table.filter.level_options.* -> table.filter.level_options.* (保持不变) */}
                 <span>{t(`table.filter.level_options.${opt.value}`)}</span>
               </div>
 

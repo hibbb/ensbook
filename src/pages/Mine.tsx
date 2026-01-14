@@ -9,12 +9,12 @@ import { useTranslation, Trans } from "react-i18next";
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar"; // 🚀
-import { ActionModals } from "../components/ActionModals"; // 🚀
+import { FloatingBar } from "../components/FloatingBar";
+import { ActionModals } from "../components/ActionModals";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions"; // 🚀
+import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
@@ -100,7 +100,7 @@ export const Mine = () => {
 
   if (!hasSource) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="max-w-7xl mx-auto lg:px-4 py-20 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
           <FontAwesomeIcon icon={faFeatherPointed} size="2x" />
         </div>
@@ -133,7 +133,7 @@ export const Mine = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 pb-24 relative">
+    <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10 flex items-end justify-between">
         <div>
           <h1 className="text-4xl font-qs-semibold flex items-center gap-3">
@@ -167,9 +167,9 @@ export const Mine = () => {
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister} // 🚀
-        onRenew={actions.onRenew} // 🚀
-        onReminder={actions.onReminder} // 🚀
+        onRegister={actions.onRegister}
+        onRenew={actions.onRenew}
+        onReminder={actions.onReminder}
         pendingLabels={pendingLabels}
         totalRecordsCount={records?.length || 0}
         statusCounts={statusCounts}
@@ -185,11 +185,10 @@ export const Mine = () => {
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels)}
         onClearSelection={clearSelection}
       />
 
-      {/* 🚀 统一模态框 */}
       <ActionModals modalState={modalState} actions={actions} />
     </div>
   );

@@ -65,7 +65,6 @@ export const ReminderModal = ({
   };
 
   const REMINDER_OPTIONS = [
-    // 🚀 替换: reminder.opt.* -> transaction.reminder.opt.*
     { label: t("transaction.reminder.opt.1m"), value: 30 },
     { label: t("transaction.reminder.opt.1w"), value: 7 },
     { label: t("transaction.reminder.opt.3d"), value: 3 },
@@ -80,7 +79,6 @@ export const ReminderModal = ({
       title={
         <>
           <FontAwesomeIcon icon={faBell} className="text-link" />
-          {/* 🚀 替换: reminder.title -> transaction.reminder.title */}
           <span>{t("transaction.reminder.title")}</span>
         </>
       }
@@ -94,7 +92,6 @@ export const ReminderModal = ({
 
         <div className="bg-orange-50/50 rounded-lg p-3 border border-orange-100 text-center">
           <span className="text-xs text-orange-600 uppercase font-qs-semibold tracking-wider block mb-1">
-            {/* 🚀 替换: reminder.expiration_date -> transaction.reminder.expiration_date */}
             {t("transaction.reminder.expiration_date")}
           </span>
           <span className="text-orange-900 font-qs-semibold">
@@ -104,7 +101,6 @@ export const ReminderModal = ({
 
         <div>
           <label className="text-xs font-qs-semibold text-gray-400 uppercase tracking-wider mb-3 block">
-            {/* 🚀 替换: reminder.remind_before -> transaction.reminder.remind_before */}
             {t("transaction.reminder.remind_before")}
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -138,7 +134,6 @@ export const ReminderModal = ({
           className="w-full py-3 bg-text-main/90 text-white rounded-lg font-qs-semibold text-sm hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
         >
           <FontAwesomeIcon icon={faDownload} />
-          {/* 🚀 替换: reminder.btn.download -> transaction.reminder.btn.download */}
           {t("transaction.reminder.btn.download")}
         </button>
 
@@ -147,7 +142,6 @@ export const ReminderModal = ({
           className="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-qs-semibold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
           <FontAwesomeIcon icon={faGoogle} className="text-red-500" />
-          {/* 🚀 替换: reminder.btn.google -> transaction.reminder.btn.google */}
           {t("transaction.reminder.btn.google")}
         </button>
       </div>

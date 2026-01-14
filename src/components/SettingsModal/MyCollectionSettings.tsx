@@ -7,13 +7,13 @@ import {
   faCheck,
   faFeatherPointed,
   faSpinner,
+  faTrash, // 🚀 1. 引入删除图标
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
 import {
   getMyCollectionSource,
   saveMyCollectionSource,
-  saveCollectionViewState,
   getUserSettings,
   updateSettings,
 } from "../../services/storage/userStore";
@@ -42,20 +42,25 @@ export const MyCollectionSettings = () => {
     );
   };
 
+  // 🚀 2. 新增清空函数
+  // 逻辑完全复用 handleSave 中处理空输入的部分
+  const handleClear = () => {
+    if (window.confirm(t("settings.my_collection.confirm.clear"))) {
+      saveMyCollectionSource("");
+      // 注意：视图状态的清理已在 userStore.saveMyCollectionSource 中自动处理
+      setInput("");
+      toast.success(t("settings.my_collection.toast.cleared"));
+    }
+  };
+
   const handleSave = async () => {
     const trimmed = input.trim();
     const currentStored = getMyCollectionSource();
 
     if (!trimmed) {
       if (currentStored) {
-        if (window.confirm(t("settings.my_collection.confirm.clear"))) {
-          saveMyCollectionSource("");
-          saveCollectionViewState("mine", {});
-          setInput("");
-          toast.success(t("settings.my_collection.toast.cleared"));
-        } else {
-          setInput(currentStored);
-        }
+        // 复用同样的逻辑
+        handleClear();
       } else {
         toast(t("settings.my_collection.toast.already_empty"), { icon: "👻" });
       }
@@ -187,25 +192,40 @@ export const MyCollectionSettings = () => {
           )}
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={isValidating}
-          className={`flex items-center gap-2 px-6 py-2 rounded-full font-qs-semibold text-white transition-all shadow-md transform
-            ${
-              isValidating
-                ? "bg-gray-400 cursor-not-allowed opacity-80"
-                : "bg-link hover:bg-link-hover active:scale-95"
-            }`}
-        >
-          {isValidating ? (
-            t("settings.my_collection.ui.btn_validating")
-          ) : (
-            <>
-              <FontAwesomeIcon icon={faCheck} />
-              {t("settings.my_collection.ui.btn_save")}
-            </>
+        {/* 🚀 3. 修改按钮区域：增加 flex 容器和 Clear 按钮 */}
+        <div className="flex items-center gap-3">
+          {input.trim().length > 0 && (
+            <button
+              onClick={handleClear}
+              disabled={isValidating}
+              className="px-4 py-2 text-sm font-qs-semibold text-red-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={t("common.clear")}
+            >
+              <FontAwesomeIcon icon={faTrash} size="sm" />
+              {t("common.clear")}
+            </button>
           )}
-        </button>
+
+          <button
+            onClick={handleSave}
+            disabled={isValidating}
+            className={`flex items-center gap-2 px-6 py-2 rounded-full font-qs-semibold text-white transition-all shadow-md transform
+              ${
+                isValidating
+                  ? "bg-gray-400 cursor-not-allowed opacity-80"
+                  : "bg-link hover:bg-link-hover active:scale-95"
+              }`}
+          >
+            {isValidating ? (
+              t("settings.my_collection.ui.btn_validating")
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faCheck} />
+                {t("common.save")}
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

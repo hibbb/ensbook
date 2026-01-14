@@ -54,7 +54,6 @@ export const ViewStateReset = ({
             transition-all duration-200 group
           "
         >
-          {/* 🚀 替换: table.reset -> common.reset */}
           <span className="text-sm font-qs-semibold">{t("common.reset")}</span>
           <FontAwesomeIcon
             icon={faFilterCircleXmark}
