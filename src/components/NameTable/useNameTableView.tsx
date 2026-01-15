@@ -18,7 +18,7 @@ import { fetchPrimaryNames } from "../../utils/fetchPrimaryNames";
 export const DEFAULT_SORT: SortConfig = { field: "status", direction: null };
 export const DEFAULT_FILTER: FilterConfig = {
   statusList: [],
-  onlyWithMemos: false,
+  memoFilter: "all",
   actionType: "all",
   lengthList: [],
   wrappedType: "all",
@@ -107,9 +107,9 @@ export const useNameTableView = (
     };
   }, [getSavedState]);
 
-  // ... (isViewStateDirty 保持不变) ...
   const isViewStateDirty = useMemo(() => {
     const isSortDirty = (() => {
+      // ...
       if (sortConfig.direction === null && DEFAULT_SORT.direction === null) {
         return false;
       }
@@ -120,7 +120,8 @@ export const useNameTableView = (
     })();
 
     const isFilterDirty =
-      filterConfig.onlyWithMemos !== DEFAULT_FILTER.onlyWithMemos ||
+      // 🚀 检查 memoFilter
+      filterConfig.memoFilter !== DEFAULT_FILTER.memoFilter ||
       filterConfig.actionType !== DEFAULT_FILTER.actionType ||
       filterConfig.wrappedType !== DEFAULT_FILTER.wrappedType ||
       (filterConfig.statusList?.length || 0) > 0 ||
@@ -148,6 +149,7 @@ export const useNameTableView = (
     wrappedType = "all",
     levelList = [],
     ownerList = [],
+    memoFilter = "all",
   } = filterConfig;
 
   const baseRecords = useMemo(() => records || [], [records]);
@@ -176,9 +178,13 @@ export const useNameTableView = (
       if (wrappedType === "all") return true;
       return wrappedType === "wrapped" ? r.wrapped : !r.wrapped;
     };
+    // 🚀 更新 checkMemos (仅用于 passOthers 检查)
     const checkMemos = (r: NameRecord) => {
-      if (!filterConfig.onlyWithMemos) return true;
-      return !!r.memo && r.memo.trim().length > 0;
+      const hasMemo = !!r.memo && r.memo.trim().length > 0;
+      if (memoFilter === "all") return true;
+      if (memoFilter === "with_memo") return hasMemo;
+      if (memoFilter === "no_memo") return !hasMemo;
+      return true;
     };
     const checkLevel = (r: NameRecord) =>
       levelList.length === 0 || levelList.includes(r.level || 0);
@@ -244,10 +250,22 @@ export const useNameTableView = (
       unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
     };
 
-    const recordsWithMemos = baseRecords.filter(
-      (r) => passOthers(r, ["memo"]) && !!r.memo && r.memo.trim().length > 0,
+    // 🚀 更新 Memo 统计逻辑
+    // 我们需要统计：在满足"其他"条件的前提下，有备注的多少个，无备注的多少个
+    const recordsForMemoStats = baseRecords.filter((r) =>
+      passOthers(r, ["memo"]),
     );
-    const memosCount = recordsWithMemos.length;
+    const memosCount = recordsForMemoStats.filter(
+      (r) => !!r.memo && r.memo.trim().length > 0,
+    ).length;
+    // 总数就是 recordsForMemoStats.length (包含了有和无)
+    // 无备注数 = 总数 - 有备注数
+    // 但为了严谨，我们显式计算一下，或者复用 wrappedCounts.all 类似的逻辑？
+    // 注意：这里的 total 应该是 "当前筛选条件下（忽略备注筛选）的总数"
+    // 也就是 recordsForMemoStats.length
+
+    // 为了和 NameHeader 的接口对接，我们可以把无备注数量也放进去，或者让 UI 自己减
+    // 这里我们稍微修改一下 nameCounts 的结构或者只传 memosCount，UI 根据 total 算 noMemo
 
     const levelCounts: Record<number, number> = {};
     baseRecords
@@ -325,7 +343,19 @@ export const useNameTableView = (
         lengthCounts,
         availableLengths: Array.from(availableLengths).sort((a, b) => a - b),
         wrappedCounts,
-        memosCount,
+        memosCount, // 有备注的数量
+        // 🚀 我们可以利用 wrappedCounts.all 作为当前上下文的总数吗？
+        // wrappedCounts 是 passOthers(r, ['wrapped']) 算出来的
+        // recordsForMemoStats 是 passOthers(r, ['memo']) 算出来的
+        // 如果 wrappedType 和 memoFilter 都选了 'all'，那这两个集合是一样的
+        // 但如果选了 wrapped=true，那 recordsForMemoStats 就是"所有已包装的域名"
+        // 此时 recordsForMemoStats.length 就是当前上下文的总数。
+        // 我们最好把这个上下文总数显式传出去，或者复用已有的结构。
+        // NameHeader 目前用 wrappedCounts.all 作为 totalCount。
+        // 这在 wrappedType='all' 时是正确的。
+        // 但如果 wrappedType != 'all'，NameHeader 里的 totalCount 也会变小，这是符合预期的。
+        // 所以我们不需要改结构，只需要知道：
+        // Total (in NameHeader context) = recordsForMemoStats.length
       },
       levelCounts,
       rawSortedOwners: sortedOwners,
@@ -344,7 +374,7 @@ export const useNameTableView = (
     actionType,
     lengthList,
     wrappedType,
-    filterConfig.onlyWithMemos,
+    memoFilter,
     levelList,
     ownerList,
     currentAddress,

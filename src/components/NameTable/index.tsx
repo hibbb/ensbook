@@ -46,6 +46,7 @@ interface NameTableProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
+    memoTotal?: number;
   };
   ownershipCounts?: { mine: number; others: number };
   levelCounts?: Record<number, number>;

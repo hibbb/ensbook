@@ -25,8 +25,8 @@ export interface SortConfig {
 }
 
 export interface FilterConfig {
-  onlyWithMemos: boolean;
   statusList: string[];
+  memoFilter: "all" | "with_memo" | "no_memo";
   actionType: "all" | "register" | "renew";
   lengthList: number[];
   wrappedType: "all" | "wrapped" | "unwrapped";

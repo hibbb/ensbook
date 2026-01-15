@@ -4,7 +4,6 @@ import {
   faSortAlphaDown,
   faSortAlphaUp,
   faCheck,
-  faCommentDots,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -12,7 +11,6 @@ import { ThWrapper } from "./ThWrapper";
 import { SortButton } from "./SortButton";
 import { FilterDropdown } from "../FilterDropdown";
 import type { SortConfig, SortField, FilterConfig } from "../types";
-import { Tooltip } from "../../ui/Tooltip";
 
 interface NameHeaderProps {
   sortConfig: SortConfig;
@@ -24,6 +22,8 @@ interface NameHeaderProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
+    // 🚀 新增字段
+    memoTotal?: number;
   };
   disabled?: boolean;
 }
@@ -36,52 +36,30 @@ export const NameHeader = ({
   nameCounts = {
     lengthCounts: {},
     availableLengths: [],
-    // 🟢 修复：将 number 改为 0
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
     memosCount: 0,
+    memoTotal: 0,
   },
   disabled,
 }: NameHeaderProps) => {
   const { t } = useTranslation();
+
+  // 状态判断
   const isActive =
-    filterConfig.lengthList.length > 0 || filterConfig.wrappedType !== "all";
+    filterConfig.lengthList.length > 0 ||
+    filterConfig.wrappedType !== "all" ||
+    filterConfig.memoFilter !== "all"; // 🚀
 
   const totalLengthCount = Object.values(nameCounts.lengthCounts).reduce(
     (a, b) => a + b,
     0,
   );
 
+  // 🚀 获取正确的统计数据
   const memosCount = nameCounts.memosCount || 0;
-  const totalCount = nameCounts.wrappedCounts.all;
-
-  const isNoMemos = memosCount === 0;
-  const isAllMemos = totalCount > 0 && memosCount === totalCount;
-
-  const isDisabled =
-    disabled || isNoMemos || (isAllMemos && !filterConfig.onlyWithMemos);
-
-  let tooltipContent = "";
-  if (isNoMemos) {
-    tooltipContent = t("table.filter.no_memos");
-  } else if (isAllMemos && !filterConfig.onlyWithMemos) {
-    tooltipContent = t("table.filter.all_memos");
-  } else {
-    tooltipContent = filterConfig.onlyWithMemos
-      ? t("table.filter.show_all")
-      : t("table.filter.only_memos", { count: memosCount });
-  }
-
-  const buttonBaseClass =
-    "w-6 h-6 flex items-center justify-center rounded-md transition-all";
-
-  let buttonClass = "";
-  if (isDisabled) {
-    buttonClass = "text-gray-300 cursor-not-allowed bg-transparent";
-  } else if (filterConfig.onlyWithMemos) {
-    buttonClass = "bg-link text-white hover:bg-link-hover";
-  } else {
-    buttonClass = "text-link hover:bg-gray-50";
-  }
+  // 如果 memoTotal 没传，降级使用 wrappedCounts.all (虽然不太准，但防止崩溃)
+  const totalCount = nameCounts.memoTotal ?? nameCounts.wrappedCounts.all;
+  const noMemosCount = totalCount - memosCount;
 
   return (
     <ThWrapper>
@@ -99,28 +77,98 @@ export const NameHeader = ({
             disabled={disabled}
           />
 
-          <Tooltip content={tooltipContent}>
-            <button
-              disabled={isDisabled}
-              onClick={() =>
-                !isDisabled &&
-                onFilterChange({
-                  ...filterConfig,
-                  onlyWithMemos: !filterConfig.onlyWithMemos,
-                })
-              }
-              className={`${buttonBaseClass} ${buttonClass}`}
-            >
-              <FontAwesomeIcon icon={faCommentDots} size="sm" />
-            </button>
-          </Tooltip>
-
           <FilterDropdown
             isActive={isActive}
             menuWidth="w-48"
             title={t("table.filter.filter_length_wrap")}
             disabled={disabled}
           >
+            {/* --- Section 1: By Memo --- */}
+            <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+              {t("table.filter.by_memo")}
+            </div>
+
+            {/* Option: All Names */}
+            <div
+              className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
+                filterConfig.memoFilter === "all"
+                  ? "text-link"
+                  : "text-gray-500"
+              }`}
+              onClick={() =>
+                onFilterChange({ ...filterConfig, memoFilter: "all" })
+              }
+            >
+              <span>{t("table.filter.all_names")}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-normal">
+                  ({totalCount})
+                </span>
+                {filterConfig.memoFilter === "all" && (
+                  <FontAwesomeIcon icon={faCheck} />
+                )}
+              </div>
+            </div>
+
+            {/* Option: With Memo */}
+            <div
+              className={`px-4 py-2 text-sm flex justify-between items-center transition-colors
+                ${
+                  memosCount === 0 && filterConfig.memoFilter !== "with_memo"
+                    ? "opacity-40 cursor-not-allowed bg-gray-50"
+                    : "cursor-pointer hover:bg-gray-200"
+                }
+                ${filterConfig.memoFilter === "with_memo" ? "text-link" : "text-gray-500"}
+              `}
+              onClick={() => {
+                // 如果数量为0且未被选中，则禁止点击
+                if (memosCount > 0 || filterConfig.memoFilter === "with_memo") {
+                  onFilterChange({ ...filterConfig, memoFilter: "with_memo" });
+                }
+              }}
+            >
+              <span>{t("table.filter.with_memo")}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-normal">
+                  ({memosCount})
+                </span>
+                {filterConfig.memoFilter === "with_memo" && (
+                  <FontAwesomeIcon icon={faCheck} />
+                )}
+              </div>
+            </div>
+
+            {/* 🚀 Option: No Memo (新增) */}
+            <div
+              className={`px-4 py-2 text-sm flex justify-between items-center transition-colors
+                ${
+                  noMemosCount === 0 && filterConfig.memoFilter !== "no_memo"
+                    ? "opacity-40 cursor-not-allowed bg-gray-50"
+                    : "cursor-pointer hover:bg-gray-200"
+                }
+                ${filterConfig.memoFilter === "no_memo" ? "text-link" : "text-gray-500"}
+              `}
+              onClick={() => {
+                if (noMemosCount > 0 || filterConfig.memoFilter === "no_memo") {
+                  onFilterChange({ ...filterConfig, memoFilter: "no_memo" });
+                }
+              }}
+            >
+              <span>{t("table.filter.no_memo")}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-normal">
+                  ({noMemosCount})
+                </span>
+                {filterConfig.memoFilter === "no_memo" && (
+                  <FontAwesomeIcon icon={faCheck} />
+                )}
+              </div>
+            </div>
+
+            <div className="h-px bg-gray-100 my-1 mx-2" />
+
+            {/* --- Section 2: By Length (保持不变) --- */}
+            {/* ... (省略中间代码) ... */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
               {t("table.filter.by_length")}
             </div>
@@ -187,6 +235,7 @@ export const NameHeader = ({
 
             <div className="h-px bg-gray-100 my-1 mx-2" />
 
+            {/* --- Section 3: By Wrap (保持不变) --- */}
             <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
               {t("table.filter.by_wrap")}
             </div>

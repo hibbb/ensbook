@@ -191,9 +191,10 @@
       "registerable": "Registerable",
       "renewable": "Renewable",
       "show_all": "Show All",
-      "no_memos": "No memos found",
-      "all_memos": "All names have memos",
-      "only_memos": "Show with Memos ({{count}})",
+      "by_memo": "By Memo",
+      "all_names": "All Names",
+      "with_memo": "With Memo",
+      "no_memo": "No Memo",
       "no_renewable": "No renewable names",
       "select_all_renewable": "Select all renewable",
       "owner_stats": "Top {{displayed}} / {{total}}",
@@ -369,12 +370,12 @@
     "999": {
       "name": "999",
       "title": "999 Club",
-      "desc": "The most representative digital collection in ENS, containing 000.eth to 999.eth."
+      "desc": "Numbers are infinite, but the first thousand are not. Welcome to the most exclusive club on Ethereum."
     },
     "bip39": {
       "name": "BIP39",
       "title": "BIP39 Club",
-      "desc": "The 2048 foundational words of crypto wallets (Mnemonic Seeds)."
+      "desc": "2048 Genesis words, the ultimate boundary of trillion-dollar assets. The native key to the crypto world—do you want to own one?"
     }
   },
   "lookup": {

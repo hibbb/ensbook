@@ -35,6 +35,7 @@ interface TableHeaderProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
+    memoTotal?: number;
   };
   ownershipCounts?: { mine: number; others: number };
   levelCounts?: Record<number, number>;
@@ -69,6 +70,7 @@ export const TableHeader = ({
     availableLengths: [],
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
     memosCount: 0,
+    memoTotal: 0,
   },
   ownershipCounts = { mine: 0, others: 0 },
   levelCounts = {},

@@ -36,8 +36,10 @@ export const processNameRecords = (
       }
     }
 
-    if (filterConfig.onlyWithMemos) {
-      if (!r.memo || r.memo.trim().length === 0) return false;
+    if (filterConfig.memoFilter !== "all") {
+      const hasMemo = !!r.memo && r.memo.trim().length > 0;
+      if (filterConfig.memoFilter === "with_memo" && !hasMemo) return false;
+      if (filterConfig.memoFilter === "no_memo" && hasMemo) return false;
     }
 
     if (
