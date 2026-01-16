@@ -6,7 +6,6 @@ import { IndexHeader } from "./headers/IndexHeader";
 import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
-import { MarketHeader } from "./headers/MarketHeader";
 import { ActionHeader } from "./headers/ActionHeader";
 import { DeleteHeader } from "./headers/DeleteHeader";
 
@@ -136,9 +135,8 @@ export const TableHeader = ({
           />
         </th>
 
-        {/* 🚀 Insert Market Header (Between Owner and Action) */}
         <th>
-          <MarketHeader />
+          <ThWrapper>{t("table.header.market")}</ThWrapper>
         </th>
 
         <th>

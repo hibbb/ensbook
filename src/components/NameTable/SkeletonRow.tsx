@@ -32,15 +32,15 @@ export const SkeletonRow = () => (
 
     {/* 🚀 新增：市场数据列 (右对齐) */}
     <td>
-      <div className="h-14 flex flex-col items-end justify-center gap-1.5 px-2">
-        <div className="h-3 w-12 bg-gray-200 rounded"></div>
-        <div className="h-2 w-8 bg-gray-200 rounded"></div>
+      <div className="h-14 flex items-center justify-start gap-2">
+        <div className="h-5 w-8 bg-gray-200 rounded"></div>
+        <div className="h-5 w-8 bg-gray-200 rounded"></div>
       </div>
     </td>
 
     {/* 操作列 (两个按钮占位) */}
     <td>
-      <div className="h-14 flex items-center justify-center gap-2">
+      <div className="h-14 flex items-center justify-start gap-2">
         <div className="h-5 w-5 bg-gray-200 rounded"></div>
         <div className="h-5 w-5 bg-gray-200 rounded"></div>
       </div>
@@ -48,8 +48,8 @@ export const SkeletonRow = () => (
 
     {/* 外部链接列 (右对齐) */}
     <td>
-      <div className="h-14 flex items-center justify-end">
-        <div className="h-7 w-16 bg-gray-200 rounded-lg"></div>
+      <div className="h-14 flex items-center justify-start">
+        <div className="h-7 w-16 bg-gray-200 rounded"></div>
       </div>
     </td>
 

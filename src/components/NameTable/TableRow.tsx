@@ -75,7 +75,7 @@ export const TableRow = ({
       </td>
 
       {/* 🚀 Insert Market Cell */}
-      <td className="text-right">
+      <td>
         <MarketCell data={marketData} isLoading={isMarketLoading} />
       </td>
 
