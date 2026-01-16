@@ -2,10 +2,13 @@
  * 全局应用常量配置
  */
 
-// 🚀 定义默认时长常量（1年 = 31536000秒）
+// 定义默认时长常量（1年 = 31536000秒）
 export const DEFAULT_DURATION_SECONDS = 365 * 24 * 60 * 60; // 1年
 export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60; // 365 * 24 * 60 * 60
 export const SECONDS_PER_DAY = 24 * 60 * 60;
+
+// UI 分页大小
+export const ITEMS_PER_PAGE = 50;
 
 // ENS 协议相关的常量
 export const MIN_REGISTRATION_DURATION = 28 * 24 * 60 * 60; // 2419200 秒

@@ -17,6 +17,8 @@ import type {
   DeleteCriteria,
 } from "./types";
 
+import { ITEMS_PER_PAGE } from "../../config/constants";
+
 interface NameTableProps {
   records: NameRecord[] | undefined | null;
   isLoading: boolean;
@@ -65,7 +67,7 @@ interface NameTableProps {
 export const NameTable = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 50;
+  const pageSize = ITEMS_PER_PAGE;
   const { t } = useTranslation();
 
   useEffect(() => {
