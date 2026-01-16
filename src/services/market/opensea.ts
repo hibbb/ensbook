@@ -8,14 +8,11 @@ import type { MarketDataMap } from "../../types/marketData";
 const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
 const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
-// ⚡️ 策略调整：
-// 1. 切片设为 5：为了配合 limit=50。
-// 2. 50/5 = 10。平均每个 Token 能获取 10 个订单。
-// 3. 由于不能服务端按价格排序，我们需要获取足够多的订单在前端找最低价。
-const LISTING_CHUNK_SIZE = 5;
-
-// Bids 并发请求数量限制
-const BID_CONCURRENCY_LIMIT = 4;
+// ⚡️ 性能优化：
+// 既然去掉了 order_by，我们可以安全地增加切片大小。
+// 30 个 ID 的 URL 长度约为 2500 字符，通常是安全的。
+// 这样 50 个数据只需要 2 次请求。
+const CHUNK_SIZE = 30;
 
 const getTokenId = (record: NameRecord): string => {
   return record.wrapped
@@ -43,9 +40,13 @@ const headers = {
 };
 
 /**
- * 🔹 1. 获取最低挂单 (Best Ask)
+ * 通用批量获取函数 (Listings 和 Offers)
  */
-async function fetchBestAsks(records: NameRecord[], resultMap: MarketDataMap) {
+async function fetchBatchOrders(
+  records: NameRecord[],
+  side: "listings" | "offers",
+  resultMap: MarketDataMap,
+) {
   const groups: Record<string, NameRecord[]> = {};
   const idToLabel: Record<string, string> = {};
 
@@ -57,126 +58,80 @@ async function fetchBestAsks(records: NameRecord[], resultMap: MarketDataMap) {
     idToLabel[`${contract}:${tokenId}`] = r.label;
   }
 
-  for (const [contract, groupRecords] of Object.entries(groups)) {
-    const chunks = chunkArray(groupRecords, LISTING_CHUNK_SIZE);
+  // 并行处理所有合约组
+  const promises = Object.entries(groups).flatMap(
+    ([contract, groupRecords]) => {
+      const chunks = chunkArray(groupRecords, CHUNK_SIZE);
 
-    // 串行处理切片，防止 429
-    for (const chunk of chunks) {
-      try {
-        const tokenIds = chunk.map((r) => getTokenId(r));
-        const params = new URLSearchParams();
-        params.append("asset_contract_address", contract);
-        tokenIds.forEach((id) => params.append("token_ids", id));
-
-        params.append("limit", "50");
-        // 🚀 核心修复：移除 order_by 和 order_direction
-        // OpenSea 不支持在批量查询时按价格排序
-        // params.append("order_by", "eth_price");
-        // params.append("order_direction", "asc");
-
-        const url = `${OPENSEA_API_BASE}/orders/ethereum/seaport/listings?${params.toString()}`;
-
-        const res = await fetch(url, { headers });
-        if (!res.ok) {
-          // 仅在非 400/404 时警告，避免干扰
-          if (res.status !== 404) {
-            console.warn(`OpenSea listings error: ${res.status}`);
-          }
-          continue;
-        }
-
-        const json = await res.json();
-        const orders = json.orders || [];
-
-        for (const order of orders) {
-          if (order.cancelled || order.finalized || order.is_expired) continue;
-
-          const item = order.maker_asset_bundle?.assets?.[0];
-          if (!item) continue;
-
-          const tokenId = item.token_id;
-          const key = `${contract}:${tokenId}`;
-          const label = idToLabel[key];
-
-          if (!label) continue;
-
-          if (!resultMap[label]) resultMap[label] = {};
-
-          const priceVal = parseFloat(formatEther(BigInt(order.current_price)));
-
-          // 前端比价逻辑：保留最低价
-          const current = resultMap[label].listing;
-          if (!current || priceVal < current.amount) {
-            resultMap[label].listing = {
-              amount: priceVal,
-              currency: "ETH",
-              url: `https://opensea.io/assets/ethereum/${contract}/${tokenId}`,
-            };
-          }
-        }
-      } catch (e) {
-        console.warn("OpenSea listings chunk failed", e);
-      }
-    }
-  }
-}
-
-/**
- * 🔹 2. 获取最高出价 (Best Bid)
- */
-async function fetchBestBids(records: NameRecord[], resultMap: MarketDataMap) {
-  const chunks = chunkArray(records, BID_CONCURRENCY_LIMIT);
-
-  for (const chunk of chunks) {
-    await Promise.all(
-      chunk.map(async (record) => {
+      return chunks.map(async (chunk) => {
         try {
-          const contract = getContract(record);
-          const tokenId = getTokenId(record);
-          const url = `${OPENSEA_API_BASE}/chain/ethereum/contract/${contract}/nfts/${tokenId}`;
+          const tokenIds = chunk.map((r) => getTokenId(r));
+          const params = new URLSearchParams();
+
+          params.append("asset_contract_address", contract);
+          tokenIds.forEach((id) => params.append("token_ids", id));
+          params.append("limit", "50"); // 获取尽可能多的订单
+
+          // ❌ 移除 order_by，防止 400 错误
+          // params.append("order_by", "eth_price");
+
+          const url = `${OPENSEA_API_BASE}/orders/ethereum/seaport/${side}?${params.toString()}`;
 
           const res = await fetch(url, { headers });
-          if (!res.ok) {
-            // 🟡 Debug: 请求失败
-            console.warn(`[Bid Fail] ${record.label}: ${res.status}`);
-            return;
-          }
+          if (!res.ok) return;
 
           const json = await res.json();
-          const bestOffer = json.nft?.best_offer;
+          const orders = json.orders || [];
 
-          // 🟡 Debug: 查看是否有 Offer
-          console.log(
-            `[Bid Check] ${record.label}:`,
-            bestOffer ? "有出价" : "无出价",
-          );
+          for (const order of orders) {
+            if (order.cancelled || order.finalized || order.is_expired)
+              continue;
 
-          if (!bestOffer) return;
+            const item = order.maker_asset_bundle?.assets?.[0];
+            if (!item) continue;
 
-          if (!resultMap[record.label]) resultMap[record.label] = {};
+            const tokenId = item.token_id;
+            const key = `${contract}:${tokenId}`;
+            const label = idToLabel[key];
 
-          const priceVal = parseFloat(
-            formatEther(BigInt(bestOffer.price?.value || "0")),
-          );
+            if (!label) continue;
 
-          if (priceVal > 0) {
-            resultMap[record.label].offer = {
+            if (!resultMap[label]) resultMap[label] = {};
+
+            const priceVal = parseFloat(
+              formatEther(BigInt(order.current_price)),
+            );
+
+            const priceData = {
               amount: priceVal,
-              currency: bestOffer.price?.currency || "WETH",
+              currency: side === "listings" ? "ETH" : "WETH",
               url: `https://opensea.io/assets/ethereum/${contract}/${tokenId}`,
             };
+
+            if (side === "listings") {
+              // 客户端比价：取最低
+              const current = resultMap[label].listing;
+              if (!current || priceVal < current.amount) {
+                resultMap[label].listing = priceData;
+              }
+            } else {
+              // 客户端比价：取最高
+              const current = resultMap[label].offer;
+              if (!current || priceVal > current.amount) {
+                resultMap[label].offer = priceData;
+              }
+            }
           }
         } catch (e) {
-          console.log(e);
+          console.warn(`OpenSea ${side} chunk failed:`, e);
         }
-      }),
-    );
-  }
+      });
+    },
+  );
+
+  await Promise.all(promises);
 }
 
-/**
- * 🔹 对外主入口
- */
 export async function fetchOpenSeaData(
   records: NameRecord[],
 ): Promise<MarketDataMap> {
@@ -184,9 +139,11 @@ export async function fetchOpenSeaData(
 
   const resultMap: MarketDataMap = {};
 
+  // 并行获取 Listings 和 Offers
+  // 现在两者都使用批量接口，速度会非常快
   await Promise.allSettled([
-    fetchBestAsks(records, resultMap),
-    fetchBestBids(records, resultMap),
+    fetchBatchOrders(records, "listings", resultMap),
+    fetchBatchOrders(records, "offers", resultMap),
   ]);
 
   return resultMap;
