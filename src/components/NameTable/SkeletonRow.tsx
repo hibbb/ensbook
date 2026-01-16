@@ -30,6 +30,14 @@ export const SkeletonRow = () => (
       </div>
     </td>
 
+    {/* 🚀 新增：市场数据列 (右对齐) */}
+    <td>
+      <div className="h-14 flex flex-col items-end justify-center gap-1.5 px-2">
+        <div className="h-3 w-12 bg-gray-200 rounded"></div>
+        <div className="h-2 w-8 bg-gray-200 rounded"></div>
+      </div>
+    </td>
+
     {/* 操作列 (两个按钮占位) */}
     <td>
       <div className="h-14 flex items-center justify-center gap-2">

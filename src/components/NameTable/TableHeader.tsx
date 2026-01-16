@@ -6,6 +6,7 @@ import { IndexHeader } from "./headers/IndexHeader";
 import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
+import { MarketHeader } from "./headers/MarketHeader";
 import { ActionHeader } from "./headers/ActionHeader";
 import { DeleteHeader } from "./headers/DeleteHeader";
 
@@ -133,6 +134,11 @@ export const TableHeader = ({
             ownerStats={ownerStats} // 🚀 传递给 OwnerHeader
             disabled={isControlsDisabled}
           />
+        </th>
+
+        {/* 🚀 Insert Market Header (Between Owner and Action) */}
+        <th>
+          <MarketHeader />
         </th>
 
         <th>

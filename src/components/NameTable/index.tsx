@@ -8,6 +8,7 @@ import { SkeletonRow } from "./SkeletonRow";
 import { Pagination } from "../ui/Pagination";
 import { ViewStateReset } from "./ViewStateReset";
 import { usePrimaryNames } from "../../hooks/usePrimaryNames";
+import { useMarketData } from "../../hooks/useMarketData";
 import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 import type {
@@ -96,6 +97,12 @@ export const NameTable = (props: NameTableProps) => {
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
 
+  // 🚀 1. 调用 Market Hook
+  // 传入当前页的数据 (Viewport Driven)
+  const { data: marketDataMap, isLoading: isMarketLoading } = useMarketData(
+    paginatedBasicRecords,
+  );
+
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
   const isDataStale =
@@ -174,11 +181,14 @@ export const NameTable = (props: NameTableProps) => {
                   onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
                   onLevelChange={props.onLevelChange}
+                  // 🚀 2. 传递市场数据
+                  marketData={marketDataMap?.[r.label]}
+                  isMarketLoading={isMarketLoading}
                 />
               ))
             ) : (
               <tr>
-                <td colSpan={7}>
+                <td colSpan={8}>
                   <div className="px-6 py-24 text-center">
                     <div className="text-gray-300 text-4xl mb-3">∅</div>
                     <p className="text-gray-400 text-sm">{t("table.empty")}</p>

@@ -2,16 +2,18 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { NameRecord } from "../../types/ensNames";
+import { Tooltip } from "../ui/Tooltip";
 
+import { IndexCell } from "./cells/IndexCell";
 import { NameCell } from "./cells/NameCell";
 import { StatusCell } from "./cells/StatusCell";
 import { OwnerCell } from "./cells/OwnerCell";
-import { LookupsCell } from "./cells/LookupsCell";
+import { MarketCell } from "./cells/MarketCell"; // 🚀
 import { ActionCell } from "./cells/ActionCell";
-import { Tooltip } from "../ui/Tooltip";
-// 🚀 1. 引入新组件
-import { IndexCell } from "./cells/IndexCell";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { LookupsCell } from "./cells/LookupsCell";
+
+import type { SimpleMarketData } from "../../types/marketData"; // 🚀
 
 interface TableRowProps {
   record: NameRecord;
@@ -26,8 +28,10 @@ interface TableRowProps {
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
   isPending?: boolean;
-  // 🚀 2. 新增回调定义
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
+  // 🚀 新增 Props
+  marketData?: SimpleMarketData;
+  isMarketLoading?: boolean;
 }
 
 export const TableRow = ({
@@ -43,7 +47,9 @@ export const TableRow = ({
   onRenew,
   onReminder,
   isPending = false,
-  onLevelChange, // 🚀 解构
+  onLevelChange,
+  marketData,
+  isMarketLoading = false,
 }: TableRowProps) => {
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
@@ -66,6 +72,11 @@ export const TableRow = ({
 
       <td>
         <OwnerCell record={record} />
+      </td>
+
+      {/* 🚀 Insert Market Cell */}
+      <td className="text-right">
+        <MarketCell data={marketData} isLoading={isMarketLoading} />
       </td>
 
       <td className="text-right">

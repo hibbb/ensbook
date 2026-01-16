@@ -166,6 +166,7 @@
       "name": "域名",
       "status": "状态",
       "owner": "所有者",
+      "market": "市场",
       "action": "操作",
       "info": "信息"
     },
@@ -249,6 +250,14 @@
       "delete_item": "删除 {{label}}.eth",
       "cannot_delete": "不可删除"
     }
+  },
+  "market": {
+    "bid": "Bid",
+    "last_sale": "上次成交",
+    "listed": "挂单",
+    "no_listing": "暂无挂单",
+    "ago": "前",
+    "view_on_opensea": "前往 OpenSea 查看"
   },
   "transaction": {
     "title": {
