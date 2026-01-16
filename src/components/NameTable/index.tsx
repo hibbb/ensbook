@@ -1,6 +1,6 @@
 // src/components/NameTable/index.tsx
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
@@ -65,7 +65,7 @@ interface NameTableProps {
   ownerStats?: { total: number; displayed: number };
 }
 
-export const NameTable = (props: NameTableProps) => {
+const NameTableComponent = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = ITEMS_PER_PAGE;
@@ -219,3 +219,6 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
+
+// 使用 React.memo 导出，只有当 props 发生浅比较变化时，才会重新渲染
+export const NameTable = React.memo(NameTableComponent);
