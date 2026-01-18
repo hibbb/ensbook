@@ -39,6 +39,7 @@ export function useEnsRenewal() {
 
   const renewSingle = useCallback(
     async (rawLabel: string, duration: bigint) => {
+      // ... (单域名续费逻辑保持不变) ...
       if (!publicClient || !address) {
         toast.error(t("common.connect_wallet"));
         return;
@@ -91,14 +92,21 @@ export function useEnsRenewal() {
     [publicClient, address, writeEthController, t],
   );
 
+  // 🚀 修改：参数 duration 类型改为 bigint[]
   const renewBatch = useCallback(
-    async (rawLabels: string[], duration: bigint) => {
+    async (rawLabels: string[], durations: bigint[]) => {
       if (!publicClient || !address) {
         toast.error(t("common.connect_wallet"));
         return;
       }
       if (rawLabels.length === 0) {
         toast.error(t("transaction.toast.select_one"));
+        return;
+      }
+      // 🚀 新增：安全检查
+      if (rawLabels.length !== durations.length) {
+        console.error("Labels and durations length mismatch");
+        toast.error(t("transaction.toast.unknown_error"));
         return;
       }
 
@@ -108,18 +116,19 @@ export function useEnsRenewal() {
       try {
         const labels = rawLabels.map((l) => normalize(l).replace(/\.eth$/, ""));
 
+        // 🚀 直接使用传入的 durations 数组
         const totalPrice = (await publicClient.readContract({
           address: contractAddress,
           abi: bulkRenewalAbi,
           functionName: "rentPrice",
-          args: [labels, duration],
+          args: [labels, durations],
         })) as bigint;
 
         const valueWithBuffer = (totalPrice * 110n) / 100n;
 
         const hash = await writeBulkRenewal({
           functionName: "renewAll",
-          args: [labels, duration],
+          args: [labels, durations, REFERRER_ADDRESS_HASH],
           value: valueWithBuffer,
         });
 

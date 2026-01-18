@@ -111,16 +111,20 @@ export const useEnsActions = () => {
     resetReg();
   }, [resetRenewal, resetReg]);
 
+  // 🚀 核心修改：接收数组参数
   const onDurationConfirm = useCallback(
-    (duration: bigint) => {
+    (durations: bigint[]) => {
       if (!durationTarget) return;
 
       if (durationTarget.type === "register" && durationTarget.record) {
-        startRegistration(durationTarget.record.label, duration);
+        // 注册只支持单个，取第一个时长
+        startRegistration(durationTarget.record.label, durations[0]);
       } else if (durationTarget.type === "renew" && durationTarget.record) {
-        renewSingle(durationTarget.record.label, duration);
+        // 单个续费，取第一个时长
+        renewSingle(durationTarget.record.label, durations[0]);
       } else if (durationTarget.type === "batch" && durationTarget.labels) {
-        renewBatch(durationTarget.labels, duration);
+        // 批量续费，直接传递数组 (useEnsRenewal 已更新为接收数组)
+        renewBatch(durationTarget.labels, durations);
       }
     },
     [durationTarget, startRegistration, renewSingle, renewBatch],
@@ -136,6 +140,15 @@ export const useEnsActions = () => {
       });
     return t("transaction.title.renew");
   }, [durationTarget, t]);
+
+  // 🚀 新增：计算当前操作的项目数量
+  const getItemCount = useCallback(() => {
+    if (!durationTarget) return 1;
+    if (durationTarget.type === "batch" && durationTarget.labels) {
+      return durationTarget.labels.length;
+    }
+    return 1;
+  }, [durationTarget]);
 
   // --- 7. 导出 ---
   return {
@@ -157,6 +170,8 @@ export const useEnsActions = () => {
       title: getModalTitle(),
       currentExpiry: durationTarget?.record?.expiryTime,
       reminderTarget,
+      // 🚀 传递数量给 UI
+      itemCount: getItemCount(),
     },
 
     // 操作方法

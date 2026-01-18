@@ -14,10 +14,13 @@ interface ActionModalsProps {
     title: string;
     currentExpiry?: number;
     reminderTarget: NameRecord | null;
+    // 🚀 新增：接收数量
+    itemCount: number;
   };
   actions: {
     onCloseModal: () => void;
-    onConfirmDuration: (duration: bigint) => void;
+    // 🚀 修改：回调接收数组
+    onConfirmDuration: (durations: bigint[]) => void;
     setReminderTarget: (record: NameRecord | null) => void;
   };
 }
@@ -35,6 +38,8 @@ export const ActionModals = ({ modalState, actions }: ActionModalsProps) => {
         currentExpiry={modalState.currentExpiry}
         onClose={actions.onCloseModal}
         onConfirm={actions.onConfirmDuration}
+        // 🚀 传递数量
+        itemCount={modalState.itemCount}
       />
 
       <ReminderModal

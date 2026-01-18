@@ -36,9 +36,12 @@ interface ProcessModalProps {
   txHash?: string | null;
   secondsLeft?: number;
   onClose: () => void;
-  onConfirm: (duration: bigint) => void;
+  // 🚀 修改：回调接收数组
+  onConfirm: (durations: bigint[]) => void;
   title: string;
   currentExpiry?: number;
+  // 🚀 新增：接收数量
+  itemCount?: number;
 }
 
 export const ProcessModal = ({
@@ -51,6 +54,8 @@ export const ProcessModal = ({
   onConfirm,
   title,
   currentExpiry,
+  // 🚀 默认为 1
+  itemCount = 1,
 }: ProcessModalProps) => {
   const { t } = useTranslation();
 
@@ -130,7 +135,10 @@ export const ProcessModal = ({
 
   const handleConfirm = () => {
     if (!validationError) {
-      onConfirm(calculatedDuration);
+      // 🚀 核心修改：作为适配器，将单一时长转换为数组
+      // 目前 UI 只有一个统一时长选择器，所以生成一个填充了相同值的数组
+      const durations = new Array(itemCount).fill(calculatedDuration);
+      onConfirm(durations);
     }
   };
 
