@@ -88,7 +88,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
       <Tooltip content={hasMemo ? memo : t("memo.tooltip.add")}>
         <PopoverTrigger asChild>
           <button
-            className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 outline-none ml-1
+            className={`flex items-center justify-center rounded-md transition-all duration-200 outline-none ml-1
               ${
                 isOpen
                   ? "bg-blue-100 text-link"
