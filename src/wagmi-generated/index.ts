@@ -9,40 +9,41 @@ import {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const bulkRenewalAbi = [
   {
     type: "function",
     inputs: [
-      { name: "names", internalType: "string[]", type: "string[]" },
-      { name: "duration", internalType: "uint256", type: "uint256" },
-    ],
-    name: "rentPrice",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "names", internalType: "string[]", type: "string[]" },
-      { name: "duration", internalType: "uint256", type: "uint256" },
+      { name: "labels", internalType: "string[]", type: "string[]" },
+      { name: "durations", internalType: "uint256[]", type: "uint256[]" },
+      { name: "referrer", internalType: "bytes32", type: "bytes32" },
     ],
     name: "renewAll",
     outputs: [],
     stateMutability: "payable",
   },
+  {
+    type: "function",
+    inputs: [
+      { name: "labels", internalType: "string[]", type: "string[]" },
+      { name: "durations", internalType: "uint256[]", type: "uint256[]" },
+    ],
+    name: "rentPrice",
+    outputs: [{ name: "total", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
 ] as const;
 
 /**
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const bulkRenewalAddress = {
-  1: "0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035",
+  1: "0x0735086b17D590c19907E88B6915ecDf47Fe8D88",
 } as const;
 
 /**
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const bulkRenewalConfig = {
   address: bulkRenewalAddress,
@@ -247,7 +248,7 @@ export const ethRegistrarConfig = {
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link bulkRenewalAbi}__
  *
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const useReadBulkRenewal = /*#__PURE__*/ createUseReadContract({
   abi: bulkRenewalAbi,
@@ -257,7 +258,7 @@ export const useReadBulkRenewal = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link bulkRenewalAbi}__ and `functionName` set to `"rentPrice"`
  *
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const useReadBulkRenewalRentPrice = /*#__PURE__*/ createUseReadContract({
   abi: bulkRenewalAbi,
@@ -268,7 +269,7 @@ export const useReadBulkRenewalRentPrice = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link bulkRenewalAbi}__
  *
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const useWriteBulkRenewal = /*#__PURE__*/ createUseWriteContract({
   abi: bulkRenewalAbi,
@@ -278,7 +279,7 @@ export const useWriteBulkRenewal = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link bulkRenewalAbi}__ and `functionName` set to `"renewAll"`
  *
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const useWriteBulkRenewalRenewAll = /*#__PURE__*/ createUseWriteContract(
   {
@@ -291,7 +292,7 @@ export const useWriteBulkRenewalRenewAll = /*#__PURE__*/ createUseWriteContract(
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link bulkRenewalAbi}__
  *
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const useSimulateBulkRenewal = /*#__PURE__*/ createUseSimulateContract({
   abi: bulkRenewalAbi,
@@ -301,7 +302,7 @@ export const useSimulateBulkRenewal = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link bulkRenewalAbi}__ and `functionName` set to `"renewAll"`
  *
- * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xfF252725f6122A92551A5FA9a6b6bf10eb0Be035)
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
  */
 export const useSimulateBulkRenewalRenewAll =
   /*#__PURE__*/ createUseSimulateContract({
