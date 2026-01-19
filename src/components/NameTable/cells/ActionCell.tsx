@@ -81,7 +81,7 @@ export const ActionCell = ({
         action: () => onRenew?.(record),
         sideIcon: faBell,
         sideIconClass:
-          "text-gray-300 hover:text-link transition-colors cursor-pointer",
+          "text-amber-300 hover:text-amber-600 transition-colors cursor-pointer",
         sideTooltip: t("table.cell.set_reminder"),
         sideAction: () => onReminder?.(record),
       };

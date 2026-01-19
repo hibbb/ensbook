@@ -1,7 +1,7 @@
 // src/components/NameTable/TableRow.tsx
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import type { NameRecord } from "../../types/ensNames";
 
 import { NameCell } from "./cells/NameCell";
@@ -97,7 +97,7 @@ export const TableRow = ({
               transition-all duration-200
               ${
                 canDelete
-                  ? "text-gray-300 hover:text-link active:scale-95"
+                  ? "text-red-300 hover:text-red-600 active:scale-95"
                   : "text-gray-200 cursor-not-allowed"
               }
             `}
