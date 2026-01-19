@@ -319,13 +319,16 @@
     },
     "mode": {
       "duration": "Duration",
-      "until": "Until Date"
+      "until": "Until Date",
+      "until_desc_batch": "All selected names will be aligned to expire on this date.",
+      "partial_skip": "Note: Target date is earlier than {{count}} names' expiry, these {{count}} names will not be renewed."
     },
     "error": {
       "min_duration": "Registration must be at least 28 days",
       "invalid_date": "Invalid date",
       "past_date": "Date must be in the future",
-      "before_expiry": "Date must be after current expiry"
+      "before_expiry": "Date must be after current expiry",
+      "all_filtered": "All selected names expire after the target date and do not need renewal."
     }
   },
   "memo": {
