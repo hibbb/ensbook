@@ -1,93 +1,64 @@
-# Changelog
+## [3.1.0] - 2026-01-19
 
-## [3.0.2] - 2026-01-09
+### 🚀 Features
 
-### 🌍 国际化支持 (i18n)
+- 增加 Account 页面，用于显示账户持仓信息
+- 为注册和续费增加日期选择模式
+- 在 设置>数据管理 增加一键清空自定义数据功能
+- 为 Account 页面增加一个返回按钮
+- _(filter)_ 实现按所有者进行筛选
+- _(bulkRenewal)_ 更新批量续费的函数调用逻辑，支持新的 Advanced Bulk Renew 合约
+- _(bulkRenewal)_ 增加“按日期”批量续费，支持将多个域名续费至相同的过期时间
 
-- **双语支持**：集成 `i18next`，支持 **English** 和 **简体中文** 的实时切换。
-- **全覆盖**：完成了导航栏、设置、核心表格、模态框、Toast 提示和错误信息的文本提取与翻译。
-- **持久化**：语言偏好保存至本地存储，下次访问自动加载。
-- **动态内容**：适配了动态变量（如倒计时、数量）和复数形式的翻译逻辑。
+### 🐛 Bug Fixes
 
-### ♻️ 架构与数据
+- 补充更新 cells 中各文件中的 i18n 引用键值
+- 修复集合名称显示问题
+- 修正作者 X 链接地址
+- 修复一个未及时更新的文本引用
+- 规范化两处说明文字
+- 解决 React Router 刷新 404 问题 & 生产环境屏蔽 Source Maps
+- 修复 Home 和 Mine 页面清空时，视图状态未清理的情况
+- 更新一处语言包调用
 
-- **全局元数据**：重构底层存储架构，从“分层存储”转变为 **“元数据池 (Metadata Pool) + 引用列表 (Reference List)”** 模式。
-- **数据一致性**：解决了 Home 和 Collection 视图之间备注 (Memo) 和等级 (Level) 数据不一致的问题。
-- **内存缓存**：在 `userStore` 中引入内存缓存机制。高频读取操作（如 `fetchNameRecords`）不再每次触发 `JSON.parse`，将时间复杂度降至 O(1)。
-- **跨标签页同步**：利用 `storage` 事件实现跨标签页数据同步，确保多窗口操作时的实时一致性。
+### 💼 Other
 
-### ⚡️ 界面与体验优化
+- 更新版本号，v3.0.3: 正式测试版本
+- Eb 重构基本完成，v3.0.6，将启动增量开发
 
-- **智能表格交互**：
-  - 当表格数据 ≤ 1 行时，自动禁用排序和筛选控件。
-  - 优化“仅显示备注”筛选按钮逻辑：无备注或全备注时自动禁用，并提供上下文相关的 Tooltip。
-- **备注增强**：
-  - 强制限制输入 **200字符**，并添加实时字数统计。
-  - 在存储层增加 `QuotaExceededError` 处理，防止 LocalStorage 爆仓导致崩溃。
-- **视觉反馈**：
-  - 优化 `IndexCell` (序号列) 的点击/双击交互样式。
-  - 统一全站图标使用 (`free-solid` vs `free-regular`)。
+### 🚜 Refactor
 
-### 🐛 问题修复
+- _(pages)_ 整理页面代码并提取公用代码
+- 移除对测试网的支持
+- 重构视图状态清空逻辑，在 useNameTableView 中引入“事件监听机制”
+- 简化“仅显示我的”按钮显示和提示逻辑
+- _(stats)_ 清理多余的数据统计结构
+- 优先显示表格中的 ens 主名称，延迟显示筛选框中的
+- 将“仅显示有备注的”按钮转移到 Nameheader 的筛选框中
+- 更新批量续费合约地址和 ABI
+- 对 ProcessModal 进行重构，避免单文件代码过于复杂
+- 调整优化注册和续费时 Modal 内容的显示逻辑
 
-- **类型安全**：修复 `ProcessModal` 中 `BigInt` 与 `number` 进行乘法运算的 TypeScript 类型错误。
-- **逻辑修正**：
-  - 修复 `NameHeader` 中备注数量计算错误的逻辑漏洞（忽略了空内容）。
-  - 修复在 `CollectionDetail` 修改备注会隐式将域名添加到 Home 关注列表的逻辑错误。
-- **显示修复**：
-  - 修复语言文件中 HTML 标签导致页面显示源码乱码的问题，回退至纯文本实现。
-  - 补全了遗漏的静态表头（如 "Info" 列）和 404 页面的翻译。
+### 📚 Documentation
 
-### 🗑️ 代码清理
+- 更新语言包，使用“域名”代替“名称”
 
-- **移除死代码**：删除了废弃文件 (`labels.ts`, `memos.ts`) 和未使用的函数 (`fetchLabelsFromLinkOwners`)。
-- **API 统一**：移除了组件中冗余的 `context` 属性传递，统一通过全局 `userStore` 方法进行数据操作。
+### 🎨 Styling
 
-## [3.0.1] - 2026-01-07
+- 优化颜色标记的相关称呼
+- 改善 Account 页面显示内容和样式，增加持仓总数
+- 调整个别样式，对移动端更友好
+- _(filter)_ 统一筛选操作样式，修复显示异常
+- 调整备注图标空间
+- 防过期和删除按钮颜色个性化
+- 调整表格显示样式
 
-### ✨ "自由飞翔" 功能增强 (Fly Freely Features)
+### ⚙️ Miscellaneous Tasks
 
-- **Mine 页面常驻**: 移除动态显示逻辑，Mine 页面现在作为导航栏的永久入口，提供更好的功能发现性。
-- **自定义首页**: 新增“设为默认首页”功能。用户可以在设置中开启此项，使 ENSBook 启动时默认进入 Mine 页面。
-- **智能重定向**: 引入根路径分发机制，根据用户偏好自动导向 `/home` 或 `/mine`。
-
-### ⚡ 搜索逻辑简化 (Search Logic Refactor)
-
-- **重构为 Version 2**:
-  - 自动识别 `0x` 开头的以太坊地址，无需前缀。
-  - 保留 `@` 前缀用于查找域名持有者持有的所有域名。
-  - 移除了复杂的 `#` 关联搜索逻辑 (`linkOwners`)，提升解析效率。
-- **Hook 同步**: 更新 `useEnsLabels` 以支持 `ethAddresses` 的长度检查，确保搜索触发准确。
-
-### 🎨 UI/UX 优化
-
-- **开关组件重构**: 修复了“设为默认首页”开关在部分浏览器下的错位问题，采用了更稳定的 CSS Peer 方案。
-- **说明文档扁平化**: 重新设计了设置页的引导说明，去除冗余卡片背景，风格更加简洁、现代。
-
-### 🛡️ 健壮性与一致性 (Data Integrity)
-
-- **级联清理**: 当用户清空“我的集合”源字符串时，系统现在会自动重置 Mine 页面的视图状态（筛选与排序），消除隐形状态干扰。
-- **类型修复**: 解决了 `useNameRecords` 在解析期间可能出现的 `undefined` 类型不匹配问题。
-
-## [3.0.0] - 2026-01-05
-
-### ✨ Added
-
-- **Smart View State**: Introduced `isViewStateDirty` and `resetViewState` logic to track and clear table filters/sorting.
-- **ViewStateReset UI**: Added a floating "Reset View" button that intelligently avoids overlap with the batch action bar.
-- **Metadata Injection**: Project name, version, and author links are now synced directly from `package.json` to the UI and browser title.
-- **Dynamic Titles**: Browser tab titles now update dynamically based on the current page or collection name (e.g., "ENSBook - BIP39 Club").
-
-### ⚡ Improved
-
-- **UX Guardrails**: The Home page now automatically resets all filters when the list becomes empty (via manual delete or bulk clear) to prevent "hidden filter" confusion.
-- **Data Architecture**: Separated view states between Home and Collection detail pages for better context isolation.
-
-### 🐛 Fixed
-
-- **TypeScript Strictness**: Resolved TS2322 error in `CollectionDetail.tsx` regarding optional data length checks.
-- **Wagmi Config**: Centralized `appName` source of truth using the injected `__APP_NAME__` constant.
-
-### 📝 Documentation
-
-- **README Update**: Fully revamped the README with the new "Local-First" positioning and feature highlights.
+- 更新 README.md 并增加 README.zh.md
+- 创建 truncateAddress 函数，替换 4 处类似的硬编码逻辑
+- 提取 formatDate 和 displayNumber 到 format.ts 供全局引用
+- 规范几个名称和样式
+- 优化个别文本的语义
+- 整理 VITE_ENS_REFERRER_HASH
+- _(release)_ Merge dev into main
