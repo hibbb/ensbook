@@ -13,6 +13,7 @@ import {
   faWallet,
   faClock,
   faCalendarDay,
+  faTriangleExclamation, // 🚀 新增图标
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { BaseModal } from "./ui/BaseModal";
@@ -36,12 +37,11 @@ interface ProcessModalProps {
   txHash?: string | null;
   secondsLeft?: number;
   onClose: () => void;
-  // 🚀 修改：回调接收数组
   onConfirm: (durations: bigint[]) => void;
   title: string;
   currentExpiry?: number;
-  // 🚀 新增：接收数量
   itemCount?: number;
+  expiryTimes?: number[];
 }
 
 export const ProcessModal = ({
@@ -54,8 +54,8 @@ export const ProcessModal = ({
   onConfirm,
   title,
   currentExpiry,
-  // 🚀 默认为 1
   itemCount = 1,
+  expiryTimes = [],
 }: ProcessModalProps) => {
   const { t } = useTranslation();
 
@@ -64,59 +64,112 @@ export const ProcessModal = ({
   const [days, setDays] = useState(0);
   const [targetDate, setTargetDate] = useState("");
 
+  // 计算基准时间 (用于 UI 限制最小可选日期)
+  // 保持不变：最小可选日期依然基于“最早过期的域名”，允许用户向下对齐
   const getBaseTime = useCallback(() => {
-    if (type === "renew" && currentExpiry) {
-      return currentExpiry;
+    if (type === "renew" || type === "batch") {
+      if (expiryTimes.length > 0) {
+        return Math.min(...expiryTimes);
+      }
+      return currentExpiry || Math.floor(Date.now() / 1000);
     }
     return Math.floor(Date.now() / 1000);
-  }, [type, currentExpiry]);
+  }, [type, currentExpiry, expiryTimes]);
 
+  // 🚀 核心修改：计算默认目标日期
   useEffect(() => {
     if (isOpen) {
       setMode("duration");
       setYears(1);
       setDays(0);
 
-      const baseTime = getBaseTime();
+      let baseTimestampForDefault = Math.floor(Date.now() / 1000);
+
+      // 如果是批量续费，我们希望默认对齐到“最晚过期时间 + 1年”
+      // 这样能保证所有选中的域名都至少续费 1 年
+      if (type === "batch" && expiryTimes.length > 0) {
+        baseTimestampForDefault = Math.max(...expiryTimes);
+      } else if (type === "renew" && currentExpiry) {
+        baseTimestampForDefault = currentExpiry;
+      }
+
       const defaultTarget = new Date(
-        (baseTime + Number(SECONDS_PER_YEAR)) * 1000,
+        (baseTimestampForDefault + Number(SECONDS_PER_YEAR)) * 1000,
       );
       setTargetDate(formatDateInput(defaultTarget));
     }
-  }, [isOpen, getBaseTime]);
+  }, [isOpen, type, expiryTimes, currentExpiry]); // 移除 getBaseTime 依赖，逻辑独立
 
-  const calculatedDuration = useMemo(() => {
-    if (mode === "duration") {
-      return (
-        BigInt(years) * BigInt(SECONDS_PER_YEAR) +
-        BigInt(days) * BigInt(SECONDS_PER_DAY)
-      );
-    } else {
-      if (!targetDate) return 0n;
-      const targetTs = Math.floor(new Date(targetDate).getTime() / 1000);
-      const baseTs = getBaseTime();
-      const diff = targetTs - baseTs;
-      return diff > 0 ? BigInt(diff) : 0n;
+  // 🚀 新增：计算最小可选日期 (UI限制)
+  const minDateValue = useMemo(() => {
+    const now = new Date();
+    const todayStr = formatDateInput(now);
+
+    if (type === "register") {
+      return todayStr;
     }
-  }, [mode, years, days, targetDate, getBaseTime]);
+
+    // 对于续费，允许选到最早过期时间（向下对齐）
+    const minExpiry = getBaseTime();
+    const minDate = new Date(minExpiry * 1000);
+
+    return minDate > now ? formatDateInput(minDate) : todayStr;
+  }, [type, getBaseTime]);
+
+  const calculatedDurations = useMemo<bigint[]>(() => {
+    if (mode === "duration") {
+      const duration =
+        BigInt(years) * BigInt(SECONDS_PER_YEAR) +
+        BigInt(days) * BigInt(SECONDS_PER_DAY);
+      return new Array(itemCount).fill(duration);
+    } else {
+      if (!targetDate) return new Array(itemCount).fill(0n);
+
+      const targetTs = Math.floor(new Date(targetDate).getTime() / 1000);
+
+      if (type === "register") {
+        const now = Math.floor(Date.now() / 1000);
+        const diff = targetTs - now;
+        const duration = diff > 0 ? BigInt(diff) : 0n;
+        return new Array(itemCount).fill(duration);
+      }
+
+      if (expiryTimes.length > 0) {
+        return expiryTimes.map((exp) => {
+          const diff = targetTs - exp;
+          return diff > 0 ? BigInt(diff) : 0n;
+        });
+      }
+
+      return new Array(itemCount).fill(0n);
+    }
+  }, [mode, years, days, targetDate, itemCount, type, expiryTimes]);
+
+  // 🚀 新增：计算被跳过的域名数量
+  const skippedCount = useMemo(() => {
+    if (mode !== "until" || type !== "batch") return 0;
+    // 统计 duration 为 0 的数量
+    return calculatedDurations.filter((d) => d <= 0n).length;
+  }, [calculatedDurations, mode, type]);
 
   const validationError = useMemo(() => {
-    const seconds = Number(calculatedDuration);
+    const isAllInvalid = calculatedDurations.every((d) => d <= 0n);
 
-    if (seconds <= 0) {
-      // 🚀 修复引用: transaction.error.*
-      return type === "renew"
+    if (isAllInvalid) {
+      return type === "renew" || type === "batch"
         ? t("transaction.error.before_expiry")
         : t("transaction.error.past_date");
     }
 
-    if (type === "register" && seconds < MIN_REGISTRATION_DURATION) {
-      // 🚀 修复引用: transaction.error.min_duration
-      return t("transaction.error.min_duration");
+    if (type === "register") {
+      const minDuration = BigInt(MIN_REGISTRATION_DURATION);
+      if (calculatedDurations[0] < minDuration) {
+        return t("transaction.error.min_duration");
+      }
     }
 
     return null;
-  }, [calculatedDuration, type, t]);
+  }, [calculatedDurations, type, t]);
 
   const isIdle = status === "idle";
   const isSuccess = status === "success";
@@ -125,7 +178,7 @@ export const ProcessModal = ({
   const isWaitingWallet =
     status === "loading" || status === "registering" || status === "committing";
 
-  const showModeSwitch = type !== "batch";
+  const showModeSwitch = true;
 
   const handleSafeClose = () => {
     if (isIdle) {
@@ -135,10 +188,7 @@ export const ProcessModal = ({
 
   const handleConfirm = () => {
     if (!validationError) {
-      // 🚀 核心修改：作为适配器，将单一时长转换为数组
-      // 目前 UI 只有一个统一时长选择器，所以生成一个填充了相同值的数组
-      const durations = new Array(itemCount).fill(calculatedDuration);
-      onConfirm(durations);
+      onConfirm(calculatedDurations);
     }
   };
 
@@ -155,7 +205,6 @@ export const ProcessModal = ({
             }`}
           >
             <FontAwesomeIcon icon={faClock} />
-            {/* 🚀 修复引用: transaction.mode.duration */}
             {t("transaction.mode.duration")}
           </button>
           <button
@@ -167,7 +216,6 @@ export const ProcessModal = ({
             }`}
           >
             <FontAwesomeIcon icon={faCalendarDay} />
-            {/* 🚀 修复引用: transaction.mode.until */}
             {t("transaction.mode.until")}
           </button>
         </div>
@@ -176,7 +224,7 @@ export const ProcessModal = ({
       <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
         {mode === "duration" ? (
           <div className="flex items-center gap-4">
-            {/* 年份 */}
+            {/* ... (Duration 模式 UI 保持不变) ... */}
             <div className="flex-1 flex flex-col items-center gap-2">
               <div className="flex items-center gap-2 w-full justify-center">
                 <button
@@ -185,8 +233,6 @@ export const ProcessModal = ({
                 >
                   <FontAwesomeIcon icon={faMinus} size="xs" />
                 </button>
-
-                {/* 🚀 修复样式: 显式颜色，去除背景，居中 */}
                 <div className="flex-1 relative min-w-[60px]">
                   <input
                     type="number"
@@ -198,11 +244,9 @@ export const ProcessModal = ({
                     className="w-full text-center text-2xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
                   />
                   <span className="block text-center text-xs text-gray-400 font-qs-medium mt-1">
-                    {/* 🚀 修复引用: common.year */}
                     {t("common.year")}
                   </span>
                 </div>
-
                 <button
                   onClick={() => setYears(years + 1)}
                   className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-link hover:text-white transition-colors"
@@ -211,10 +255,7 @@ export const ProcessModal = ({
                 </button>
               </div>
             </div>
-
             <div className="w-px h-12 bg-gray-100"></div>
-
-            {/* 天数 */}
             <div className="flex-1 flex flex-col items-center gap-2">
               <div className="flex items-center gap-2 w-full justify-center">
                 <button
@@ -223,8 +264,6 @@ export const ProcessModal = ({
                 >
                   <FontAwesomeIcon icon={faMinus} size="xs" />
                 </button>
-
-                {/* 🚀 修复样式 */}
                 <div className="flex-1 relative min-w-[60px]">
                   <input
                     type="number"
@@ -236,11 +275,9 @@ export const ProcessModal = ({
                     className="w-full text-center text-2xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
                   />
                   <span className="block text-center text-xs text-gray-400 font-qs-medium mt-1">
-                    {/* 🚀 修复引用: common.day */}
                     {t("common.day")}
                   </span>
                 </div>
-
                 <button
                   onClick={() => setDays(days + 1)}
                   className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-link hover:text-white transition-colors"
@@ -253,16 +290,33 @@ export const ProcessModal = ({
         ) : (
           <div className="flex flex-col gap-2">
             <label className="text-xs font-qs-bold text-gray-400 uppercase tracking-wider">
-              {/* 🚀 修复引用: transaction.mode.until */}
               {t("transaction.mode.until")}
             </label>
             <input
               type="date"
               value={targetDate}
-              min={formatDateInput(new Date())}
+              min={minDateValue}
               onChange={(e) => setTargetDate(e.target.value)}
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg font-qs-medium text-text-main outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
             />
+            {type === "batch" && (
+              <p className="text-xs text-gray-400 mt-1">
+                {t("transaction.mode.until_desc_batch")}
+              </p>
+            )}
+
+            {/* 🚀 显式提示：如果有域名被跳过 */}
+            {skippedCount > 0 && (
+              <div className="flex items-start gap-2 mt-2 p-2 bg-orange-50 border border-orange-100 rounded-md text-orange-600 text-xs font-qs-medium animate-in fade-in slide-in-from-top-1">
+                <FontAwesomeIcon
+                  icon={faTriangleExclamation}
+                  className="mt-0.5"
+                />
+                <span>
+                  {t("transaction.mode.partial_skip", { count: skippedCount })}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -279,7 +333,6 @@ export const ProcessModal = ({
           onClick={onClose}
           className="flex-1 py-3 rounded-lg font-qs-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
         >
-          {/* 🚀 修复引用: common.cancel */}
           {t("common.cancel")}
         </button>
         <button
@@ -292,7 +345,6 @@ export const ProcessModal = ({
                 : "bg-link hover:bg-link-hover shadow-link/20"
             }`}
         >
-          {/* 🚀 修复引用: transaction.btn.* */}
           {type === "register"
             ? t("transaction.btn.start_register")
             : t("transaction.btn.confirm_renew")}
@@ -302,12 +354,10 @@ export const ProcessModal = ({
   );
 
   const renderProcessing = () => {
-    // 🚀 修复引用: transaction.status.*
     let message = t("transaction.status.processing");
     let subMessage = t("transaction.status.confirm_wallet");
     let showTimer = false;
 
-    // 🚀 修复引用: transaction.step.*
     if (status === "committing") {
       message = t("transaction.step.commit_title");
       subMessage = t("transaction.step.commit_desc");
@@ -381,7 +431,6 @@ export const ProcessModal = ({
         <FontAwesomeIcon icon={faCheckCircle} />
       </div>
       <h3 className="text-xl font-qs-semibold text-text-main mb-2">
-        {/* 🚀 修复引用: transaction.result.* */}
         {type === "register"
           ? t("transaction.result.success_register")
           : t("transaction.result.success_renew")}
@@ -393,12 +442,12 @@ export const ProcessModal = ({
         onClick={onClose}
         className="w-full py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
       >
-        {/* 🚀 修复引用: common.finish */}
         {t("common.finish")}
       </button>
     </div>
   );
 
+  // ... (return JSX 保持不变) ...
   return (
     <BaseModal
       isOpen={isOpen}
@@ -410,7 +459,6 @@ export const ProcessModal = ({
             <FontAwesomeIcon icon={faCalendarAlt} className="text-link" />
           )}
           <span>
-            {/* 🚀 修复引用: transaction.title.* */}
             {isProcessing
               ? t("transaction.title.processing")
               : isSuccess
@@ -440,7 +488,6 @@ export const ProcessModal = ({
               onClick={onClose}
               className="text-link text-sm font-qs-semibold hover:underline"
             >
-              {/* 🚀 修复引用: common.retry */}
               {t("common.retry")}
             </button>
           </div>

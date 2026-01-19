@@ -7,19 +7,19 @@ import type { NameRecord } from "../types/ensNames";
 interface ActionModalsProps {
   modalState: {
     isOpen: boolean;
-    type: string; // ProcessType 的字符串形式
+    type: string;
     status: string;
     txHash?: string | null;
     secondsLeft: number;
     title: string;
     currentExpiry?: number;
     reminderTarget: NameRecord | null;
-    // 🚀 新增：接收数量
     itemCount: number;
+    // 🚀 新增
+    expiryTimes: number[];
   };
   actions: {
     onCloseModal: () => void;
-    // 🚀 修改：回调接收数组
     onConfirmDuration: (durations: bigint[]) => void;
     setReminderTarget: (record: NameRecord | null) => void;
   };
@@ -38,8 +38,9 @@ export const ActionModals = ({ modalState, actions }: ActionModalsProps) => {
         currentExpiry={modalState.currentExpiry}
         onClose={actions.onCloseModal}
         onConfirm={actions.onConfirmDuration}
-        // 🚀 传递数量
         itemCount={modalState.itemCount}
+        // 🚀 传递
+        expiryTimes={modalState.expiryTimes}
       />
 
       <ReminderModal

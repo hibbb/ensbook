@@ -111,7 +111,7 @@ export const CollectionDetail = () => {
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)}
+        onBatchRenew={() => actions.onBatchRenew(selectedLabels, records || [])}
         onClearSelection={clearSelection}
       />
 
