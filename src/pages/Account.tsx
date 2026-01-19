@@ -1,7 +1,6 @@
 // src/pages/Account.tsx
 
 import { useState, useMemo } from "react";
-// 🚀 1. 引入路由钩子
 import { useParams, useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +9,7 @@ import {
   faWallet,
   faUserTag,
   faWarehouse,
-  faArrowLeft, // 🚀 2. 引入返回图标
+  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { faCopy, faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
@@ -23,12 +22,12 @@ import { truncateAddress } from "../utils/format";
 // Components
 import { NameTable } from "../components/NameTable";
 import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar"; // 🚀
-import { ActionModals } from "../components/ActionModals"; // 🚀
+import { FloatingBar } from "../components/FloatingBar";
+import { ActionModals } from "../components/ActionModals";
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions"; // 🚀
+import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { fetchLabels } from "../services/graph/fetchLabels";
@@ -37,7 +36,6 @@ import { publicClient } from "../utils/client";
 // Types
 import type { NameRecord } from "../types/ensNames";
 
-// --- 内部 Hook: 解析输入为地址 ---
 const useResolveInput = (input: string | undefined) => {
   return useQuery({
     queryKey: ["resolve-account", input],
@@ -67,7 +65,6 @@ const useResolveInput = (input: string | undefined) => {
   });
 };
 
-// --- 内部 Hook: 获取地址持仓 ---
 const useAccountLabels = (address: Address | null | undefined) => {
   return useQuery({
     queryKey: ["account-labels", address],
@@ -85,15 +82,12 @@ const useAccountLabels = (address: Address | null | undefined) => {
 };
 
 export const Account = () => {
-  // --- 1. 基础 Hooks ---
   const { input } = useParams<{ input: string }>();
   const { address: myAddress, isConnected } = useAccount();
   const { t } = useTranslation();
 
-  // --- 2. 本地状态 ---
   const [showFullAddress, setShowFullAddress] = useState(false);
 
-  // --- 3. 数据获取 ---
   const {
     data: resolvedAddress,
     isLoading: isResolving,
@@ -119,7 +113,6 @@ export const Account = () => {
     isFetchError ||
     (resolvedAddress === null && !isResolving);
 
-  // --- 4. 表格视图逻辑 ---
   const {
     processedRecords,
     sortConfig,
@@ -136,6 +129,9 @@ export const Account = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
+    ownerCounts,
+    ownerStats,
+    ownershipCounts,
   } = useNameTableView(
     records,
     myAddress,
@@ -143,10 +139,8 @@ export const Account = () => {
     resolvedAddress || "unknown",
   );
 
-  // --- 5. 核心业务逻辑 ---
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
-  // --- 6. 辅助逻辑 ---
   const updateLevel = useOptimisticLevelUpdate();
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
@@ -176,18 +170,12 @@ export const Account = () => {
 
   const navigate = useNavigate();
   const handleBack = () => {
-    // 判断依据：
-    // location.key !== "default" 通常意味着是由路由跳转进来的（有历史）
-    // window.history.state.idx > 0 也是一种判断方式
-    // 这里采用更稳健的策略：如果 state.idx > 0，说明有内部历史
     if (window.history.state && window.history.state.idx > 0) {
-      navigate(-1); // 返回上一页
+      navigate(-1);
     } else {
-      navigate("/"); // 如果没有上一页（比如直接打开链接），则回首页
+      navigate("/");
     }
   };
-
-  // --- 7. 渲染 ---
 
   if (isError) {
     return (
@@ -209,7 +197,6 @@ export const Account = () => {
     <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10">
         <div className="flex items-center gap-3 mb-2">
-          {/* 🚀 5. 新增返回按钮 */}
           <button
             onClick={handleBack}
             className="w-10 h-10 flex items-center justify-center rounded-full text-gray-400 hover:text-text-main hover:bg-gray-100 transition-all active:scale-95 outline-none"
@@ -226,7 +213,6 @@ export const Account = () => {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 p-4">
-          {/* 输入名称区域 */}
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faUserTag} className="text-gray-400" />
             <span className="font-qs-regular text-gray-500">
@@ -245,7 +231,6 @@ export const Account = () => {
           {resolvedAddress && (
             <>
               <div className="hidden md:block w-px h-4 bg-gray-300"></div>
-              {/* 钱包地址区域 */}
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faWallet} className="text-gray-400" />
                 <span className="font-qs-regular text-gray-500">
@@ -274,7 +259,6 @@ export const Account = () => {
                 </button>
               </div>
 
-              {/* 持仓总数区域 */}
               <div className="hidden md:block w-px h-4 bg-gray-300"></div>
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faWarehouse} className="text-gray-400" />
@@ -304,9 +288,9 @@ export const Account = () => {
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister} // 🚀
-        onRenew={actions.onRenew} // 🚀
-        onReminder={actions.onReminder} // 🚀
+        onRegister={actions.onRegister}
+        onRenew={actions.onRenew}
+        onReminder={actions.onReminder}
         pendingLabels={pendingLabels}
         totalRecordsCount={records?.length || 0}
         statusCounts={statusCounts}
@@ -316,17 +300,21 @@ export const Account = () => {
         isViewStateDirty={isViewStateDirty}
         onResetViewState={resetViewState}
         onLevelChange={handleLevelChange}
+        ownerCounts={ownerCounts}
+        ownerStats={ownerStats}
+        ownershipCounts={ownershipCounts}
       />
 
       <FloatingBar
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)} // 🚀
+        onBatchRenew={() =>
+          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
+        }
         onClearSelection={clearSelection}
       />
 
-      {/* 🚀 统一模态框 */}
       <ActionModals modalState={modalState} actions={actions} />
     </div>
   );

@@ -46,13 +46,20 @@ interface NameTableProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
+    memoTotal?: number;
   };
-  myCount?: number;
   ownershipCounts?: { mine: number; others: number };
   levelCounts?: Record<number, number>;
   isViewStateDirty?: boolean;
   onResetViewState?: () => void;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
+  ownerCounts?: {
+    count: number;
+    label: string;
+    address: string;
+    isMyself: boolean;
+  }[];
+  ownerStats?: { total: number; displayed: number };
 }
 
 export const NameTable = (props: NameTableProps) => {
@@ -101,16 +108,7 @@ export const NameTable = (props: NameTableProps) => {
   const showSkeleton = props.isLoading || isResolvingPage;
   const skeletonCount = props.skeletonRows || 8;
 
-  const myCount = safeRecords.filter(
-    (r) =>
-      props.currentAddress &&
-      r.owner?.toLowerCase() === props.currentAddress.toLowerCase(),
-  ).length;
-
-  const ownershipCounts = {
-    mine: myCount,
-    others: safeRecords.length - myCount,
-  };
+  const ownershipCounts = props.ownershipCounts || { mine: 0, others: 0 };
 
   const renewableRecords = safeRecords.filter((r) => isRenewable(r.status));
   const hasRenewableRecords = renewableRecords.length > 0;
@@ -127,7 +125,7 @@ export const NameTable = (props: NameTableProps) => {
   return (
     <div className="bg-table-row rounded-xl border border-gray-100 relative flex flex-col">
       <div className="overflow-x-auto lg:overflow-visible">
-        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-1 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3">
+        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-0.5 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3">
           <TableHeader
             sortConfig={props.sortConfig}
             onSort={props.onSort}
@@ -147,9 +145,10 @@ export const NameTable = (props: NameTableProps) => {
             statusCounts={props.statusCounts}
             actionCounts={props.actionCounts}
             nameCounts={props.nameCounts}
-            myCount={myCount}
             ownershipCounts={ownershipCounts}
             levelCounts={props.levelCounts}
+            ownerCounts={props.ownerCounts}
+            ownerStats={props.ownerStats}
           />
           <tbody>
             {showSkeleton ? (
@@ -163,7 +162,6 @@ export const NameTable = (props: NameTableProps) => {
                   record={r}
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
-                  currentAddress={props.currentAddress}
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}
                   onDelete={props.onDelete}

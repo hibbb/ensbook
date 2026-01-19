@@ -11,9 +11,6 @@ interface ImportMetaEnv {
   /** Infura 或其他 RPC 服务的 API Key */
   readonly VITE_INFURA_API_KEY: string;
 
-  /** ENS 注册推荐人哈希 */
-  readonly VITE_ENS_REFERRER_HASH: string;
-
   /** The Graph Subgraph API Key */
   readonly VITE_SUBGRAPH_API_KEY: string;
 }

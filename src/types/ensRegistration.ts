@@ -11,7 +11,7 @@ export interface RegistrationStruct {
   duration: bigint;
   secret: Hex;
   resolver: Address;
-  data: readonly Hex[]; // 建议加上 readonly 以完美匹配生成的类型
+  data: readonly Hex[];
   reverseRecord: number;
   referrer: Hex;
 }
@@ -21,6 +21,7 @@ export interface RegistrationStruct {
  */
 export type RegistrationStatus =
   | "idle"
+  | "loading" // 🚀 新增：用于断点续传时的检查状态，或初始加载状态
   | "committing" // 等待钱包确认 Commit
   | "waiting_commit" // Commit 上链中
   | "counting_down" // 60秒倒计时

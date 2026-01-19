@@ -8,19 +8,18 @@ export const processNameRecords = (
   records: NameRecord[] | undefined,
   sortConfig: SortConfig,
   filterConfig: FilterConfig,
-  currentAddress?: string,
 ): NameRecord[] => {
   if (!records) return [];
 
   // 1. 过滤逻辑
   const filtered = records.filter((r) => {
-    // A. 所有者过滤
-    if (filterConfig.onlyMe) {
-      if (!currentAddress || !r.owner) return false;
-      if (r.owner.toLowerCase() !== currentAddress.toLowerCase()) return false;
+    // A. 所有者列表过滤 (现在是主要逻辑)
+    if (filterConfig.ownerList.length > 0) {
+      if (!r.owner) return false;
+      if (!filterConfig.ownerList.includes(r.owner.toLowerCase())) return false;
     }
 
-    // B. 状态多选过滤
+    // ... 后续逻辑保持不变 (status, action, memo, length, wrapped, level)
     if (
       filterConfig.statusList.length > 0 &&
       !filterConfig.statusList.includes(r.status)
@@ -28,7 +27,6 @@ export const processNameRecords = (
       return false;
     }
 
-    // C. 操作类型过滤
     if (filterConfig.actionType !== "all") {
       if (filterConfig.actionType === "renew" && !isRenewable(r.status)) {
         return false;
@@ -38,12 +36,12 @@ export const processNameRecords = (
       }
     }
 
-    // D. 备注过滤
-    if (filterConfig.onlyWithMemos) {
-      if (!r.memo || r.memo.trim().length === 0) return false;
+    if (filterConfig.memoFilter !== "all") {
+      const hasMemo = !!r.memo && r.memo.trim().length > 0;
+      if (filterConfig.memoFilter === "with_memo" && !hasMemo) return false;
+      if (filterConfig.memoFilter === "no_memo" && hasMemo) return false;
     }
 
-    // E. 长度过滤
     if (
       filterConfig.lengthList.length > 0 &&
       !filterConfig.lengthList.includes(r.label.length)
@@ -51,13 +49,11 @@ export const processNameRecords = (
       return false;
     }
 
-    // F. 包装状态过滤
     if (filterConfig.wrappedType !== "all") {
       if (filterConfig.wrappedType === "wrapped" && !r.wrapped) return false;
       if (filterConfig.wrappedType === "unwrapped" && r.wrapped) return false;
     }
 
-    // 🚀 G. 等级过滤 (新增)
     if (
       filterConfig.levelList.length > 0 &&
       !filterConfig.levelList.includes(r.level || 0)
@@ -84,7 +80,6 @@ export const processNameRecords = (
         return r.registeredTime || 0;
       case "owner":
         return r.ownerPrimaryName || r.owner || "";
-      // 🚀 Level 排序: 降序时红色(3)在前
       case "level":
         return r.level || 0;
       default:

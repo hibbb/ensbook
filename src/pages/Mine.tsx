@@ -40,12 +40,10 @@ const useMyCollectionLabels = (source: string) => {
 };
 
 export const Mine = () => {
-  // --- 1. 基础 Hooks ---
   const { address, isConnected } = useAccount();
   const { t } = useTranslation();
   useDocumentTitle("Mine");
 
-  // --- 2. 数据源 ---
   const source = useMyCollectionSource();
   const hasSource = !!source && source.length > 0;
 
@@ -66,7 +64,6 @@ export const Mine = () => {
   const isLoading = isResolving || isQuerying;
   const isError = isResolveError || isQueryError;
 
-  // --- 3. 表格视图逻辑 ---
   const {
     processedRecords,
     sortConfig,
@@ -83,20 +80,19 @@ export const Mine = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
+    ownerCounts,
+    ownerStats,
+    ownershipCounts,
   } = useNameTableView(records, address, "collection", "mine");
 
-  // --- 4. 核心业务逻辑 ---
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
-  // --- 5. 辅助逻辑 ---
   const updateLevel = useOptimisticLevelUpdate();
   const handleLevelChange = (record: NameRecord, newLevel: number) => {
     updateLevel(record, newLevel);
   };
 
   const selectionCount = selectedLabels.size;
-
-  // --- 6. 渲染 ---
 
   if (!hasSource) {
     return (
@@ -179,13 +175,18 @@ export const Mine = () => {
         isViewStateDirty={isViewStateDirty}
         onResetViewState={resetViewState}
         onLevelChange={handleLevelChange}
+        ownerCounts={ownerCounts} // 🚀
+        ownerStats={ownerStats} // 🚀
+        ownershipCounts={ownershipCounts} // 🚀 2. 传递给组件
       />
 
       <FloatingBar
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels)}
+        onBatchRenew={() =>
+          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
+        }
         onClearSelection={clearSelection}
       />
 

@@ -81,7 +81,7 @@ export const ActionCell = ({
         action: () => onRenew?.(record),
         sideIcon: faBell,
         sideIconClass:
-          "text-gray-300 hover:text-link transition-colors cursor-pointer",
+          "text-amber-300 hover:text-amber-600 transition-colors cursor-pointer",
         sideTooltip: t("table.cell.set_reminder"),
         sideAction: () => onReminder?.(record),
       };
@@ -159,7 +159,7 @@ export const ActionCell = ({
         )}
 
       {!isConnected && (
-        <Tooltip content={t("table.cell.connect_wallet_tooltip")}>
+        <Tooltip content={t("common.connect_wallet")}>
           <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
             <FontAwesomeIcon icon={faWallet} size="2xs" />
           </div>

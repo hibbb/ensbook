@@ -1,7 +1,7 @@
 // src/components/NameTable/TableRow.tsx
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import type { NameRecord } from "../../types/ensNames";
 
 import { NameCell } from "./cells/NameCell";
@@ -17,7 +17,6 @@ interface TableRowProps {
   record: NameRecord;
   index: number;
   now: number;
-  currentAddress?: string;
   isConnected: boolean;
   canDelete?: boolean;
   isSelected?: boolean;
@@ -35,7 +34,6 @@ export const TableRow = ({
   record,
   index,
   now,
-  currentAddress,
   isConnected,
   canDelete = true,
   onDelete,
@@ -48,7 +46,7 @@ export const TableRow = ({
   onLevelChange, // 🚀 解构
 }: TableRowProps) => {
   return (
-    <tr className="group transition-colors duration-150 last:border-0 hover:bg-yellow-50 bg-table-row">
+    <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
       <td className="w-14 text-center">
         {/* 🚀 3. 替换旧的 span，使用 IndexCell */}
         <IndexCell
@@ -67,7 +65,7 @@ export const TableRow = ({
       </td>
 
       <td>
-        <OwnerCell record={record} currentAddress={currentAddress} />
+        <OwnerCell record={record} />
       </td>
 
       <td className="text-right">
@@ -99,7 +97,7 @@ export const TableRow = ({
               transition-all duration-200
               ${
                 canDelete
-                  ? "text-gray-300 hover:text-link active:scale-95"
+                  ? "text-red-300 hover:text-red-600 active:scale-95"
                   : "text-gray-200 cursor-not-allowed"
               }
             `}

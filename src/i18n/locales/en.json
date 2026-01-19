@@ -14,7 +14,8 @@
     "unknown": "Unknown",
     "copy_success": "Copied {{label}}",
     "year": "Year",
-    "day": "Day"
+    "day": "Day",
+    "run_in_background": "Run in Background"
   },
   "app": {
     "not_found": "404 | Page Not Found"
@@ -178,6 +179,8 @@
       "filter_status": "Filter by Status",
       "filter_action": "Filter by Action",
       "filter_level": "Filter by Marker",
+      "filter_owner": "Filter by Owner",
+      "no_owners": "No owners found",
       "by_length": "By Length",
       "by_wrap": "By Wrap State",
       "all_length": "All Lengths",
@@ -188,13 +191,14 @@
       "unwrapped": "Unwrapped",
       "registerable": "Registerable",
       "renewable": "Renewable",
-      "only_connected_wallet": "Show Only ({{count}}) Owned by Connected Wallet",
       "show_all": "Show All",
-      "no_memos": "No memos found",
-      "all_memos": "All names have memos",
-      "only_memos": "Show with Memos ({{count}})",
+      "by_memo": "By Memo",
+      "all_names": "All Names",
+      "with_memo": "With Memo",
+      "no_memo": "No Memo",
       "no_renewable": "No renewable names",
       "select_all_renewable": "Select all renewable",
+      "owner_stats": "Top {{displayed}} / {{total}}",
       "level_options": {
         "0": "Default",
         "1": "Blue Marker",
@@ -316,13 +320,16 @@
     },
     "mode": {
       "duration": "Duration",
-      "until": "Until Date"
+      "until": "Until Date",
+      "until_desc_batch": "All selected names will be aligned to expire on this date.",
+      "partial_skip": "Note: Target date is earlier than {{count}} names' expiry, these {{count}} names will not be renewed."
     },
     "error": {
       "min_duration": "Registration must be at least 28 days",
       "invalid_date": "Invalid date",
       "past_date": "Date must be in the future",
-      "before_expiry": "Date must be after current expiry"
+      "before_expiry": "Date must be after current expiry",
+      "all_filtered": "All selected names expire after the target date and do not need renewal."
     }
   },
   "memo": {
@@ -367,12 +374,12 @@
     "999": {
       "name": "999",
       "title": "999 Club",
-      "desc": "The most representative digital collection in ENS, containing 000.eth to 999.eth."
+      "desc": "Numbers are infinite, but the first thousand are not. Welcome to the most exclusive club on Ethereum."
     },
     "bip39": {
       "name": "BIP39",
       "title": "BIP39 Club",
-      "desc": "The 2048 foundational words of crypto wallets (Mnemonic Seeds)."
+      "desc": "2048 Genesis words, the ultimate boundary of trillion-dollar assets. The native key to the crypto world—do you want to own one?"
     }
   },
   "lookup": {
