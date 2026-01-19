@@ -153,7 +153,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
     <div className="h-12 flex flex-col justify-center items-start">
       <Tooltip content={getTooltipContent()}>
         <div
-          className={`inline-flex items-center px-2.5 py-1 text-xs uppercase tracking-wide cursor-default transition-opacity hover:opacity-90 ${statusClass}`}
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs uppercase tracking-wide cursor-default transition-opacity hover:opacity-90 ${statusClass}`}
         >
           {renderContent()}
         </div>

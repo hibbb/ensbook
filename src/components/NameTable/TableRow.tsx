@@ -46,7 +46,7 @@ export const TableRow = ({
   onLevelChange, // 🚀 解构
 }: TableRowProps) => {
   return (
-    <tr className="group transition-colors duration-150 last:border-0 hover:bg-yellow-50 bg-table-row">
+    <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
       <td className="w-14 text-center">
         {/* 🚀 3. 替换旧的 span，使用 IndexCell */}
         <IndexCell
