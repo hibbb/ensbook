@@ -1,0 +1,101 @@
+# cliff.toml
+
+# Git changelog generator configuration
+
+# Compatible with Conventional Commits + commitlint
+
+[changelog]
+header = """
+
+# Changelog
+
+所有重要的变更都会记录在此文件中。
+
+格式遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
+"""
+
+body = """
+{% if version %}
+
+## {{ version }}{% if date %} ({{ date }}){% endif %}
+
+{% else %}
+
+## 未发布
+
+{% endif %}
+
+{% for group, commits in commits | group_by(attribute="group") %}
+
+### {{ group }}
+
+{% for commit in commits %}
+
+* {{ commit.message | capitalize_first }}{% if commit.author %} ({{ commit.author.name }}){% endif %}
+  {% endfor %}
+  {% endfor %}
+  """
+
+## footer = """
+
+由 git-cliff 自动生成
+"""
+
+trim = true
+
+[git]
+
+# 只解析符合 Conventional Commits 的提交
+
+conventional_commits = true
+filter_unconventional = true
+
+# 忽略 merge commit（避免 merge 噪音）
+
+ignore_merge_commits = true
+
+# tag 排序方式
+
+tag_pattern = "v[0-9]*"
+
+# 提交时间排序
+
+sort_commits = "oldest"
+
+[commit_parsers]
+
+# === 核心提交类型 ===
+
+{ message = "^feat", group = "✨ Features" }
+{ message = "^fix", group = "🐛 Bug Fixes" }
+
+# === 改进 & 重构 ===
+
+{ message = "^perf", group = "⚡ Performance" }
+{ message = "^refactor", group = "♻️ Refactoring" }
+
+# === 工程相关 ===
+
+{ message = "^docs", group = "📝 Documentation" }
+{ message = "^test", group = "🧪 Tests" }
+{ message = "^build", group = "🏗 Build System" }
+{ message = "^ci", group = "🤖 CI" }
+{ message = "^chore", group = "🔧 Chores" }
+
+# === 样式（通常不影响功能）===
+
+{ message = "^style", group = "🎨 Styles" }
+
+# === Revert ===
+
+{ message = "^revert", group = "⏪ Reverts" }
+
+# === BREAKING CHANGE（最高优先级）===
+
+{ body = "BREAKING CHANGE", group = "💥 Breaking Changes" }
+
+[notes]
+
+# BREAKING CHANGE 会被单独提升
+
+keywords = ["BREAKING CHANGE"]
