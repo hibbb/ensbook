@@ -14,7 +14,8 @@
     "unknown": "未知",
     "copy_success": "已复制 {{label}}",
     "year": "年",
-    "day": "天"
+    "day": "天",
+    "run_in_background": "在后台运行"
   },
   "app": {
     "not_found": "404 | 页面不存在"

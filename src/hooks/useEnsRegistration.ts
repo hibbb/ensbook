@@ -31,6 +31,7 @@ export function useEnsRegistration() {
   const { t } = useTranslation();
 
   const registrationDataRef = useRef<RegistrationStruct | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { address } = useAccount();
   const publicClient = usePublicClient();
@@ -41,6 +42,7 @@ export function useEnsRegistration() {
     isMounted.current = true;
     return () => {
       isMounted.current = false;
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
@@ -49,7 +51,17 @@ export function useEnsRegistration() {
     setSecondsLeft(0);
     setCurrentHash(null);
     registrationDataRef.current = null;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   }, []);
+
+  // 🚀 新增：准备恢复状态
+  const startResuming = useCallback(() => {
+    resetStatus();
+    setStatus("loading");
+  }, [resetStatus]);
 
   const executeRegister = useCallback(
     async (params: RegistrationStruct) => {
@@ -112,72 +124,26 @@ export function useEnsRegistration() {
     [address, publicClient, writeContractAsync, t],
   );
 
-  const checkAndResume = useCallback(
-    async (rawLabel: string) => {
-      if (!publicClient) return;
-      const label = normalize(rawLabel).replace(/\.eth$/, "");
+  const startCountdown = (seconds: number, onFinish: () => void) => {
+    // 先清除旧的（如果有）
+    if (timerRef.current) clearInterval(timerRef.current);
 
-      try {
-        const result = await checkRegStatus(publicClient, label);
+    let left = seconds;
+    setSecondsLeft(left);
 
-        if (result.status === "idle") {
-          console.log("Commit 无效或已过期，清理本地状态");
-          removeRegistrationState(label);
-
-          if (result.errorMessage) {
-            // checkRegStatus 返回的是 Key，直接翻译
-            toast.error(t(result.errorMessage));
-          }
-          setStatus("idle");
-          return;
-        }
-
-        if (result.localState && result.localState.registration) {
-          console.log("🔍 恢复状态:", result.status);
-
-          registrationDataRef.current = result.localState.registration;
-
-          if (result.status === "waiting_commit") {
-            setCurrentHash(result.localState.commitTxHash as Hex);
-          } else if (result.status === "waiting_register") {
-            setCurrentHash(result.localState.regTxHash as Hex);
-          } else {
-            setCurrentHash(null);
-          }
-
-          setStatus(result.status);
-          if (result.errorMessage) {
-            toast.error(t(result.errorMessage));
-          }
-
-          if (result.status === "counting_down") {
-            setSecondsLeft(result.secondsLeft);
-            startCountdown(result.secondsLeft, () => {
-              if (registrationDataRef.current && isMounted.current) {
-                executeRegister(registrationDataRef.current);
-              }
-            });
-          } else if (result.status === "registering") {
-            console.log("⚡️ 自动发起最终注册交易...");
-            executeRegister(registrationDataRef.current);
-          }
-        }
-      } catch (e) {
-        console.error("恢复检查失败", e);
-        toast.error(t("transaction.toast.recovery_failed"));
+    timerRef.current = setInterval(() => {
+      if (!isMounted.current) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        return;
       }
-    },
-    [publicClient, executeRegister, t],
-  );
-
-  const continueRegistration = useCallback(() => {
-    if (registrationDataRef.current) {
-      executeRegister(registrationDataRef.current);
-    } else {
-      toast.error(t("transaction.toast.recovery_failed"));
-      resetStatus();
-    }
-  }, [executeRegister, resetStatus, t]);
+      left -= 1;
+      setSecondsLeft(left);
+      if (left <= 0) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        onFinish();
+      }
+    }, 1000);
+  };
 
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint) => {
@@ -251,8 +217,13 @@ export function useEnsRegistration() {
         const WAIT_SECONDS = 65;
         setSecondsLeft(WAIT_SECONDS);
 
+        // 🚀 修改：使用 timerRef 管理倒计时
         startCountdown(WAIT_SECONDS, () => {
-          if (isMounted.current) executeRegister(params);
+          // 只有当状态依然是 counting_down 时才执行下一步
+          // 这防止了用户已经重置状态后，定时器回调依然触发的问题
+          if (isMounted.current && registrationDataRef.current) {
+            executeRegister(registrationDataRef.current);
+          }
         });
       } catch (err: unknown) {
         console.error(err);
@@ -272,22 +243,77 @@ export function useEnsRegistration() {
     [address, publicClient, writeContractAsync, executeRegister, t],
   );
 
-  const startCountdown = (seconds: number, onFinish: () => void) => {
-    let left = seconds;
-    setSecondsLeft(left);
-    const timer = setInterval(() => {
-      if (!isMounted.current) {
-        clearInterval(timer);
-        return;
+  const checkAndResume = useCallback(
+    async (rawLabel: string) => {
+      if (!publicClient) return;
+      const label = normalize(rawLabel).replace(/\.eth$/, "");
+
+      try {
+        const result = await checkRegStatus(publicClient, label);
+
+        if (result.status === "idle") {
+          console.log("Commit 无效或已过期，清理本地状态");
+          removeRegistrationState(label);
+
+          if (result.errorMessage) {
+            toast.error(t(result.errorMessage));
+          }
+          setStatus("idle");
+          return;
+        }
+
+        if (result.localState && result.localState.registration) {
+          console.log("🔍 恢复状态:", result.status);
+
+          registrationDataRef.current = result.localState.registration;
+
+          if (result.status === "waiting_commit") {
+            setCurrentHash(result.localState.commitTxHash as Hex);
+          } else if (result.status === "waiting_register") {
+            setCurrentHash(result.localState.regTxHash as Hex);
+          } else {
+            setCurrentHash(null);
+          }
+
+          setStatus(result.status);
+          if (result.errorMessage) {
+            toast.error(t(result.errorMessage));
+          }
+
+          if (result.status === "counting_down") {
+            setSecondsLeft(result.secondsLeft);
+            startCountdown(result.secondsLeft, () => {
+              if (registrationDataRef.current && isMounted.current) {
+                executeRegister(registrationDataRef.current);
+              }
+            });
+          } else if (result.status === "registering") {
+            console.log("⚡️ 自动发起最终注册交易...");
+            executeRegister(registrationDataRef.current);
+          }
+        }
+      } catch (e) {
+        console.error("恢复检查失败", e);
+        toast.error(t("transaction.toast.recovery_failed"));
+
+        // 🚀 核心安全修复：
+        // 如果检查过程崩溃，必须强制重置回 idle。
+        // 否则界面会一直卡在 startResuming 设置的 "loading" 状态。
+        setStatus("idle");
       }
-      left -= 1;
-      setSecondsLeft(left);
-      if (left <= 0) {
-        clearInterval(timer);
-        onFinish();
-      }
-    }, 1000);
-  };
+    },
+    [publicClient, executeRegister, t],
+  );
+
+  // ... (continueRegistration 保持不变) ...
+  const continueRegistration = useCallback(() => {
+    if (registrationDataRef.current) {
+      executeRegister(registrationDataRef.current);
+    } else {
+      toast.error(t("transaction.toast.recovery_failed"));
+      resetStatus();
+    }
+  }, [executeRegister, resetStatus, t]);
 
   return {
     status,
@@ -297,6 +323,7 @@ export function useEnsRegistration() {
     checkAndResume,
     continueRegistration,
     resetStatus,
+    startResuming, // 导出
     isBusy:
       status !== "idle" &&
       status !== "success" &&

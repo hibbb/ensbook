@@ -94,7 +94,11 @@ export function useEnsRenewal() {
 
   // 🚀 修改：参数 duration 类型改为 bigint[]
   const renewBatch = useCallback(
-    async (rawLabels: string[], durations: bigint[]) => {
+    async (
+      rawLabels: string[],
+      durations: bigint[],
+      onSubmitted?: () => void,
+    ) => {
       if (!publicClient || !address) {
         toast.error(t("common.connect_wallet"));
         return;
@@ -131,6 +135,11 @@ export function useEnsRenewal() {
           args: [labels, durations, REFERRER_ADDRESS_HASH],
           value: valueWithBuffer,
         });
+
+        // 🚀 交易已提交！立即调用回调
+        if (onSubmitted) {
+          onSubmitted();
+        }
 
         setStatus("processing");
         await toast.promise(publicClient.waitForTransactionReceipt({ hash }), {

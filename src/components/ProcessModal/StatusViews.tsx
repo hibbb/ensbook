@@ -1,3 +1,5 @@
+// src/components/ProcessModal/StatusViews.tsx
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faWallet,
@@ -5,6 +7,7 @@ import {
   faExternalLinkAlt,
   faCheckCircle,
   faExclamationCircle,
+  faMinimize, // 🚀 新增图标
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { truncateAddress } from "../../utils/format";
@@ -13,22 +16,29 @@ interface ProcessingViewProps {
   status: string;
   secondsLeft: number;
   txHash?: string | null;
+  // 🚀 新增回调
+  onClose: () => void;
 }
 
 export const ProcessingView = ({
   status,
   secondsLeft,
   txHash,
+  onClose,
 }: ProcessingViewProps) => {
   const { t } = useTranslation();
 
   let message = t("transaction.status.processing");
   let subMessage = t("transaction.status.confirm_wallet");
   let showTimer = false;
+  // 🚀 只有在等待钱包签名时，我们不建议用户关闭（因为钱包弹窗还在），
+  // 但技术上关闭也没问题。为了体验，我们只在非钱包交互阶段显示“后台运行”按钮？
+  // 不，统一显示更简单，用户想关就关。
   const isWaitingWallet = ["loading", "registering", "committing"].includes(
     status,
   );
 
+  // ... (中间的 message 判断逻辑保持不变，请保留原代码) ...
   if (status === "committing") {
     message = t("transaction.step.commit_title");
     subMessage = t("transaction.step.commit_desc");
@@ -48,6 +58,9 @@ export const ProcessingView = ({
   } else if (status === "loading") {
     message = t("transaction.step.loading_title");
     subMessage = t("transaction.step.loading_desc");
+  } else if (status === "processing") {
+    message = t("transaction.step.processing_title");
+    subMessage = t("transaction.step.processing_desc");
   }
 
   return (
@@ -76,21 +89,34 @@ export const ProcessingView = ({
       <p className="text-xs text-gray-500 mb-6 max-w-[85%] mx-auto">
         {subMessage}
       </p>
-      {txHash && (
-        <a
-          href={`https://etherscan.io/tx/${txHash}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-md text-xs text-link hover:text-link-hover hover:bg-gray-100 transition-colors border border-gray-100"
+
+      <div className="flex flex-col gap-3 items-center">
+        {txHash && (
+          <a
+            href={`https://etherscan.io/tx/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-md text-xs text-link hover:text-link-hover hover:bg-gray-100 transition-colors border border-gray-100"
+          >
+            <span>{truncateAddress(txHash, 10, 8)}</span>
+            <FontAwesomeIcon icon={faExternalLinkAlt} />
+          </a>
+        )}
+
+        {/* 🚀 新增：后台运行按钮 */}
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-600 text-xs font-qs-medium flex items-center gap-1.5 transition-colors mt-2"
         >
-          <span>{truncateAddress(txHash, 10, 8)}</span>
-          <FontAwesomeIcon icon={faExternalLinkAlt} />
-        </a>
-      )}
+          <FontAwesomeIcon icon={faMinimize} />
+          {t("common.run_in_background")}
+        </button>
+      </div>
     </div>
   );
 };
 
+// ... (SuccessView 和 ErrorView 保持不变) ...
 export const SuccessView = ({
   type,
   onClose,

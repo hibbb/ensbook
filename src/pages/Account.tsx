@@ -309,7 +309,9 @@ export const Account = () => {
         selectedCount={selectionCount}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels, records || [])}
+        onBatchRenew={() =>
+          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
+        }
         onClearSelection={clearSelection}
       />
 

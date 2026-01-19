@@ -256,7 +256,9 @@ export const Home = () => {
         selectedCount={selectedLabels.size}
         isBusy={isBusy}
         isConnected={isConnected}
-        onBatchRenew={() => actions.onBatchRenew(selectedLabels, records || [])}
+        onBatchRenew={() =>
+          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
+        }
         onClearSelection={clearSelection}
       />
 

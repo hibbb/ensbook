@@ -22,6 +22,7 @@ export const useEnsActions = () => {
     record?: NameRecord;
     labels?: string[];
     expiryTimes?: number[];
+    onSuccess?: () => void;
   } | null>(null);
 
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
@@ -44,6 +45,7 @@ export const useEnsActions = () => {
     currentHash: regTxHash,
     resetStatus: resetReg,
     checkAndResume,
+    startResuming, // 🚀 引入新方法
   } = useEnsRegistration();
 
   useEffect(() => {
@@ -69,30 +71,51 @@ export const useEnsActions = () => {
     }
   }, [regStatus, renewalStatus, queryClient]);
 
-  // ... (handleSingleRegister, handleSingleRenew, handleBatchRenewalTrigger 等保持不变) ...
   const handleSingleRegister = useCallback(
     async (record: NameRecord) => {
       if (pendingLabels.has(record.label)) {
+        // 🚀 场景 A: 断点续传
+        // 1. 先设为 loading，防止 Modal 闪现时间选择界面
+        startResuming();
+        // 2. 打开 Modal (此时用户看到的是转圈圈)
         setDurationTarget({ type: "register", record });
+        // 3. 开始异步检查，检查完后会自动更新为 correct status
         await checkAndResume(record.label);
       } else {
+        // 🚀 场景 B: 新注册
+        // 重置为 idle，显示时间选择界面
+        resetReg();
         setDurationTarget({ type: "register", record });
       }
     },
-    [pendingLabels, checkAndResume],
+    [pendingLabels, checkAndResume, resetReg, startResuming], // 添加依赖
   );
 
-  const handleSingleRenew = useCallback((record: NameRecord) => {
-    setDurationTarget({
-      type: "renew",
-      record,
-      expiryTimes: [record.expiryTime],
-    });
-  }, []);
+  const handleSingleRenew = useCallback(
+    (record: NameRecord) => {
+      // 🚀 核心修复：每次点击续费时，强制重置为 Idle 状态
+      // 这样 Modal 打开时就会显示初始的时间选择界面
+      resetRenewal();
+
+      setDurationTarget({
+        type: "renew",
+        record,
+        expiryTimes: [record.expiryTime],
+      });
+    },
+    [resetRenewal],
+  ); // 添加依赖
 
   const handleBatchRenewalTrigger = useCallback(
-    (selectedLabels: Set<string>, allRecords: NameRecord[]) => {
+    (
+      selectedLabels: Set<string>,
+      allRecords: NameRecord[],
+      onSuccess?: () => void,
+    ) => {
       if (selectedLabels.size === 0) return;
+
+      // 🚀 核心修复：批量操作也一样，先重置
+      resetRenewal();
 
       const targetRecords = allRecords.filter((r) =>
         selectedLabels.has(r.label),
@@ -100,9 +123,9 @@ export const useEnsActions = () => {
       const labels = targetRecords.map((r) => r.label);
       const expiryTimes = targetRecords.map((r) => r.expiryTime);
 
-      setDurationTarget({ type: "batch", labels, expiryTimes });
+      setDurationTarget({ type: "batch", labels, expiryTimes, onSuccess });
     },
-    [],
+    [resetRenewal], // 添加依赖
   );
 
   const handleSetReminder = useCallback((record: NameRecord) => {
@@ -146,7 +169,7 @@ export const useEnsActions = () => {
         const validLabels = validItems.map((i) => i.label);
         const validDurations = validItems.map((i) => i.duration);
 
-        renewBatch(validLabels, validDurations);
+        renewBatch(validLabels, validDurations, durationTarget.onSuccess);
       }
     },
     [durationTarget, startRegistration, renewSingle, renewBatch, t],

@@ -1,3 +1,5 @@
+// src/components/ProcessModal/index.tsx
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarAlt,
@@ -40,7 +42,6 @@ export const ProcessModal = ({
 }: ProcessModalProps) => {
   const { t } = useTranslation();
 
-  // 1. 使用 Hook 获取计算逻辑和状态
   const {
     mode,
     setMode,
@@ -62,14 +63,14 @@ export const ProcessModal = ({
     itemCount,
   });
 
-  // 2. 状态判断
   const isIdle = status === "idle";
   const isSuccess = status === "success";
   const isError = status === "error";
   const isProcessing = !isIdle && !isSuccess && !isError;
 
-  const handleSafeClose = () => {
-    if (isIdle) onClose();
+  // 🚀 移除状态检查，允许随时关闭
+  const handleClose = () => {
+    onClose();
   };
 
   const handleConfirm = () => {
@@ -81,7 +82,7 @@ export const ProcessModal = ({
   return (
     <BaseModal
       isOpen={isOpen}
-      onClose={handleSafeClose}
+      onClose={handleClose}
       maxWidth="max-w-sm"
       title={
         <div className="flex items-center gap-2">
@@ -97,7 +98,8 @@ export const ProcessModal = ({
           </span>
         </div>
       }
-      showCloseButton={isIdle}
+      // 🚀 永远显示关闭按钮
+      showCloseButton={true}
     >
       <div className="p-4">
         {isIdle && (
@@ -125,7 +127,7 @@ export const ProcessModal = ({
 
             <div className="flex gap-3">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="flex-1 py-3 rounded-lg font-qs-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
               >
                 {t("common.cancel")}
@@ -153,12 +155,13 @@ export const ProcessModal = ({
             status={status}
             secondsLeft={secondsLeft}
             txHash={txHash}
+            onClose={handleClose} // 🚀 传递关闭函数
           />
         )}
 
-        {isSuccess && <SuccessView type={type} onClose={onClose} />}
+        {isSuccess && <SuccessView type={type} onClose={handleClose} />}
 
-        {isError && <ErrorView onClose={onClose} />}
+        {isError && <ErrorView onClose={handleClose} />}
       </div>
     </BaseModal>
   );

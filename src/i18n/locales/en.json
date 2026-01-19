@@ -14,7 +14,8 @@
     "unknown": "Unknown",
     "copy_success": "Copied {{label}}",
     "year": "Year",
-    "day": "Day"
+    "day": "Day",
+    "run_in_background": "Run in Background"
   },
   "app": {
     "not_found": "404 | Page Not Found"
