@@ -31,30 +31,50 @@
 
 **ENSBook** is a decentralized ENS management terminal built on the **Local-First** philosophy.
 
-We have abandoned heavy centralized backend databases, building entirely on on-chain data (The Graph) and browser local storage. It solves the pain points of multi-domain management and personalized notes found in official apps, providing a lightning-fast, smooth, and privacy-secure asset management experience through a built-in multi-threaded parsing engine and smart caching strategies.
+Unlike traditional ENS tools that rely on heavy backend databases, ENSBook is built entirely on on-chain data (The Graph), decentralized APIs, and browser local storage. It solves the friction points of official apps in multi-domain management, bulk operations, and personalized notes, providing a lightning-fast, privacy-secure, and professional asset management experience.
 
 ## ✨ Key Features
 
 ### ⚡ **High-Performance Search**
 
-- **Web Worker Engine**: Built-in multi-threaded parser handles text, addresses, and mixed formats in milliseconds. Whether pasting 10 or 1000 domains, the interface remains fluid.
-- **Smart Classification**: Automatically identifies and categorizes standard domains, Ethereum addresses, and specific holder queries (`@ensname`).
+- **Web Worker Engine**: Built-in multi-threaded parser handles text, addresses, and mixed formats in milliseconds. Whether pasting 10 or hundreds of domains, the interface remains fluid.
+- **Smart Classification**: Automatically identifies and categorizes standard domains, Ethereum addresses, and specific holder queries (`@example.eth`).
+
+### 🔍 **Intelligent Table Views**
+
+- **Multi-Dimensional Filtering**: Drill down into your data by **Status** (Available, Grace, Premium), **Length**, **Wrapped State**, **Ownership**, or **Memo** presence.
+- **Instant Sorting**: Sort thousands of names instantly by Expiry Date, Registration Date, Name, or Length to find what matters most.
+- **Context Awareness**: View states (filters & sorting) are saved independently for each collection, remembering exactly how you left them.
+
+### ☯️ **Dual-Mode Workflow**
+
+ENSBook designs two complementary workspaces for different user needs:
+
+- **Home (The Scratchpad)**: A free-form area for **temporary, high-frequency operations**. Paste text, filter, batch renew, and clear. Perfect for quick tasks and bulk processing.
+- **Mine (The Portfolio)**: A persistent workspace defined by **rules** (e.g., "my wallet address", "specific keywords"). It automatically tracks your long-term assets and synchronizes view states.
+
+### 🔒 **Data Sovereignty & Backup**
+
+- **Zero Backend**: Your **Watchlist**, **Private Memos**, and **View Preferences** are stored entirely in your browser's `localStorage`. We do not collect any user data.
+- **Full Portability**: Supports one-click export to standard JSON files with flexible **"Merge"** and **"Overwrite"** import strategies, ensuring your asset configuration is safe, portable, and never lost.
+
+### 🚀 **Advanced Bulk Renewal**
+
+Powered by the **`AdvancedBulkRenewal`** contract (deployed by ENSBook), we offer flexibility that traditional tools cannot match:
+
+- **Align Expiry Dates**: With the **"Renew Until"** feature, you can align the expiration dates of multiple domains to a specific day in a single transaction.
+- **Independent Durations**: Supports renewing different names for different durations in one go, optimizing your gas usage.
+- **Trustless**: The contract is stateless and holds no funds, ensuring maximum security.
 
 ### 🛡️ **Robust Registration System**
 
-- **State Recovery**: Uses a state machine to manage the ENS Commit-Reveal process. Even if you refresh the page or accidentally close the browser, registration progress is recovered locally, preventing gas waste.
+- **State Recovery**: Uses a state machine to manage the ENS Commit-Reveal process. Even if you refresh the page or accidentally close the browser, registration progress is recovered locally via "breakpoints," preventing gas waste.
 - **Anti-Front-Running**: Registration secrets are generated and stored locally, eliminating the risk of man-in-the-middle attacks.
 
-### 🔒 **Data Sovereignty & Privacy**
+### 💎 **Curated Collections**
 
-- **Zero Backend**: Your **Watchlist**, **Private Memos**, and **View Preferences** are stored entirely in your browser's `localStorage`. We do not collect any user data.
-- **Full Backup**: Supports generating standard JSON backup files with "Merge" and "Overwrite" strategies, ensuring your asset configuration is never lost.
-
-### 🏷️ **Smart Management**
-
-- **Global Metadata**: Memos and importance levels are synchronized globally across Home, Collections, and Search views.
-- **Context-Aware Views**: While data is global, view states (filters, sorting) are isolated per context (e.g., Home vs. 999 Club), remembering your preferences for each specific workflow.
-- **Cross-Tab Sync**: Real-time data synchronization across multiple browser tabs.
+- **Built-in Access**: Comes pre-loaded with iconic ENS communities like the **999 Club** and **BIP39 Club**.
+- **Instant Insight**: Instantly monitor the registration status, expiration timeline, and ownership distribution of these foundational assets without manual configuration.
 
 ### 🌍 **Native Internationalization**
 
@@ -65,7 +85,8 @@ We have abandoned heavy centralized backend databases, building entirely on on-c
 
 - **Core**: React 18, TypeScript, Vite
 - **Web3**: Wagmi v2, Viem, ConnectKit
-- **Data**: The Graph (GraphQL), Apollo Client
+- **Contract**: Solidity (AdvancedBulkRenewal)
+- **Data**: The Graph (GraphQL)
 - **State**: TanStack Query (React Query), Custom Local Store
 - **i18n**: i18next, react-i18next
 - **Styling**: Tailwind CSS, FontAwesome
