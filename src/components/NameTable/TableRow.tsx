@@ -1,7 +1,6 @@
 // src/components/NameTable/TableRow.tsx
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import type { NameRecord } from "../../types/ensNames";
 
 import { NameCell } from "./cells/NameCell";
@@ -12,6 +11,7 @@ import { ActionCell } from "./cells/ActionCell";
 import { Tooltip } from "../ui/Tooltip";
 // 🚀 1. 引入新组件
 import { IndexCell } from "./cells/IndexCell";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface TableRowProps {
   record: NameRecord;
@@ -94,15 +94,15 @@ export const TableRow = ({
               disabled={!canDelete}
               onClick={() => onDelete?.(record)}
               className={`
-              transition-all duration-200
+              transition-all duration-200 text-xs
               ${
                 canDelete
-                  ? "text-red-300 hover:text-red-600 active:scale-95"
+                  ? "text-link hover:text-link-hover active:scale-95"
                   : "text-gray-200 cursor-not-allowed"
               }
             `}
             >
-              <FontAwesomeIcon icon={faCircleXmark} size="sm" />
+              <FontAwesomeIcon icon={faXmark} size="sm" />
             </button>
           </Tooltip>
         </div>
