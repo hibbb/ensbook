@@ -363,7 +363,7 @@
     "custom_collection": "Custom Collection",
     "empty_state": {
       "title": "Open Your ENS Vision",
-      "desc": "The Mine page allows you to create an exclusive domain collection through custom rules\n(e.g., \"abc, hello, 12345\", \"@vitalik.eth\", or Ethereum addresses).",
+      "desc": "The Mine page allows you to create an exclusive domain collection through custom rules\n(e.g., \"abc, hello, 12345\", \"@alice.eth\", or Ethereum addresses).",
       "guide": "Please go to Settings > My Collection to configure"
     },
     "error": "Failed to load, please check network or configuration rules"

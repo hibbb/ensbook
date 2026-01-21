@@ -105,17 +105,17 @@ export const Mine = () => {
         </h2>
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
           <Trans i18nKey="mine.empty_state.desc">
-            Mine 页面允许你通过自定义规则
+            The Mine page allows you to create an exclusive domain collection
+            through custom rules
             <br />
-            （如 "abc, hello, 12345"、"@vitalik.eth" 或以太坊地址）
-            <br />
-            来创建一个专属的域名集合。
+            (e.g., "abc, hello, 12345", "@alice.eth", or Ethereum addresses).
           </Trans>
         </p>
         <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-400 mb-8 font-mono">
           <Trans i18nKey="mine.empty_state.guide">
-            请前往 <span className="text-text-main">设置 {">"} 我的集合</span>{" "}
-            进行配置
+            Please go to{" "}
+            <span className="text-text-main">Settings {">"} My Collection</span>{" "}
+            to configure
           </Trans>
         </div>
       </div>

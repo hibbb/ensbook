@@ -27,7 +27,7 @@ const DEFAULT_DATA: EnsBookUserData = {
   },
   settings: {
     theme: "system",
-    locale: "zh",
+    locale: "en",
     defaultDuration: 31536000,
     myCollectionSource: "",
     mineAsHomepage: false,

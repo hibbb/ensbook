@@ -363,7 +363,7 @@
     "custom_collection": "自定义集合",
     "empty_state": {
       "title": "开启你的 ENS 自由视界",
-      "desc": "Mine 页面允许你通过自定义规则\n（如 \"abc, hello, 12345\"、\"@vitalik.eth\" 或以太坊地址）\n来创建一个专属的域名集合。",
+      "desc": "Mine 页面允许你通过自定义规则\n（如 \"abc, hello, 12345\"、\"@alice.eth\" 或以太坊地址）\n来创建一个专属的域名集合。",
       "guide": "请前往 设置 > 我的集合 进行配置"
     },
     "error": "加载失败，请检查网络或配置规则"

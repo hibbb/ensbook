@@ -65,7 +65,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 </Trans>
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
-                @vitalik.eth 或 @vitalik
+                @alice.eth 或 @alice
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                 {t("search.guide.mode.mixed.desc")}
               </p>
               <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
-                apple @vitalik.eth 0xd8...
+                apple @alice.eth 0xd8...
               </div>
             </div>
           </div>

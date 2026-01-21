@@ -126,7 +126,7 @@ export const MyCollectionSettings = () => {
             abc, hello, 123
           </span>
           <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
-            @vitalik.eth
+            @alice.eth
           </span>
           <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
             0xd8dA...6045
