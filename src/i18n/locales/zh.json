@@ -172,7 +172,7 @@
     "filter": {
       "default_title": "筛选",
       "sort_name": "按域名字母排序",
-      "sort_status": "按状态排序",
+      "sort_expiry_date": "按到期时间排序",
       "sort_reg_date": "按注册时间排序",
       "sort_owner": "按所有者排序",
       "filter_length_wrap": "按长度或包装筛选",
