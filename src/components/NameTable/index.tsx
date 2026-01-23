@@ -1,6 +1,6 @@
 // src/components/NameTable/index.tsx
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
@@ -8,6 +8,7 @@ import { SkeletonRow } from "./SkeletonRow";
 import { Pagination } from "../ui/Pagination";
 import { ViewStateReset } from "./ViewStateReset";
 import { usePrimaryNames } from "../../hooks/usePrimaryNames";
+import { useMarketData } from "../../hooks/useMarketData";
 import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 import type {
@@ -16,6 +17,8 @@ import type {
   FilterConfig,
   DeleteCriteria,
 } from "./types";
+
+import { ITEMS_PER_PAGE } from "../../config/constants";
 
 interface NameTableProps {
   records: NameRecord[] | undefined | null;
@@ -62,10 +65,10 @@ interface NameTableProps {
   ownerStats?: { total: number; displayed: number };
 }
 
-export const NameTable = (props: NameTableProps) => {
+const NameTableComponent = (props: NameTableProps) => {
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 50;
+  const pageSize = ITEMS_PER_PAGE;
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -93,6 +96,12 @@ export const NameTable = (props: NameTableProps) => {
     const startIndex = (currentPage - 1) * pageSize;
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
+
+  // 🚀 1. 调用 Market Hook
+  // 传入当前页的数据 (Viewport Driven)
+  const { data: marketDataMap, isLoading: isMarketLoading } = useMarketData(
+    paginatedBasicRecords,
+  );
 
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
@@ -172,11 +181,14 @@ export const NameTable = (props: NameTableProps) => {
                   onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
                   onLevelChange={props.onLevelChange}
+                  // 🚀 2. 传递市场数据
+                  marketData={marketDataMap?.[r.label]}
+                  isMarketLoading={isMarketLoading}
                 />
               ))
             ) : (
               <tr>
-                <td colSpan={7}>
+                <td colSpan={8}>
                   <div className="px-6 py-24 text-center">
                     <div className="text-gray-300 text-4xl mb-3">∅</div>
                     <p className="text-gray-400 text-sm">{t("table.empty")}</p>
@@ -207,3 +219,6 @@ export const NameTable = (props: NameTableProps) => {
     </div>
   );
 };
+
+// 使用 React.memo 导出，只有当 props 发生浅比较变化时，才会重新渲染
+export const NameTable = React.memo(NameTableComponent);

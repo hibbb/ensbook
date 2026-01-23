@@ -1,7 +1,5 @@
 // src/components/NameTable/cells/StatusCell.tsx
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEthereum } from "@fortawesome/free-brands-svg-icons";
 import { useTranslation } from "react-i18next";
 import { usePremiumEthPrice } from "../../../hooks/usePremiumEthPrice";
 import {
@@ -117,8 +115,8 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
 
       return (
         <div className="flex items-center gap-1.5 font-qs-medium">
-          <div className="flex items-center gap-0.5">
-            <FontAwesomeIcon icon={faEthereum} className="text-[10px]" />
+          <div className="flex items-center gap-1">
+            <span className="font-qs-regular leading-none">Ξ</span>
             <span>{premiumEthPrice || "-"}</span>
           </div>
           <span className="opacity-50 text-[10px]">|</span>

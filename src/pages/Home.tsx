@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react"; // 🚀 引入 useCallback
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -72,17 +72,23 @@ export const Home = () => {
     levelCounts,
     isViewStateDirty,
     resetViewState,
-    ownerCounts, // 🚀
-    ownerStats, // 🚀
-    ownershipCounts, // 🚀 1. 从 Hook 解构
+    ownerCounts,
+    ownerStats,
+    ownershipCounts,
   } = useNameTableView(validRecords, address, "home");
 
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
   const updateLevel = useOptimisticLevelUpdate();
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    updateLevel(record, newLevel);
-  };
+
+  // 🚀 核心修复：使用 useCallback 稳定函数引用
+  // 这样 NameTable 的 props 在打字期间就不会变化，React.memo 才能生效
+  const handleLevelChange = useCallback(
+    (record: NameRecord, newLevel: number) => {
+      updateLevel(record, newLevel);
+    },
+    [updateLevel],
+  );
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -118,90 +124,106 @@ export const Home = () => {
     }
   };
 
-  const handleDelete = (record: NameRecord) => {
-    removeFromHome(record.label);
-    setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
-    if (selectedLabels.has(record.label)) {
-      toggleSelection(record.label);
-    }
-  };
-
-  const handleBatchDelete = (criteria: DeleteCriteria) => {
-    const targetRecords = records;
-    if (!targetRecords) return;
-
-    const { type, value } = criteria;
-
-    if (type === "all") {
-      if (window.confirm(t("home.toast.clear_confirm"))) {
-        clearHomeList();
-        setResolvedLabels([]);
-        clearSelection();
-        resetViewState();
+  // 🚀 修复：添加 useCallback 并补全依赖
+  const handleDelete = useCallback(
+    (record: NameRecord) => {
+      removeFromHome(record.label);
+      setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
+      if (selectedLabels.has(record.label)) {
+        toggleSelection(record.label);
       }
-      return;
-    }
+    },
+    [selectedLabels, toggleSelection],
+  );
 
-    let labelsToDelete = new Set<string>();
+  // 🚀 修复：添加 useCallback 并补全依赖
+  const handleBatchDelete = useCallback(
+    (criteria: DeleteCriteria) => {
+      const targetRecords = records;
+      if (!targetRecords) return;
 
-    switch (type) {
-      case "status":
-        labelsToDelete = new Set(
-          targetRecords.filter((r) => r.status === value).map((r) => r.label),
-        );
-        break;
-      case "length":
-        labelsToDelete = new Set(
-          targetRecords
-            .filter((r) => r.label.length === value)
-            .map((r) => r.label),
-        );
-        break;
-      case "wrapped": {
-        const isWrapped = value as boolean;
-        labelsToDelete = new Set(
-          targetRecords
-            .filter((r) => r.wrapped === isWrapped)
-            .map((r) => r.label),
-        );
-        break;
-      }
-      case "owner": {
-        if (!address) {
-          toast.error(t("common.connect_wallet"));
-          return;
+      const { type, value } = criteria;
+
+      if (type === "all") {
+        if (window.confirm(t("home.toast.clear_confirm"))) {
+          clearHomeList();
+          setResolvedLabels([]);
+          clearSelection();
+          resetViewState();
         }
-        const isDeletingMine = value === "mine";
-        labelsToDelete = new Set(
-          targetRecords
-            .filter((r) => {
-              const recordOwner = r.owner?.toLowerCase();
-              const myAddress = address.toLowerCase();
-              const isOwner = recordOwner === myAddress;
-              return isDeletingMine ? isOwner : !isOwner;
-            })
-            .map((r) => r.label),
-        );
-        break;
+        return;
       }
-    }
 
-    if (labelsToDelete.size === 0) return;
+      let labelsToDelete = new Set<string>();
 
-    bulkRemoveFromHome(Array.from(labelsToDelete));
-    setResolvedLabels((prev) =>
-      prev.filter((label) => !labelsToDelete.has(label)),
-    );
-
-    if (selectedLabels.size > 0) {
-      labelsToDelete.forEach((label) => {
-        if (selectedLabels.has(label)) {
-          toggleSelection(label);
+      switch (type) {
+        case "status":
+          labelsToDelete = new Set(
+            targetRecords.filter((r) => r.status === value).map((r) => r.label),
+          );
+          break;
+        case "length":
+          labelsToDelete = new Set(
+            targetRecords
+              .filter((r) => r.label.length === value)
+              .map((r) => r.label),
+          );
+          break;
+        case "wrapped": {
+          const isWrapped = value as boolean;
+          labelsToDelete = new Set(
+            targetRecords
+              .filter((r) => r.wrapped === isWrapped)
+              .map((r) => r.label),
+          );
+          break;
         }
-      });
-    }
-    toast.success(t("home.toast.delete_success"));
-  };
+        case "owner": {
+          if (!address) {
+            toast.error(t("common.connect_wallet"));
+            return;
+          }
+          const isDeletingMine = value === "mine";
+          labelsToDelete = new Set(
+            targetRecords
+              .filter((r) => {
+                const recordOwner = r.owner?.toLowerCase();
+                const myAddress = address.toLowerCase();
+                const isOwner = recordOwner === myAddress;
+                return isDeletingMine ? isOwner : !isOwner;
+              })
+              .map((r) => r.label),
+          );
+          break;
+        }
+      }
+
+      if (labelsToDelete.size === 0) return;
+
+      bulkRemoveFromHome(Array.from(labelsToDelete));
+      setResolvedLabels((prev) =>
+        prev.filter((label) => !labelsToDelete.has(label)),
+      );
+
+      if (selectedLabels.size > 0) {
+        labelsToDelete.forEach((label) => {
+          if (selectedLabels.has(label)) {
+            toggleSelection(label);
+          }
+        });
+      }
+      toast.success(t("home.toast.delete_success"));
+    },
+    [
+      records,
+      address,
+      selectedLabels,
+      toggleSelection,
+      resetViewState,
+      clearSelection,
+      t,
+    ],
+  );
 
   return (
     <div className="max-w-7xl mx-auto lg:px-4 relative min-h-[85vh] flex flex-col">
@@ -244,10 +266,10 @@ export const Home = () => {
             levelCounts={levelCounts}
             isViewStateDirty={isViewStateDirty}
             onResetViewState={resetViewState}
-            onLevelChange={handleLevelChange}
-            ownerCounts={ownerCounts} // 🚀
-            ownerStats={ownerStats} // 🚀
-            ownershipCounts={ownershipCounts} // 🚀 2. 传递给组件
+            onLevelChange={handleLevelChange} // 🚀 现在它是稳定的
+            ownerCounts={ownerCounts}
+            ownerStats={ownerStats}
+            ownershipCounts={ownershipCounts}
           />
         </div>
       )}
