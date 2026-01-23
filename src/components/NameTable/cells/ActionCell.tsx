@@ -159,17 +159,11 @@ export const ActionCell = ({
         )}
 
       {!isConnected && (
-<<<<<<< HEAD
         <Tooltip content={t("common.connect_wallet")}>
           <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
             <FontAwesomeIcon icon={faWallet} size="2xs" />
           </div>
         </Tooltip>
-=======
-        <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
-          <FontAwesomeIcon icon={faWallet} size="2xs" />
-        </div>
->>>>>>> fa8b7fd (refactor: 调整优化数据获取逻辑，成功获取价格信息)
       )}
 
       <div className="flex items-center gap-2">
