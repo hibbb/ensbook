@@ -8,10 +8,7 @@ import type { MarketDataMap } from "../../types/marketData";
 const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
 const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
-// ⚡️ 性能优化：
-// 既然去掉了 order_by，我们可以安全地增加切片大小。
 // 30 个 ID 的 URL 长度约为 2500 字符，通常是安全的。
-// 这样 50 个数据只需要 2 次请求。
 const CHUNK_SIZE = 30;
 
 const getTokenId = (record: NameRecord): string => {
@@ -34,14 +31,16 @@ function chunkArray<T>(array: T[], size: number): T[][] {
   return res;
 }
 
-const headers = {
-  accept: "application/json",
-  "x-api-key": API_KEY,
+const getHeaders = () => {
+  const headers: HeadersInit = {
+    accept: "application/json",
+  };
+  if (API_KEY) {
+    headers["X-API-KEY"] = API_KEY;
+  }
+  return headers;
 };
 
-/**
- * 通用批量获取函数 (Listings 和 Offers)
- */
 async function fetchBatchOrders(
   records: NameRecord[],
   side: "listings" | "offers",
@@ -58,7 +57,6 @@ async function fetchBatchOrders(
     idToLabel[`${contract}:${tokenId}`] = r.label;
   }
 
-  // 并行处理所有合约组
   const promises = Object.entries(groups).flatMap(
     ([contract, groupRecords]) => {
       const chunks = chunkArray(groupRecords, CHUNK_SIZE);
@@ -70,15 +68,19 @@ async function fetchBatchOrders(
 
           params.append("asset_contract_address", contract);
           tokenIds.forEach((id) => params.append("token_ids", id));
-          params.append("limit", "50"); // 获取尽可能多的订单
-
-          // ❌ 移除 order_by，防止 400 错误
-          // params.append("order_by", "eth_price");
+          params.append("limit", "50");
 
           const url = `${OPENSEA_API_BASE}/orders/ethereum/seaport/${side}?${params.toString()}`;
 
-          const res = await fetch(url, { headers });
-          if (!res.ok) return;
+          const res = await fetch(url, { headers: getHeaders() });
+
+          if (!res.ok) {
+            // 仅在非 404 时警告 (404 可能意味着没有订单，不一定是错误)
+            if (res.status !== 404) {
+              console.warn(`OpenSea ${side} error: ${res.status}`);
+            }
+            return;
+          }
 
           const json = await res.json();
           const orders = json.orders || [];
@@ -87,7 +89,14 @@ async function fetchBatchOrders(
             if (order.cancelled || order.finalized || order.is_expired)
               continue;
 
-            const item = order.maker_asset_bundle?.assets?.[0];
+            // 根据 side 决定去哪里找 Token ID
+            let item;
+            if (side === "listings") {
+              item = order.maker_asset_bundle?.assets?.[0];
+            } else {
+              item = order.taker_asset_bundle?.assets?.[0];
+            }
+
             if (!item) continue;
 
             const tokenId = item.token_id;
@@ -109,14 +118,14 @@ async function fetchBatchOrders(
             };
 
             if (side === "listings") {
-              // 客户端比价：取最低
               const current = resultMap[label].listing;
+              // 取最低价
               if (!current || priceVal < current.amount) {
                 resultMap[label].listing = priceData;
               }
             } else {
-              // 客户端比价：取最高
               const current = resultMap[label].offer;
+              // 取最高价
               if (!current || priceVal > current.amount) {
                 resultMap[label].offer = priceData;
               }
@@ -139,8 +148,6 @@ export async function fetchOpenSeaData(
 
   const resultMap: MarketDataMap = {};
 
-  // 并行获取 Listings 和 Offers
-  // 现在两者都使用批量接口，速度会非常快
   await Promise.allSettled([
     fetchBatchOrders(records, "listings", resultMap),
     fetchBatchOrders(records, "offers", resultMap),
