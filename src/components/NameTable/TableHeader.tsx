@@ -136,6 +136,10 @@ export const TableHeader = ({
         </th>
 
         <th>
+          <ThWrapper>{t("table.header.market")}</ThWrapper>
+        </th>
+
+        <th>
           <ActionHeader
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}

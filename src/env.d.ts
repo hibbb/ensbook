@@ -13,6 +13,9 @@ interface ImportMetaEnv {
 
   /** The Graph Subgraph API Key */
   readonly VITE_SUBGRAPH_API_KEY: string;
+
+  /** OpenSea API Key */
+  readonly VITE_OPENSEA_API_KEY: string;
 }
 
 interface ImportMeta {

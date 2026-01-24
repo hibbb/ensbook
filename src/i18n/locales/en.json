@@ -166,13 +166,14 @@
       "name": "Name",
       "status": "Status",
       "owner": "Owner",
+      "market": "Market",
       "action": "Action",
       "info": "Info"
     },
     "filter": {
       "default_title": "Filter",
       "sort_name": "Sort by Name",
-      "sort_status": "Sort by Status",
+      "sort_expiry_date": "Sort by Expiry Date",
       "sort_reg_date": "Sort by Registration Date",
       "sort_owner": "Sort by Owner",
       "filter_length_wrap": "Filter by Length / Wrap",
@@ -249,6 +250,14 @@
       "delete_item": "Delete {{label}}.eth",
       "cannot_delete": "Cannot delete"
     }
+  },
+  "market": {
+    "bid": "Bid",
+    "last_sale": "Last Sale",
+    "listed": "List",
+    "no_listing": "No Listing",
+    "ago": "ago",
+    "view_on_opensea": "View on OpenSea"
   },
   "transaction": {
     "title": {

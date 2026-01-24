@@ -1,10 +1,9 @@
 // src/components/NameTable/headers/StatusHeader.tsx
 
 import {
-  faSortAmountDown,
-  faSortAmountUp,
   faCheck,
-  faClock,
+  faPersonRunning,
+  faPersonCane,
   faRotateLeft,
   faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
@@ -50,24 +49,24 @@ export const StatusHeader = ({
         <span>{t("table.header.status")}</span>
         <div className="flex items-center gap-1 pl-2 border-l border-gray-300/50">
           <SortButton
-            field="status"
+            field="registered"
             currentSort={sortConfig}
             onSort={onSort}
-            defaultIcon={faSortAmountDown}
-            ascIcon={faSortAmountUp}
-            descIcon={faSortAmountDown}
-            title={t("table.filter.sort_status")}
+            defaultIcon={faPersonRunning}
+            ascIcon={faRotateRight}
+            descIcon={faRotateLeft}
+            title={t("table.filter.sort_reg_date")}
             disabled={disabled}
           />
 
           <SortButton
-            field="registered"
+            field="status"
             currentSort={sortConfig}
             onSort={onSort}
-            defaultIcon={faClock}
+            defaultIcon={faPersonCane}
             ascIcon={faRotateRight}
             descIcon={faRotateLeft}
-            title={t("table.filter.sort_reg_date")}
+            title={t("table.filter.sort_expiry_date")}
             disabled={disabled}
           />
 
