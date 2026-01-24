@@ -1,101 +1,114 @@
-# cliff.toml
-
-# Git changelog generator configuration
-
-# Compatible with Conventional Commits + commitlint
+# ================================
+# git-cliff final stable config
+# Conventional Commits compatible
+# ================================
 
 [changelog]
 header = """
-
 # Changelog
 
 所有重要的变更都会记录在此文件中。
-
 格式遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
 """
 
+# 🚀 修改说明：
+# 1. {% if version -%} 后面的两个空行确保了版本号上方有一个空行。
+# 2. {% for group ... -%} 中的 -% 删除了标签后的换行。
+# 3. 显式添加 \n ### {{ group }} 确保标题前有一个空行。
+# 4. 内层 {% endfor -%} 和外层 {% endfor -%} 都使用了 -% 来消除循环产生的多余累积换行。
 body = """
 {% if version %}
-
 ## {{ version }}{% if date %} ({{ date }}){% endif %}
-
-{% else %}
-
+{% else -%}
 ## 未发布
-
-{% endif %}
-
+{% endif -%}
 {% for group, commits in commits | group_by(attribute="group") %}
-
 ### {{ group }}
 
-{% for commit in commits %}
+{% for commit in commits -%}
+- {{ commit.message }}
+{% endfor -%}
+{% endfor -%}
+"""
 
-* {{ commit.message | capitalize_first }}{% if commit.author %} ({{ commit.author.name }}){% endif %}
-  {% endfor %}
-  {% endfor %}
-  """
+footer = """
 
-## footer = """
-
-由 git-cliff 自动生成
+---
+Book Your ENS Names at ENSBook.
 """
 
 trim = true
 
+# ================================
+# Git behavior
+# ================================
+
 [git]
-
-# 只解析符合 Conventional Commits 的提交
-
 conventional_commits = true
 filter_unconventional = true
-
-# 忽略 merge commit（避免 merge 噪音）
-
 ignore_merge_commits = true
 
-# tag 排序方式
-
+# 只识别 vX.Y.Z 形式的 tag
 tag_pattern = "v[0-9]*"
 
-# 提交时间排序
-
+# 提交按时间正序（更符合阅读习惯）
 sort_commits = "oldest"
 
-[commit_parsers]
+# ================================
+# Commit parsers
+# ================================
 
-# === 核心提交类型 ===
+[[commit_parsers]]
+message = "^feat"
+group = "🚀 Features"
 
-{ message = "^feat", group = "✨ Features" }
-{ message = "^fix", group = "🐛 Bug Fixes" }
+[[commit_parsers]]
+message = "^fix"
+group = "🐛 Bug Fixes"
 
-# === 改进 & 重构 ===
+[[commit_parsers]]
+message = "^perf"
+group = "⚡ Performance"
 
-{ message = "^perf", group = "⚡ Performance" }
-{ message = "^refactor", group = "♻️ Refactoring" }
+[[commit_parsers]]
+message = "^refactor"
+group = "🚜 Refactor"
 
-# === 工程相关 ===
+[[commit_parsers]]
+message = "^docs"
+group = "📚 Documentation"
 
-{ message = "^docs", group = "📝 Documentation" }
-{ message = "^test", group = "🧪 Tests" }
-{ message = "^build", group = "🏗 Build System" }
-{ message = "^ci", group = "🤖 CI" }
-{ message = "^chore", group = "🔧 Chores" }
+[[commit_parsers]]
+message = "^test"
+group = "🧪 Tests"
 
-# === 样式（通常不影响功能）===
+[[commit_parsers]]
+message = "^build"
+group = "🏗 Build System"
 
-{ message = "^style", group = "🎨 Styles" }
+[[commit_parsers]]
+message = "^ci"
+group = "🤖 CI"
 
-# === Revert ===
+[[commit_parsers]]
+message = "^style"
+group = "🎨 Styling"
 
-{ message = "^revert", group = "⏪ Reverts" }
+[[commit_parsers]]
+message = "^chore"
+group = "⚙️ Miscellaneous Tasks"
 
-# === BREAKING CHANGE（最高优先级）===
+[[commit_parsers]]
+message = "^revert"
+group = "⏪ Reverts"
 
-{ body = "BREAKING CHANGE", group = "💥 Breaking Changes" }
+# ================================
+# Breaking changes
+# ================================
+
+[[commit_parsers]]
+body = "BREAKING CHANGE"
+group = "💥 Breaking Changes"
 
 [notes]
-
-# BREAKING CHANGE 会被单独提升
-
 keywords = ["BREAKING CHANGE"]
