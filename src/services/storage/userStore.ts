@@ -185,11 +185,23 @@ export const bulkAddToHome = (labels: string[]) => {
   if (labels.length === 0) return;
   const data = getFullUserData();
   let hasChanges = false;
+  const now = Date.now(); // 🚀 获取当前时间
 
   labels.forEach((label) => {
+    // 1. 如果元数据不存在，创建新的
     if (!data.metadata[label]) {
       data.metadata[label] = createMeta();
+      hasChanges = true;
+    } else {
+      // 🚀 2. 核心修复：即使元数据已存在，也更新 createdAt
+      // 这确保了“重新添加”的域名会被视为“最新”，从而排在列表顶部
+      // 注意：我们只更新 createdAt，保留 memo 和 level 不变
+      data.metadata[label].createdAt = now;
+      data.metadata[label].updatedAt = now;
+      hasChanges = true;
     }
+
+    // 3. 添加到列表 (如果不在列表里)
     if (!data.homeList.includes(label)) {
       data.homeList.push(label);
       hasChanges = true;
