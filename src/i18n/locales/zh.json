@@ -218,7 +218,7 @@
       "clear_all": "全部清空"
     },
     "cell": {
-      "index_tooltip": "单击标记颜色 / 双击重置",
+      "index_tooltip": "单击切换标记颜色",
       "owner_addr": "所有者地址",
       "primary_name": "主域名",
       "copy_addr": "复制地址",

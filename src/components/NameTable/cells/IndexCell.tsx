@@ -27,14 +27,8 @@ export const IndexCell = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onLevelChange) {
+      // 保持循环逻辑：0 -> 1 -> 2 -> 3 -> 0
       onLevelChange((level + 1) % 4);
-    }
-  };
-
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onLevelChange) {
-      onLevelChange(0);
     }
   };
 
@@ -43,7 +37,6 @@ export const IndexCell = ({
       <Tooltip content={t("table.cell.index_tooltip")}>
         <div
           onClick={handleClick}
-          onDoubleClick={handleDoubleClick}
           className={`
             w-5 h-5 flex items-center justify-center rounded-full
             text-xs font-qs-bold cursor-pointer select-none

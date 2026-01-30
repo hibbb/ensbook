@@ -218,7 +218,7 @@
       "clear_all": "Clear All"
     },
     "cell": {
-      "index_tooltip": "Click to toggle Marker / Double click to reset",
+      "index_tooltip": "Click to toggle Marker",
       "owner_addr": "Owner Address",
       "primary_name": "Primary Name",
       "copy_addr": "Copy Address",
