@@ -20,6 +20,9 @@ interface BaseModalProps {
     | "max-w-4xl";
   showCloseButton?: boolean;
   zIndex?: number;
+  // 🚀 新增配置项
+  closeOnOverlayClick?: boolean; // 是否允许点击遮罩关闭
+  closeOnEsc?: boolean; // 是否允许按 ESC 关闭
 }
 
 export const BaseModal = ({
@@ -30,26 +33,26 @@ export const BaseModal = ({
   maxWidth = "max-w-sm",
   showCloseButton = true,
   zIndex = 100,
+  // 🚀 默认值为 true，保持原有行为
+  closeOnOverlayClick = true,
+  closeOnEsc = true,
 }: BaseModalProps) => {
-  // 1. 滚动锁定 (Scroll Lock)
-  // 当模态框打开时，禁止背景页面滚动；关闭时恢复
+  // 1. 滚动锁定
   useEffect(() => {
     if (isOpen) {
-      // 记录当前的 overflow 状态，防止覆盖原有的 style
       const originalStyle = window.getComputedStyle(document.body).overflow;
       document.body.style.overflow = "hidden";
-
       return () => {
         document.body.style.overflow = originalStyle;
       };
     }
   }, [isOpen]);
 
-  // 2. 键盘交互 (A11y)
-  // 监听 ESC 键关闭模态框
+  // 2. 键盘交互 (ESC)
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      // 🚀 增加判断：只有当 closeOnEsc 为 true 时才响应
+      if (e.key === "Escape" && isOpen && closeOnEsc) {
         onClose();
       }
     };
@@ -58,14 +61,10 @@ export const BaseModal = ({
       window.addEventListener("keydown", handleEsc);
     }
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, closeOnEsc]); // 添加依赖
 
-  // 3. 安全性与环境检查
-  // 如果在服务端 (document undefined) 或模态框未打开，直接返回 null
-  // 这避免了 "document is not defined" 错误，也消除了 useEffect setState 导致的级联渲染
   if (typeof document === "undefined" || !isOpen) return null;
 
-  // 使用 Portal 渲染到 body，确保层级正确，不受父级 overflow:hidden 影响
   return createPortal(
     <div
       className="fixed inset-0 flex items-center justify-center p-4 transition-all"
@@ -76,21 +75,23 @@ export const BaseModal = ({
       {/* 背景遮罩 */}
       <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200"
-        onClick={onClose}
+        // 🚀 修改点击事件：只有允许点击关闭时才触发 onClose
+        onClick={() => {
+          if (closeOnOverlayClick) onClose();
+        }}
         aria-hidden="true"
       />
 
       {/* 模态框容器 */}
-      {/* 添加 max-h 和 flex 布局，确保内容过多时头部固定，内部滚动 */}
       <div
         className={`
           relative w-full ${maxWidth} bg-white rounded-xl shadow-2xl overflow-hidden
           animate-in zoom-in-95 fade-in duration-200 border border-gray-100/50
           flex flex-col max-h-[90vh]
         `}
-        onClick={(e) => e.stopPropagation()} // 防止点击内部触发背景关闭
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* 头部 (仅当提供了 title 或 showCloseButton 时渲染) */}
+        {/* 头部 */}
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 shrink-0 bg-white z-10">
             <div className="text-lg font-qs-semibold text-text-main flex items-center gap-2">
@@ -108,7 +109,7 @@ export const BaseModal = ({
           </div>
         )}
 
-        {/* 内容区域 (支持内部滚动) */}
+        {/* 内容区域 */}
         <div className="overflow-y-auto custom-scrollbar">{children}</div>
       </div>
     </div>,

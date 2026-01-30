@@ -110,6 +110,9 @@ export const ProcessModal = ({
         </div>
       }
       showCloseButton={true}
+      // 🚀 核心修改：禁用遮罩点击和 ESC 关闭
+      closeOnOverlayClick={false}
+      closeOnEsc={false}
     >
       <div className="p-4">
         {isIdle && (
