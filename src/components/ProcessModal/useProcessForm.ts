@@ -1,8 +1,10 @@
-// src/components/ProcessModal/useDurationCalculation.ts
+// src/components/ProcessModal/useProcessForm.ts
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { isAddress } from "viem"; // 🚀
+import { isAddress, type Address } from "viem";
+import { normalize } from "viem/ens";
+import { publicClient } from "../../utils/client"; // 🚀 引入 client
 import {
   MIN_REGISTRATION_DURATION,
   SECONDS_PER_DAY,
@@ -33,8 +35,14 @@ export const useProcessForm = ({
   const [days, setDays] = useState(0);
   const [targetDate, setTargetDate] = useState("");
 
-  // 🚀 新增：接收地址状态
-  const [recipient, setRecipient] = useState("");
+  // 🚀 接收者输入状态
+  const [recipientInput, setRecipientInput] = useState("");
+  // 🚀 解析后的有效地址 (如果输入为空，则为 null)
+  const [resolvedAddress, setResolvedAddress] = useState<Address | null>(null);
+  // 🚀 解析状态
+  const [isResolving, setIsResolving] = useState(false);
+  // 🚀 解析错误信息
+  const [resolveError, setResolveError] = useState<string | null>(null);
 
   const getBaseTime = useCallback(() => {
     if (type === "renew" || type === "batch") {
@@ -44,12 +52,16 @@ export const useProcessForm = ({
     return Math.floor(Date.now() / 1000);
   }, [type, currentExpiry, expiryTimes]);
 
+  // 初始化
   useEffect(() => {
     if (isOpen) {
       setMode("duration");
       setYears(1);
       setDays(0);
-      setRecipient(""); // 🚀 重置接收地址
+      setRecipientInput("");
+      setResolvedAddress(null);
+      setResolveError(null);
+      setIsResolving(false);
 
       let baseForDefault = Math.floor(Date.now() / 1000);
       if (type === "batch" && expiryTimes.length > 0) {
@@ -64,6 +76,62 @@ export const useProcessForm = ({
       setTargetDate(formatDateInput(defaultTarget));
     }
   }, [isOpen, type, expiryTimes, currentExpiry]);
+
+  // 🚀 核心逻辑：监听输入并解析 (带防抖)
+  useEffect(() => {
+    const input = recipientInput.trim();
+
+    // 1. 空输入：重置，视为使用当前钱包
+    if (!input) {
+      setResolvedAddress(null);
+      setResolveError(null);
+      setIsResolving(false);
+      return;
+    }
+
+    // 2. 如果是标准地址：直接通过
+    if (isAddress(input)) {
+      setResolvedAddress(input);
+      setResolveError(null);
+      setIsResolving(false);
+      return;
+    }
+
+    // 3. 如果看起来像 ENS (包含点)：发起异步解析
+    if (input.includes(".")) {
+      setIsResolving(true);
+      setResolveError(null);
+      setResolvedAddress(null); // 先清空，防止提交旧的
+
+      const timer = setTimeout(async () => {
+        try {
+          const normalized = normalize(input);
+          const addr = await publicClient.getEnsAddress({ name: normalized });
+
+          if (addr) {
+            setResolvedAddress(addr);
+            setResolveError(null);
+          } else {
+            setResolvedAddress(null);
+            setResolveError("ENS name not found"); // 简单提示，UI层可以翻译
+          }
+        } catch (e) {
+          setResolvedAddress(null);
+          setResolveError("Invalid ENS name");
+          console.log(e);
+        } finally {
+          setIsResolving(false);
+        }
+      }, 500); // 500ms 防抖
+
+      return () => clearTimeout(timer);
+    }
+
+    // 4. 既不是地址也不是 ENS：报错
+    setResolvedAddress(null);
+    setResolveError("Invalid format");
+    setIsResolving(false);
+  }, [recipientInput]);
 
   const minDateValue = useMemo(() => {
     const now = new Date();
@@ -122,16 +190,24 @@ export const useProcessForm = ({
       }
     }
 
-    // 🚀 新增：地址校验
-    // 只有当用户输入了内容时才校验，空字符串代表使用默认地址（当前钱包），是合法的
-    if (type === "register" && recipient.trim() !== "") {
-      if (!isAddress(recipient)) {
+    // 🚀 校验地址逻辑更新
+    if (type === "register" && recipientInput.trim() !== "") {
+      if (isResolving) return t("common.loading"); // 正在解析中，暂不报错，但也阻止提交
+      if (resolveError || !resolvedAddress) {
         return t("transaction.error.invalid_address");
       }
     }
 
     return null;
-  }, [calculatedDurations, type, t, recipient]);
+  }, [
+    calculatedDurations,
+    type,
+    t,
+    recipientInput,
+    isResolving,
+    resolveError,
+    resolvedAddress,
+  ]);
 
   return {
     mode,
@@ -146,8 +222,11 @@ export const useProcessForm = ({
     calculatedDurations,
     skippedCount,
     validationError,
-    // 🚀 导出
-    recipient,
-    setRecipient,
+    // 🚀 导出新状态
+    recipientInput,
+    setRecipientInput,
+    resolvedAddress,
+    isResolving,
+    resolveError,
   };
 };

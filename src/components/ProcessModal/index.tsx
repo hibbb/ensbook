@@ -57,9 +57,12 @@ export const ProcessModal = ({
     calculatedDurations,
     skippedCount,
     validationError,
-    // 🚀 解构
-    recipient,
-    setRecipient,
+    // 🚀 解构新状态
+    recipientInput,
+    setRecipientInput,
+    resolvedAddress,
+    isResolving,
+    resolveError,
   } = useProcessForm({
     isOpen,
     type,
@@ -79,9 +82,11 @@ export const ProcessModal = ({
 
   const handleConfirm = () => {
     if (!validationError) {
-      // 🚀 传递 recipient (如果是空字符串，传 undefined)
-      const ownerAddress = recipient ? (recipient as Address) : undefined;
-      onConfirm(calculatedDurations, ownerAddress);
+      // 🚀 核心修改：使用解析后的地址
+      // 如果 resolvedAddress 存在，说明用户输入了有效内容（地址或ENS）
+      // 如果不存在（且无错误），说明用户留空，传 undefined 让底层使用当前钱包
+      const finalOwner = resolvedAddress || undefined;
+      onConfirm(calculatedDurations, finalOwner);
     }
   };
 
@@ -121,9 +126,12 @@ export const ProcessModal = ({
               minDateValue={minDateValue}
               skippedCount={skippedCount}
               type={type}
-              // 🚀 传递
-              recipient={recipient}
-              setRecipient={setRecipient}
+              // 🚀 传递新 Props
+              recipientInput={recipientInput}
+              setRecipientInput={setRecipientInput}
+              resolvedAddress={resolvedAddress}
+              isResolving={isResolving}
+              resolveError={resolveError}
             />
 
             {validationError && (
@@ -142,7 +150,7 @@ export const ProcessModal = ({
               </button>
               <button
                 onClick={handleConfirm}
-                disabled={!!validationError}
+                disabled={!!validationError || isResolving} // 🚀 解析中禁止提交
                 className={`flex-1 py-3 rounded-lg font-qs-semibold text-sm text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2
                   ${
                     validationError

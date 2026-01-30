@@ -1,6 +1,6 @@
-// src/components/ProcessModal/DurationSettings.tsx
+// src/components/ProcessModal/ProcessForm.tsx
 
-import { useState } from "react"; // 🚀
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
@@ -8,10 +8,14 @@ import {
   faMinus,
   faPlus,
   faTriangleExclamation,
-  faChevronDown, // 🚀
-  faChevronUp, // 🚀
+  faChevronDown,
+  faChevronUp,
+  faSpinner, // 🚀
+  faCheck, // 🚀
+  faXmark, // 🚀
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
+import { truncateAddress } from "../../utils/format"; // 🚀
 
 interface ProcessFormProps {
   mode: "duration" | "until";
@@ -25,9 +29,12 @@ interface ProcessFormProps {
   minDateValue: string;
   skippedCount: number;
   type: "register" | "renew" | "batch";
-  // 🚀 新增
-  recipient: string;
-  setRecipient: (addr: string) => void;
+  // 🚀 更新 Props 定义
+  recipientInput: string;
+  setRecipientInput: (val: string) => void;
+  resolvedAddress: string | null;
+  isResolving: boolean;
+  resolveError: string | null;
 }
 
 export const ProcessForm = ({
@@ -42,34 +49,30 @@ export const ProcessForm = ({
   minDateValue,
   skippedCount,
   type,
-  recipient,
-  setRecipient,
+  // 🚀 解构新 Props
+  recipientInput,
+  setRecipientInput,
+  resolvedAddress,
+  isResolving,
+  resolveError,
 }: ProcessFormProps) => {
   const { t } = useTranslation();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
     <div className="animate-in slide-in-from-right-4 duration-300">
-      {/* Mode Switcher */}
+      {/* ... (Mode Switcher 和 时长选择器 保持不变，省略以节省篇幅) ... */}
       <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
         <button
           onClick={() => setMode("duration")}
-          className={`flex-1 py-2 text-sm font-qs-semibold rounded-md transition-all flex items-center justify-center gap-2 ${
-            mode === "duration"
-              ? "bg-white text-link shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
+          className={`flex-1 py-2 text-sm font-qs-semibold rounded-md transition-all flex items-center justify-center gap-2 ${mode === "duration" ? "bg-white text-link shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
         >
           <FontAwesomeIcon icon={faClock} />
           {t("transaction.mode.duration")}
         </button>
         <button
           onClick={() => setMode("until")}
-          className={`flex-1 py-2 text-sm font-qs-semibold rounded-md transition-all flex items-center justify-center gap-2 ${
-            mode === "until"
-              ? "bg-white text-link shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
+          className={`flex-1 py-2 text-sm font-qs-semibold rounded-md transition-all flex items-center justify-center gap-2 ${mode === "until" ? "bg-white text-link shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
         >
           <FontAwesomeIcon icon={faCalendarDay} />
           {t("transaction.mode.until")}
@@ -79,7 +82,7 @@ export const ProcessForm = ({
       <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
         {mode === "duration" ? (
           <div className="flex items-center gap-4">
-            {/* Years Input */}
+            {/* ... (Years/Days Inputs 保持不变) ... */}
             <div className="flex-1 flex flex-col items-center gap-2">
               <div className="flex items-center gap-2 w-full justify-center">
                 <button
@@ -111,7 +114,6 @@ export const ProcessForm = ({
               </div>
             </div>
             <div className="w-px h-12 bg-gray-100"></div>
-            {/* Days Input */}
             <div className="flex-1 flex flex-col items-center gap-2">
               <div className="flex items-center gap-2 w-full justify-center">
                 <button
@@ -174,7 +176,7 @@ export const ProcessForm = ({
           </div>
         )}
 
-        {/* 🚀 核心新增：高级设置 (仅注册时显示) */}
+        {/* 高级设置 */}
         {type === "register" && (
           <div className="mt-4 border-t border-gray-100 pt-4">
             <button
@@ -195,20 +197,61 @@ export const ProcessForm = ({
                 <div className="relative">
                   <input
                     type="text"
-                    value={recipient}
-                    onChange={(e) => setRecipient(e.target.value)}
+                    value={recipientInput}
+                    onChange={(e) => setRecipientInput(e.target.value)}
                     placeholder={t(
                       "transaction.settings.recipient_placeholder",
                     )}
-                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono text-text-main outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
+                    className={`w-full p-2 bg-gray-50 border rounded-lg text-sm font-mono text-text-main outline-none focus:ring-2 transition-all pr-8
+                      ${resolveError ? "border-red-300 focus:ring-red-100 focus:border-red-400" : "border-gray-200 focus:ring-link/20 focus:border-link"}
+                    `}
                   />
+
+                  {/* 🚀 状态图标 */}
+                  <div className="absolute right-3 top-2.5 text-xs">
+                    {isResolving && (
+                      <FontAwesomeIcon
+                        icon={faSpinner}
+                        spin
+                        className="text-link"
+                      />
+                    )}
+                    {!isResolving && resolvedAddress && (
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-green-500"
+                      />
+                    )}
+                    {!isResolving && resolveError && (
+                      <FontAwesomeIcon
+                        icon={faXmark}
+                        className="text-red-400"
+                      />
+                    )}
+                  </div>
                 </div>
-                {recipient && (
-                  <p className="text-[10px] text-orange-500 mt-1.5 flex items-center gap-1">
-                    <FontAwesomeIcon icon={faTriangleExclamation} />
-                    {t("transaction.settings.recipient_warning")}
-                  </p>
-                )}
+
+                {/* 🚀 解析结果反馈 */}
+                <div className="mt-1.5 min-h-[1.25rem]">
+                  {isResolving ? (
+                    <span className="text-xs text-gray-400">
+                      {t("account.resolving")}
+                    </span>
+                  ) : resolveError ? (
+                    <span className="text-xs text-red-400">{resolveError}</span>
+                  ) : resolvedAddress ? (
+                    <div className="flex items-center gap-1 text-xs text-green-600 font-mono bg-green-50 px-2 py-0.5 rounded w-fit">
+                      <FontAwesomeIcon icon={faCheck} size="xs" />
+                      {truncateAddress(resolvedAddress)}
+                    </div>
+                  ) : recipientInput ? null : ( // 有输入但还没解析完或还没触发
+                    // 空输入，显示默认提示
+                    <p className="text-[10px] text-orange-500 flex items-center gap-1">
+                      <FontAwesomeIcon icon={faTriangleExclamation} />
+                      {t("transaction.settings.recipient_warning")}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </div>
