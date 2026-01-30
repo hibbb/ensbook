@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import toast from "react-hot-toast"; // 🚀 引入 toast
+import toast from "react-hot-toast";
+import { type Address } from "viem"; // 🚀
 
 import { useEnsRenewal } from "./useEnsRenewal";
 import { useEnsRegistration } from "./useEnsRegistration";
@@ -16,7 +17,6 @@ export const useEnsActions = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  // ... (状态定义保持不变) ...
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
     record?: NameRecord;
@@ -28,7 +28,6 @@ export const useEnsActions = () => {
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
   const [pendingLabels, setPendingLabels] = useState<Set<string>>(new Set());
 
-  // ... (useEnsRenewal, useEnsRegistration, useEffects 保持不变) ...
   const {
     renewSingle,
     renewBatch,
@@ -45,7 +44,7 @@ export const useEnsActions = () => {
     currentHash: regTxHash,
     resetStatus: resetReg,
     checkAndResume,
-    startResuming, // 🚀 引入新方法
+    startResuming,
   } = useEnsRegistration();
 
   useEffect(() => {
@@ -62,6 +61,7 @@ export const useEnsActions = () => {
         queryClient.invalidateQueries({ queryKey: ["collection-records"] });
         queryClient.invalidateQueries({ queryKey: ["account-labels"] });
       };
+
       const timer1 = setTimeout(refresh, 2000);
       const timer2 = setTimeout(refresh, 10000);
       return () => {
@@ -73,30 +73,21 @@ export const useEnsActions = () => {
 
   const handleSingleRegister = useCallback(
     async (record: NameRecord) => {
+      resetReg();
       if (pendingLabels.has(record.label)) {
-        // 🚀 场景 A: 断点续传
-        // 1. 先设为 loading，防止 Modal 闪现时间选择界面
         startResuming();
-        // 2. 打开 Modal (此时用户看到的是转圈圈)
         setDurationTarget({ type: "register", record });
-        // 3. 开始异步检查，检查完后会自动更新为 correct status
         await checkAndResume(record.label);
       } else {
-        // 🚀 场景 B: 新注册
-        // 重置为 idle，显示时间选择界面
-        resetReg();
         setDurationTarget({ type: "register", record });
       }
     },
-    [pendingLabels, checkAndResume, resetReg, startResuming], // 添加依赖
+    [pendingLabels, checkAndResume, resetReg, startResuming],
   );
 
   const handleSingleRenew = useCallback(
     (record: NameRecord) => {
-      // 🚀 核心修复：每次点击续费时，强制重置为 Idle 状态
-      // 这样 Modal 打开时就会显示初始的时间选择界面
       resetRenewal();
-
       setDurationTarget({
         type: "renew",
         record,
@@ -104,7 +95,7 @@ export const useEnsActions = () => {
       });
     },
     [resetRenewal],
-  ); // 添加依赖
+  );
 
   const handleBatchRenewalTrigger = useCallback(
     (
@@ -113,8 +104,6 @@ export const useEnsActions = () => {
       onSuccess?: () => void,
     ) => {
       if (selectedLabels.size === 0) return;
-
-      // 🚀 核心修复：批量操作也一样，先重置
       resetRenewal();
 
       const targetRecords = allRecords.filter((r) =>
@@ -125,7 +114,7 @@ export const useEnsActions = () => {
 
       setDurationTarget({ type: "batch", labels, expiryTimes, onSuccess });
     },
-    [resetRenewal], // 添加依赖
+    [resetRenewal],
   );
 
   const handleSetReminder = useCallback((record: NameRecord) => {
@@ -138,21 +127,17 @@ export const useEnsActions = () => {
     resetReg();
   }, [resetRenewal, resetReg]);
 
-  // 🚀 核心修改：过滤无效时长
+  // 🚀 修改：接收可选的 owner 参数
   const onDurationConfirm = useCallback(
-    (durations: bigint[]) => {
+    (durations: bigint[], owner?: Address) => {
       if (!durationTarget) return;
 
       if (durationTarget.type === "register" && durationTarget.record) {
-        startRegistration(durationTarget.record.label, durations[0]);
+        // 🚀 传递 owner 给 startRegistration
+        startRegistration(durationTarget.record.label, durations[0], owner);
       } else if (durationTarget.type === "renew" && durationTarget.record) {
         renewSingle(durationTarget.record.label, durations[0]);
       } else if (durationTarget.type === "batch" && durationTarget.labels) {
-        // 🚀 过滤逻辑：
-        // 1. 组合 label 和 duration
-        // 2. 剔除 duration <= 0 的项
-        // 3. 拆分回两个数组
-
         const validItems = durationTarget.labels
           .map((label, index) => ({
             label,
@@ -161,8 +146,7 @@ export const useEnsActions = () => {
           .filter((item) => item.duration > 0n);
 
         if (validItems.length === 0) {
-          // 如果全部被过滤掉了（说明所有选中的域名都已经晚于目标日期）
-          toast.error(t("transaction.error.all_filtered")); // 需要在语言包添加
+          toast.error(t("transaction.error.all_filtered"));
           return;
         }
 
@@ -175,7 +159,6 @@ export const useEnsActions = () => {
     [durationTarget, startRegistration, renewSingle, renewBatch, t],
   );
 
-  // ... (getModalTitle, getItemCount 保持不变) ...
   const getModalTitle = useCallback(() => {
     const activeType = durationTarget?.type || "renew";
     if (activeType === "register") return t("transaction.title.register");

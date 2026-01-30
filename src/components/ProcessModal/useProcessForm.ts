@@ -1,5 +1,8 @@
+// src/components/ProcessModal/useDurationCalculation.ts
+
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { isAddress } from "viem"; // 🚀
 import {
   MIN_REGISTRATION_DURATION,
   SECONDS_PER_DAY,
@@ -8,7 +11,7 @@ import {
 
 const formatDateInput = (date: Date) => date.toISOString().split("T")[0];
 
-interface UseDurationProps {
+interface UseProcessFormProps {
   isOpen: boolean;
   type: "register" | "renew" | "batch";
   currentExpiry?: number;
@@ -16,13 +19,13 @@ interface UseDurationProps {
   itemCount: number;
 }
 
-export const useDurationCalculation = ({
+export const useProcessForm = ({
   isOpen,
   type,
   currentExpiry,
   expiryTimes = [],
   itemCount,
-}: UseDurationProps) => {
+}: UseProcessFormProps) => {
   const { t } = useTranslation();
 
   const [mode, setMode] = useState<"duration" | "until">("duration");
@@ -30,7 +33,9 @@ export const useDurationCalculation = ({
   const [days, setDays] = useState(0);
   const [targetDate, setTargetDate] = useState("");
 
-  // 1. 计算基准时间
+  // 🚀 新增：接收地址状态
+  const [recipient, setRecipient] = useState("");
+
   const getBaseTime = useCallback(() => {
     if (type === "renew" || type === "batch") {
       if (expiryTimes.length > 0) return Math.min(...expiryTimes);
@@ -39,14 +44,13 @@ export const useDurationCalculation = ({
     return Math.floor(Date.now() / 1000);
   }, [type, currentExpiry, expiryTimes]);
 
-  // 2. 初始化默认值
   useEffect(() => {
     if (isOpen) {
       setMode("duration");
       setYears(1);
       setDays(0);
+      setRecipient(""); // 🚀 重置接收地址
 
-      // 默认目标日期：基准时间 + 1年 (如果是批量，取最晚过期时间+1年)
       let baseForDefault = Math.floor(Date.now() / 1000);
       if (type === "batch" && expiryTimes.length > 0) {
         baseForDefault = Math.max(...expiryTimes);
@@ -61,7 +65,6 @@ export const useDurationCalculation = ({
     }
   }, [isOpen, type, expiryTimes, currentExpiry]);
 
-  // 3. 计算最小可选日期
   const minDateValue = useMemo(() => {
     const now = new Date();
     const todayStr = formatDateInput(now);
@@ -72,7 +75,6 @@ export const useDurationCalculation = ({
     return minDate > now ? formatDateInput(minDate) : todayStr;
   }, [type, getBaseTime]);
 
-  // 4. 核心：计算时长数组
   const calculatedDurations = useMemo<bigint[]>(() => {
     if (mode === "duration") {
       const duration =
@@ -99,13 +101,11 @@ export const useDurationCalculation = ({
     }
   }, [mode, years, days, targetDate, itemCount, type, expiryTimes]);
 
-  // 5. 统计被跳过的数量
   const skippedCount = useMemo(() => {
     if (mode !== "until" || type !== "batch") return 0;
     return calculatedDurations.filter((d) => d <= 0n).length;
   }, [calculatedDurations, mode, type]);
 
-  // 6. 验证逻辑
   const validationError = useMemo(() => {
     const isAllInvalid = calculatedDurations.every((d) => d <= 0n);
 
@@ -121,8 +121,17 @@ export const useDurationCalculation = ({
         return t("transaction.error.min_duration");
       }
     }
+
+    // 🚀 新增：地址校验
+    // 只有当用户输入了内容时才校验，空字符串代表使用默认地址（当前钱包），是合法的
+    if (type === "register" && recipient.trim() !== "") {
+      if (!isAddress(recipient)) {
+        return t("transaction.error.invalid_address");
+      }
+    }
+
     return null;
-  }, [calculatedDurations, type, t]);
+  }, [calculatedDurations, type, t, recipient]);
 
   return {
     mode,
@@ -137,5 +146,8 @@ export const useDurationCalculation = ({
     calculatedDurations,
     skippedCount,
     validationError,
+    // 🚀 导出
+    recipient,
+    setRecipient,
   };
 };

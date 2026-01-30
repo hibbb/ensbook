@@ -3,6 +3,7 @@
 import { ProcessModal, type ProcessType } from "./ProcessModal";
 import { ReminderModal } from "./ReminderModal";
 import type { NameRecord } from "../types/ensNames";
+import { type Address } from "viem"; // 🚀
 
 interface ActionModalsProps {
   modalState: {
@@ -15,12 +16,12 @@ interface ActionModalsProps {
     currentExpiry?: number;
     reminderTarget: NameRecord | null;
     itemCount: number;
-    // 🚀 新增
     expiryTimes: number[];
   };
   actions: {
     onCloseModal: () => void;
-    onConfirmDuration: (durations: bigint[]) => void;
+    // 🚀 修改类型
+    onConfirmDuration: (durations: bigint[], owner?: Address) => void;
     setReminderTarget: (record: NameRecord | null) => void;
   };
 }
@@ -39,7 +40,6 @@ export const ActionModals = ({ modalState, actions }: ActionModalsProps) => {
         onClose={actions.onCloseModal}
         onConfirm={actions.onConfirmDuration}
         itemCount={modalState.itemCount}
-        // 🚀 传递
         expiryTimes={modalState.expiryTimes}
       />
 

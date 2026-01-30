@@ -57,7 +57,6 @@ export function useEnsRegistration() {
     }
   }, []);
 
-  // 🚀 新增：准备恢复状态
   const startResuming = useCallback(() => {
     resetStatus();
     setStatus("loading");
@@ -125,7 +124,6 @@ export function useEnsRegistration() {
   );
 
   const startCountdown = (seconds: number, onFinish: () => void) => {
-    // 先清除旧的（如果有）
     if (timerRef.current) clearInterval(timerRef.current);
 
     let left = seconds;
@@ -144,104 +142,6 @@ export function useEnsRegistration() {
       }
     }, 1000);
   };
-
-  const startRegistration = useCallback(
-    async (rawLabel: string, duration: bigint) => {
-      if (!address || !publicClient) {
-        toast.error(t("common.connect_wallet"));
-        return;
-      }
-
-      let label: string;
-      try {
-        label = parseLabel(rawLabel);
-        validateLabel(label);
-      } catch (e: unknown) {
-        setStatus("error");
-        toast.error((e as Error).message);
-        return;
-      }
-
-      setStatus("committing");
-      setCurrentHash(null);
-      const secret = generateSecret();
-      const referrer = REFERRER_ADDRESS_HASH;
-
-      const params: RegistrationStruct = {
-        label,
-        owner: address as Address,
-        duration,
-        secret,
-        resolver: MAINNET_CONTRACTS.ENS_PUBLIC_RESOLVER,
-        data: [],
-        reverseRecord: 0,
-        referrer,
-      };
-
-      registrationDataRef.current = params;
-      saveRegistrationState(label, { registration: params });
-
-      const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
-
-      try {
-        const commitment = (await publicClient.readContract({
-          address: contractAddress,
-          abi: ethControllerV3Abi,
-          functionName: "makeCommitment",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          args: [params as any],
-        })) as Hex;
-
-        saveRegistrationState(label, { commitment });
-
-        const commitHash = await writeContractAsync({
-          functionName: "commit",
-          args: [commitment],
-        });
-
-        setCurrentHash(commitHash);
-        saveRegistrationState(label, { commitTxHash: commitHash });
-
-        setStatus("waiting_commit");
-        await toast.promise(
-          publicClient.waitForTransactionReceipt({ hash: commitHash }),
-          {
-            loading: t("transaction.toast.confirming"),
-            success: t("transaction.step.commit_success"),
-            error: t("transaction.step.commit_failed"),
-          },
-        );
-
-        setStatus("counting_down");
-        setCurrentHash(null);
-        const WAIT_SECONDS = 65;
-        setSecondsLeft(WAIT_SECONDS);
-
-        // 🚀 修改：使用 timerRef 管理倒计时
-        startCountdown(WAIT_SECONDS, () => {
-          // 只有当状态依然是 counting_down 时才执行下一步
-          // 这防止了用户已经重置状态后，定时器回调依然触发的问题
-          if (isMounted.current && registrationDataRef.current) {
-            executeRegister(registrationDataRef.current);
-          }
-        });
-      } catch (err: unknown) {
-        console.error(err);
-        if (isMounted.current) {
-          setStatus("error");
-          removeRegistrationState(label);
-
-          const error = err as Error & { shortMessage?: string };
-          if (error.shortMessage?.includes("User rejected")) {
-            toast(t("transaction.toast.commit_rejected"));
-          } else {
-            toast.error(t("transaction.toast.process_interrupted"));
-          }
-        }
-      }
-    },
-    [address, publicClient, writeContractAsync, executeRegister, t],
-  );
 
   const checkAndResume = useCallback(
     async (rawLabel: string) => {
@@ -295,17 +195,12 @@ export function useEnsRegistration() {
       } catch (e) {
         console.error("恢复检查失败", e);
         toast.error(t("transaction.toast.recovery_failed"));
-
-        // 🚀 核心安全修复：
-        // 如果检查过程崩溃，必须强制重置回 idle。
-        // 否则界面会一直卡在 startResuming 设置的 "loading" 状态。
         setStatus("idle");
       }
     },
     [publicClient, executeRegister, t],
   );
 
-  // ... (continueRegistration 保持不变) ...
   const continueRegistration = useCallback(() => {
     if (registrationDataRef.current) {
       executeRegister(registrationDataRef.current);
@@ -315,6 +210,103 @@ export function useEnsRegistration() {
     }
   }, [executeRegister, resetStatus, t]);
 
+  // 🚀 修改：接收 customOwner 参数
+  const startRegistration = useCallback(
+    async (rawLabel: string, duration: bigint, customOwner?: Address) => {
+      if (!address || !publicClient) {
+        toast.error(t("common.connect_wallet"));
+        return;
+      }
+
+      let label: string;
+      try {
+        label = parseLabel(rawLabel);
+        validateLabel(label);
+      } catch (e: unknown) {
+        setStatus("error");
+        toast.error((e as Error).message);
+        return;
+      }
+
+      setStatus("committing");
+      setCurrentHash(null);
+      const secret = generateSecret();
+      const referrer = REFERRER_ADDRESS_HASH;
+
+      // 🚀 使用自定义 owner，如果未提供则使用当前连接的 address
+      const ownerToUse = customOwner || (address as Address);
+
+      const params: RegistrationStruct = {
+        label,
+        owner: ownerToUse,
+        duration,
+        secret,
+        resolver: MAINNET_CONTRACTS.ENS_PUBLIC_RESOLVER,
+        data: [],
+        reverseRecord: 0,
+        referrer,
+      };
+
+      registrationDataRef.current = params;
+      saveRegistrationState(label, { registration: params });
+
+      const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
+
+      try {
+        const commitment = (await publicClient.readContract({
+          address: contractAddress,
+          abi: ethControllerV3Abi,
+          functionName: "makeCommitment",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          args: [params as any],
+        })) as Hex;
+
+        saveRegistrationState(label, { commitment });
+
+        const commitHash = await writeContractAsync({
+          functionName: "commit",
+          args: [commitment],
+        });
+
+        setCurrentHash(commitHash);
+        saveRegistrationState(label, { commitTxHash: commitHash });
+
+        setStatus("waiting_commit");
+        await toast.promise(
+          publicClient.waitForTransactionReceipt({ hash: commitHash }),
+          {
+            loading: t("transaction.toast.confirming"),
+            success: t("transaction.step.commit_success"),
+            error: t("transaction.step.commit_failed"),
+          },
+        );
+
+        setStatus("counting_down");
+        setCurrentHash(null);
+        const WAIT_SECONDS = 65;
+        setSecondsLeft(WAIT_SECONDS);
+
+        startCountdown(WAIT_SECONDS, () => {
+          if (isMounted.current) executeRegister(params);
+        });
+      } catch (err: unknown) {
+        console.error(err);
+        if (isMounted.current) {
+          setStatus("error");
+          removeRegistrationState(label);
+
+          const error = err as Error & { shortMessage?: string };
+          if (error.shortMessage?.includes("User rejected")) {
+            toast(t("transaction.toast.commit_rejected"));
+          } else {
+            toast.error(t("transaction.toast.process_interrupted"));
+          }
+        }
+      }
+    },
+    [address, publicClient, writeContractAsync, executeRegister, t],
+  );
+
   return {
     status,
     secondsLeft,
@@ -323,7 +315,7 @@ export function useEnsRegistration() {
     checkAndResume,
     continueRegistration,
     resetStatus,
-    startResuming, // 导出
+    startResuming,
     isBusy:
       status !== "idle" &&
       status !== "success" &&

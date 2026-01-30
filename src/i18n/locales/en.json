@@ -267,6 +267,12 @@
       "processing": "Processing",
       "done": "Completed"
     },
+    "settings": {
+      "advanced": "Advanced Settings",
+      "recipient": "Recipient Address",
+      "recipient_placeholder": "Defaults to connected wallet",
+      "recipient_warning": "Note: Domain will be registered to this address."
+    },
     "btn": {
       "start_register": "Start Registration",
       "confirm_renew": "Confirm Renewal"
@@ -338,7 +344,8 @@
       "invalid_date": "Invalid date",
       "past_date": "Date must be in the future",
       "before_expiry": "Date must be after current expiry",
-      "all_filtered": "All selected names expire after the target date and do not need renewal."
+      "all_filtered": "All selected names expire after the target date and do not need renewal.",
+      "invalid_address": "Invalid Ethereum address"
     }
   },
   "memo": {

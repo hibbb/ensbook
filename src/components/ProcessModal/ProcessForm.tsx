@@ -1,3 +1,6 @@
+// src/components/ProcessModal/DurationSettings.tsx
+
+import { useState } from "react"; // 🚀
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
@@ -5,10 +8,12 @@ import {
   faMinus,
   faPlus,
   faTriangleExclamation,
+  faChevronDown, // 🚀
+  faChevronUp, // 🚀
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-interface DurationSettingsProps {
+interface ProcessFormProps {
   mode: "duration" | "until";
   setMode: (m: "duration" | "until") => void;
   years: number;
@@ -20,9 +25,12 @@ interface DurationSettingsProps {
   minDateValue: string;
   skippedCount: number;
   type: "register" | "renew" | "batch";
+  // 🚀 新增
+  recipient: string;
+  setRecipient: (addr: string) => void;
 }
 
-export const DurationSettings = ({
+export const ProcessForm = ({
   mode,
   setMode,
   years,
@@ -34,8 +42,11 @@ export const DurationSettings = ({
   minDateValue,
   skippedCount,
   type,
-}: DurationSettingsProps) => {
+  recipient,
+  setRecipient,
+}: ProcessFormProps) => {
   const { t } = useTranslation();
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
     <div className="animate-in slide-in-from-right-4 duration-300">
@@ -158,6 +169,46 @@ export const DurationSettings = ({
                 <span>
                   {t("transaction.mode.partial_skip", { count: skippedCount })}
                 </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 🚀 核心新增：高级设置 (仅注册时显示) */}
+        {type === "register" && (
+          <div className="mt-4 border-t border-gray-100 pt-4">
+            <button
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="text-xs text-gray-400 flex items-center gap-1 hover:text-gray-600 font-qs-medium transition-colors"
+            >
+              <FontAwesomeIcon
+                icon={showAdvanced ? faChevronUp : faChevronDown}
+              />
+              {t("transaction.settings.advanced")}
+            </button>
+
+            {showAdvanced && (
+              <div className="mt-3 animate-in fade-in slide-in-from-top-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">
+                  {t("transaction.settings.recipient")}
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                    placeholder={t(
+                      "transaction.settings.recipient_placeholder",
+                    )}
+                    className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono text-text-main outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
+                  />
+                </div>
+                {recipient && (
+                  <p className="text-[10px] text-orange-500 mt-1.5 flex items-center gap-1">
+                    <FontAwesomeIcon icon={faTriangleExclamation} />
+                    {t("transaction.settings.recipient_warning")}
+                  </p>
+                )}
               </div>
             )}
           </div>

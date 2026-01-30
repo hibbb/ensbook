@@ -6,9 +6,10 @@ import {
   faExclamationCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
+import { type Address } from "viem"; // 🚀
 import { BaseModal } from "../ui/BaseModal";
-import { useDurationCalculation } from "./useDurationCalculation";
-import { DurationSettings } from "./DurationSettings";
+import { useProcessForm } from "./useProcessForm";
+import { ProcessForm } from "./ProcessForm";
 import { ProcessingView, SuccessView, ErrorView } from "./StatusViews";
 
 export type ProcessType = "register" | "renew" | "batch";
@@ -20,7 +21,8 @@ interface ProcessModalProps {
   txHash?: string | null;
   secondsLeft?: number;
   onClose: () => void;
-  onConfirm: (durations: bigint[]) => void;
+  // 🚀 修改：onConfirm 接收可选的 owner
+  onConfirm: (durations: bigint[], owner?: Address) => void;
   title: string;
   currentExpiry?: number;
   itemCount?: number;
@@ -55,7 +57,10 @@ export const ProcessModal = ({
     calculatedDurations,
     skippedCount,
     validationError,
-  } = useDurationCalculation({
+    // 🚀 解构
+    recipient,
+    setRecipient,
+  } = useProcessForm({
     isOpen,
     type,
     currentExpiry,
@@ -68,14 +73,15 @@ export const ProcessModal = ({
   const isError = status === "error";
   const isProcessing = !isIdle && !isSuccess && !isError;
 
-  // 🚀 移除状态检查，允许随时关闭
   const handleClose = () => {
     onClose();
   };
 
   const handleConfirm = () => {
     if (!validationError) {
-      onConfirm(calculatedDurations);
+      // 🚀 传递 recipient (如果是空字符串，传 undefined)
+      const ownerAddress = recipient ? (recipient as Address) : undefined;
+      onConfirm(calculatedDurations, ownerAddress);
     }
   };
 
@@ -98,13 +104,12 @@ export const ProcessModal = ({
           </span>
         </div>
       }
-      // 🚀 永远显示关闭按钮
       showCloseButton={true}
     >
       <div className="p-4">
         {isIdle && (
           <>
-            <DurationSettings
+            <ProcessForm
               mode={mode}
               setMode={setMode}
               years={years}
@@ -116,6 +121,9 @@ export const ProcessModal = ({
               minDateValue={minDateValue}
               skippedCount={skippedCount}
               type={type}
+              // 🚀 传递
+              recipient={recipient}
+              setRecipient={setRecipient}
             />
 
             {validationError && (
@@ -155,7 +163,7 @@ export const ProcessModal = ({
             status={status}
             secondsLeft={secondsLeft}
             txHash={txHash}
-            onClose={handleClose} // 🚀 传递关闭函数
+            onClose={handleClose}
           />
         )}
 

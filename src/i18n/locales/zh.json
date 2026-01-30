@@ -267,6 +267,12 @@
       "processing": "操作进行中",
       "done": "操作完成"
     },
+    "settings": {
+      "advanced": "高级设置",
+      "recipient": "接收地址",
+      "recipient_placeholder": "默认为当前连接钱包",
+      "recipient_warning": "注意：域名将注册给此地址，请仔细核对。"
+    },
     "btn": {
       "start_register": "开始注册",
       "confirm_renew": "确认续费"
@@ -338,7 +344,8 @@
       "invalid_date": "无效的日期",
       "past_date": "日期必须是未来时间",
       "before_expiry": "日期必须晚于当前过期时间",
-      "all_filtered": "所有选中的域名过期时间均晚于目标日期，无需续费。"
+      "all_filtered": "所有选中的域名过期时间均晚于目标日期，无需续费。",
+      "invalid_address": "无效的以太坊地址"
     }
   },
   "memo": {
