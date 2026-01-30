@@ -269,7 +269,7 @@
     },
     "settings": {
       "advanced": "高级设置",
-      "recipient": "接收地址",
+      "recipient": "接收地址或 ENS 名称",
       "recipient_placeholder": "默认为当前连接钱包",
       "recipient_warning": "注意：域名将注册给此地址，请仔细核对。"
     },
@@ -417,7 +417,7 @@
   "utils": {
     "validate": {
       "empty": "域名不能为空",
-      "subdomain": "仅支持注册二级域名 (如 alice.eth)，不支持子域名",
+      "subname": "仅支持注册二级域名 (如 alice.eth)，不支持子域名",
       "too_short": "ENS 域名长度至少为 3 个字符"
     },
     "parse": {
@@ -431,9 +431,9 @@
     "quota_exceeded": "存储空间不足"
   },
   "calendar": {
-    "summary": "[ENS] {{domain}} 续费提醒",
-    "description": "您的 ENS 域名 {{domain}} 将于 {{date}} 到期。\\n请及时续费以防止域名被释放。\\n\\n管理链接: https://app.ens.domains/{{domain}}",
-    "alarm_desc": "{{domain}} 将于 {{days}} 天后到期"
+    "summary": "[ENS] {{name}} 续费提醒",
+    "description": "您的 ENS 域名 {{name}} 将于 {{date}} 到期。\\n请及时续费以防止域名被释放。\\n\\n管理链接: https://app.ens.domains/{{name}}",
+    "alarm_desc": "{{name}} 将于 {{days}} 天后到期"
   },
   "account": {
     "title": "账户持仓",

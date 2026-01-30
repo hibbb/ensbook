@@ -69,7 +69,7 @@
         "export_success": "Successfully exported {{count}} items",
         "export_fail": "Export failed",
         "invalid_format": "Invalid backup file or incompatible version",
-        "no_data": "No domain data found in backup file",
+        "no_data": "No name data found in backup file",
         "import_success": "Import successful! Refreshing...",
         "parse_fail": "Failed to parse file",
         "reset_success": "Data cleared, refreshing..."
@@ -104,18 +104,18 @@
         "home_unset": "Default homepage restored",
         "cleared": "Custom collection cleared",
         "already_empty": "It's already empty here",
-        "validating": "Parsing and validating domains...",
-        "no_valid_format": "No valid domain format detected",
-        "save_success": "Saved! Contains {{count}} valid domains",
-        "no_valid_found": "No valid domains found, please check input rules",
+        "validating": "Parsing and validating names...",
+        "no_valid_format": "No valid name format detected",
+        "save_success": "Saved! Contains {{count}} valid names",
+        "no_valid_found": "No valid names found, please check input rules",
         "network_error": "Network error during validation"
       },
       "confirm": {
-        "clear": "Are you sure you want to clear 'My Collection'?\nThis will remove all custom domains from the Mine page."
+        "clear": "Are you sure you want to clear 'My Collection'?\nThis will remove all custom names from the Mine page."
       },
       "ui": {
         "title": "Define Your ENS Vision",
-        "desc": "Here you can combine any ENS domains you are interested in into an exclusive collection (Mine). Supports mixed input:",
+        "desc": "Here you can combine any ENS names you are interested in into an exclusive collection (Mine). Supports mixed input:",
         "set_home": "Set as Default Homepage",
         "set_home_desc": "Show Mine page by default when opening ENSBook",
         "placeholder": "Enter index string here... (Comma, space, or newline separated)",
@@ -126,7 +126,7 @@
       }
     },
     "about": {
-      "description": "ENSBook is an efficient ENS domain management tool designed to help users manage, monitor, and record their Ethereum domain assets more conveniently.",
+      "description": "ENSBook is an efficient ENS name management tool designed to help users manage, monitor, and record their ENS name assets more conveniently.",
       "connect": "Connect",
       "author": "Author",
       "github": "GitHub",
@@ -269,9 +269,9 @@
     },
     "settings": {
       "advanced": "Advanced Settings",
-      "recipient": "Recipient Address",
+      "recipient": "Recipient Address/ENS Name",
       "recipient_placeholder": "Defaults to connected wallet",
-      "recipient_warning": "Note: Domain will be registered to this address."
+      "recipient_warning": "Note: Name will be registered to this address."
     },
     "btn": {
       "start_register": "Start Registration",
@@ -305,12 +305,12 @@
       "error_desc": "Check network or rejection reason"
     },
     "toast": {
-      "select_one": "Please select at least one domain",
+      "select_one": "Please select at least one name",
       "confirming": "Confirming transaction...",
       "success": "Transaction successful!",
       "failed": "Transaction failed",
       "unknown_error": "Unknown error",
-      "batch_confirming": "Batch renewing {{count}} domains...",
+      "batch_confirming": "Batch renewing {{count}} names...",
       "price_buffer": "Price buffer applied (+10%)",
       "commit_rejected": "You rejected the Commit transaction",
       "register_rejected": "You rejected the transaction, please retry",
@@ -361,15 +361,15 @@
   },
   "home": {
     "toast": {
-      "all_exist": "All domains already exist in the list",
-      "add_success": "Successfully added {{count}} domains",
-      "no_valid": "No valid ENS domains found",
+      "all_exist": "All names already exist in the list",
+      "add_success": "Successfully added {{count}} names",
+      "no_valid": "No valid ENS names found",
       "parse_error": "Error parsing input",
       "delete_success": "Deleted successfully",
       "clear_confirm": "Are you sure you want to clear all history?"
     },
     "floating_bar": {
-      "selected": "Selected {{count}} domains",
+      "selected": "Selected {{count}} names",
       "renew_batch": "Batch Renew"
     }
   },
@@ -379,7 +379,7 @@
     "custom_collection": "Custom Collection",
     "empty_state": {
       "title": "Open Your ENS Vision",
-      "desc": "The Mine page allows you to create an exclusive domain collection through custom rules\n(e.g., \"abc, hello, 12345\", \"@alice.eth\", or Ethereum addresses).",
+      "desc": "The Mine page allows you to create an exclusive name collection through custom rules\n(e.g., \"abc, hello, 12345\", \"@alice.eth\", or Ethereum addresses).",
       "guide": "Please go to Settings > My Collection to configure"
     },
     "error": "Failed to load, please check network or configuration rules"
@@ -416,32 +416,32 @@
   },
   "utils": {
     "validate": {
-      "empty": "Domain name cannot be empty",
-      "subdomain": "Only second-level domains (e.g., alice.eth) are supported",
-      "too_short": "ENS domain must be at least 3 characters"
+      "empty": "Name name cannot be empty",
+      "subname": "Only second-level names (e.g., alice.eth) are supported",
+      "too_short": "ENS name must be at least 3 characters"
     },
     "parse": {
       "norm_error": "\"{{snippet}}...\" contains invalid characters and was excluded."
     },
     "ens": {
-      "invalid_format": "Invalid domain format: {{message}}"
+      "invalid_format": "Invalid name format: {{message}}"
     }
   },
   "storage": {
     "quota_exceeded": "Storage quota exceeded"
   },
   "calendar": {
-    "summary": "[ENS] {{domain}} Renewal Reminder",
-    "description": "Your ENS domain {{domain}} will expire on {{date}}.\\nPlease renew in time to prevent release.\\n\\nManage Link: https://app.ens.domains/{{domain}}",
-    "alarm_desc": "{{domain}} expires in {{days}} days"
+    "summary": "[ENS] {{name}} Renewal Reminder",
+    "description": "Your ENS name {{name}} will expire on {{date}}.\\nPlease renew in time to prevent release.\\n\\nManage Link: https://app.ens.domains/{{name}}",
+    "alarm_desc": "{{name}} expires in {{days}} days"
   },
   "account": {
     "title": "Account Portfolio",
     "resolving": "Resolving address...",
-    "fetching": "Fetching domains...",
+    "fetching": "Fetching names...",
     "error_resolve": "Could not resolve address",
-    "error_fetch": "Failed to fetch domains",
-    "empty": "No ENS domains found for this account",
+    "error_fetch": "Failed to fetch names",
+    "empty": "No ENS names found for this account",
     "address_label": "Address",
     "name_label": "Input Name",
     "total_label": "Total Holdings"

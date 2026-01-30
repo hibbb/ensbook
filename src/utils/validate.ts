@@ -8,7 +8,7 @@ export function validateLabel(label: string): void {
   }
 
   if (label.includes(".")) {
-    throw new Error(i18n.t("utils.validate.subdomain"));
+    throw new Error(i18n.t("utils.validate.subname"));
   }
 
   if (label.length < 3) {

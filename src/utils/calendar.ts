@@ -11,30 +11,30 @@ const formatDateToICS = (date: Date): string => {
 };
 
 export const generateICS = (
-  domain: string,
+  name: string,
   expiryTimestamp: number,
   reminders: number[] = [30, 7],
 ): string => {
   const expiryDate = new Date(expiryTimestamp * 1000);
   const now = new Date();
-  const uid = `${domain}-${now.getTime()}@ensbook.com`;
+  const uid = `${name}-${now.getTime()}@ensbook.xyz`;
   const dtStamp = formatDateToICS(now);
   const dtStart = formatDateToICS(expiryDate);
   const dtEnd = formatDateToICS(new Date(expiryTimestamp * 1000 + 3600 * 1000));
 
   // 🚀 翻译摘要
-  const summary = i18n.t("calendar.summary", { domain });
+  const summary = i18n.t("calendar.summary", { name });
 
   // 🚀 翻译描述 (注意：这里使用了 \n 换行符，i18next 会正确处理)
   const description = i18n.t("calendar.description", {
-    domain,
+    name,
     date: expiryDate.toLocaleString(),
   });
 
   const alarms = reminders
     .map((days) => {
       // 🚀 翻译报警描述
-      const alarmDesc = i18n.t("calendar.alarm_desc", { domain, days });
+      const alarmDesc = i18n.t("calendar.alarm_desc", { name, days });
 
       // 🚀 优化：使用 CRLF (\r\n) 符合 RFC 5545 标准
       return [
@@ -60,7 +60,7 @@ export const generateICS = (
     `DTEND:${dtEnd}`,
     `SUMMARY:${summary}`,
     `DESCRIPTION:${description}`,
-    `URL:https://app.ens.domains/${domain}`,
+    `URL:https://app.ens.domains/${name}`,
     "STATUS:CONFIRMED",
     alarms, // 嵌入报警块
     "END:VEVENT",
@@ -71,7 +71,7 @@ export const generateICS = (
 };
 
 export const generateGoogleCalendarUrl = (
-  domain: string,
+  name: string,
   expiryTimestamp: number,
 ): string => {
   const expiryDate = new Date(expiryTimestamp * 1000);
@@ -79,12 +79,12 @@ export const generateGoogleCalendarUrl = (
   const end = formatDateToICS(new Date(expiryTimestamp * 1000 + 3600 * 1000));
 
   // 🚀 翻译摘要
-  const text = encodeURIComponent(i18n.t("calendar.summary", { domain }));
+  const text = encodeURIComponent(i18n.t("calendar.summary", { name }));
 
   // 🚀 翻译详情
   const details = encodeURIComponent(
     i18n.t("calendar.description", {
-      domain,
+      name,
       date: expiryDate.toLocaleString(),
     }),
   );
