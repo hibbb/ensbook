@@ -3,12 +3,12 @@
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPlus,
   faWallet,
   faClock,
   faBell,
   faTriangleExclamation,
   type IconDefinition,
+  faCartShopping,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { isRenewable, isRegistrable } from "../../../utils/ens";
@@ -153,8 +153,8 @@ export const ActionCell = ({
         isConnected &&
         !renewable &&
         record.status !== "Unknown" && (
-          <div className="w-4 h-4 flex items-center justify-center text-gray-400 select-none">
-            <FontAwesomeIcon icon={faPlus} size="2xs" />
+          <div className="w-4 h-4 flex items-center justify-center text-link select-none">
+            <FontAwesomeIcon icon={faCartShopping} size="sm" />
           </div>
         )}
 
