@@ -7,15 +7,13 @@ import type {
   UserSettings,
 } from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
-import i18n from "../../i18n/config"; // 🚀 引入 i18n 实例
+import i18n from "../../i18n/config";
 
 const STORAGE_KEY = "ensbook_user_data_v2";
 const MAX_MEMO_LENGTH = 200;
 
-// 🚀 1. 定义内存缓存变量
 let cachedData: EnsBookUserData | null = null;
 
-// 初始化默认数据
 const DEFAULT_DATA: EnsBookUserData = {
   version: 2,
   timestamp: 0,
@@ -34,14 +32,12 @@ const DEFAULT_DATA: EnsBookUserData = {
   },
 };
 
-// --- 内部辅助：初始化并写入 ---
 const initUserData = (): EnsBookUserData => {
-  // 这里直接调用底层保存，避免循环依赖
   try {
     const data = DEFAULT_DATA;
     data.timestamp = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    cachedData = data; // 更新缓存
+    cachedData = data;
     return data;
   } catch (e) {
     console.error("Failed to init user data:", e);
@@ -49,10 +45,7 @@ const initUserData = (): EnsBookUserData => {
   }
 };
 
-// --- 基础读写 (核心优化部分) ---
-
 export const getFullUserData = (): EnsBookUserData => {
-  // 🚀 2. 优先读取内存缓存 (性能提升的关键)
   if (cachedData) {
     return cachedData;
   }
@@ -62,7 +55,6 @@ export const getFullUserData = (): EnsBookUserData => {
     if (!raw) return initUserData();
 
     const parsed = JSON.parse(raw);
-    // 深度合并默认值，确保结构完整
     const data = {
       ...DEFAULT_DATA,
       ...parsed,
@@ -70,7 +62,6 @@ export const getFullUserData = (): EnsBookUserData => {
       viewStates: { ...DEFAULT_DATA.viewStates, ...parsed.viewStates },
     };
 
-    // 🚀 3. 写入缓存
     cachedData = data;
     return data;
   } catch (e) {
@@ -82,15 +73,10 @@ export const getFullUserData = (): EnsBookUserData => {
 export const saveFullUserData = (data: EnsBookUserData) => {
   try {
     data.timestamp = Date.now();
-
-    // 4. 更新内存缓存
     cachedData = data;
-
-    // 写入硬盘
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     if (e instanceof DOMException && e.name === "QuotaExceededError") {
-      // 🚀 翻译错误信息
       throw new Error(i18n.t("storage.quota_exceeded"));
     }
     console.error("Failed to save user data:", e);
@@ -98,22 +84,15 @@ export const saveFullUserData = (data: EnsBookUserData) => {
   }
 };
 
-// 🚀 5. 监听跨标签页同步 (Cross-Tab Sync)
-// 当用户在 Tab A 修改数据时，Tab B 会收到 storage 事件
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (e) => {
     if (e.key === STORAGE_KEY) {
-      // 策略：直接清空缓存。下次读取时会重新从 LS 加载最新数据。
-      // 这样可以避免复杂的合并逻辑，且保证数据绝对新鲜。
       cachedData = null;
-
-      // 触发应用内更新事件，通知 UI 刷新
       window.dispatchEvent(new Event("user-settings-updated"));
     }
   });
 }
 
-// 辅助：创建新的元数据对象
 const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
   const now = Date.now();
   return {
@@ -125,7 +104,26 @@ const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
   };
 };
 
-// --- 核心业务操作 (Global Metadata) ---
+// 🚀 核心辅助：判断是否为垃圾数据
+// 如果不在 Home 列表，且无备注、无等级，则视为垃圾
+const tryCleanupMeta = (data: EnsBookUserData, label: string) => {
+  const meta = data.metadata[label];
+  if (!meta) return;
+
+  // 检查是否还在 Home 列表中
+  const isInHome = data.homeList.includes(label);
+
+  // 检查是否有实质内容
+  const hasContent =
+    (meta.memo && meta.memo.trim().length > 0) || meta.level > 0;
+
+  // 如果既不在列表里，也没有实质内容，就删除
+  if (!isInHome && !hasContent) {
+    delete data.metadata[label];
+  }
+};
+
+// --- 核心业务操作 ---
 
 export const getDomainMeta = (label: string): UserDomainMeta | undefined => {
   const data = getFullUserData();
@@ -152,6 +150,11 @@ export const updateDomainMeta = (
   } else {
     data.metadata[label] = createMeta(updates);
   }
+
+  // 🚀 每次更新后，尝试清理
+  // (例如用户清空了备注，且该域名不在 Home 列表中，则该元数据应该被删除)
+  tryCleanupMeta(data, label);
+
   saveFullUserData(data);
 };
 
@@ -173,6 +176,10 @@ export const addToHome = (label: string) => {
 
   if (!data.metadata[label]) {
     data.metadata[label] = createMeta();
+  } else {
+    // 更新时间戳以便置顶
+    data.metadata[label].createdAt = Date.now();
+    data.metadata[label].updatedAt = Date.now();
   }
 
   if (!data.homeList.includes(label)) {
@@ -185,23 +192,18 @@ export const bulkAddToHome = (labels: string[]) => {
   if (labels.length === 0) return;
   const data = getFullUserData();
   let hasChanges = false;
-  const now = Date.now(); // 🚀 获取当前时间
+  const now = Date.now();
 
   labels.forEach((label) => {
-    // 1. 如果元数据不存在，创建新的
     if (!data.metadata[label]) {
       data.metadata[label] = createMeta();
       hasChanges = true;
     } else {
-      // 🚀 2. 核心修复：即使元数据已存在，也更新 createdAt
-      // 这确保了“重新添加”的域名会被视为“最新”，从而排在列表顶部
-      // 注意：我们只更新 createdAt，保留 memo 和 level 不变
       data.metadata[label].createdAt = now;
       data.metadata[label].updatedAt = now;
       hasChanges = true;
     }
 
-    // 3. 添加到列表 (如果不在列表里)
     if (!data.homeList.includes(label)) {
       data.homeList.push(label);
       hasChanges = true;
@@ -216,6 +218,10 @@ export const removeFromHome = (label: string) => {
   const index = data.homeList.indexOf(label);
   if (index > -1) {
     data.homeList.splice(index, 1);
+
+    // 🚀 移除后尝试清理元数据
+    tryCleanupMeta(data, label);
+
     saveFullUserData(data);
   }
 };
@@ -229,23 +235,30 @@ export const bulkRemoveFromHome = (labels: string[]) => {
   data.homeList = data.homeList.filter((l) => !set.has(l));
 
   if (data.homeList.length !== initialLen) {
+    // 🚀 批量移除后，对涉及的每个 label 尝试清理
+    labels.forEach((label) => tryCleanupMeta(data, label));
+
     saveFullUserData(data);
   }
 };
 
 export const clearHomeList = () => {
   const data = getFullUserData();
-  data.homeList = [];
 
-  // 🚀 新增：清空 Home 列表时，同时重置 Home 的视图状态
-  // 这样用户重新添加数据时，不会因为之前的筛选器而看不到数据
+  // 🚀 在清空列表前，先获取所有待检查的 label
+  const labelsToCheck = [...data.homeList];
+
+  data.homeList = [];
   data.viewStates.home = {};
+
+  // 🚀 遍历检查并清理
+  // 因为 homeList 已经空了，所以只要没有 memo/level 的都会被删掉
+  labelsToCheck.forEach((label) => tryCleanupMeta(data, label));
 
   saveFullUserData(data);
 };
 
-// --- 视图状态操作 ---
-
+// ... (后续 ViewState, Settings, Import, Reset 等逻辑保持不变) ...
 export const getHomeViewState = (): PageViewState => {
   return getFullUserData().viewStates.home || {};
 };
@@ -269,8 +282,6 @@ export const saveCollectionViewState = (
   saveFullUserData(data);
 };
 
-// --- 设置操作 ---
-
 export const getUserSettings = (): UserSettings => {
   return getFullUserData().settings;
 };
@@ -291,19 +302,14 @@ export const getMyCollectionSource = (): string => {
 export const saveMyCollectionSource = (source: string) => {
   const data = getFullUserData();
   data.settings.myCollectionSource = source;
-
-  // 🚀 新增：如果 Source 被清空，同时也重置 Mine 的视图状态
   if (!source) {
     data.viewStates.collections["mine"] = {};
   }
-
   saveFullUserData(data);
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("user-settings-updated"));
   }
 };
-
-// --- 导入逻辑 ---
 
 export const importUserData = (
   backup: EnsBookBackup,
@@ -352,18 +358,10 @@ export const importUserData = (
   saveFullUserData(mergedData);
 };
 
-/**
- * 🚀 危险操作：重置所有用户数据 (Factory Reset)
- * 彻底清空 Metadata, HomeList, ViewStates 以及 Settings (语言/主题/自定义集合等)
- * 恢复到应用刚安装时的初始状态。
- */
 export const resetUserCustomData = () => {
-  // 直接使用 DEFAULT_DATA 进行全量覆盖
-  // 注意：需要克隆对象并更新时间戳，防止引用污染
   const resetData: EnsBookUserData = {
     ...DEFAULT_DATA,
     timestamp: Date.now(),
   };
-
   saveFullUserData(resetData);
 };
