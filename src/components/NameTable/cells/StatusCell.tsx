@@ -83,12 +83,12 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
             key={point.label}
             className={`flex py-0.5 justify-between items-center gap-4 text-xs ${
               point.isCurrent
-                ? "text-white font-qs-semibold border-l-2 border-link pl-2 -ml-2.5"
-                : "text-gray-300 font-qs-medium"
+                ? "text-white font-sans font-semibold border-l-2 border-link pl-2 -ml-2.5"
+                : "text-gray-300 font-sans font-medium"
             }`}
           >
             <span>{point.label}</span>
-            <span className="tracking-tight opacity-90 font-mono">
+            <span className="tracking-tight opacity-90 font-mono font-light">
               {formatDate(point.time || 0)}
             </span>
           </div>
@@ -114,13 +114,17 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
         : "";
 
       return (
-        <div className="flex items-center gap-1.5 font-qs-medium">
+        <div className="flex items-center gap-1 font-sans">
           <div className="flex items-center gap-1">
-            <span className="font-qs-regular leading-none">Ξ</span>
-            <span>{premiumEthPrice || "-"}</span>
+            <span className="leading-none">Ξ</span>
+            <span className="font-mono font-light">
+              {premiumEthPrice || "-"}
+            </span>
           </div>
           <span className="opacity-50 text-[10px]">|</span>
-          <span className="font-mono text-[10px] opacity-90">{remaining}</span>
+          <span className="font-mono font-light text-[10px] opacity-90">
+            {remaining}
+          </span>
         </div>
       );
     }

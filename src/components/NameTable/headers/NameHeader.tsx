@@ -222,7 +222,7 @@ export const NameHeader = ({
                     {len} {t("table.filter.char")}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 font-qs-regular">
+                    <span className="text-xs text-gray-400 font-sans font-regular">
                       ({count})
                     </span>
                     {isSelected && (
@@ -268,7 +268,7 @@ export const NameHeader = ({
                 >
                   <span>{label}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 font-qs-regular">
+                    <span className="text-xs text-gray-400 font-sans font-regular">
                       ({count})
                     </span>
                     {isSelected && (

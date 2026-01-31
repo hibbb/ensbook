@@ -108,7 +108,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
 
       <PopoverContent align="start" side="bottom" className="w-64 p-3">
         <div className="mb-2 flex justify-between items-center">
-          <span className="text-xs font-qs-semibold text-gray-400">
+          <span className="text-xs font-sans font-semibold text-gray-400">
             {t("memo.edit_title")}
           </span>
           <span
@@ -128,7 +128,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t("memo.placeholder")}
-          className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-qs-medium"
+          className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-sans font-medium"
           maxLength={MAX_MEMO_LENGTH}
         />
 
@@ -141,7 +141,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="px-3 bg-gray-100 text-gray-500 text-xs font-bold py-1.5 rounded-lg hover:bg-gray-200 hover:text-gray-700 active:scale-95 transition-all"
+            className="px-3 bg-gray-100 text-gray-500 text-xs font-bold py-1.5 rounded-lg hover:bg-gray-200 hover:text-text-main active:scale-95 transition-all"
           >
             {t("common.cancel")}
           </button>

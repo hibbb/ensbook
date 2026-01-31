@@ -114,7 +114,7 @@ export const MyCollectionSettings = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="text-sm text-text-main/80">
-        <h4 className="font-qs-semibold text-base text-black mb-2">
+        <h4 className="font-sans font-semibold text-base text-black mb-2">
           <FontAwesomeIcon icon={faFeatherPointed} className="mr-2" />
           {t("settings.my_collection.ui.title")}
         </h4>
@@ -138,7 +138,7 @@ export const MyCollectionSettings = () => {
 
       <div className="flex items-center justify-between py-1">
         <div className="flex flex-col">
-          <span className="font-qs-semibold text-sm text-black">
+          <span className="font-sans font-semibold text-sm text-black">
             {t("settings.my_collection.ui.set_home")}
           </span>
           <span className="text-xs text-gray-400 mt-0.5">
@@ -174,7 +174,7 @@ export const MyCollectionSettings = () => {
       </div>
 
       <div className="flex items-center justify-between pt-2">
-        <div className="text-sm font-qs-medium">
+        <div className="text-sm font-sans font-medium">
           {isValidating ? (
             <span className="flex items-center gap-2 text-link animate-pulse">
               <FontAwesomeIcon icon={faSpinner} spin />
@@ -198,7 +198,7 @@ export const MyCollectionSettings = () => {
             <button
               onClick={handleClear}
               disabled={isValidating}
-              className="px-4 py-2 text-sm font-qs-semibold text-red-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-sans font-semibold text-red-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               title={t("common.clear")}
             >
               <FontAwesomeIcon icon={faTrash} size="sm" />
@@ -209,7 +209,7 @@ export const MyCollectionSettings = () => {
           <button
             onClick={handleSave}
             disabled={isValidating}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full font-qs-semibold text-white transition-all shadow-md transform
+            className={`flex items-center gap-2 px-6 py-2 rounded-full font-sans font-semibold text-white transition-all shadow-md transform
               ${
                 isValidating
                   ? "bg-gray-400 cursor-not-allowed opacity-80"

@@ -65,14 +65,14 @@ export const ProcessForm = ({
       <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
         <button
           onClick={() => setMode("duration")}
-          className={`flex-1 py-2 text-sm font-qs-semibold rounded-md transition-all flex items-center justify-center gap-2 ${mode === "duration" ? "bg-white text-link shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+          className={`flex-1 py-2 text-sm font-sans font-semibold rounded-md transition-all flex items-center justify-center gap-2 ${mode === "duration" ? "bg-white text-link shadow-sm" : "text-gray-500 hover:text-text-main"}`}
         >
           <FontAwesomeIcon icon={faClock} />
           {t("transaction.mode.duration")}
         </button>
         <button
           onClick={() => setMode("until")}
-          className={`flex-1 py-2 text-sm font-qs-semibold rounded-md transition-all flex items-center justify-center gap-2 ${mode === "until" ? "bg-white text-link shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+          className={`flex-1 py-2 text-sm font-sans font-semibold rounded-md transition-all flex items-center justify-center gap-2 ${mode === "until" ? "bg-white text-link shadow-sm" : "text-gray-500 hover:text-text-main"}`}
         >
           <FontAwesomeIcon icon={faCalendarDay} />
           {t("transaction.mode.until")}
@@ -99,9 +99,9 @@ export const ProcessForm = ({
                     onChange={(e) =>
                       setYears(Math.max(0, parseInt(e.target.value) || 0))
                     }
-                    className="w-full text-center text-2xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
+                    className="w-full text-center text-2xl font-mono text-text-main bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
                   />
-                  <span className="block text-center text-xs text-gray-400 font-qs-medium mt-1">
+                  <span className="block text-center text-xs text-gray-400 font-sans font-medium mt-1">
                     {t("common.year")}
                   </span>
                 </div>
@@ -130,9 +130,9 @@ export const ProcessForm = ({
                     onChange={(e) =>
                       setDays(Math.max(0, parseInt(e.target.value) || 0))
                     }
-                    className="w-full text-center text-2xl font-qs-bold text-gray-900 bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
+                    className="w-full text-center text-2xl font-mono text-text-main bg-transparent outline-none border-b border-transparent focus:border-link transition-colors appearance-none m-0 p-0"
                   />
-                  <span className="block text-center text-xs text-gray-400 font-qs-medium mt-1">
+                  <span className="block text-center text-xs text-gray-400 font-sans font-medium mt-1">
                     {t("common.day")}
                   </span>
                 </div>
@@ -147,7 +147,7 @@ export const ProcessForm = ({
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-qs-bold text-gray-400 uppercase tracking-wider">
+            <label className="text-xs font-sans font-semibold text-gray-400 uppercase tracking-wider">
               {t("transaction.mode.until")}
             </label>
             <input
@@ -155,7 +155,7 @@ export const ProcessForm = ({
               value={targetDate}
               min={minDateValue}
               onChange={(e) => setTargetDate(e.target.value)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg font-qs-medium text-text-main outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg font-sans font-medium text-text-main outline-none focus:ring-2 focus:ring-link/20 focus:border-link transition-all"
             />
             {type === "batch" && (
               <p className="text-xs text-gray-400 mt-1">
@@ -163,7 +163,7 @@ export const ProcessForm = ({
               </p>
             )}
             {skippedCount > 0 && (
-              <div className="flex items-start gap-2 mt-2 p-2 bg-orange-50 border border-orange-100 rounded-md text-orange-600 text-xs font-qs-medium animate-in fade-in slide-in-from-top-1">
+              <div className="flex items-start gap-2 mt-2 p-2 bg-orange-50 border border-orange-100 rounded-md text-orange-600 text-xs font-sans font-medium animate-in fade-in slide-in-from-top-1">
                 <FontAwesomeIcon
                   icon={faTriangleExclamation}
                   className="mt-0.5"
@@ -181,7 +181,7 @@ export const ProcessForm = ({
           <div className="mt-4 border-t border-gray-100 pt-4">
             <button
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-xs text-gray-400 flex items-center gap-1 hover:text-gray-600 font-qs-medium transition-colors"
+              className="text-xs text-gray-400 flex items-center gap-1 hover:text-gray-600 font-sans font-medium transition-colors"
             >
               <FontAwesomeIcon
                 icon={showAdvanced ? faChevronUp : faChevronDown}

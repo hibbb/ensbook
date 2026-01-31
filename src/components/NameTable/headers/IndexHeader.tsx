@@ -66,7 +66,7 @@ export const IndexHeader = ({
                     ? "opacity-40 cursor-not-allowed bg-gray-50"
                     : "cursor-pointer hover:bg-gray-50"
                 }
-                ${isSelected ? "text-link font-qs-bold" : "text-text-main"}
+                ${isSelected ? "text-link font-sans font-semibold" : "text-text-main"}
               `}
               onClick={(e) => {
                 e.stopPropagation();
@@ -83,7 +83,7 @@ export const IndexHeader = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 font-qs-regular">
+                <span className="text-xs text-gray-400 font-sans font-regular">
                   ({count})
                 </span>
                 {isSelected && (

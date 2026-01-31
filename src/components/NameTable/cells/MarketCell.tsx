@@ -40,7 +40,7 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
       {/* Listing Detail */}
       {data.listing ? (
         <div className="flex justify-between items-center text-xs">
-          <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
+          <span className="text-gray-400 font-sans font-medium flex items-center gap-1.5">
             <FontAwesomeIcon icon={faTag} size="xs" />
             {t("market.listed")}
           </span>
@@ -59,13 +59,13 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
       {/* Offer Detail */}
       {data.offer && (
         <div className="flex justify-between items-center text-xs border-t border-white/10 pt-2">
-          <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
+          <span className="text-gray-400 font-sans font-medium flex items-center gap-1.5">
             <span className="text-[10px] bg-purple-600/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">
               Bid
             </span>
           </span>
           <div className="flex flex-col items-end">
-            <span className="text-purple-300 font-qs-medium">
+            <span className="text-purple-300 font-sans font-medium">
               {displayNumber(data.offer.amount)} {data.offer.currency}
             </span>
           </div>
@@ -88,17 +88,21 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
         >
           {/* A. Listing Price (Primary) */}
           {data.listing ? (
-            <div className="flex items-center gap-0.5 text-sm font-qs-bold text-gray-900 group-hover:text-link transition-colors">
+            <div className="flex items-center gap-1 text-xs text-text-main group-hover:text-link transition-colors">
               <span className="font-sans leading-none">Ξ</span>
-              <span>{displayNumber(data.listing.amount)}</span>
+              <span className="font-mono font-light">
+                {displayNumber(data.listing.amount)}
+              </span>
             </div>
           ) : null}
 
           {/* B. Offer Price (Badge Style) */}
           {data.offer && (
-            <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 text-xs group-hover:bg-purple-100 transition-colors">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 text-xs group-hover:bg-purple-100 transition-colors">
               <span className="font-sans leading-none">Ξ</span>
-              <span>{displayNumber(data.offer.amount)}</span>
+              <span className="font-mono font-light">
+                {displayNumber(data.offer.amount)}
+              </span>
             </div>
           )}
         </a>

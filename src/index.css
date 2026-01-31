@@ -1,80 +1,139 @@
-/* ===== ebr-normal: Quicksand ===== */
+/* src/index.css */
+
+/* ========================================= */
+/* 1. Quicksand (Sans-Serif / Main Font)     */
+/* ========================================= */
+
+/* Light (300) */
 @font-face {
-  font-family: "qs-light";
+  font-family: "Quicksand";
   src: url("./assets/fonts/Quicksand-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
   font-display: swap;
 }
+
+/* Regular (400) */
 @font-face {
-  font-family: "qs-regular";
+  font-family: "Quicksand";
   src: url("./assets/fonts/Quicksand-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
+
+/* Medium (500) */
 @font-face {
-  font-family: "qs-medium";
+  font-family: "Quicksand";
   src: url("./assets/fonts/Quicksand-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
   font-display: swap;
 }
+
+/* SemiBold (600) */
 @font-face {
-  font-family: "qs-semibold";
+  font-family: "Quicksand";
   src: url("./assets/fonts/Quicksand-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
   font-display: swap;
 }
+
+/* Bold (700) */
 @font-face {
-  font-family: "qs-bold";
+  font-family: "Quicksand";
   src: url("./assets/fonts/Quicksand-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
   font-display: swap;
 }
+
+/* ========================================= */
+/* 2. DM Mono (Monospace / Data Font)        */
+/* ========================================= */
+
+/* Light (300) */
+@font-face {
+  font-family: "DM Mono";
+  src: url("./assets/fonts/DMMono-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Regular (400) */
+@font-face {
+  font-family: "DM Mono";
+  src: url("./assets/fonts/DMMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Medium (500) */
+@font-face {
+  font-family: "DM Mono";
+  src: url("./assets/fonts/DMMono-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+   注意：DM Mono 原生没有 Bold (700)。
+   如果你在代码里用了 font-bold (700)，浏览器会自动“伪造”加粗效果，
+   或者你可以把 Medium (500) 强制映射给 700，视效果而定。
+   目前保持标准引入。
+*/
+
+/* ========================================= */
+/* 3. Tailwind Directives                    */
+/* ========================================= */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
-- 主题背景色，不需要在 table 中体现：#f5f5f5
-- 可点击的文字颜色，如链接：#0dcaf0
-- 可点击的文字辅助颜色，如链接悬浮：#0aa2c0
-- 文字颜色：#483c32
-- 表头行的背景色：#eaeaea
-- 表格行的背景色：#ffffff
-- 表格行上边框颜色：#dddddd
-- 表格行悬停时的背景色：cyan-50
-
-- Active: gray-200
-- Grace: red-200
-- Premium: yellow-200
-- Released: green-200
-- Available: green-200
-*/
+/* ========================================= */
+/* 4. Global Styles                          */
+/* ========================================= */
 
 body {
   background-color: #f5f5f5;
-  font-family: "qs-regular";
+  color: #483c32;
+  /* 默认使用 Quicksand */
+  font-family: "Quicksand", sans-serif;
+  font-weight: 400;
 }
+
 h1 {
   padding: 0 0.5rem;
 }
+
 h1 a {
   text-decoration: none;
 }
 
-/* ==== color model ==== */
-
-body {
-  color: #483c32;
-  font-weight: 300;
-}
-a {
-  color: #0dcaf0;
-}
-a:hover {
-  color: #0aa2c0;
-}
 h1 a .title-ens {
   color: #483c32;
 }
+
+a {
+  color: #0dcaf0;
+}
+
+a:hover {
+  color: #0aa2c0;
+}
+
 .error-boundary {
   color: indianred;
 }
+
+/* ========================================= */
+/* 5. Utilities                              */
+/* ========================================= */
 
 @layer utilities {
   input[type="number"]::-webkit-inner-spin-button,
@@ -85,5 +144,19 @@ h1 a .title-ens {
 
   input[type="number"] {
     -moz-appearance: textfield; /* Firefox */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #e5e7eb;
+    border-radius: 20px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #d1d5db;
   }
 }

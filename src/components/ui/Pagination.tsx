@@ -54,7 +54,7 @@ export const Pagination = ({
   const btnClass =
     "w-8 h-8 flex items-center justify-center rounded-lg text-sm transition-colors outline-none focus:ring-2 focus:ring-link/20";
   const activeClass =
-    "bg-link text-white font-qs-semibold shadow-md shadow-link/20";
+    "bg-link text-white font-sans font-semibold shadow-md shadow-link/20";
   const inactiveClass = "text-gray-500 hover:bg-gray-100 hover:text-text-main";
   const disabledClass = "text-gray-300 cursor-not-allowed";
 
@@ -106,7 +106,7 @@ export const Pagination = ({
         <FontAwesomeIcon icon={faAnglesRight} size="xs" />
       </button>
 
-      <span className="text-xs text-gray-400 ml-4 font-qs-medium">
+      <span className="text-xs text-gray-400 ml-4 font-sans font-medium">
         {t("pagination.info", { total: totalCount, pages: totalPages })}
       </span>
     </div>

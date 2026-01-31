@@ -31,7 +31,7 @@ export const LanguageView = () => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
       <div>
-        <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
+        <p className="text-sm text-gray-500 mb-4 leading-relaxed font-sans font-medium">
           {t("settings.language.desc")}
         </p>
 
@@ -54,7 +54,7 @@ export const LanguageView = () => {
                 <div className="text-2xl">{lang.flag}</div>
                 <div className="flex-1">
                   <div
-                    className={`text-sm font-qs-semibold ${
+                    className={`text-sm font-sans font-semibold ${
                       isActive ? "text-link" : "text-text-main"
                     }`}
                   >

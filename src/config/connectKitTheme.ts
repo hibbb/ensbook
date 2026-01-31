@@ -1,5 +1,5 @@
 export const connectKitTheme = {
-  "--ck-font-family": "qs-semibold",
+  "--ck-font-family": '"Quicksand", sans-serif',
   "--ck-font-weight": "400",
   "--ck-border-radius": "20px",
   "--ck-overlay-backdrop-filter": "blur(4px)",

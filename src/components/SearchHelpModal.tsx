@@ -26,7 +26,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
       maxWidth="max-w-lg"
     >
       <div className="p-6 space-y-6">
-        <p className="text-sm text-gray-500 font-qs-medium">
+        <p className="text-sm text-gray-500 font-sans font-medium">
           {t("search.guide.desc")}
         </p>
 
@@ -37,13 +37,13 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faMagnifyingGlass} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-semibold text-text-main text-sm">
+              <h4 className="font-sans font-semibold text-text-main text-sm">
                 {t("search.guide.mode.batch.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
                 {t("search.guide.mode.batch.desc")}
               </p>
-              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-sans font-medium text-text-main">
                 abc.eth apple 999
               </div>
             </div>
@@ -55,7 +55,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faAt} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-semibold text-text-main text-sm">
+              <h4 className="font-sans font-semibold text-text-main text-sm">
                 {t("search.guide.mode.owner.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
@@ -64,7 +64,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
                   ENS（或以太坊地址）” 的格式查询。
                 </Trans>
               </p>
-              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-sans font-medium text-text-main">
                 @alice.eth 或 @alice
               </div>
             </div>
@@ -76,13 +76,13 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faEthereum} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-semibold text-text-main text-sm">
+              <h4 className="font-sans font-semibold text-text-main text-sm">
                 {t("search.guide.mode.address.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
                 {t("search.guide.mode.address.desc")}
               </p>
-              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-sans font-medium text-text-main">
                 0xd8dA...6045
               </div>
             </div>
@@ -94,13 +94,13 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               <FontAwesomeIcon icon={faGears} size="sm" />
             </div>
             <div>
-              <h4 className="font-qs-semibold text-text-main text-sm">
+              <h4 className="font-sans font-semibold text-text-main text-sm">
                 {t("search.guide.mode.mixed.title")}
               </h4>
               <p className="text-xs text-gray-400 mt-1">
                 {t("search.guide.mode.mixed.desc")}
               </p>
-              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-qs-medium text-text-main">
+              <div className="mt-2 text-sm bg-gray-50 border border-gray-100 px-3 py-2 rounded-xs font-sans font-medium text-text-main">
                 apple @alice.eth 0xd8...
               </div>
             </div>
@@ -111,7 +111,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
       <div className="px-6 pb-6 pt-2">
         <button
           onClick={onClose}
-          className="w-full py-3 bg-link text-white text-sm font-qs-semibold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
+          className="w-full py-3 bg-link text-white text-sm font-sans font-semibold rounded-lg hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-gray-200"
         >
           {t("common.got_it")}
         </button>

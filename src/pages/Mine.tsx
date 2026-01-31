@@ -100,7 +100,7 @@ export const Mine = () => {
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
           <FontAwesomeIcon icon={faFeatherPointed} size="2x" />
         </div>
-        <h2 className="text-2xl font-qs-semibold text-gray-800 mb-3">
+        <h2 className="text-2xl font-sans font-semibold text-text-main mb-3">
           {t("mine.empty_state.title")}
         </h2>
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
@@ -132,7 +132,7 @@ export const Mine = () => {
     <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10 flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-qs-semibold flex items-center gap-3">
+          <h1 className="text-4xl font-sans font-semibold flex items-center gap-3">
             {t("mine.title")}
             <span className="text-sm bg-black text-white px-2 py-1 rounded-md font-bold tracking-wide transform -translate-y-4">
               {t("mine.subtitle")}

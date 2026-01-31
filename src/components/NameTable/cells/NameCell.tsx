@@ -34,9 +34,9 @@ const MetadataRow = ({
 
   return (
     <div className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-      <span className="text-gray-500 font-qs-medium">{label}:</span>
+      <span className="text-gray-500 font-sans font-medium">{label}:</span>
       <div className="flex items-center gap-2">
-        <span className="font-mono text-gray-700">{value}</span>
+        <span className="font-mono text-text-main">{value}</span>
         {fullValue && (
           <button
             onClick={handleCopy}
@@ -97,10 +97,10 @@ export const NameCell = ({ record }: NameCellProps) => {
       <div className="flex flex-col gap-2 min-w-[200px]">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-medium">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-sans font-medium">
               {t("table.cell.label")}
             </span>
-            <span className="font-qs-medium text-xs text-white">
+            <span className="font-sans font-medium text-xs text-white">
               {record.label}
             </span>
           </div>
@@ -115,10 +115,10 @@ export const NameCell = ({ record }: NameCellProps) => {
 
         <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-medium">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-sans font-medium">
               {t("table.cell.name")}
             </span>
-            <span className="font-qs-medium text-xs text-white">
+            <span className="font-sans font-medium text-xs text-white">
               {fullName}
             </span>
           </div>
@@ -132,7 +132,7 @@ export const NameCell = ({ record }: NameCellProps) => {
         </div>
 
         <div className="pt-2 pb-1 mt-1 border-t border-white/10 text-center">
-          <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
+          <span className="text-[10px] text-white font-sans font-regular flex items-center justify-center gap-1">
             {t("table.cell.ens_app_link")}
           </span>
         </div>
@@ -151,14 +151,20 @@ export const NameCell = ({ record }: NameCellProps) => {
             className="flex items-center gap-0.5 group"
           >
             {record.wrapped && (
-              <span className="text-sm font-qs-regular text-link">{"["}</span>
+              <span className="text-sm font-sans font-regular text-link">
+                {"["}
+              </span>
             )}
-            <span className="text-base font-qs-medium tracking-tight text-text-main transition-colors">
+            <span className="text-base font-sans font-medium tracking-tight text-text-main transition-colors">
               {record.label}
             </span>
-            <span className="text-sm font-qs-regular text-gray-400">.eth</span>
+            <span className="text-sm font-sans font-regular text-gray-400">
+              .eth
+            </span>
             {record.wrapped && (
-              <span className="text-sm font-qs-regular text-link">{"]"}</span>
+              <span className="text-sm font-sans font-regular text-link">
+                {"]"}
+              </span>
             )}
           </a>
         </Tooltip>
@@ -175,29 +181,29 @@ export const NameCell = ({ record }: NameCellProps) => {
 
             <PopoverContent className="w-80 p-0 overflow-hidden" align="start">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                <span className="text-xs font-qs-semibold text-gray-500 uppercase tracking-wider">
+                <span className="text-xs font-sans font-semibold text-gray-500 uppercase tracking-wider">
                   {t("table.cell.meta_title")}
                 </span>
-                <span className="text-xs font-qs-medium text-gray-400">
+                <span className="text-xs font-sans font-medium text-gray-400">
                   {record.label}.eth
                 </span>
               </div>
               <div className="p-4 flex flex-col gap-1 text-xs">
                 <div className="flex items-center justify-between py-1.5 border-b border-gray-50">
-                  <span className="text-gray-500 font-qs-medium">
+                  <span className="text-gray-500 font-sans font-medium">
                     {t("table.cell.length")}:
                   </span>
-                  <span className="font-qs-semibold text-gray-700">
+                  <span className="font-sans font-semibold text-text-main">
                     {metadata.length}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between py-1.5 border-b border-gray-50">
-                  <span className="text-gray-500 font-qs-medium">
+                  <span className="text-gray-500 font-sans font-medium">
                     {t("table.cell.state")}:
                   </span>
                   {record.wrapped ? (
-                    <div className="flex items-center font-qs-semibold gap-2">
+                    <div className="flex items-center font-sans font-semibold gap-2">
                       <span className="text-sm text-link">{"["}</span>
                       {t("table.filter.wrapped")}
                       <span className="text-sm text-link">{"]"}</span>

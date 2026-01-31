@@ -37,7 +37,7 @@ export const HomeSearchSection = ({
       }`}
     >
       {!hasContent && (
-        <h1 className="text-4xl font-qs-regular text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
+        <h1 className="text-4xl font-sans font-regular text-text-main mb-8 tracking-tight animate-in fade-in zoom-in duration-500">
           {/* 建议在 search 下加一个 title: "Search" */}
           {/* 暂时使用 "Search" 字符串，或者添加 key */}
           <span className="text-link">Search</span> ENS

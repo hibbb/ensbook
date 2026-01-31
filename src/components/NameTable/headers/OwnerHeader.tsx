@@ -87,7 +87,7 @@ export const OwnerHeader = ({
             </div>
 
             {/* 🚀 2. Statistics Bar */}
-            <div className="bg-gray-50 border-y border-gray-100 px-4 py-1.5 flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-qs-bold select-none my-1">
+            <div className="bg-gray-50 border-y border-gray-100 px-4 py-1.5 flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-sans font-semibold select-none my-1">
               <div className="flex items-center gap-1.5">
                 <FontAwesomeIcon icon={faUsers} />
                 <span>Owners</span>
@@ -111,7 +111,7 @@ export const OwnerHeader = ({
                   "px-4 py-2 text-sm flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-50 text-text-main ";
 
                 if (isSelected) {
-                  containerClass += "font-qs-bold ";
+                  containerClass += "font-sans font-semibold ";
                   if (!item.isMyself) containerClass += "text-link ";
                 }
 
@@ -151,7 +151,7 @@ export const OwnerHeader = ({
 
                     <div className="flex items-center gap-2 pl-2">
                       <span
-                        className={`text-xs font-qs-regular ${item.isMyself ? "text-link" : "text-gray-400"}`}
+                        className={`text-xs font-sans font-regular ${item.isMyself ? "text-link" : "text-gray-400"}`}
                       >
                         ({item.count})
                       </span>

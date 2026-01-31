@@ -39,7 +39,7 @@ export const IndexCell = ({
           onClick={handleClick}
           className={`
             w-5 h-5 flex items-center justify-center rounded-full
-            text-xs font-qs-bold cursor-pointer select-none
+            text-xs font-sans font-semibold cursor-pointer select-none
             transition-all duration-100
             hover:scale-110 active:scale-90
             ${currentStyle}

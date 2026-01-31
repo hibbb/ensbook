@@ -138,7 +138,7 @@ export const ProcessModal = ({
             />
 
             {validationError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2 text-red-500 text-sm font-qs-medium animate-in fade-in slide-in-from-top-1">
+              <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2 text-red-500 text-sm font-sans font-medium animate-in fade-in slide-in-from-top-1">
                 <FontAwesomeIcon icon={faExclamationCircle} />
                 {validationError}
               </div>
@@ -147,14 +147,14 @@ export const ProcessModal = ({
             <div className="flex gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 py-3 rounded-lg font-qs-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="flex-1 py-3 rounded-lg font-sans font-semibold text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors"
               >
                 {t("common.cancel")}
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={!!validationError || isResolving} // 🚀 解析中禁止提交
-                className={`flex-1 py-3 rounded-lg font-qs-semibold text-sm text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2
+                className={`flex-1 py-3 rounded-lg font-sans font-semibold text-sm text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2
                   ${
                     validationError
                       ? "bg-gray-300 cursor-not-allowed shadow-none"
