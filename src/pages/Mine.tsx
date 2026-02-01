@@ -100,7 +100,7 @@ export const Mine = () => {
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
           <FontAwesomeIcon icon={faFeatherPointed} size="2x" />
         </div>
-        <h2 className="text-2xl font-sans font-semibold text-text-main mb-3">
+        <h2 className="text-2xl font-sans font-medium text-text-main mb-3">
           {t("mine.empty_state.title")}
         </h2>
         <p className="text-gray-500 max-w-md mb-8 leading-relaxed">
