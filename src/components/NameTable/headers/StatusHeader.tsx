@@ -133,7 +133,7 @@ export const StatusHeader = ({
                   {/* 🚀 翻译状态 */}
                   <span>{t(`status.${s.toLowerCase()}`)}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 font-qs-regular">
+                    <span className="text-xs text-gray-400 font-sans font-regular">
                       ({count})
                     </span>
                     {isSelected && (

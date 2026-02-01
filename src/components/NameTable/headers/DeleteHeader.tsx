@@ -172,7 +172,7 @@ export const DeleteHeader = ({
                         >
                           <span>{t(`status.${status.toLowerCase()}`)}</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs opacity-60 font-qs-regular">
+                            <span className="text-xs opacity-60 font-sans font-regular">
                               ({count})
                             </span>
                             <FontAwesomeIcon
@@ -205,7 +205,7 @@ export const DeleteHeader = ({
                             {len} {t("table.filter.char")}
                           </span>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs opacity-60 font-qs-regular">
+                            <span className="text-xs opacity-60 font-sans font-regular">
                               ({count})
                             </span>
                             <FontAwesomeIcon
@@ -233,7 +233,7 @@ export const DeleteHeader = ({
                       >
                         <span>{t("table.filter.wrapped")}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs opacity-60 font-qs-regular">
+                          <span className="text-xs opacity-60 font-sans font-regular">
                             ({nameCounts.wrappedCounts.wrapped})
                           </span>
                           <FontAwesomeIcon
@@ -252,7 +252,7 @@ export const DeleteHeader = ({
                       >
                         <span>{t("table.filter.unwrapped")}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs opacity-60 font-qs-regular">
+                          <span className="text-xs opacity-60 font-sans font-regular">
                             ({nameCounts.wrappedCounts.unwrapped})
                           </span>
                           <FontAwesomeIcon
@@ -280,7 +280,7 @@ export const DeleteHeader = ({
                         <span>{t("table.delete.connected_wallet")}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs opacity-60 font-qs-regular">
+                        <span className="text-xs opacity-60 font-sans font-regular">
                           ({ownershipCounts.mine})
                         </span>
                         <FontAwesomeIcon
@@ -298,7 +298,7 @@ export const DeleteHeader = ({
                     >
                       <span>{t("table.delete.others")}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs opacity-60 font-qs-regular">
+                        <span className="text-xs opacity-60 font-sans font-regular">
                           ({ownershipCounts.others})
                         </span>
                         <FontAwesomeIcon

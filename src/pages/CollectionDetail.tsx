@@ -71,7 +71,7 @@ export const CollectionDetail = () => {
   return (
     <div className="max-w-7xl mx-auto lg:px-4 py-10 pb-24 relative">
       <header className="mb-10">
-        <h1 className="text-4xl font-qs-semibold">
+        <h1 className="text-4xl font-sans font-semibold">
           {t(collection.displayName)}
         </h1>
         <p className="text-gray-400 mt-2 ml-2">{t(collection.description)}</p>

@@ -21,7 +21,7 @@ export const NavBar = () => {
 
   const getLinkClass = (path: string) => {
     const isActive = location.pathname === path;
-    return `flex items-center gap-2 text-sm font-qs-semibold transition-all py-1 border-b-2 ${
+    return `flex items-center gap-2 text-sm font-sans font-semibold transition-all py-1 border-b-2 ${
       isActive
         ? "text-link border-link"
         : "text-text-main border-transparent hover:text-link hover:border-link/30"
@@ -34,7 +34,7 @@ export const NavBar = () => {
         <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="text-3xl font-qs-regular transition-colors text-link hover:text-link-hover"
+            className="text-3xl font-sans font-regular transition-colors text-link hover:text-link-hover"
           >
             <span className="text-text-main">ENS</span>Book
           </Link>

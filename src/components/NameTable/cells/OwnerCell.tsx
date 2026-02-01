@@ -31,10 +31,10 @@ export const OwnerCell = ({ record }: OwnerCellProps) => {
         {/* 所有者地址 */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-sans font-semibold">
               {t("table.cell.owner_addr")}
             </span>
-            <span className="font-qs-medium text-xs">
+            <span className="font-mono font-light text-xs">
               {truncateAddress(record.owner)}
             </span>
           </div>
@@ -53,10 +53,10 @@ export const OwnerCell = ({ record }: OwnerCellProps) => {
         {record.ownerPrimaryName && (
           <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-2">
             <div className="flex flex-col">
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-qs-semibold">
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider font-sans font-semibold">
                 {t("table.cell.primary_name")}
               </span>
-              <span className="font-qs-medium text-xs">
+              <span className="font-sans font-medium text-xs">
                 {record.ownerPrimaryName}
               </span>
             </div>
@@ -78,7 +78,7 @@ export const OwnerCell = ({ record }: OwnerCellProps) => {
 
         {/* 🚀 底部提示：点击查看持仓 */}
         <div className="pt-2 pb-1 border-t border-white/10 text-center">
-          <span className="text-[10px] text-white font-qs-regular flex items-center justify-center gap-1">
+          <span className="text-[10px] text-white font-sans font-regular flex items-center justify-center gap-1">
             {t("table.cell.view_portfolio")}
           </span>
         </div>

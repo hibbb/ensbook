@@ -20,12 +20,12 @@ export const AboutView = () => {
         </p>
       </div>
 
-      <p className="text-sm text-gray-600 leading-relaxed font-qs-regular text-center px-8">
+      <p className="text-sm text-gray-600 leading-relaxed font-sans font-regular text-center px-8">
         {t("settings.about.description")}
       </p>
 
       <div>
-        <h5 className="text-xs font-qs-semibold text-gray-400 uppercase tracking-wider px-1 mb-2 border-b border-gray-100 pb-2">
+        <h5 className="text-xs font-sans font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2 border-b border-gray-100 pb-2">
           {t("settings.about.connect")}
         </h5>
 
@@ -42,7 +42,7 @@ export const AboutView = () => {
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-qs-semibold text-text-main group-hover:text-link transition-colors">
+              <div className="text-sm font-sans font-semibold text-text-main group-hover:text-link transition-colors">
                 {t("settings.about.author")}
               </div>
               <div className="text-xs text-gray-500">@forlbb</div>
@@ -59,7 +59,7 @@ export const AboutView = () => {
               <FontAwesomeIcon icon={faGithub} className="text-2xl" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-qs-semibold text-text-main group-hover:text-link transition-colors">
+              <div className="text-sm font-sans font-semibold text-text-main group-hover:text-link transition-colors">
                 {t("settings.about.github")}
               </div>
               <div className="text-xs text-gray-500">

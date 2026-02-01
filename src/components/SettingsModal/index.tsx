@@ -53,9 +53,9 @@ const SidebarItem = ({
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-qs-medium transition-colors duration-150 rounded-md ${
+    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-sans font-medium transition-colors duration-150 rounded-md ${
       active
-        ? "bg-gray-100 text-black font-qs-semibold"
+        ? "bg-gray-100 text-black font-sans font-semibold"
         : disabled
           ? "text-gray-300 cursor-not-allowed"
           : "text-gray-500 hover:bg-gray-50 hover:text-text-main"
@@ -68,7 +68,7 @@ const SidebarItem = ({
     </div>
     <span>{label}</span>
     {disabled && badge && (
-      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-qs-semibold">
+      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-sans font-semibold">
         {badge}
       </span>
     )}
@@ -105,7 +105,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
       <div className="flex h-[600px] max-h-[80vh] w-full">
         <div className="w-56 bg-white border-r border-gray-100 flex flex-col shrink-0">
           <div className="p-6">
-            <h3 className="text-xl font-qs-semibold text-text-main tracking-tight">
+            <h3 className="text-xl font-sans font-semibold text-text-main tracking-tight">
               {t("settings.title.default")}
             </h3>
           </div>
@@ -164,14 +164,14 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             />
           </nav>
 
-          <div className="p-4 text-xs text-gray-300 text-center font-qs-medium">
+          <div className="p-4 text-xs text-gray-300 text-center font-sans font-medium">
             ENSBook v{pkg.version}
           </div>
         </div>
 
         <div className="flex-1 flex flex-col min-w-0 bg-white">
           <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100 shrink-0">
-            <h4 className="text-lg font-qs-semibold text-gray-800">
+            <h4 className="text-lg font-sans font-semibold text-text-main">
               {getTitle()}
             </h4>
             <button

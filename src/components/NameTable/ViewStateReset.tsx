@@ -37,7 +37,7 @@ export const ViewStateReset = ({
           animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200
         "
       >
-        <div className="flex items-center gap-1 text-xs font-qs-medium mr-3 select-none">
+        <div className="flex items-center gap-1 text-xs font-sans font-medium mr-3 select-none">
           <span className="font-bold text-white">{filteredCount}</span>
           <span className="text-white/60">/</span>
           <span className="text-white/80">{totalCount}</span>
@@ -54,7 +54,9 @@ export const ViewStateReset = ({
             transition-all duration-200 group
           "
         >
-          <span className="text-sm font-qs-semibold">{t("common.reset")}</span>
+          <span className="text-sm font-sans font-semibold">
+            {t("common.reset")}
+          </span>
           <FontAwesomeIcon
             icon={faFilterCircleXmark}
             className="text-white/90 group-hover:rotate-90 transition-transform duration-300"

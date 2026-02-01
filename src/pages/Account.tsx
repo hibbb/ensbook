@@ -184,7 +184,7 @@ export const Account = () => {
           <FontAwesomeIcon icon={faUserTag} size="2x" />
         </div>
         <div>
-          <h2 className="text-lg font-qs-semibold text-gray-800">
+          <h2 className="text-lg font-sans font-semibold text-text-main">
             {t("account.error_resolve")}
           </h2>
           <p className="text-sm text-gray-400 mt-1 font-mono">{input}</p>
@@ -204,7 +204,9 @@ export const Account = () => {
           >
             <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
           </button>
-          <h1 className="text-4xl font-qs-semibold">{t("account.title")}</h1>
+          <h1 className="text-4xl font-sans font-semibold">
+            {t("account.title")}
+          </h1>
           {isLoading && (
             <span className="text-sm text-link animate-pulse">
               {t("common.loading")}
@@ -215,10 +217,12 @@ export const Account = () => {
         <div className="flex flex-col md:flex-row gap-4 md:items-center text-sm text-gray-500 bg-gray-50 border border-gray-100 p-4">
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faUserTag} className="text-gray-400" />
-            <span className="font-qs-regular text-gray-500">
+            <span className="font-sans font-regular text-gray-500">
               {t("account.name_label")}:
             </span>
-            <span className="font-qs-medium text-text-main">{displayName}</span>
+            <span className="font-sans font-medium text-text-main">
+              {displayName}
+            </span>
             <button
               onClick={() => handleCopy(fullNameToCopy, "Name")}
               className="text-gray-400 hover:text-link transition-colors p-1"
@@ -233,10 +237,10 @@ export const Account = () => {
               <div className="hidden md:block w-px h-4 bg-gray-300"></div>
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faWallet} className="text-gray-400" />
-                <span className="font-qs-regular text-gray-500">
+                <span className="font-sans font-regular text-gray-500">
                   {t("account.address_label")}:
                 </span>
-                <span className="text-text-main">
+                <span className="text-text-main font-mono font-light">
                   {showFullAddress
                     ? resolvedAddress
                     : truncateAddress(resolvedAddress)}
@@ -262,10 +266,10 @@ export const Account = () => {
               <div className="hidden md:block w-px h-4 bg-gray-300"></div>
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faWarehouse} className="text-gray-400" />
-                <span className="font-qs-regular text-gray-500">
+                <span className="font-sans font-regular text-gray-500">
                   {t("account.total_label")}:
                 </span>
-                <span className="font-qs-medium text-text-main">
+                <span className="font-sans font-medium text-text-main">
                   {labels?.length || 0}
                 </span>
               </div>

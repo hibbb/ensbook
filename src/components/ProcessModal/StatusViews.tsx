@@ -83,7 +83,7 @@ export const ProcessingView = ({
           </>
         )}
       </div>
-      <h3 className="text-lg font-qs-semibold text-text-main mb-1">
+      <h3 className="text-lg font-sans font-semibold text-text-main mb-1">
         {message}
       </h3>
       <p className="text-xs text-gray-500 mb-6 max-w-[85%] mx-auto">
@@ -96,7 +96,7 @@ export const ProcessingView = ({
             href={`https://etherscan.io/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-md text-xs text-link hover:text-link-hover hover:bg-gray-100 transition-colors border border-gray-100"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-md text-xs font-mono text-link hover:text-link-hover hover:bg-gray-100 transition-colors border border-gray-100"
           >
             <span>{truncateAddress(txHash, 10, 8)}</span>
             <FontAwesomeIcon icon={faExternalLinkAlt} />
@@ -106,7 +106,7 @@ export const ProcessingView = ({
         {/* 🚀 新增：后台运行按钮 */}
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 text-xs font-qs-medium flex items-center gap-1.5 transition-colors mt-2"
+          className="text-gray-400 hover:text-gray-600 text-xs font-sans font-medium flex items-center gap-1.5 transition-colors mt-2"
         >
           <FontAwesomeIcon icon={faMinimize} />
           {t("common.run_in_background")}
@@ -130,7 +130,7 @@ export const SuccessView = ({
       <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 text-3xl mx-auto mb-4 border border-green-100">
         <FontAwesomeIcon icon={faCheckCircle} />
       </div>
-      <h3 className="text-xl font-qs-semibold text-text-main mb-2">
+      <h3 className="text-xl font-sans font-semibold text-text-main mb-2">
         {type === "register"
           ? t("transaction.result.success_register")
           : t("transaction.result.success_renew")}
@@ -140,7 +140,7 @@ export const SuccessView = ({
       </p>
       <button
         onClick={onClose}
-        className="w-full py-3 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
+        className="w-full py-3 rounded-lg font-sans font-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20"
       >
         {t("common.finish")}
       </button>
@@ -163,7 +163,7 @@ export const ErrorView = ({ onClose }: { onClose: () => void }) => {
       </p>
       <button
         onClick={onClose}
-        className="text-link text-sm font-qs-semibold hover:underline"
+        className="text-link text-sm font-sans font-semibold hover:underline"
       >
         {t("common.retry")}
       </button>

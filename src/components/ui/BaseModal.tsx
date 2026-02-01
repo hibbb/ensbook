@@ -94,7 +94,7 @@ export const BaseModal = ({
         {/* 头部 */}
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 shrink-0 bg-white z-10">
-            <div className="text-lg font-qs-semibold text-text-main flex items-center gap-2">
+            <div className="text-lg font-sans font-semibold text-text-main flex items-center gap-2">
               {title}
             </div>
             {showCloseButton && (

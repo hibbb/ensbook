@@ -85,22 +85,22 @@ export const ReminderModal = ({
     >
       <div className="p-6 space-y-6">
         <div className="-mt-4 mb-2">
-          <p className="text-gray-500 text-sm font-qs-medium">
+          <p className="text-gray-500 text-sm font-sans font-medium">
             {record.label}.eth
           </p>
         </div>
 
         <div className="bg-orange-50/50 rounded-lg p-3 border border-orange-100 text-center">
-          <span className="text-xs text-orange-600 uppercase font-qs-semibold tracking-wider block mb-1">
+          <span className="text-xs text-orange-600 uppercase font-sans font-semibold tracking-wider block mb-1">
             {t("transaction.reminder.expiration_date")}
           </span>
-          <span className="text-orange-900 font-qs-semibold">
+          <span className="text-orange-900 font-sans font-semibold">
             {formatExpiry(record.expiryTime)}
           </span>
         </div>
 
         <div>
-          <label className="text-xs font-qs-semibold text-gray-400 uppercase tracking-wider mb-3 block">
+          <label className="text-xs font-sans font-semibold text-gray-400 uppercase tracking-wider mb-3 block">
             {t("transaction.reminder.remind_before")}
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -111,7 +111,7 @@ export const ReminderModal = ({
                   key={opt.value}
                   onClick={() => handleToggleReminder(opt.value)}
                   className={`
-                    px-3 py-2 rounded-lg text-sm font-qs-medium transition-all border
+                    px-3 py-2 rounded-lg text-sm font-sans font-medium transition-all border
                     ${
                       isSelected
                         ? "bg-link text-white border-link shadow-sm shadow-link/20"
@@ -131,7 +131,7 @@ export const ReminderModal = ({
         <button
           onClick={handleDownloadICS}
           disabled={selectedReminders.length === 0}
-          className="w-full py-3 bg-text-main/90 text-white rounded-lg font-qs-semibold text-sm hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+          className="w-full py-3 bg-text-main/90 text-white rounded-lg font-sans font-semibold text-sm hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
         >
           <FontAwesomeIcon icon={faDownload} />
           {t("transaction.reminder.btn.download")}
@@ -139,7 +139,7 @@ export const ReminderModal = ({
 
         <button
           onClick={handleGoogleCalendar}
-          className="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-qs-semibold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 flex items-center justify-center gap-2"
+          className="w-full py-3 bg-white border border-gray-200 text-text-main rounded-lg font-sans font-semibold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
           <FontAwesomeIcon icon={faGoogle} className="text-red-500" />
           {t("transaction.reminder.btn.google")}

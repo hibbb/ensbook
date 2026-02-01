@@ -91,7 +91,7 @@ export const ActionCell = ({
       return {
         text: t("table.cell.continue"),
         style:
-          "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-0.5 rounded-lg hover:bg-orange-100 font-qs-semibold shadow-sm transition-all active:scale-95",
+          "bg-orange-50 text-orange-600 border border-orange-200 px-3 py-0.5 rounded-lg hover:bg-orange-100 font-sans font-semibold shadow-sm transition-all active:scale-95",
         disabled: false,
         action: () => onRegister?.(record),
         sideIcon: faClock,

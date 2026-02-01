@@ -144,15 +144,15 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             <FontAwesomeIcon icon={faDownload} />
           </div>
           <div className="flex-1">
-            <h5 className="text-sm font-qs-semibold text-gray-900 mb-1">
+            <h5 className="text-sm font-sans font-semibold text-text-main mb-1">
               {t("settings.backup.export.title")}
             </h5>
-            <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
+            <p className="text-sm text-gray-500 mb-4 leading-relaxed font-sans font-medium">
               {t("settings.backup.export.desc")}
             </p>
             <button
               onClick={handleExport}
-              className="px-4 py-2 bg-cyan-50 text-cyan-700 text-sm font-qs-semibold rounded border border-cyan-200 hover:bg-cyan-100 hover:border-cyan-300 transition-colors active:scale-95"
+              className="px-4 py-2 bg-cyan-50 text-cyan-700 text-sm font-sans font-semibold rounded border border-cyan-200 hover:bg-cyan-100 hover:border-cyan-300 transition-colors active:scale-95"
             >
               {t("settings.backup.export.btn")}
             </button>
@@ -166,12 +166,12 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             <FontAwesomeIcon icon={faUpload} />
           </div>
           <div className="flex-1">
-            <h5 className="text-sm font-qs-semibold text-gray-900 mb-1">
+            <h5 className="text-sm font-sans font-semibold text-text-main mb-1">
               {t("settings.backup.import.title")}
             </h5>
-            <div className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
+            <div className="text-sm text-gray-500 mb-4 leading-relaxed font-sans font-medium">
               {t("settings.backup.import.desc")}
-              <div className="flex items-center gap-1.5 mt-2 text-xs text-lime-700 font-qs-semibold">
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-lime-700 font-sans font-semibold">
                 <FontAwesomeIcon icon={faTriangleExclamation} />
                 {t("settings.backup.import.warning")}
               </div>
@@ -186,7 +186,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-lime-50 text-lime-700 text-sm font-qs-semibold rounded border border-lime-200 hover:bg-lime-100 hover:border-lime-300 transition-all active:scale-95"
+              className="px-4 py-2 bg-lime-50 text-lime-700 text-sm font-sans font-semibold rounded border border-lime-200 hover:bg-lime-100 hover:border-lime-300 transition-all active:scale-95"
             >
               {t("settings.backup.import.btn")}
             </button>
@@ -201,19 +201,19 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             <FontAwesomeIcon icon={faTrashCan} />
           </div>
           <div className="flex-1">
-            <h5 className="text-sm font-qs-semibold text-gray-900 mb-1">
+            <h5 className="text-sm font-sans font-semibold text-text-main mb-1">
               {t("settings.backup.reset.title")}
             </h5>
 
             {!isResetting ? (
               // 初始状态：显示描述和按钮
               <>
-                <p className="text-sm text-gray-500 mb-4 leading-relaxed font-qs-medium">
+                <p className="text-sm text-gray-500 mb-4 leading-relaxed font-sans font-medium">
                   {t("settings.backup.reset.desc")}
                 </p>
                 <button
                   onClick={() => setIsResetting(true)}
-                  className="px-4 py-2 bg-red-50 text-red-600 text-sm font-qs-semibold rounded border border-red-100 hover:bg-red-100 hover:border-red-200 transition-all active:scale-95"
+                  className="px-4 py-2 bg-red-50 text-red-600 text-sm font-sans font-semibold rounded border border-red-100 hover:bg-red-100 hover:border-red-200 transition-all active:scale-95"
                 >
                   {t("settings.backup.reset.btn")}
                 </button>
@@ -221,7 +221,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             ) : (
               // 确认状态：显示警告、输入框和确认按钮
               <div className="bg-red-50/50 rounded-lg p-4 border border-red-100 animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex items-start gap-2 text-red-600 text-xs font-qs-bold mb-3">
+                <div className="flex items-start gap-2 text-red-600 text-xs font-sans font-semibold mb-3">
                   <FontAwesomeIcon
                     icon={faTriangleExclamation}
                     className="mt-0.5"
@@ -238,14 +238,14 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
                     value={confirmInput}
                     onChange={(e) => setConfirmInput(e.target.value)}
                     placeholder={t("settings.backup.reset.type_delete")}
-                    className="flex-1 px-3 py-1.5 text-sm border border-red-200 rounded focus:outline-none focus:border-red-400 text-red-600 placeholder:text-red-200 font-qs-medium"
+                    className="flex-1 px-3 py-1.5 text-sm border border-red-200 rounded focus:outline-none focus:border-red-400 text-red-600 placeholder:text-red-200 font-sans font-medium"
                     autoFocus
                   />
                   <button
                     onClick={handleResetConfirm}
                     disabled={confirmInput !== "DELETE"}
                     className={`
-                            px-4 py-1.5 text-sm font-qs-semibold rounded border transition-all
+                            px-4 py-1.5 text-sm font-sans font-semibold rounded border transition-all
                             ${
                               confirmInput === "DELETE"
                                 ? "bg-red-500 border-red-600 text-white hover:bg-red-600 shadow-sm active:scale-95"
@@ -260,7 +260,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
                       setIsResetting(false);
                       setConfirmInput("");
                     }}
-                    className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 font-qs-medium underline decoration-gray-300 underline-offset-2"
+                    className="px-3 py-1.5 text-sm text-gray-500 hover:text-text-main font-sans font-medium underline decoration-gray-300 underline-offset-2"
                   >
                     {t("common.cancel")}
                   </button>
