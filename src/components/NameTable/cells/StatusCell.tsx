@@ -117,9 +117,7 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
         <div className="flex items-center gap-1 font-sans">
           <div className="flex items-center gap-1 text-[11px]">
             <span className="leading-none">Ξ</span>
-            <span className="font-mono font-light">
-              {premiumEthPrice || "-"}
-            </span>
+            <span className="font-mono">{premiumEthPrice || "-"}</span>
           </div>
           <span className="opacity-50 text-[10px]">|</span>
           <span className="font-mono font-light text-[10px] opacity-90">
