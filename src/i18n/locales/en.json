@@ -7,6 +7,7 @@
     "clear": "Clear",
     "finish": "Done",
     "retry": "Retry",
+    "abort": "Abort",
     "got_it": "Got it",
     "connect_wallet": "Connect Wallet",
     "not_connected": "Not Connected",
@@ -316,7 +317,8 @@
       "register_rejected": "You rejected the transaction, please retry",
       "recovery_failed": "Failed to recover registration progress",
       "commit_expired": "Commit expired, please restart",
-      "process_interrupted": "Process interrupted, check console"
+      "process_interrupted": "Process interrupted, check console",
+      "abort_success": "Registration Aborted, you can start over"
     },
     "reminder": {
       "title": "Set Renewal Reminder",

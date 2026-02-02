@@ -57,6 +57,21 @@ export function useEnsRegistration() {
     }
   }, []);
 
+  // 🚀 新增：放弃当前注册任务
+  const abandonRegistration = useCallback(() => {
+    // 1. 获取当前正在处理的 label
+    const currentLabel = registrationDataRef.current?.label;
+
+    if (currentLabel) {
+      // 2. 清除本地存储
+      removeRegistrationState(currentLabel);
+      toast.success(t("transaction.toast.abort_success"));
+    }
+
+    // 3. 重置内存状态 (这也包含清除定时器)
+    resetStatus();
+  }, [resetStatus, t]);
+
   const startResuming = useCallback(() => {
     resetStatus();
     setStatus("loading");
@@ -315,6 +330,7 @@ export function useEnsRegistration() {
     checkAndResume,
     continueRegistration,
     resetStatus,
+    abandonRegistration, // 🚀 导出
     startResuming,
     isBusy:
       status !== "idle" &&

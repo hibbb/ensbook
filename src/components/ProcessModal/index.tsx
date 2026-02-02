@@ -21,12 +21,12 @@ interface ProcessModalProps {
   txHash?: string | null;
   secondsLeft?: number;
   onClose: () => void;
-  // 🚀 修改：onConfirm 接收可选的 owner
   onConfirm: (durations: bigint[], owner?: Address) => void;
   title: string;
   currentExpiry?: number;
   itemCount?: number;
   expiryTimes?: number[];
+  onAbort: () => void; // 🚀 新增
 }
 
 export const ProcessModal = ({
@@ -41,6 +41,7 @@ export const ProcessModal = ({
   currentExpiry,
   itemCount = 1,
   expiryTimes = [],
+  onAbort, // 🚀 解构
 }: ProcessModalProps) => {
   const { t } = useTranslation();
 
@@ -175,6 +176,8 @@ export const ProcessModal = ({
             secondsLeft={secondsLeft}
             txHash={txHash}
             onClose={handleClose}
+            // 🚀 只有注册流程才允许 Abort
+            onAbort={type === "register" ? onAbort : undefined}
           />
         )}
 

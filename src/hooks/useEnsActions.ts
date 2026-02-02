@@ -52,6 +52,7 @@ export const useEnsActions = () => {
     secondsLeft,
     currentHash: regTxHash,
     resetStatus: resetReg,
+    abandonRegistration, // 🚀 引入
     checkAndResume,
     startResuming,
   } = useEnsRegistration();
@@ -178,6 +179,14 @@ export const useEnsActions = () => {
     resetReg();
   }, [resetRenewal, resetReg]);
 
+  // 🚀 封装一个处理函数，同时处理 UI 状态
+  const handleAbort = useCallback(() => {
+    abandonRegistration();
+    setDurationTarget(null); // 关闭 Modal
+    // 强制刷新 pendingLabels，让表格图标立即变回“注册”
+    setPendingLabels(getAllPendingLabels());
+  }, [abandonRegistration]);
+
   const onDurationConfirm = useCallback(
     (durations: bigint[], owner?: Address) => {
       if (!durationTarget) return;
@@ -266,6 +275,7 @@ export const useEnsActions = () => {
       onCloseModal: handleCloseModal,
       onConfirmDuration: onDurationConfirm,
       setReminderTarget,
+      onAbort: handleAbort, // 🚀 导出给 Modal
     },
   };
 };

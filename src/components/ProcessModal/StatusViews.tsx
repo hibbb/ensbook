@@ -7,7 +7,8 @@ import {
   faExternalLinkAlt,
   faCheckCircle,
   faExclamationCircle,
-  faMinimize, // 🚀 新增图标
+  faMinimize,
+  faTrashCan, // 🚀 新增图标
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { truncateAddress } from "../../utils/format";
@@ -16,8 +17,8 @@ interface ProcessingViewProps {
   status: string;
   secondsLeft: number;
   txHash?: string | null;
-  // 🚀 新增回调
   onClose: () => void;
+  onAbort?: () => void; // 🚀 新增
 }
 
 export const ProcessingView = ({
@@ -25,6 +26,7 @@ export const ProcessingView = ({
   secondsLeft,
   txHash,
   onClose,
+  onAbort,
 }: ProcessingViewProps) => {
   const { t } = useTranslation();
 
@@ -103,7 +105,7 @@ export const ProcessingView = ({
           </a>
         )}
 
-        {/* 🚀 新增：后台运行按钮 */}
+        {/* 后台运行按钮 */}
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 text-xs font-sans font-medium flex items-center gap-1.5 transition-colors mt-2"
@@ -111,6 +113,26 @@ export const ProcessingView = ({
           <FontAwesomeIcon icon={faMinimize} />
           {t("common.run_in_background")}
         </button>
+
+        {/* 🚀 放弃任务按钮 (仅当 onAbort 存在时显示) */}
+        {onAbort && (
+          <button
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Are you sure you want to abort this registration? This will clear your local progress.",
+                )
+              ) {
+                onAbort();
+              }
+            }}
+            className="text-red-300 hover:text-red-500 text-xs font-qs-medium flex items-center gap-1.5 transition-colors"
+            title="Clear local progress and start over"
+          >
+            <FontAwesomeIcon icon={faTrashCan} />
+            {t("common.abort")}
+          </button>
+        )}
       </div>
     </div>
   );
