@@ -4,11 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
-import { type Address } from "viem"; // 🚀
+import { type Address } from "viem";
+import { useAccount } from "wagmi"; // 🚀
 
 import { useEnsRenewal } from "./useEnsRenewal";
 import { useEnsRegistration } from "./useEnsRegistration";
 import { getAllPendingLabels } from "../services/storage/registration";
+import { useOptimisticNameUpdate } from "./useOptimisticNameUpdate"; // 🚀
 
 import type { NameRecord } from "../types/ensNames";
 import type { ProcessType } from "../components/ProcessModal";
@@ -16,6 +18,10 @@ import type { ProcessType } from "../components/ProcessModal";
 export const useEnsActions = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { address } = useAccount(); // 🚀 获取当前连接钱包，作为注册默认 Owner
+
+  // 🚀 引入乐观更新 Hook
+  const { updateRenewal, updateRegistration } = useOptimisticNameUpdate();
 
   const [durationTarget, setDurationTarget] = useState<{
     type: ProcessType;
@@ -23,6 +29,9 @@ export const useEnsActions = () => {
     labels?: string[];
     expiryTimes?: number[];
     onSuccess?: () => void;
+    // 🚀 新增：暂存用户提交的参数，用于后续更新 UI
+    pendingDurations?: bigint[];
+    pendingOwner?: string;
   } | null>(null);
 
   const [reminderTarget, setReminderTarget] = useState<NameRecord | null>(null);
@@ -54,8 +63,42 @@ export const useEnsActions = () => {
     return () => clearTimeout(timer);
   }, [regStatus]);
 
+  // 🚀 核心逻辑：监听交易成功状态
   useEffect(() => {
     if (regStatus === "success" || renewalStatus === "success") {
+      // 1. 立即执行乐观更新 (Optimistic Update)
+      if (durationTarget) {
+        // A. 处理续费
+        if (renewalStatus === "success") {
+          const labels =
+            durationTarget.labels ||
+            (durationTarget.record ? [durationTarget.record.label] : []);
+
+          // 目前 UI 仅支持统一时长，取第一个即可
+          const duration = durationTarget.pendingDurations
+            ? durationTarget.pendingDurations[0]
+            : 0n;
+
+          if (labels.length > 0 && duration > 0n) {
+            updateRenewal(labels, duration);
+          }
+        }
+
+        // B. 处理注册
+        if (regStatus === "success" && durationTarget.record) {
+          const duration = durationTarget.pendingDurations
+            ? durationTarget.pendingDurations[0]
+            : 0n;
+          const owner = durationTarget.pendingOwner || address;
+
+          if (duration > 0n && owner) {
+            updateRegistration(durationTarget.record.label, duration, owner);
+          }
+        }
+      }
+
+      // 2. 延迟执行真实刷新 (Eventual Consistency)
+      // 作为双重保险，防止乐观更新计算错误
       const refresh = () => {
         queryClient.invalidateQueries({ queryKey: ["name-records"] });
         queryClient.invalidateQueries({ queryKey: ["collection-records"] });
@@ -63,13 +106,21 @@ export const useEnsActions = () => {
       };
 
       const timer1 = setTimeout(refresh, 2000);
-      const timer2 = setTimeout(refresh, 10000);
+      const timer2 = setTimeout(refresh, 10000); // 10秒后再刷一次，应对 Graph 严重延迟
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
       };
     }
-  }, [regStatus, renewalStatus, queryClient]);
+  }, [
+    regStatus,
+    renewalStatus,
+    queryClient,
+    durationTarget,
+    updateRenewal,
+    updateRegistration,
+    address,
+  ]);
 
   const handleSingleRegister = useCallback(
     async (record: NameRecord) => {
@@ -127,13 +178,22 @@ export const useEnsActions = () => {
     resetReg();
   }, [resetRenewal, resetReg]);
 
-  // 🚀 修改：接收可选的 owner 参数
   const onDurationConfirm = useCallback(
     (durations: bigint[], owner?: Address) => {
       if (!durationTarget) return;
 
+      // 🚀 关键：将用户选择的参数保存到 state，供 useEffect 中的乐观更新使用
+      setDurationTarget((prev) =>
+        prev
+          ? {
+              ...prev,
+              pendingDurations: durations,
+              pendingOwner: owner,
+            }
+          : null,
+      );
+
       if (durationTarget.type === "register" && durationTarget.record) {
-        // 🚀 传递 owner 给 startRegistration
         startRegistration(durationTarget.record.label, durations[0], owner);
       } else if (durationTarget.type === "renew" && durationTarget.record) {
         renewSingle(durationTarget.record.label, durations[0]);
