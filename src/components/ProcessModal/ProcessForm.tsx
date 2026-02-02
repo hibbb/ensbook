@@ -191,7 +191,7 @@ export const ProcessForm = ({
 
             {showAdvanced && (
               <div className="mt-3 animate-in fade-in slide-in-from-top-1">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 block">
                   {t("transaction.settings.recipient")}
                 </label>
                 <div className="relative">

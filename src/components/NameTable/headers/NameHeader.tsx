@@ -84,7 +84,7 @@ export const NameHeader = ({
             disabled={disabled}
           >
             {/* --- Section 1: By Memo --- */}
-            <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("table.filter.by_memo")}
             </div>
 
@@ -169,7 +169,7 @@ export const NameHeader = ({
 
             {/* --- Section 2: By Length (保持不变) --- */}
             {/* ... (省略中间代码) ... */}
-            <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("table.filter.by_length")}
             </div>
 
@@ -236,7 +236,7 @@ export const NameHeader = ({
             <div className="h-px bg-gray-100 my-1 mx-2" />
 
             {/* --- Section 3: By Wrap (保持不变) --- */}
-            <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("table.filter.by_wrap")}
             </div>
 

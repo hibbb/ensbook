@@ -157,7 +157,7 @@ export const DeleteHeader = ({
                 {/* 移除内部的 overflow-y-auto，由外层统一控制 */}
                 {activeStatuses.length > 1 && (
                   <>
-                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <div className="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                       {t("table.delete.by_status")}
                     </div>
                     {activeStatuses.map((status) => {
@@ -188,7 +188,7 @@ export const DeleteHeader = ({
                 )}
                 {activeLengths.length > 1 && (
                   <>
-                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <div className="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                       {t("table.delete.by_length")}
                     </div>
                     {activeLengths.map((len) => {
@@ -221,7 +221,7 @@ export const DeleteHeader = ({
                 )}
                 {activeWrappedCount > 1 && (
                   <>
-                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <div className="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                       {t("table.delete.by_wrap")}
                     </div>
                     {hasWrapped && (
@@ -267,7 +267,7 @@ export const DeleteHeader = ({
                 )}
                 {activeOwnerCount > 1 && (
                   <>
-                    <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    <div className="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                       {t("table.delete.by_owner")}
                     </div>
                     <button

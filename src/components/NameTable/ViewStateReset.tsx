@@ -38,7 +38,7 @@ export const ViewStateReset = ({
         "
       >
         <div className="flex items-center gap-1 text-xs font-sans font-medium mr-3 select-none">
-          <span className="font-bold text-white">{filteredCount}</span>
+          <span className="font-semibold text-white">{filteredCount}</span>
           <span className="text-white/60">/</span>
           <span className="text-white/80">{totalCount}</span>
         </div>

@@ -111,7 +111,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
           </div>
           <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto custom-scrollbar flex flex-col">
             <div className="mb-2">
-              <div className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">
+              <div className="px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">
                 {t("settings.section.features")}
               </div>
               <SidebarItem
@@ -123,7 +123,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             </div>
 
             <div className="mb-2">
-              <div className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 mt-2">
+              <div className="px-4 text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">
                 {t("settings.section.system")}
               </div>
               <SidebarItem

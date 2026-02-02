@@ -67,7 +67,7 @@ export const ProcessingView = ({
     <div className="text-center py-6 animate-in zoom-in-95 duration-300">
       <div className="relative inline-block mb-6">
         {showTimer ? (
-          <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 text-xl font-bold border-2 border-orange-100">
+          <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 text-xl font-semibold border-2 border-orange-100">
             {secondsLeft}s
           </div>
         ) : (
@@ -155,7 +155,7 @@ export const ErrorView = ({ onClose }: { onClose: () => void }) => {
       <div className="text-red-500 text-3xl mb-3">
         <FontAwesomeIcon icon={faExclamationCircle} />
       </div>
-      <p className="text-text-main font-bold mb-1">
+      <p className="text-text-main font-semibold mb-1">
         {t("transaction.result.error_title")}
       </p>
       <p className="text-xs text-gray-500 mb-6">

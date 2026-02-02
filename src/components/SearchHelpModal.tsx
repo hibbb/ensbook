@@ -60,7 +60,7 @@ export const SearchHelpModal = ({ isOpen, onClose }: SearchHelpModalProps) => {
               </h4>
               <p className="text-xs text-gray-400 mt-1">
                 <Trans i18nKey="search.guide.mode.owner.desc">
-                  使用 “<span className="text-cyan-500 font-bold">@</span> +
+                  使用 “<span className="text-cyan-500 font-semibold">@</span> +
                   ENS（或以太坊地址）” 的格式查询。
                 </Trans>
               </p>

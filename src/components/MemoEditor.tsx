@@ -114,7 +114,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           <span
             className={`text-[10px] ${
               editValue.length >= MAX_MEMO_LENGTH
-                ? "text-red-400 font-bold"
+                ? "text-red-400 font-semibold"
                 : "text-gray-300"
             }`}
           >
@@ -135,13 +135,13 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
         <div className="flex gap-2 mt-3">
           <button
             onClick={handleSave}
-            className="flex-1 bg-link text-white text-xs font-bold py-1.5 rounded-lg hover:bg-link-hover active:scale-95 transition-all flex items-center justify-center gap-1"
+            className="flex-1 bg-link text-white text-xs font-semibold py-1.5 rounded-lg hover:bg-link-hover active:scale-95 transition-all flex items-center justify-center gap-1"
           >
             <FontAwesomeIcon icon={faCheck} /> {t("common.save")}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="px-3 bg-gray-100 text-gray-500 text-xs font-bold py-1.5 rounded-lg hover:bg-gray-200 hover:text-text-main active:scale-95 transition-all"
+            className="px-3 bg-gray-100 text-gray-500 text-xs font-semibold py-1.5 rounded-lg hover:bg-gray-200 hover:text-text-main active:scale-95 transition-all"
           >
             {t("common.cancel")}
           </button>
