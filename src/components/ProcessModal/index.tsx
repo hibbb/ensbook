@@ -26,7 +26,8 @@ interface ProcessModalProps {
   currentExpiry?: number;
   itemCount?: number;
   expiryTimes?: number[];
-  onAbort: () => void; // 🚀 新增
+  onAbort: () => void;
+  onConfirmRegistration: () => void; // 🚀
 }
 
 export const ProcessModal = ({
@@ -41,7 +42,8 @@ export const ProcessModal = ({
   currentExpiry,
   itemCount = 1,
   expiryTimes = [],
-  onAbort, // 🚀 解构
+  onAbort,
+  onConfirmRegistration, // 🚀 解构
 }: ProcessModalProps) => {
   const { t } = useTranslation();
 
@@ -58,7 +60,6 @@ export const ProcessModal = ({
     calculatedDurations,
     skippedCount,
     validationError,
-    // 🚀 解构新状态
     recipientInput,
     setRecipientInput,
     resolvedAddress,
@@ -130,7 +131,6 @@ export const ProcessModal = ({
               minDateValue={minDateValue}
               skippedCount={skippedCount}
               type={type}
-              // 🚀 传递新 Props
               recipientInput={recipientInput}
               setRecipientInput={setRecipientInput}
               resolvedAddress={resolvedAddress}
@@ -176,8 +176,8 @@ export const ProcessModal = ({
             secondsLeft={secondsLeft}
             txHash={txHash}
             onClose={handleClose}
-            // 🚀 只有注册流程才允许 Abort
             onAbort={type === "register" ? onAbort : undefined}
+            onConfirmRegistration={onConfirmRegistration} // 🚀 传递
           />
         )}
 

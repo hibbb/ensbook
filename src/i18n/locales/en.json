@@ -341,6 +341,9 @@
       "until_desc_batch": "All selected names will be aligned to expire on this date.",
       "partial_skip": "Note: Target date is earlier than {{count}} names' expiry, these {{count}} names will not be renewed."
     },
+    "confirm": {
+      "abort": "Are you sure you want to abort this registration? This will clear your local progress."
+    },
     "error": {
       "min_duration": "Registration must be at least 28 days",
       "invalid_date": "Invalid date",

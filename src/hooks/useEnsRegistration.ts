@@ -57,18 +57,12 @@ export function useEnsRegistration() {
     }
   }, []);
 
-  // 🚀 新增：放弃当前注册任务
   const abandonRegistration = useCallback(() => {
-    // 1. 获取当前正在处理的 label
     const currentLabel = registrationDataRef.current?.label;
-
     if (currentLabel) {
-      // 2. 清除本地存储
       removeRegistrationState(currentLabel);
       toast.success(t("transaction.toast.abort_success"));
     }
-
-    // 3. 重置内存状态 (这也包含清除定时器)
     resetStatus();
   }, [resetStatus, t]);
 
@@ -77,68 +71,70 @@ export function useEnsRegistration() {
     setStatus("loading");
   }, [resetStatus]);
 
-  const executeRegister = useCallback(
-    async (params: RegistrationStruct) => {
-      if (!publicClient || !address) return;
+  // 🚀 核心修改：executeRegister 现在是用户点击按钮后触发的动作
+  const executeRegister = useCallback(async () => {
+    // 参数直接从 ref 读取，不需要传参
+    const params = registrationDataRef.current;
+    if (!publicClient || !address || !params) return;
 
-      setStatus("registering");
-      setCurrentHash(null);
-      const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
+    setStatus("registering");
+    setCurrentHash(null);
+    const contractAddress = MAINNET_CONTRACTS.ETH_CONTROLLER_V3;
 
-      try {
-        const priceData = (await publicClient.readContract({
-          address: contractAddress,
-          abi: ethControllerV3Abi,
-          functionName: "rentPrice",
-          args: [params.label, params.duration],
-        })) as { base: bigint; premium: bigint };
+    try {
+      const priceData = (await publicClient.readContract({
+        address: contractAddress,
+        abi: ethControllerV3Abi,
+        functionName: "rentPrice",
+        args: [params.label, params.duration],
+      })) as { base: bigint; premium: bigint };
 
-        const priceWithBuffer =
-          ((priceData.base + priceData.premium) * 110n) / 100n;
+      const priceWithBuffer =
+        ((priceData.base + priceData.premium) * 110n) / 100n;
 
-        const registerHash = await writeContractAsync({
-          functionName: "register",
-          args: [params],
-          value: priceWithBuffer,
-        });
+      const registerHash = await writeContractAsync({
+        functionName: "register",
+        args: [params],
+        value: priceWithBuffer,
+      });
 
-        setCurrentHash(registerHash);
-        saveRegistrationState(params.label, { regTxHash: registerHash });
+      setCurrentHash(registerHash);
+      saveRegistrationState(params.label, { regTxHash: registerHash });
 
-        setStatus("waiting_register");
-        await toast.promise(
-          publicClient.waitForTransactionReceipt({ hash: registerHash }),
-          {
-            loading: t("transaction.toast.confirming"),
-            success: t("transaction.result.success_register"),
-            error: t("transaction.toast.failed"),
-          },
-        );
+      setStatus("waiting_register");
+      await toast.promise(
+        publicClient.waitForTransactionReceipt({ hash: registerHash }),
+        {
+          loading: t("transaction.toast.confirming"),
+          success: t("transaction.result.success_register"),
+          error: t("transaction.toast.failed"),
+        },
+      );
 
-        removeRegistrationState(params.label);
-        setStatus("success");
-      } catch (err: unknown) {
-        console.error("Register Error:", err);
-        if (isMounted.current) {
+      removeRegistrationState(params.label);
+      setStatus("success");
+    } catch (err: unknown) {
+      console.error("Register Error:", err);
+      if (isMounted.current) {
+        const error = err as Error & { shortMessage?: string };
+        if (error.shortMessage?.includes("User rejected")) {
+          // 如果用户拒绝，回退到 ready 状态，允许再次点击
+          setStatus("ready");
+          toast.error(t("transaction.toast.register_rejected"));
+        } else {
           setStatus("error");
-          const error = err as Error & { shortMessage?: string };
-
-          if (error.shortMessage?.includes("User rejected")) {
-            toast.error(t("transaction.toast.register_rejected"));
-          } else {
-            toast.error(
-              t("transaction.result.error_title") +
-                ": " +
-                (error.shortMessage || error.message),
-            );
-          }
+          toast.error(
+            t("transaction.result.error_title") +
+              ": " +
+              (error.shortMessage || error.message),
+          );
         }
       }
-    },
-    [address, publicClient, writeContractAsync, t],
-  );
+    }
+  }, [address, publicClient, writeContractAsync, t]);
 
-  const startCountdown = (seconds: number, onFinish: () => void) => {
+  // 🚀 修改：倒计时结束不再自动执行，而是进入 ready 状态
+  const startCountdown = (seconds: number) => {
     if (timerRef.current) clearInterval(timerRef.current);
 
     let left = seconds;
@@ -153,7 +149,8 @@ export function useEnsRegistration() {
       setSecondsLeft(left);
       if (left <= 0) {
         if (timerRef.current) clearInterval(timerRef.current);
-        onFinish();
+        // 倒计时结束，准备就绪
+        setStatus("ready");
       }
     }, 1000);
   };
@@ -169,7 +166,6 @@ export function useEnsRegistration() {
         if (result.status === "idle") {
           console.log("Commit 无效或已过期，清理本地状态");
           removeRegistrationState(label);
-
           if (result.errorMessage) {
             toast.error(t(result.errorMessage));
           }
@@ -196,16 +192,12 @@ export function useEnsRegistration() {
           }
 
           if (result.status === "counting_down") {
-            setSecondsLeft(result.secondsLeft);
-            startCountdown(result.secondsLeft, () => {
-              if (registrationDataRef.current && isMounted.current) {
-                executeRegister(registrationDataRef.current);
-              }
-            });
-          } else if (result.status === "registering") {
-            console.log("⚡️ 自动发起最终注册交易...");
-            executeRegister(registrationDataRef.current);
+            // 恢复倒计时
+            startCountdown(result.secondsLeft);
           }
+          // 注意：如果 checkRegStatus 返回的是 'ready' (即时间已到)，
+          // 上面的 setStatus(result.status) 已经将其设为 ready 了，
+          // UI 会自动显示 "Start Registration" 按钮，无需额外操作。
         }
       } catch (e) {
         console.error("恢复检查失败", e);
@@ -213,19 +205,13 @@ export function useEnsRegistration() {
         setStatus("idle");
       }
     },
-    [publicClient, executeRegister, t],
+    [publicClient, t],
   );
 
-  const continueRegistration = useCallback(() => {
-    if (registrationDataRef.current) {
-      executeRegister(registrationDataRef.current);
-    } else {
-      toast.error(t("transaction.toast.recovery_failed"));
-      resetStatus();
-    }
-  }, [executeRegister, resetStatus, t]);
+  // continueRegistration 在新逻辑下已不再需要，因为 UI 会直接调用 confirmRegistration
+  // 但为了兼容性保留空实现或直接移除
+  const continueRegistration = useCallback(() => {}, []);
 
-  // 🚀 修改：接收 customOwner 参数
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint, customOwner?: Address) => {
       if (!address || !publicClient) {
@@ -248,7 +234,6 @@ export function useEnsRegistration() {
       const secret = generateSecret();
       const referrer = REFERRER_ADDRESS_HASH;
 
-      // 🚀 使用自定义 owner，如果未提供则使用当前连接的 address
       const ownerToUse = customOwner || (address as Address);
 
       const params: RegistrationStruct = {
@@ -301,9 +286,8 @@ export function useEnsRegistration() {
         const WAIT_SECONDS = 65;
         setSecondsLeft(WAIT_SECONDS);
 
-        startCountdown(WAIT_SECONDS, () => {
-          if (isMounted.current) executeRegister(params);
-        });
+        // 启动倒计时，结束后进入 ready
+        startCountdown(WAIT_SECONDS);
       } catch (err: unknown) {
         console.error(err);
         if (isMounted.current) {
@@ -319,7 +303,7 @@ export function useEnsRegistration() {
         }
       }
     },
-    [address, publicClient, writeContractAsync, executeRegister, t],
+    [address, publicClient, writeContractAsync, t],
   );
 
   return {
@@ -330,12 +314,13 @@ export function useEnsRegistration() {
     checkAndResume,
     continueRegistration,
     resetStatus,
-    abandonRegistration, // 🚀 导出
+    abandonRegistration,
     startResuming,
+    confirmRegistration: executeRegister, // 🚀 导出确认方法
     isBusy:
       status !== "idle" &&
       status !== "success" &&
       status !== "error" &&
-      status !== "registering",
+      status !== "ready", // 🚀 ready 状态不视为 busy
   };
 }

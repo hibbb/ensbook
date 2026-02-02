@@ -8,7 +8,9 @@ import {
   faCheckCircle,
   faExclamationCircle,
   faMinimize,
-  faTrashCan, // 🚀 新增图标
+  faTrashCan,
+  faRocket, // 假设有这个图标，或者用 faCheck
+  faArrowRight, // 🚀 用这个做注册按钮
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { truncateAddress } from "../../utils/format";
@@ -18,7 +20,8 @@ interface ProcessingViewProps {
   secondsLeft: number;
   txHash?: string | null;
   onClose: () => void;
-  onAbort?: () => void; // 🚀 新增
+  onAbort?: () => void;
+  onConfirmRegistration?: () => void; // 🚀 新增
 }
 
 export const ProcessingView = ({
@@ -27,15 +30,15 @@ export const ProcessingView = ({
   txHash,
   onClose,
   onAbort,
+  onConfirmRegistration,
 }: ProcessingViewProps) => {
   const { t } = useTranslation();
 
   let message = t("transaction.status.processing");
   let subMessage = t("transaction.status.confirm_wallet");
   let showTimer = false;
-  // 🚀 只有在等待钱包签名时，我们不建议用户关闭（因为钱包弹窗还在），
-  // 但技术上关闭也没问题。为了体验，我们只在非钱包交互阶段显示“后台运行”按钮？
-  // 不，统一显示更简单，用户想关就关。
+  let showRegisterBtn = false; // 🚀
+
   const isWaitingWallet = ["loading", "registering", "committing"].includes(
     status,
   );
@@ -51,6 +54,11 @@ export const ProcessingView = ({
     message = t("transaction.step.cooldown_title");
     subMessage = t("transaction.step.cooldown_desc");
     showTimer = true;
+  } else if (status === "ready") {
+    // 🚀 新增状态处理
+    message = t("transaction.step.register_title"); // "Final Registration"
+    subMessage = t("transaction.step.register_desc"); // "Cooldown over..."
+    showRegisterBtn = true;
   } else if (status === "registering") {
     message = t("transaction.step.register_title");
     subMessage = t("transaction.step.register_desc");
@@ -78,6 +86,8 @@ export const ProcessingView = ({
             <div className="relative w-16 h-16 bg-link/10 rounded-full flex items-center justify-center text-link text-2xl">
               {isWaitingWallet ? (
                 <FontAwesomeIcon icon={faWallet} className="animate-pulse" />
+              ) : showRegisterBtn ? (
+                <FontAwesomeIcon icon={faRocket} /> // 冷却结束，显示火箭图标
               ) : (
                 <FontAwesomeIcon icon={faCircleNotch} spin />
               )}
@@ -91,6 +101,17 @@ export const ProcessingView = ({
       <p className="text-xs text-gray-500 mb-6 max-w-[85%] mx-auto">
         {subMessage}
       </p>
+
+      {/* 🚀 核心：注册按钮 */}
+      {showRegisterBtn && onConfirmRegistration && (
+        <button
+          onClick={onConfirmRegistration}
+          className="w-full py-3 mb-4 rounded-lg font-qs-semibold text-sm bg-link text-white hover:bg-link-hover transition-all active:scale-95 shadow-lg shadow-link/20 flex items-center justify-center gap-2"
+        >
+          {t("transaction.btn.start_register")}{" "}
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+      )}
 
       <div className="flex flex-col gap-3 items-center">
         {txHash && (
@@ -118,11 +139,7 @@ export const ProcessingView = ({
         {onAbort && (
           <button
             onClick={() => {
-              if (
-                window.confirm(
-                  "Are you sure you want to abort this registration? This will clear your local progress.",
-                )
-              ) {
+              if (window.confirm(t("transaction.confirm.abort"))) {
                 onAbort();
               }
             }}

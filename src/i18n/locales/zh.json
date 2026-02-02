@@ -288,7 +288,7 @@
       "wait_commit_title": "等待 Commit 上链",
       "wait_commit_desc": "交易已发出，等待区块链确认...",
       "cooldown_title": "等待冷却期",
-      "cooldown_desc": "为了安全，以太坊网络要求等待 60 秒...",
+      "cooldown_desc": "为了注册安全，等待 60 秒...",
       "register_title": "最终注册",
       "register_desc": "冷却结束，正在发起最终注册交易",
       "wait_register_title": "等待注册确认",
@@ -340,6 +340,9 @@
       "until": "日期模式",
       "until_desc_batch": "所有选中的域名将对齐到此日期过期。",
       "partial_skip": "注意：目标日期早于 {{count}} 个域名的过期时间，这 {{count}} 个域名不会续费。"
+    },
+    "confirm": {
+      "abort": "您确定要取消此次注册吗？这将清除您本地的注册进度。"
     },
     "error": {
       "min_duration": "注册时长至少为 28 天",

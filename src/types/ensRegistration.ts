@@ -21,12 +21,13 @@ export interface RegistrationStruct {
  */
 export type RegistrationStatus =
   | "idle"
-  | "loading" // 🚀 新增：用于断点续传时的检查状态，或初始加载状态
-  | "committing" // 等待钱包确认 Commit
-  | "waiting_commit" // Commit 上链中
-  | "counting_down" // 60秒倒计时
-  | "registering" // 等待钱包确认 Register
-  | "waiting_register" // Register 上链中
+  | "loading"
+  | "committing"
+  | "waiting_commit"
+  | "counting_down"
+  | "ready" // 🚀 新增：冷却结束，等待用户点击注册
+  | "registering" // 用户已点击，正在请求钱包签名
+  | "waiting_register"
   | "success"
   | "error";
 

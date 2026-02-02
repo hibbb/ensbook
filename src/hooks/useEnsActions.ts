@@ -55,6 +55,7 @@ export const useEnsActions = () => {
     abandonRegistration, // 🚀 引入
     checkAndResume,
     startResuming,
+    confirmRegistration, // 🚀 引入
   } = useEnsRegistration();
 
   useEffect(() => {
@@ -276,6 +277,7 @@ export const useEnsActions = () => {
       onConfirmDuration: onDurationConfirm,
       setReminderTarget,
       onAbort: handleAbort, // 🚀 导出给 Modal
+      onConfirmRegistration: confirmRegistration, // 🚀 导出
     },
   };
 };

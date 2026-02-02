@@ -81,8 +81,9 @@ export async function checkRegStatus(
         };
       }
 
+      // 🚀 修改：时间满足了，进入 ready 状态，而不是直接 registering
       return {
-        status: "registering",
+        status: "ready",
         secondsLeft: 0,
         localState,
         errorMessage: regErrorMessage,
