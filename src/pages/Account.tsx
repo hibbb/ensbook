@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,19 +19,14 @@ import toast from "react-hot-toast";
 import { truncateAddress } from "../utils/format";
 
 // Components
-import { NameTable } from "../components/NameTable";
-import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar";
-import { ActionModals } from "../components/ActionModals";
+import { NameListView } from "../components/NameListView"; // 🚀
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { publicClient } from "../utils/client";
-import { addToHome, getHomeLabels } from "../services/storage/userStore"; // 🚀 引入
+import { addToHome, getHomeLabels } from "../services/storage/userStore";
 
 // Types
 import type { NameRecord } from "../types/ensNames";
@@ -84,7 +78,6 @@ const useAccountLabels = (address: Address | null | undefined) => {
 
 export const Account = () => {
   const { input } = useParams<{ input: string }>();
-  const { address: myAddress, isConnected } = useAccount();
   const { t } = useTranslation();
 
   const [showFullAddress, setShowFullAddress] = useState(false);
@@ -114,56 +107,17 @@ export const Account = () => {
     isFetchError ||
     (resolvedAddress === null && !isResolving);
 
-  const {
-    processedRecords,
-    sortConfig,
-    filterConfig,
-    handleSort,
-    setFilterConfig,
-    selectedLabels,
-    toggleSelection,
-    toggleSelectAll,
-    clearSelection,
-    statusCounts,
-    actionCounts,
-    nameCounts,
-    levelCounts,
-    isViewStateDirty,
-    resetViewState,
-    ownerCounts,
-    ownerStats,
-    ownershipCounts,
-  } = useNameTableView(
-    records,
-    myAddress,
-    "collection",
-    resolvedAddress || "unknown",
-  );
-
-  const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
-
-  const updateLevel = useOptimisticLevelUpdate();
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    updateLevel(record, newLevel);
-  };
-
-  const selectionCount = selectedLabels.size;
-
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("common.copy_success", { label }));
   };
 
-  // 🚀 定义处理函数
   const handleAddToHome = (record: NameRecord) => {
-    // 检查是否已存在 (可选，addToHome 内部其实处理了去重，但为了 Toast 体验)
     const currentList = getHomeLabels();
     const exists = currentList.includes(record.label);
-
     addToHome(record.label);
-
     if (exists) {
-      toast(t("home.toast.all_exist"), { icon: "👌" }); // 或者 "Already in Home"
+      toast(t("home.toast.all_exist"), { icon: "👌" });
     } else {
       toast.success(t("home.toast.add_success", { count: 1 }));
     }
@@ -294,47 +248,16 @@ export const Account = () => {
         </div>
       </header>
 
-      <NameTable
-        key={resolvedAddress || "loading"}
-        records={processedRecords}
+      {/* 🚀 使用 NameListView */}
+      <NameListView
+        records={records}
         isLoading={isLoading}
-        isConnected={isConnected}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-        filterConfig={filterConfig}
-        onFilterChange={setFilterConfig}
-        onAddToHome={handleAddToHome} // 🚀 开启添加模式
-        selectedLabels={selectedLabels}
-        onToggleSelection={toggleSelection}
-        onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister}
-        onRenew={actions.onRenew}
-        onReminder={actions.onReminder}
-        pendingLabels={pendingLabels}
-        totalRecordsCount={records?.length || 0}
-        statusCounts={statusCounts}
-        actionCounts={actionCounts}
-        nameCounts={nameCounts}
-        levelCounts={levelCounts}
-        isViewStateDirty={isViewStateDirty}
-        onResetViewState={resetViewState}
-        onLevelChange={handleLevelChange}
-        ownerCounts={ownerCounts}
-        ownerStats={ownerStats}
-        ownershipCounts={ownershipCounts}
+        context="collection"
+        // 🚀 修复：将 null 转换为 undefined
+        // 如果 resolvedAddress 是 null，则传 undefined
+        collectionId={resolvedAddress || undefined}
+        onAddToHome={handleAddToHome}
       />
-
-      <FloatingBar
-        selectedCount={selectionCount}
-        isBusy={isBusy}
-        isConnected={isConnected}
-        onBatchRenew={() =>
-          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
-        }
-        onClearSelection={clearSelection}
-      />
-
-      <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
 };
