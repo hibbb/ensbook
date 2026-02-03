@@ -113,20 +113,22 @@ export const TableRow = ({
                   e.stopPropagation();
                   onDelete?.(record);
                 }}
-                className="transition-all duration-200 text-xs text-gray-300 hover:text-red-400 active:scale-95"
+                className="transition-all duration-200 text-xs text-red-300 hover:text-red-500 active:scale-95"
               >
                 <FontAwesomeIcon icon={faXmark} size="sm" />
               </button>
             </Tooltip>
           ) : onAddToHome ? (
             /* 🚀 添加模式按钮 */
-            <Tooltip content={t("table.cell.add_to_home")}>
+            <Tooltip
+              content={t("table.cell.add_to_home", { label: record.label })}
+            >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onAddToHome(record);
                 }}
-                className="transition-all duration-200 text-xs text-gray-300 hover:text-link active:scale-95"
+                className="transition-all duration-200 text-xs text-link hover:text-link-hover active:scale-95"
               >
                 <FontAwesomeIcon icon={faPlus} size="sm" />
               </button>
