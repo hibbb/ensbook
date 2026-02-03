@@ -21,18 +21,17 @@ interface TableRowProps {
   index: number;
   now: number;
   isConnected: boolean;
-  canDelete?: boolean;
-  isSelected?: boolean;
-  onToggleSelection?: (label: string) => void;
+  // 🗑️ 删除: canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
   // 🚀 新增
   onAddToHome?: (record: NameRecord) => void;
+  isSelected?: boolean;
+  onToggleSelection?: (label: string) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
   isPending?: boolean;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
-  // 🚀 新增 Props
   marketData?: SimpleMarketData;
   isMarketLoading?: boolean;
 }
@@ -42,7 +41,7 @@ export const TableRow = ({
   index,
   now,
   isConnected,
-  canDelete = true,
+  // 🗑️ 删除: canDelete
   onDelete,
   onAddToHome, // 🚀
   isSelected,
@@ -60,7 +59,6 @@ export const TableRow = ({
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
       <td className="w-14 text-center">
-        {/* 🚀 3. 替换旧的 span，使用 IndexCell */}
         <IndexCell
           index={index}
           level={record.level || 0}
@@ -80,7 +78,6 @@ export const TableRow = ({
         <OwnerCell record={record} />
       </td>
 
-      {/* 🚀 Insert Market Cell */}
       <td>
         <MarketCell data={marketData} isLoading={isMarketLoading} />
       </td>
@@ -104,14 +101,15 @@ export const TableRow = ({
 
       <td className="text-center">
         <div className="h-12 flex items-center justify-center">
-          {canDelete ? (
+          {/* 🚀 逻辑简化：有 onDelete 就显示删除，有 onAddToHome 就显示添加 */}
+          {onDelete ? (
             <Tooltip
               content={t("table.cell.delete_item", { label: record.label })}
             >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete?.(record);
+                  onDelete(record);
                 }}
                 className="transition-all duration-200 text-xs text-red-300 hover:text-red-500 active:scale-95"
               >

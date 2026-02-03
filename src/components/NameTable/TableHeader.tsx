@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import type { DeleteCriteria } from "./types";
 import { useTranslation } from "react-i18next";
+import type { NameRecord } from "../../types/ensNames"; // 🚀
 
 interface TableHeaderProps {
   sortConfig: SortConfig;
@@ -21,15 +22,16 @@ interface TableHeaderProps {
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
   isConnected: boolean;
-  showDelete?: boolean;
-  // 🚀 新增
-  showAdd?: boolean;
+  // 🗑️ 删除: showDelete?: boolean;
+  // 🗑️ 删除: showAdd?: boolean;
+  // 🚀 新增: 接收回调函数
+  onBatchDelete?: (criteria: DeleteCriteria) => void;
+  onAddToHome?: (record: NameRecord) => void;
   isAllSelected?: boolean;
   onToggleSelectAll?: () => void;
   hasRenewable?: boolean;
   hasRecords?: boolean;
   topOffset?: string | number;
-  onBatchDelete?: (criteria: DeleteCriteria) => void;
   uniqueStatuses?: string[];
   totalCount?: number;
   filteredCount?: number;
@@ -50,7 +52,6 @@ interface TableHeaderProps {
     address: string;
     isMyself: boolean;
   }[];
-  // 🚀 新增: 接收统计数据
   ownerStats?: { total: number; displayed: number };
 }
 
@@ -63,10 +64,10 @@ export const TableHeader = ({
   isAllSelected,
   onToggleSelectAll,
   hasRenewable,
-  showDelete,
-  showAdd, // 🚀
-  topOffset = 0,
+  // 🚀 解构回调
   onBatchDelete,
+  onAddToHome,
+  topOffset = 0,
   uniqueStatuses,
   totalCount = 0,
   statusCounts = {},
@@ -81,7 +82,6 @@ export const TableHeader = ({
   ownershipCounts = { mine: 0, others: 0 },
   levelCounts = {},
   ownerCounts = [],
-  // 🚀 解构 ownerStats，给予默认值
   ownerStats = { total: 0, displayed: 0 },
 }: TableHeaderProps) => {
   const headerStyle = {
@@ -136,7 +136,7 @@ export const TableHeader = ({
             onSort={onSort}
             onFilterChange={onFilterChange}
             ownerCounts={ownerCounts}
-            ownerStats={ownerStats} // 🚀 传递给 OwnerHeader
+            ownerStats={ownerStats}
             disabled={isControlsDisabled}
           />
         </th>
@@ -163,16 +163,17 @@ export const TableHeader = ({
         </th>
 
         <th className="text-center w-14 relative">
-          {showDelete ? (
+          {/* 🚀 逻辑简化：优先判断是否支持批量删除 */}
+          {onBatchDelete ? (
             <DeleteHeader
-              showDelete={showDelete}
+              showDelete={true} // DeleteHeader 内部可能还需要这个 prop
               onBatchDelete={onBatchDelete}
               uniqueStatuses={uniqueStatuses}
               statusCounts={statusCounts}
               nameCounts={nameCounts}
               ownershipCounts={ownershipCounts}
             />
-          ) : showAdd ? (
+          ) : onAddToHome ? (
             /* 🚀 添加模式：显示静态加号图标作为表头 */
             <ThWrapper className="justify-center">
               <div className="w-6 h-6 flex items-center justify-center text-gray-300 select-none">

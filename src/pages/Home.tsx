@@ -272,7 +272,6 @@ export const Home = () => {
             onSort={handleSort}
             filterConfig={filterConfig}
             onFilterChange={setFilterConfig}
-            canDelete={true}
             onDelete={handleDelete}
             onBatchDelete={handleBatchDelete}
             selectedLabels={selectedLabels}

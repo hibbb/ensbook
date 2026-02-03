@@ -103,7 +103,6 @@ export const CollectionDetail = () => {
         onSort={handleSort}
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
-        canDelete={false}
         onAddToHome={handleAddToHome} // 🚀 开启添加模式
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}

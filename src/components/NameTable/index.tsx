@@ -28,8 +28,10 @@ interface NameTableProps {
   onSort: (field: SortField) => void;
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
-  canDelete?: boolean;
+  // 🗑️ 删除: canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
+  // 🚀 新增: 添加到 Home 的回调
+  onAddToHome?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
@@ -62,7 +64,6 @@ interface NameTableProps {
     isMyself: boolean;
   }[];
   ownerStats?: { total: number; displayed: number };
-  onAddToHome?: (record: NameRecord) => void;
 }
 
 const NameTableComponent = (props: NameTableProps) => {
@@ -97,8 +98,6 @@ const NameTableComponent = (props: NameTableProps) => {
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
 
-  // 🚀 1. 调用 Market Hook
-  // 传入当前页的数据 (Viewport Driven)
   const { data: marketDataMap, isLoading: isMarketLoading } = useMarketData(
     paginatedBasicRecords,
   );
@@ -145,11 +144,10 @@ const NameTableComponent = (props: NameTableProps) => {
             onToggleSelectAll={props.onToggleSelectAll}
             hasRenewable={hasRenewableRecords}
             hasRecords={safeRecords.length > 0}
-            showDelete={props.canDelete}
-            // 🚀 传递判断依据：如果有这个回调，说明需要显示 Add 列头
-            showAdd={!!props.onAddToHome}
-            topOffset={props.headerTop}
+            // 🚀 逻辑简化：直接传递回调函数，由 Header 内部判断显示什么
             onBatchDelete={props.onBatchDelete}
+            onAddToHome={props.onAddToHome}
+            topOffset={props.headerTop}
             uniqueStatuses={uniqueStatuses}
             filteredCount={safeRecords.length}
             totalCount={props.totalRecordsCount ?? safeRecords.length}
@@ -174,9 +172,8 @@ const NameTableComponent = (props: NameTableProps) => {
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
                   isConnected={props.isConnected}
-                  canDelete={props.canDelete}
+                  // 🚀 逻辑简化：直接传递回调函数
                   onDelete={props.onDelete}
-                  // 🚀 传递回调
                   onAddToHome={props.onAddToHome}
                   isSelected={props.selectedLabels?.has(r.label)}
                   onToggleSelection={props.onToggleSelection}
@@ -223,5 +220,4 @@ const NameTableComponent = (props: NameTableProps) => {
   );
 };
 
-// 使用 React.memo 导出，只有当 props 发生浅比较变化时，才会重新渲染
 export const NameTable = React.memo(NameTableComponent);
