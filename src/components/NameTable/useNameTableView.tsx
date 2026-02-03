@@ -32,7 +32,6 @@ export const useNameTableView = (
   context?: "home" | "collection",
   collectionId?: string,
 ) => {
-  // ... (useState 初始化逻辑保持不变，省略以节省篇幅，请保留原代码) ...
   const getSavedState = useCallback((): PageViewState => {
     if (context === "home") return getHomeViewState();
     if (context === "collection" && collectionId)
@@ -62,7 +61,6 @@ export const useNameTableView = (
 
   const isInternalWrite = useRef(false);
 
-  // ... (useEffect for saving state 保持不变) ...
   useEffect(() => {
     if (!context) return;
     const viewState: PageViewState = { sort: sortConfig, filter: filterConfig };
@@ -82,7 +80,6 @@ export const useNameTableView = (
     }
   }, [sortConfig, filterConfig, context, collectionId]);
 
-  // ... (useEffect for syncing storage 保持不变) ...
   useEffect(() => {
     const handleExternalUpdate = () => {
       if (isInternalWrite.current) return;
@@ -109,7 +106,6 @@ export const useNameTableView = (
 
   const isViewStateDirty = useMemo(() => {
     const isSortDirty = (() => {
-      // ...
       if (sortConfig.direction === null && DEFAULT_SORT.direction === null) {
         return false;
       }
@@ -120,7 +116,6 @@ export const useNameTableView = (
     })();
 
     const isFilterDirty =
-      // 🚀 检查 memoFilter
       filterConfig.memoFilter !== DEFAULT_FILTER.memoFilter ||
       filterConfig.actionType !== DEFAULT_FILTER.actionType ||
       filterConfig.wrappedType !== DEFAULT_FILTER.wrappedType ||
@@ -163,7 +158,6 @@ export const useNameTableView = (
     ownerStats,
     ownershipCounts,
   } = useMemo(() => {
-    // ... (check functions & passOthers 保持不变，省略以节省篇幅) ...
     const checkStatus = (r: NameRecord) =>
       statusList.length === 0 || statusList.includes(r.status);
     const checkAction = (r: NameRecord) => {
@@ -178,7 +172,6 @@ export const useNameTableView = (
       if (wrappedType === "all") return true;
       return wrappedType === "wrapped" ? r.wrapped : !r.wrapped;
     };
-    // 🚀 更新 checkMemos (仅用于 passOthers 检查)
     const checkMemos = (r: NameRecord) => {
       const hasMemo = !!r.memo && r.memo.trim().length > 0;
       if (memoFilter === "all") return true;
@@ -250,22 +243,14 @@ export const useNameTableView = (
       unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
     };
 
-    // 🚀 更新 Memo 统计逻辑
-    // 我们需要统计：在满足"其他"条件的前提下，有备注的多少个，无备注的多少个
+    // 🚀 Memo 统计逻辑
     const recordsForMemoStats = baseRecords.filter((r) =>
       passOthers(r, ["memo"]),
     );
     const memosCount = recordsForMemoStats.filter(
       (r) => !!r.memo && r.memo.trim().length > 0,
     ).length;
-    // 总数就是 recordsForMemoStats.length (包含了有和无)
-    // 无备注数 = 总数 - 有备注数
-    // 但为了严谨，我们显式计算一下，或者复用 wrappedCounts.all 类似的逻辑？
-    // 注意：这里的 total 应该是 "当前筛选条件下（忽略备注筛选）的总数"
-    // 也就是 recordsForMemoStats.length
-
-    // 为了和 NameHeader 的接口对接，我们可以把无备注数量也放进去，或者让 UI 自己减
-    // 这里我们稍微修改一下 nameCounts 的结构或者只传 memosCount，UI 根据 total 算 noMemo
+    const memoTotal = recordsForMemoStats.length;
 
     const levelCounts: Record<number, number> = {};
     baseRecords
@@ -317,24 +302,13 @@ export const useNameTableView = (
 
     const totalOwnersCount = ownerMap.size;
 
-    // 🚀 逻辑修复 1: 确保 "我自己" 始终在列表中
-    // 如果我拥有域名 (mineCount > 0)，但可能因为数量太少被 slice(0, 50) 截掉
-    // 我们需要强制保留我。
     const allOwners = Array.from(ownerMap.values()).sort((a, b) => {
       if (a.isMyself && !b.isMyself) return -1;
       if (!a.isMyself && b.isMyself) return 1;
       return b.count - a.count;
     });
 
-    // 简单截取 Top 50
     const sortedOwners = allOwners.slice(0, 50);
-
-    // 检查截取后的列表中是否包含 "我自己"
-    // (由于上面已经把 isMyself 排到第一位了，所以如果我有持仓，我一定在 allOwners[0])
-    // (slice(0, 50) 肯定会包含 allOwners[0]，除非数组为空)
-    // 所以，只要我的 count > 0，上面的排序逻辑已经保证了我会在 Top 50 里。
-    // 这个逻辑修复其实主要依赖于上面的 .sort 逻辑 (MySelf first)。
-    // 只要 mineCount > 0，我就一定在 sortedOwners[0]。完美。
 
     return {
       statusCounts,
@@ -343,19 +317,8 @@ export const useNameTableView = (
         lengthCounts,
         availableLengths: Array.from(availableLengths).sort((a, b) => a - b),
         wrappedCounts,
-        memosCount, // 有备注的数量
-        // 🚀 我们可以利用 wrappedCounts.all 作为当前上下文的总数吗？
-        // wrappedCounts 是 passOthers(r, ['wrapped']) 算出来的
-        // recordsForMemoStats 是 passOthers(r, ['memo']) 算出来的
-        // 如果 wrappedType 和 memoFilter 都选了 'all'，那这两个集合是一样的
-        // 但如果选了 wrapped=true，那 recordsForMemoStats 就是"所有已包装的域名"
-        // 此时 recordsForMemoStats.length 就是当前上下文的总数。
-        // 我们最好把这个上下文总数显式传出去，或者复用已有的结构。
-        // NameHeader 目前用 wrappedCounts.all 作为 totalCount。
-        // 这在 wrappedType='all' 时是正确的。
-        // 但如果 wrappedType != 'all'，NameHeader 里的 totalCount 也会变小，这是符合预期的。
-        // 所以我们不需要改结构，只需要知道：
-        // Total (in NameHeader context) = recordsForMemoStats.length
+        memosCount,
+        memoTotal, // 🚀 导出
       },
       levelCounts,
       rawSortedOwners: sortedOwners,
@@ -380,39 +343,35 @@ export const useNameTableView = (
     currentAddress,
   ]);
 
-  // 🚀 性能优化 2: 延迟/错峰解析 (Debounce)
   useEffect(() => {
     if (rawSortedOwners.length === 0) return;
 
-    // 筛选出需要解析的
     const targetsToResolve = rawSortedOwners
       .filter((o) => o.label.startsWith("0x") && !resolvedOwnerNames[o.address])
       .map((o) => o.address);
 
-    if (targetsToResolve.length === 0) return;
-
-    // 设置一个 1.5秒 的定时器
-    // 这让 Table 组件有时间先发起它的 50 个请求，渲染出首屏
-    const timer = setTimeout(() => {
-      fetchPrimaryNames(targetsToResolve).then((newMap) => {
-        if (newMap.size > 0) {
-          setResolvedOwnerNames((prev) => {
-            const next = { ...prev };
-            let hasChange = false;
-            newMap.forEach((name, addr) => {
-              if (next[addr] !== name) {
-                next[addr] = name;
-                hasChange = true;
-              }
+    if (targetsToResolve.length > 0) {
+      const timer = setTimeout(() => {
+        fetchPrimaryNames(targetsToResolve).then((newMap) => {
+          if (newMap.size > 0) {
+            setResolvedOwnerNames((prev) => {
+              const next = { ...prev };
+              let hasChange = false;
+              newMap.forEach((name, addr) => {
+                if (next[addr] !== name) {
+                  next[addr] = name;
+                  hasChange = true;
+                }
+              });
+              return hasChange ? next : prev;
             });
-            return hasChange ? next : prev;
-          });
-        }
-      });
-    }, 1500); // 1500ms 延迟
+          }
+        });
+      }, 1500);
 
-    return () => clearTimeout(timer);
-  }, [rawSortedOwners, resolvedOwnerNames]); // 注意：这会随着 filters 变化而触发，是预期的
+      return () => clearTimeout(timer);
+    }
+  }, [rawSortedOwners, resolvedOwnerNames]);
 
   const ownerCounts = useMemo(() => {
     return rawSortedOwners.map((item) => {
@@ -429,13 +388,27 @@ export const useNameTableView = (
     [baseRecords, sortConfig, filterConfig],
   );
 
-  // ... (handleSort, etc. 保持不变) ...
   const handleSort = useCallback((field: SortField) => {
     setSortConfig((prev) => {
-      if (prev.field !== field) return { field, direction: "asc" };
-      if (prev.direction === null) return { field, direction: "asc" };
-      if (prev.direction === "asc") return { field, direction: "desc" };
-      if (prev.direction === "desc") return { field, direction: null };
+      // 🚀 核心修改：注册时间优先降序
+      const isDescFirst = field === "registered";
+
+      if (prev.field !== field) {
+        return { field, direction: isDescFirst ? "desc" : "asc" };
+      }
+
+      if (prev.direction === null) {
+        return { field, direction: isDescFirst ? "desc" : "asc" };
+      }
+
+      if (isDescFirst) {
+        if (prev.direction === "desc") return { field, direction: "asc" };
+        if (prev.direction === "asc") return { field, direction: null };
+      } else {
+        if (prev.direction === "asc") return { field, direction: "desc" };
+        if (prev.direction === "desc") return { field, direction: null };
+      }
+
       return { field, direction: "asc" };
     });
   }, []);
