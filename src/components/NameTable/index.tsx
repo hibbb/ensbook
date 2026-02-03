@@ -62,6 +62,7 @@ interface NameTableProps {
     isMyself: boolean;
   }[];
   ownerStats?: { total: number; displayed: number };
+  onAddToHome?: (record: NameRecord) => void;
 }
 
 const NameTableComponent = (props: NameTableProps) => {
@@ -145,6 +146,8 @@ const NameTableComponent = (props: NameTableProps) => {
             hasRenewable={hasRenewableRecords}
             hasRecords={safeRecords.length > 0}
             showDelete={props.canDelete}
+            // 🚀 传递判断依据：如果有这个回调，说明需要显示 Add 列头
+            showAdd={!!props.onAddToHome}
             topOffset={props.headerTop}
             onBatchDelete={props.onBatchDelete}
             uniqueStatuses={uniqueStatuses}
@@ -173,6 +176,8 @@ const NameTableComponent = (props: NameTableProps) => {
                   isConnected={props.isConnected}
                   canDelete={props.canDelete}
                   onDelete={props.onDelete}
+                  // 🚀 传递回调
+                  onAddToHome={props.onAddToHome}
                   isSelected={props.selectedLabels?.has(r.label)}
                   onToggleSelection={props.onToggleSelection}
                   onRegister={props.onRegister}
@@ -180,7 +185,6 @@ const NameTableComponent = (props: NameTableProps) => {
                   onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
                   onLevelChange={props.onLevelChange}
-                  // 🚀 2. 传递市场数据
                   marketData={marketDataMap?.[r.label]}
                   isMarketLoading={isMarketLoading}
                 />

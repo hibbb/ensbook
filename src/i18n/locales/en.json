@@ -249,7 +249,8 @@
       "state": "State",
       "copy_full": "Copy full value",
       "delete_item": "Delete {{label}}.eth",
-      "cannot_delete": "Cannot delete"
+      "cannot_delete": "Cannot delete",
+      "add_to_home": "Add to Home"
     }
   },
   "market": {

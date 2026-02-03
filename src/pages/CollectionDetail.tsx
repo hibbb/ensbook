@@ -15,10 +15,12 @@ import { useCollectionRecords } from "../hooks/useEnsData";
 import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
+import { addToHome, getHomeLabels } from "../services/storage/userStore"; // 🚀 引入
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
 import type { NameRecord } from "../types/ensNames";
+import toast from "react-hot-toast";
 
 export const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,6 +59,21 @@ export const CollectionDetail = () => {
     updateLevel(record, newLevel);
   };
 
+  // 🚀 定义处理函数
+  const handleAddToHome = (record: NameRecord) => {
+    // 检查是否已存在 (可选，addToHome 内部其实处理了去重，但为了 Toast 体验)
+    const currentList = getHomeLabels();
+    const exists = currentList.includes(record.label);
+
+    addToHome(record.label);
+
+    if (exists) {
+      toast(t("home.toast.all_exist"), { icon: "👌" }); // 或者 "Already in Home"
+    } else {
+      toast.success(t("home.toast.add_success", { count: 1 }));
+    }
+  };
+
   const selectionCount = selectedLabels.size;
 
   if (!collection)
@@ -87,6 +104,7 @@ export const CollectionDetail = () => {
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
         canDelete={false}
+        onAddToHome={handleAddToHome} // 🚀 开启添加模式
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}

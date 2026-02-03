@@ -1,6 +1,7 @@
 // src/components/NameTable/TableRow.tsx
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons"; // 🚀
 import type { NameRecord } from "../../types/ensNames";
 import { Tooltip } from "../ui/Tooltip";
 
@@ -8,12 +9,12 @@ import { IndexCell } from "./cells/IndexCell";
 import { NameCell } from "./cells/NameCell";
 import { StatusCell } from "./cells/StatusCell";
 import { OwnerCell } from "./cells/OwnerCell";
-import { MarketCell } from "./cells/MarketCell"; // 🚀
+import { MarketCell } from "./cells/MarketCell";
 import { ActionCell } from "./cells/ActionCell";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { LookupsCell } from "./cells/LookupsCell";
 
-import type { SimpleMarketData } from "../../types/marketData"; // 🚀
+import type { SimpleMarketData } from "../../types/marketData";
+import { useTranslation } from "react-i18next";
 
 interface TableRowProps {
   record: NameRecord;
@@ -24,6 +25,8 @@ interface TableRowProps {
   isSelected?: boolean;
   onToggleSelection?: (label: string) => void;
   onDelete?: (record: NameRecord) => void;
+  // 🚀 新增
+  onAddToHome?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
@@ -41,6 +44,7 @@ export const TableRow = ({
   isConnected,
   canDelete = true,
   onDelete,
+  onAddToHome, // 🚀
   isSelected,
   onToggleSelection,
   onRegister,
@@ -51,6 +55,8 @@ export const TableRow = ({
   marketData,
   isMarketLoading = false,
 }: TableRowProps) => {
+  const { t } = useTranslation();
+
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
       <td className="w-14 text-center">
@@ -98,24 +104,37 @@ export const TableRow = ({
 
       <td className="text-center">
         <div className="h-12 flex items-center justify-center">
-          <Tooltip
-            content={canDelete ? `删除 ${record.label}.eth` : "不可删除"}
-          >
-            <button
-              disabled={!canDelete}
-              onClick={() => onDelete?.(record)}
-              className={`
-              transition-all duration-200 text-xs
-              ${
-                canDelete
-                  ? "text-link hover:text-link-hover active:scale-95"
-                  : "text-gray-200 cursor-not-allowed"
-              }
-            `}
+          {canDelete ? (
+            <Tooltip
+              content={t("table.cell.delete_item", { label: record.label })}
             >
-              <FontAwesomeIcon icon={faXmark} size="sm" />
-            </button>
-          </Tooltip>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(record);
+                }}
+                className="transition-all duration-200 text-xs text-gray-300 hover:text-red-400 active:scale-95"
+              >
+                <FontAwesomeIcon icon={faXmark} size="sm" />
+              </button>
+            </Tooltip>
+          ) : onAddToHome ? (
+            /* 🚀 添加模式按钮 */
+            <Tooltip content={t("table.cell.add_to_home")}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToHome(record);
+                }}
+                className="transition-all duration-200 text-xs text-gray-300 hover:text-link active:scale-95"
+              >
+                <FontAwesomeIcon icon={faPlus} size="sm" />
+              </button>
+            </Tooltip>
+          ) : (
+            /* 既不能删也不能加（极少情况，或者是占位） */
+            <span className="text-gray-200 text-xs">—</span>
+          )}
         </div>
       </td>
     </tr>

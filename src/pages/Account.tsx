@@ -32,6 +32,7 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { publicClient } from "../utils/client";
+import { addToHome, getHomeLabels } from "../services/storage/userStore"; // 🚀 引入
 
 // Types
 import type { NameRecord } from "../types/ensNames";
@@ -151,6 +152,21 @@ export const Account = () => {
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("common.copy_success", { label }));
+  };
+
+  // 🚀 定义处理函数
+  const handleAddToHome = (record: NameRecord) => {
+    // 检查是否已存在 (可选，addToHome 内部其实处理了去重，但为了 Toast 体验)
+    const currentList = getHomeLabels();
+    const exists = currentList.includes(record.label);
+
+    addToHome(record.label);
+
+    if (exists) {
+      toast(t("home.toast.all_exist"), { icon: "👌" }); // 或者 "Already in Home"
+    } else {
+      toast.success(t("home.toast.add_success", { count: 1 }));
+    }
   };
 
   const { displayName, fullNameToCopy } = useMemo(() => {
@@ -288,6 +304,7 @@ export const Account = () => {
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
         canDelete={false}
+        onAddToHome={handleAddToHome} // 🚀 开启添加模式
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}

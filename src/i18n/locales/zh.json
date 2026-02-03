@@ -249,7 +249,8 @@
       "state": "状态",
       "copy_full": "复制完整值",
       "delete_item": "删除 {{label}}.eth",
-      "cannot_delete": "不可删除"
+      "cannot_delete": "不可删除",
+      "add_to_home": "添加到首页"
     }
   },
   "market": {

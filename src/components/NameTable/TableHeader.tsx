@@ -9,6 +9,9 @@ import { OwnerHeader } from "./headers/OwnerHeader";
 import { ActionHeader } from "./headers/ActionHeader";
 import { DeleteHeader } from "./headers/DeleteHeader";
 
+import { faPlus } from "@fortawesome/free-solid-svg-icons"; // 🚀
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import type { DeleteCriteria } from "./types";
 import { useTranslation } from "react-i18next";
 
@@ -19,6 +22,8 @@ interface TableHeaderProps {
   onFilterChange: (config: FilterConfig) => void;
   isConnected: boolean;
   showDelete?: boolean;
+  // 🚀 新增
+  showAdd?: boolean;
   isAllSelected?: boolean;
   onToggleSelectAll?: () => void;
   hasRenewable?: boolean;
@@ -59,6 +64,7 @@ export const TableHeader = ({
   onToggleSelectAll,
   hasRenewable,
   showDelete,
+  showAdd, // 🚀
   topOffset = 0,
   onBatchDelete,
   uniqueStatuses,
@@ -157,14 +163,23 @@ export const TableHeader = ({
         </th>
 
         <th className="text-center w-14 relative">
-          <DeleteHeader
-            showDelete={showDelete}
-            onBatchDelete={onBatchDelete}
-            uniqueStatuses={uniqueStatuses}
-            statusCounts={statusCounts}
-            nameCounts={nameCounts}
-            ownershipCounts={ownershipCounts}
-          />
+          {showDelete ? (
+            <DeleteHeader
+              showDelete={showDelete}
+              onBatchDelete={onBatchDelete}
+              uniqueStatuses={uniqueStatuses}
+              statusCounts={statusCounts}
+              nameCounts={nameCounts}
+              ownershipCounts={ownershipCounts}
+            />
+          ) : showAdd ? (
+            /* 🚀 添加模式：显示静态加号图标作为表头 */
+            <ThWrapper className="justify-center">
+              <div className="w-6 h-6 flex items-center justify-center text-gray-300 select-none">
+                <FontAwesomeIcon icon={faPlus} size="sm" />
+              </div>
+            </ThWrapper>
+          ) : null}
         </th>
       </tr>
     </thead>

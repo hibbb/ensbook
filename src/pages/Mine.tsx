@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeatherPointed } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation, Trans } from "react-i18next";
+import toast from "react-hot-toast";
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -20,6 +21,7 @@ import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
+import { addToHome, getHomeLabels } from "../services/storage/userStore"; // 🚀 引入
 
 // Types
 import type { NameRecord } from "../types/ensNames";
@@ -92,6 +94,21 @@ export const Mine = () => {
     updateLevel(record, newLevel);
   };
 
+  // 🚀 定义处理函数
+  const handleAddToHome = (record: NameRecord) => {
+    // 检查是否已存在 (可选，addToHome 内部其实处理了去重，但为了 Toast 体验)
+    const currentList = getHomeLabels();
+    const exists = currentList.includes(record.label);
+
+    addToHome(record.label);
+
+    if (exists) {
+      toast(t("home.toast.all_exist"), { icon: "👌" }); // 或者 "Already in Home"
+    } else {
+      toast.success(t("home.toast.add_success", { count: 1 }));
+    }
+  };
+
   const selectionCount = selectedLabels.size;
 
   if (!hasSource) {
@@ -159,6 +176,7 @@ export const Mine = () => {
         filterConfig={filterConfig}
         onFilterChange={setFilterConfig}
         canDelete={false}
+        onAddToHome={handleAddToHome} // 🚀 开启添加模式
         selectedLabels={selectedLabels}
         onToggleSelection={toggleSelection}
         onToggleSelectAll={toggleSelectAll}
