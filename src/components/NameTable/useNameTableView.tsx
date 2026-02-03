@@ -12,8 +12,10 @@ import {
   saveCollectionViewState,
 } from "../../services/storage/userStore";
 import type { PageViewState } from "../../types/userData";
-import { truncateAddress } from "../../utils/format";
-import { fetchPrimaryNames } from "../../utils/fetchPrimaryNames";
+
+// 🚀 引入子 Hooks
+import { useOwnerStats } from "./hooks/useOwnerStats";
+import { useTableStats } from "./hooks/useTableStats";
 
 export const DEFAULT_SORT: SortConfig = { field: "status", direction: null };
 export const DEFAULT_FILTER: FilterConfig = {
@@ -32,6 +34,7 @@ export const useNameTableView = (
   context?: "home" | "collection",
   collectionId?: string,
 ) => {
+  // 1. 状态管理与持久化 (保持不变)
   const getSavedState = useCallback((): PageViewState => {
     if (context === "home") return getHomeViewState();
     if (context === "collection" && collectionId)
@@ -133,256 +136,83 @@ export const useNameTableView = (
   }, []);
 
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
-  const [resolvedOwnerNames, setResolvedOwnerNames] = useState<
-    Record<string, string>
-  >({});
-
-  const {
-    statusList = [],
-    actionType = "all",
-    lengthList = [],
-    wrappedType = "all",
-    levelList = [],
-    ownerList = [],
-    memoFilter = "all",
-  } = filterConfig;
-
   const baseRecords = useMemo(() => records || [], [records]);
 
-  const {
-    statusCounts,
-    actionCounts,
-    nameCounts,
-    levelCounts,
-    rawSortedOwners,
-    ownerStats,
-    ownershipCounts,
-  } = useMemo(() => {
-    const checkStatus = (r: NameRecord) =>
-      statusList.length === 0 || statusList.includes(r.status);
-    const checkAction = (r: NameRecord) => {
-      if (actionType === "all") return true;
-      if (actionType === "renew") return isRenewable(r.status);
-      if (actionType === "register") return isRegistrable(r.status);
-      return false;
-    };
-    const checkLength = (r: NameRecord) =>
-      lengthList.length === 0 || lengthList.includes(r.label.length);
-    const checkWrapped = (r: NameRecord) => {
-      if (wrappedType === "all") return true;
-      return wrappedType === "wrapped" ? r.wrapped : !r.wrapped;
-    };
-    const checkMemos = (r: NameRecord) => {
-      const hasMemo = !!r.memo && r.memo.trim().length > 0;
-      if (memoFilter === "all") return true;
-      if (memoFilter === "with_memo") return hasMemo;
-      if (memoFilter === "no_memo") return !hasMemo;
+  // 2. 定义通用的 passOthers 逻辑 (供子 Hook 使用)
+  const passOthers = useCallback(
+    (r: NameRecord, exclude: string[]) => {
+      const {
+        statusList,
+        actionType,
+        lengthList,
+        wrappedType,
+        memoFilter,
+        levelList,
+        ownerList,
+      } = filterConfig;
+
+      if (
+        !exclude.includes("status") &&
+        statusList.length > 0 &&
+        !statusList.includes(r.status)
+      )
+        return false;
+
+      if (!exclude.includes("action")) {
+        if (actionType === "renew" && !isRenewable(r.status)) return false;
+        if (actionType === "register" && !isRegistrable(r.status)) return false;
+      }
+
+      if (
+        !exclude.includes("length") &&
+        lengthList.length > 0 &&
+        !lengthList.includes(r.label.length)
+      )
+        return false;
+
+      if (!exclude.includes("wrapped")) {
+        if (wrappedType === "wrapped" && !r.wrapped) return false;
+        if (wrappedType === "unwrapped" && r.wrapped) return false;
+      }
+
+      if (!exclude.includes("memo")) {
+        const hasMemo = !!r.memo && r.memo.trim().length > 0;
+        if (memoFilter === "with_memo" && !hasMemo) return false;
+        if (memoFilter === "no_memo" && hasMemo) return false;
+      }
+
+      if (
+        !exclude.includes("level") &&
+        levelList.length > 0 &&
+        !levelList.includes(r.level || 0)
+      )
+        return false;
+
+      if (!exclude.includes("owner") && ownerList.length > 0) {
+        if (!r.owner || !ownerList.includes(r.owner.toLowerCase()))
+          return false;
+      }
+
       return true;
-    };
-    const checkLevel = (r: NameRecord) =>
-      levelList.length === 0 || levelList.includes(r.level || 0);
-    const checkOwner = (r: NameRecord) =>
-      ownerList.length === 0 ||
-      (!!r.owner && ownerList.includes(r.owner.toLowerCase()));
+    },
+    [filterConfig],
+  );
 
-    const passOthers = (
-      r: NameRecord,
-      exclude: (
-        | "status"
-        | "action"
-        | "length"
-        | "wrapped"
-        | "memo"
-        | "level"
-        | "owner"
-      )[],
-    ) => {
-      if (!exclude.includes("status") && !checkStatus(r)) return false;
-      if (!exclude.includes("action") && !checkAction(r)) return false;
-      if (!exclude.includes("length") && !checkLength(r)) return false;
-      if (!exclude.includes("wrapped") && !checkWrapped(r)) return false;
-      if (!exclude.includes("memo") && !checkMemos(r)) return false;
-      if (!exclude.includes("level") && !checkLevel(r)) return false;
-      if (!exclude.includes("owner") && !checkOwner(r)) return false;
-      return true;
-    };
+  // 🚀 3. 调用子 Hooks 获取统计数据
+  const { statusCounts, actionCounts, nameCounts, levelCounts } = useTableStats(
+    {
+      baseRecords,
+      passOthers,
+    },
+  );
 
-    const statusCounts: Record<string, number> = {};
-    baseRecords
-      .filter((r) => passOthers(r, ["status"]))
-      .forEach(
-        (r) => (statusCounts[r.status] = (statusCounts[r.status] || 0) + 1),
-      );
-
-    const recordsForAction = baseRecords.filter((r) =>
-      passOthers(r, ["action"]),
-    );
-    const actionCounts = {
-      all: recordsForAction.length,
-      register: recordsForAction.filter((r) => isRegistrable(r.status)).length,
-      renew: recordsForAction.filter((r) => isRenewable(r.status)).length,
-    };
-
-    const lengthCounts: Record<number, number> = {};
-    const availableLengths = new Set<number>();
-    baseRecords.forEach((r) => availableLengths.add(r.label.length));
-    baseRecords
-      .filter((r) => passOthers(r, ["length"]))
-      .forEach(
-        (r) =>
-          (lengthCounts[r.label.length] =
-            (lengthCounts[r.label.length] || 0) + 1),
-      );
-
-    const recordsForWrapped = baseRecords.filter((r) =>
-      passOthers(r, ["wrapped"]),
-    );
-    const wrappedCounts = {
-      all: recordsForWrapped.length,
-      wrapped: recordsForWrapped.filter((r) => r.wrapped).length,
-      unwrapped: recordsForWrapped.filter((r) => !r.wrapped).length,
-    };
-
-    // 🚀 Memo 统计逻辑
-    const recordsForMemoStats = baseRecords.filter((r) =>
-      passOthers(r, ["memo"]),
-    );
-    const memosCount = recordsForMemoStats.filter(
-      (r) => !!r.memo && r.memo.trim().length > 0,
-    ).length;
-    const memoTotal = recordsForMemoStats.length;
-
-    const levelCounts: Record<number, number> = {};
-    baseRecords
-      .filter((r) => passOthers(r, ["level"]))
-      .forEach(
-        (r) =>
-          (levelCounts[r.level || 0] = (levelCounts[r.level || 0] || 0) + 1),
-      );
-
-    // --- Owner Counts Calculation ---
-    const ownerMap = new Map<
-      string,
-      { count: number; label: string; address: string; isMyself: boolean }
-    >();
-    const myAddressLower = currentAddress?.toLowerCase();
-
-    let mineCount = 0;
-    let totalOwnerRecords = 0;
-
-    baseRecords
-      .filter((r) => passOthers(r, ["owner"]))
-      .forEach((r) => {
-        if (!r.owner) return;
-        const key = r.owner.toLowerCase();
-
-        totalOwnerRecords++;
-        if (key === myAddressLower) {
-          mineCount++;
-        }
-
-        let current = ownerMap.get(key);
-        if (!current) {
-          current = {
-            count: 0,
-            label: "",
-            address: key,
-            isMyself: key === myAddressLower,
-          };
-          current.label = truncateAddress(r.owner);
-        }
-
-        if (r.ownerPrimaryName) {
-          current.label = r.ownerPrimaryName;
-        }
-
-        current.count += 1;
-        ownerMap.set(key, current);
-      });
-
-    const totalOwnersCount = ownerMap.size;
-
-    const allOwners = Array.from(ownerMap.values()).sort((a, b) => {
-      if (a.isMyself && !b.isMyself) return -1;
-      if (!a.isMyself && b.isMyself) return 1;
-      return b.count - a.count;
-    });
-
-    const sortedOwners = allOwners.slice(0, 50);
-
-    return {
-      statusCounts,
-      actionCounts,
-      nameCounts: {
-        lengthCounts,
-        availableLengths: Array.from(availableLengths).sort((a, b) => a - b),
-        wrappedCounts,
-        memosCount,
-        memoTotal, // 🚀 导出
-      },
-      levelCounts,
-      rawSortedOwners: sortedOwners,
-      ownerStats: {
-        total: totalOwnersCount,
-        displayed: sortedOwners.length,
-      },
-      ownershipCounts: {
-        mine: mineCount,
-        others: totalOwnerRecords - mineCount,
-      },
-    };
-  }, [
+  const { ownerCounts, ownerStats, ownershipCounts } = useOwnerStats({
     baseRecords,
-    statusList,
-    actionType,
-    lengthList,
-    wrappedType,
-    memoFilter,
-    levelList,
-    ownerList,
     currentAddress,
-  ]);
+    passOthers,
+  });
 
-  useEffect(() => {
-    if (rawSortedOwners.length === 0) return;
-
-    const targetsToResolve = rawSortedOwners
-      .filter((o) => o.label.startsWith("0x") && !resolvedOwnerNames[o.address])
-      .map((o) => o.address);
-
-    if (targetsToResolve.length > 0) {
-      const timer = setTimeout(() => {
-        fetchPrimaryNames(targetsToResolve).then((newMap) => {
-          if (newMap.size > 0) {
-            setResolvedOwnerNames((prev) => {
-              const next = { ...prev };
-              let hasChange = false;
-              newMap.forEach((name, addr) => {
-                if (next[addr] !== name) {
-                  next[addr] = name;
-                  hasChange = true;
-                }
-              });
-              return hasChange ? next : prev;
-            });
-          }
-        });
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [rawSortedOwners, resolvedOwnerNames]);
-
-  const ownerCounts = useMemo(() => {
-    return rawSortedOwners.map((item) => {
-      const resolvedName = resolvedOwnerNames[item.address];
-      return {
-        ...item,
-        label: resolvedName || item.label,
-      };
-    });
-  }, [rawSortedOwners, resolvedOwnerNames]);
-
+  // 4. 数据处理与操作 (保持不变)
   const processedRecords = useMemo(
     () => processNameRecords(baseRecords, sortConfig, filterConfig),
     [baseRecords, sortConfig, filterConfig],
@@ -390,17 +220,13 @@ export const useNameTableView = (
 
   const handleSort = useCallback((field: SortField) => {
     setSortConfig((prev) => {
-      // 🚀 核心修改：注册时间优先降序
       const isDescFirst = field === "registered";
-
       if (prev.field !== field) {
         return { field, direction: isDescFirst ? "desc" : "asc" };
       }
-
       if (prev.direction === null) {
         return { field, direction: isDescFirst ? "desc" : "asc" };
       }
-
       if (isDescFirst) {
         if (prev.direction === "desc") return { field, direction: "asc" };
         if (prev.direction === "asc") return { field, direction: null };
@@ -408,7 +234,6 @@ export const useNameTableView = (
         if (prev.direction === "asc") return { field, direction: "desc" };
         if (prev.direction === "desc") return { field, direction: null };
       }
-
       return { field, direction: "asc" };
     });
   }, []);
