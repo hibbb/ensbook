@@ -449,7 +449,7 @@
     "error_fetch": "Failed to fetch names",
     "empty": "No ENS names found for this account",
     "address_label": "Address",
-    "name_label": "Input Name",
+    "name_label": "Account",
     "total_label": "Total Holdings"
   }
 }

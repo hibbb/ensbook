@@ -448,8 +448,8 @@
     "error_resolve": "无法解析地址或域名无效",
     "error_fetch": "获取域名失败",
     "empty": "该账户下未找到 ENS 域名",
-    "address_label": "钱包地址",
-    "name_label": "输入域名",
+    "address_label": "账户地址",
+    "name_label": "账户",
     "total_label": "持仓总数"
   }
 }
