@@ -241,7 +241,6 @@ export const Home = () => {
           <NameTable
             records={processedRecords}
             isLoading={showSkeleton}
-            currentAddress={address}
             isConnected={isConnected}
             sortConfig={sortConfig}
             onSort={handleSort}

@@ -282,7 +282,6 @@ export const Account = () => {
         key={resolvedAddress || "loading"}
         records={processedRecords}
         isLoading={isLoading}
-        currentAddress={myAddress}
         isConnected={isConnected}
         sortConfig={sortConfig}
         onSort={handleSort}

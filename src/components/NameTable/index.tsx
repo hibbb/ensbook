@@ -23,7 +23,6 @@ import { ITEMS_PER_PAGE } from "../../config/constants";
 interface NameTableProps {
   records: NameRecord[] | undefined | null;
   isLoading: boolean;
-  currentAddress?: string;
   isConnected: boolean;
   sortConfig: SortConfig;
   onSort: (field: SortField) => void;

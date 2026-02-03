@@ -81,7 +81,6 @@ export const CollectionDetail = () => {
         key={id}
         records={processedRecords}
         isLoading={isLoading}
-        currentAddress={address}
         isConnected={isConnected}
         sortConfig={sortConfig}
         onSort={handleSort}

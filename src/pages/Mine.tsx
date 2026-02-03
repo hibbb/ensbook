@@ -153,7 +153,6 @@ export const Mine = () => {
         key="mine-table"
         records={processedRecords}
         isLoading={isLoading}
-        currentAddress={address}
         isConnected={isConnected}
         sortConfig={sortConfig}
         onSort={handleSort}
