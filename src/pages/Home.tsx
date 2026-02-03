@@ -1,9 +1,10 @@
 // src/pages/Home.tsx
 
-import { useState, useMemo, useCallback } from "react"; // 🚀 引入 useCallback
+import { useState, useMemo, useCallback } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { namehash, labelhash } from "viem"; // 🚀 引入 viem
 
 // Components
 import { NameTable } from "../components/NameTable";
@@ -44,18 +45,46 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  const { data: records, isLoading: isQuerying } =
-    useNameRecords(resolvedLabels);
+  // 1. 获取远程数据 (可能正在加载，或者包含旧数据)
+  const { data: fetchedRecords } = useNameRecords(resolvedLabels);
 
-  const showSkeleton = isQuerying || isResolving;
+  // 🚀 2. 核心修改：构建混合数据源 (Merged Records)
+  // 以本地 resolvedLabels 为准，立即渲染所有行
+  const mergedRecords = useMemo(() => {
+    // 将远程数据转为 Map 以便快速查找
+    const recordMap = new Map(fetchedRecords?.map((r) => [r.label, r]));
+
+    return resolvedLabels.map((label) => {
+      // A. 尝试获取远程数据
+      const remoteRecord = recordMap.get(label);
+      if (remoteRecord) return remoteRecord;
+
+      // B. 如果没拿到 (正在加载中)，生成一个“占位记录”
+      // 这样用户能立刻看到这一行，虽然状态暂时是 Unknown
+      return {
+        label: label,
+        namehash: namehash(`${label}.eth`),
+        labelhash: labelhash(label),
+        length: label.length,
+        status: "Unknown", // 稍后会自动更新为真实状态
+        owner: null,
+        wrapped: false,
+        registeredTime: 0,
+        expiryTime: 0,
+        releaseTime: 0,
+        level: 0, // 默认等级
+        memo: "", // 暂时为空
+      } as NameRecord;
+    });
+  }, [resolvedLabels, fetchedRecords]);
+
+  // 🚀 3. 骨架屏逻辑调整：
+  // 只有在“解析输入中”才显示骨架屏。
+  // “查询链上数据中”不再显示骨架屏，而是显示上面的占位记录。
+  const showSkeleton = isResolving;
   const hasContent = resolvedLabels.length > 0;
 
-  const validRecords = useMemo(() => {
-    if (!records || resolvedLabels.length === 0) return [];
-    const currentLabelSet = new Set(resolvedLabels);
-    return records.filter((r) => currentLabelSet.has(r.label));
-  }, [records, resolvedLabels]);
-
+  // 4. 将混合后的数据传给 useNameTableView
   const {
     processedRecords,
     sortConfig,
@@ -75,14 +104,12 @@ export const Home = () => {
     ownerCounts,
     ownerStats,
     ownershipCounts,
-  } = useNameTableView(validRecords, address, "home");
+  } = useNameTableView(mergedRecords, address, "home");
 
   const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
 
   const updateLevel = useOptimisticLevelUpdate();
 
-  // 🚀 核心修复：使用 useCallback 稳定函数引用
-  // 这样 NameTable 的 props 在打字期间就不会变化，React.memo 才能生效
   const handleLevelChange = useCallback(
     (record: NameRecord, newLevel: number) => {
       updateLevel(record, newLevel);
@@ -124,7 +151,6 @@ export const Home = () => {
     }
   };
 
-  // 🚀 修复：添加 useCallback 并补全依赖
   const handleDelete = useCallback(
     (record: NameRecord) => {
       removeFromHome(record.label);
@@ -136,10 +162,10 @@ export const Home = () => {
     [selectedLabels, toggleSelection],
   );
 
-  // 🚀 修复：添加 useCallback 并补全依赖
   const handleBatchDelete = useCallback(
     (criteria: DeleteCriteria) => {
-      const targetRecords = records;
+      // 注意：这里使用 mergedRecords 而不是 records，确保数据源一致
+      const targetRecords = mergedRecords;
       if (!targetRecords) return;
 
       const { type, value } = criteria;
@@ -215,7 +241,7 @@ export const Home = () => {
       toast.success(t("home.toast.delete_success"));
     },
     [
-      records,
+      mergedRecords, // 🚀 依赖更新
       address,
       selectedLabels,
       toggleSelection,
@@ -258,14 +284,14 @@ export const Home = () => {
             onReminder={actions.onReminder}
             skeletonRows={5}
             headerTop="88px"
-            totalRecordsCount={validRecords?.length || 0}
+            totalRecordsCount={mergedRecords?.length || 0} // 🚀 使用 mergedRecords
             statusCounts={statusCounts}
             actionCounts={actionCounts}
             nameCounts={nameCounts}
             levelCounts={levelCounts}
             isViewStateDirty={isViewStateDirty}
             onResetViewState={resetViewState}
-            onLevelChange={handleLevelChange} // 🚀 现在它是稳定的
+            onLevelChange={handleLevelChange}
             ownerCounts={ownerCounts}
             ownerStats={ownerStats}
             ownershipCounts={ownershipCounts}
@@ -278,7 +304,11 @@ export const Home = () => {
         isBusy={isBusy}
         isConnected={isConnected}
         onBatchRenew={() =>
-          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
+          actions.onBatchRenew(
+            selectedLabels,
+            mergedRecords || [], // 🚀 使用 mergedRecords
+            clearSelection,
+          )
         }
         onClearSelection={clearSelection}
       />
