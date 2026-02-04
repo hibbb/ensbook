@@ -26,8 +26,8 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
   if (isLoading) {
     return (
       <div className="h-12 flex items-center justify-start gap-3 opacity-50 px-2">
-        <div className="h-4 w-10 bg-gray-200 rounded-lg animate-pulse" />
-        <div className="h-4 w-10 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-6 w-10 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-6 w-10 bg-gray-200 rounded-lg animate-pulse" />
       </div>
     );
   }
