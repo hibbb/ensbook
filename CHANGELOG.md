@@ -3,42 +3,40 @@
 所有重要的变更都会记录在此文件中。
 格式遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
 
-## v3.2.3
+## v3.2.4
 
 ### <!-- 0 -->🚀 Features
 
-- 加入 Optimistic Updates 解决 The Graph 索引延迟导致的用户体验问题
-- 在注册过程中引入 “放弃” 当前注册流程的机制
+- 实现在其他页面轻松向 Home 页添加域名的功能
+
+### <!-- 1 -->🐛 Bug Fixes
+
+- 在 ETH, WETH 之外，增加对 "USDC", "USDT", "DAI" 价格的支持
 
 ### <!-- 2 -->🚜 Refactor
 
-- 将“倒计时结束”与“发起注册交易”解耦，避免重复发起交易请求
-- 调整注册时间排序循环次序，优先降序
-
-### <!-- 5 -->🎨 Styling
-
-- 调整 index 列和溢价的字重
-- 使用 font-semibold 替换 font-bold；connectKit 字重恢复默认值
-
-### <!-- 7 -->⚙️ Miscellaneous Tasks
-
-- 移除未使用的 currentAddress 信息，保持代码清洁
-
-## v3.2.2
-
-### <!-- 0 -->🚀 Features
-
-- 为本地的 metadata 数据加入垃圾回收
+- 重构 useNameTableView，拆分出 useOwnerStats 和 useTableStats
+- 优化 Home 页面添加域名时的显示逻辑，采用：本地数据驱动 + 远程数据填充
+- 重构 pages 中的页面，创建 NameListView 容器组件封装公共代码
+- 封装 ControlHeader 和 ControlCell，同时取代旧的 DeleteHeader
 
 ### <!-- 3 -->📚 Documentation
 
-- update changelog for v3.2.1
+- update changelog for v3.2.3
+- 矫正账户页面中查询识别符的名称，以“账户”作为识别符
+
+### <!-- 4 -->⚡ Performance
+
+- 移除 canDelete Prop，改用函数引用的真值检测，消除逻辑冗余
 
 ### <!-- 5 -->🎨 Styling
 
-- 规范化字体和颜色，引入等宽字体 DM Mono
-- 移除未使用的字体文件
-- 仅保留必要字体及其预加载，调节个别字重字号
+- 提升最右侧管理列的表现细节
+- 同步微调 MarketCell 中的 Tooltip 样式
+- 初步完成 UI 圆角化
+- 仅保留表头吸顶效果，移除其他吸顶及 topOffset 相关逻辑
+- 在不显示分页栏时，通过 CSS 动态控制表格最后一行的圆角
+- 调整骨架屏样式，使其高度一致，长度更合理
 
 ---
 
