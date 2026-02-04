@@ -41,19 +41,25 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
     );
   }
 
-  // 3. Tooltip 内容 (保持不变)
+  // 3. Tooltip 内容
   const renderTooltip = () => (
     <div className="flex flex-col gap-2 min-w-[180px] p-1">
       {/* Listing Detail */}
       {data.listing ? (
         <div className="flex justify-between items-center text-xs">
-          <span className="text-gray-400 font-sans font-medium flex items-center gap-1.5">
+          <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
             <FontAwesomeIcon icon={faTag} size="xs" />
             {t("market.listed")}
           </span>
           <div className="flex flex-col items-end">
             <span className="text-white">
-              {displayNumber(data.listing.amount)} {data.listing.currency}
+              {/* 🚀 修改：数字用 font-mono font-bold，单位保持原样 */}
+              <span className="font-mono font-light">
+                {displayNumber(data.listing.amount)}
+              </span>
+              <span className="ml-1 font-qs-medium text-gray-300">
+                {data.listing.currency}
+              </span>
             </span>
           </div>
         </div>
@@ -66,14 +72,20 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
       {/* Offer Detail */}
       {data.offer && (
         <div className="flex justify-between items-center text-xs border-t border-white/10 pt-2">
-          <span className="text-gray-400 font-sans font-medium flex items-center gap-1.5">
+          <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
             <span className="text-[10px] bg-purple-600/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">
               Bid
             </span>
           </span>
           <div className="flex flex-col items-end">
-            <span className="text-purple-300 font-sans font-medium">
-              {displayNumber(data.offer.amount)} {data.offer.currency}
+            <span className="text-purple-300">
+              {/* 🚀 修改：数字用 font-mono font-bold */}
+              <span className="font-mono font-light">
+                {displayNumber(data.offer.amount)}
+              </span>
+              <span className="ml-1 font-qs-medium text-purple-400">
+                {data.offer.currency}
+              </span>
             </span>
           </div>
         </div>
