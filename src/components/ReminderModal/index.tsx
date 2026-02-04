@@ -131,7 +131,7 @@ export const ReminderModal = ({
         <button
           onClick={handleDownloadICS}
           disabled={selectedReminders.length === 0}
-          className="w-full py-3 bg-text-main/90 text-white rounded-lg font-sans font-semibold text-sm hover:bg-black transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
+          className="w-full py-3 bg-text-main/90 text-white rounded-lg font-sans font-semibold text-sm hover:bg-text-main transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
         >
           <FontAwesomeIcon icon={faDownload} />
           {t("transaction.reminder.btn.download")}

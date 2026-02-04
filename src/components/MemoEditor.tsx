@@ -128,7 +128,7 @@ export const MemoEditor = ({ label }: MemoEditorProps) => {
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t("memo.placeholder")}
-          className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-sans font-medium"
+          className="w-full h-24 p-2 text-sm text-text-main bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-link/20 focus:border-link resize-none font-sans font-medium"
           maxLength={MAX_MEMO_LENGTH}
         />
 

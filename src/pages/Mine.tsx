@@ -110,7 +110,7 @@ export const Mine = () => {
         <div>
           <h1 className="text-4xl font-sans font-semibold flex items-center gap-3">
             {t("mine.title")}
-            <span className="text-sm bg-black text-white px-2 py-1 rounded-md font-semibold tracking-wide transform -translate-y-4">
+            <span className="text-sm bg-text-main text-white px-2 py-1 rounded-md font-semibold tracking-wide transform -translate-y-4">
               {t("mine.subtitle")}
             </span>
           </h1>

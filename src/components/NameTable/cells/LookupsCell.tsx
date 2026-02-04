@@ -21,12 +21,12 @@ export const LookupsCell = ({ record }: LookupsCellProps) => {
             href={item.getLink(record)}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-white transition-all hover:scale-110 overflow-hidden border border-gray-300 opacity-45 hover:opacity-100"
+            className="w-6 h-6 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-white transition-all hover:scale-110 overflow-hidden border border-gray-300 opacity-45 hover:opacity-100"
           >
             <img
               src={item.icon}
               alt={item.key}
-              className="w-4 h-4 object-contain"
+              className="w-4 h-4 object-contain rounded-md"
             />
           </a>
         </Tooltip>

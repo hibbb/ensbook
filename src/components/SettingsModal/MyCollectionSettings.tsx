@@ -122,13 +122,13 @@ export const MyCollectionSettings = () => {
           {t("settings.my_collection.ui.desc")}
         </p>
         <div className="flex flex-wrap gap-2 font-mono text-xs">
-          <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
+          <span className="bg-gray-100/70 px-2 py-0.5 rounded-lg text-text-main/80">
             abc, hello, 123
           </span>
-          <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
+          <span className="bg-gray-100/70 px-2 py-0.5 rounded-lg text-text-main/80">
             @alice.eth
           </span>
-          <span className="bg-gray-100/70 px-2 py-0.5 rounded text-text-main/80">
+          <span className="bg-gray-100/70 px-2 py-0.5 rounded-lg text-text-main/80">
             0xd8dA...6045
           </span>
         </div>
@@ -168,7 +168,7 @@ export const MyCollectionSettings = () => {
             placeholder:text-gray-300"
           spellCheck={false}
         />
-        <div className="absolute bottom-3 right-3 text-[10px] text-gray-300 font-mono bg-white/80 px-1 rounded backdrop-blur-sm">
+        <div className="absolute bottom-3 right-3 text-[10px] text-gray-300 font-mono bg-white/80 px-1 rounded-lg backdrop-blur-sm">
           {input.length} chars
         </div>
       </div>

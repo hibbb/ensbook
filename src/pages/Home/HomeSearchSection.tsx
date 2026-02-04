@@ -32,7 +32,7 @@ export const HomeSearchSection = ({
     <div
       className={`flex flex-col items-center transition-all duration-700 ease-in-out z-40 ${
         hasContent
-          ? "sticky top-0 py-4 mb-6 bg-background/80 backdrop-blur-md"
+          ? "top-0 py-4 mb-6 bg-background/80 backdrop-blur-md"
           : "flex-1 justify-center -mt-60"
       }`}
     >

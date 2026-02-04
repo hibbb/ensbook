@@ -87,11 +87,11 @@ export const TableHeader = ({
 
   return (
     <thead
-      className="sticky top-0 z-20 bg-table-header backdrop-blur-sm transition-all duration-300 lg:top-[var(--header-offset)]"
+      className="sticky top-0 z-20 backdrop-blur-sm transition-all duration-300 lg:top-[var(--header-offset)]"
       style={headerStyle}
     >
-      <tr className="text-left">
-        <th className="w-14 text-center">
+      <tr className="text-left bg-table-header">
+        <th className="w-14 text-center rounded-tl-xl">
           <IndexHeader
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
@@ -155,7 +155,7 @@ export const TableHeader = ({
           <ThWrapper>{t("table.header.info")}</ThWrapper>
         </th>
 
-        <th className="text-center w-14 relative">
+        <th className="text-center w-14 relative rounded-tr-xl">
           {/* 🚀 使用统一的 ControlHeader */}
           <ControlHeader
             onBatchDelete={onBatchDelete}

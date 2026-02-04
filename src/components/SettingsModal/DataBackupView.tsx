@@ -152,7 +152,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             </p>
             <button
               onClick={handleExport}
-              className="px-4 py-2 bg-cyan-50 text-cyan-700 text-sm font-sans font-semibold rounded border border-cyan-200 hover:bg-cyan-100 hover:border-cyan-300 transition-colors active:scale-95"
+              className="px-4 py-2 bg-cyan-50 text-cyan-700 text-sm font-sans font-semibold rounded-xl border border-cyan-200 hover:bg-cyan-100 hover:border-cyan-300 transition-colors active:scale-95"
             >
               {t("settings.backup.export.btn")}
             </button>
@@ -186,7 +186,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-lime-50 text-lime-700 text-sm font-sans font-semibold rounded border border-lime-200 hover:bg-lime-100 hover:border-lime-300 transition-all active:scale-95"
+              className="px-4 py-2 bg-lime-50 text-lime-700 text-sm font-sans font-semibold rounded-xl border border-lime-200 hover:bg-lime-100 hover:border-lime-300 transition-all active:scale-95"
             >
               {t("settings.backup.import.btn")}
             </button>
@@ -213,7 +213,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
                 </p>
                 <button
                   onClick={() => setIsResetting(true)}
-                  className="px-4 py-2 bg-red-50 text-red-600 text-sm font-sans font-semibold rounded border border-red-100 hover:bg-red-100 hover:border-red-200 transition-all active:scale-95"
+                  className="px-4 py-2 bg-red-50 text-red-600 text-sm font-sans font-semibold rounded-lg border border-red-100 hover:bg-red-100 hover:border-red-200 transition-all active:scale-95"
                 >
                   {t("settings.backup.reset.btn")}
                 </button>
@@ -238,14 +238,14 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
                     value={confirmInput}
                     onChange={(e) => setConfirmInput(e.target.value)}
                     placeholder={t("settings.backup.reset.type_delete")}
-                    className="flex-1 px-3 py-1.5 text-sm border border-red-200 rounded focus:outline-none focus:border-red-400 text-red-600 placeholder:text-red-200 font-sans font-medium"
+                    className="flex-1 px-3 py-1.5 text-sm border border-red-200 rounded-xl focus:outline-none focus:border-red-400 text-red-600 placeholder:text-red-200 font-sans font-medium"
                     autoFocus
                   />
                   <button
                     onClick={handleResetConfirm}
                     disabled={confirmInput !== "DELETE"}
                     className={`
-                            px-4 py-1.5 text-sm font-sans font-semibold rounded border transition-all
+                            px-4 py-1.5 text-sm font-sans font-semibold rounded-lg border transition-all
                             ${
                               confirmInput === "DELETE"
                                 ? "bg-red-500 border-red-600 text-white hover:bg-red-600 shadow-sm active:scale-95"

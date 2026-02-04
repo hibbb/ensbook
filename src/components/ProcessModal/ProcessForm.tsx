@@ -240,7 +240,7 @@ export const ProcessForm = ({
                   ) : resolveError ? (
                     <span className="text-xs text-red-400">{resolveError}</span>
                   ) : resolvedAddress ? (
-                    <div className="flex items-center gap-1 text-xs text-green-600 font-mono bg-green-50 px-2 py-0.5 rounded w-fit">
+                    <div className="flex items-center gap-1 text-xs text-green-600 font-mono bg-green-50 px-2 py-0.5 rounded-lg w-fit">
                       <FontAwesomeIcon icon={faCheck} size="xs" />
                       {truncateAddress(resolvedAddress)}
                     </div>

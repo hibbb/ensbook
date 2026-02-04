@@ -26,8 +26,8 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
   if (isLoading) {
     return (
       <div className="h-12 flex items-center justify-start gap-3 opacity-50 px-2">
-        <div className="h-4 w-10 bg-gray-200 rounded animate-pulse" />
-        <div className="h-4 w-10 bg-gray-200 rounded animate-pulse" />
+        <div className="h-4 w-10 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-4 w-10 bg-gray-200 rounded-lg animate-pulse" />
       </div>
     );
   }
@@ -73,7 +73,7 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
       {data.offer && (
         <div className="flex justify-between items-center text-xs border-t border-white/10 pt-2">
           <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
-            <span className="text-[10px] bg-purple-600/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">
+            <span className="text-[10px] bg-purple-600/20 text-purple-300 px-1.5 py-0.5 rounded-lg border border-purple-500/30">
               Bid
             </span>
           </span>
@@ -119,7 +119,7 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
 
           {/* B. Offer Price */}
           {data.offer && (
-            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 text-xs group-hover:bg-purple-100 transition-colors">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-purple-50 text-purple-600 text-xs group-hover:bg-purple-100 transition-colors">
               <span className="font-sans leading-none">
                 {getCurrencySymbol(data.offer.currency)}
               </span>
