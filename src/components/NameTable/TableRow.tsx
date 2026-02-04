@@ -1,35 +1,34 @@
 // src/components/NameTable/TableRow.tsx
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { NameRecord } from "../../types/ensNames";
-import { Tooltip } from "../ui/Tooltip";
 
 import { IndexCell } from "./cells/IndexCell";
 import { NameCell } from "./cells/NameCell";
 import { StatusCell } from "./cells/StatusCell";
 import { OwnerCell } from "./cells/OwnerCell";
-import { MarketCell } from "./cells/MarketCell"; // 🚀
+import { MarketCell } from "./cells/MarketCell";
 import { ActionCell } from "./cells/ActionCell";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { LookupsCell } from "./cells/LookupsCell";
+import { ControlCell } from "./cells/ControlCell";
 
-import type { SimpleMarketData } from "../../types/marketData"; // 🚀
+import type { SimpleMarketData } from "../../types/marketData";
 
 interface TableRowProps {
   record: NameRecord;
   index: number;
   now: number;
   isConnected: boolean;
-  canDelete?: boolean;
+  // 🗑️ 删除: canDelete?: boolean;
+  onDelete?: (record: NameRecord) => void;
+  // 🚀 新增
+  onAddToHome?: (record: NameRecord) => void;
   isSelected?: boolean;
   onToggleSelection?: (label: string) => void;
-  onDelete?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
   isPending?: boolean;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
-  // 🚀 新增 Props
   marketData?: SimpleMarketData;
   isMarketLoading?: boolean;
 }
@@ -39,8 +38,9 @@ export const TableRow = ({
   index,
   now,
   isConnected,
-  canDelete = true,
+  // 🗑️ 删除: canDelete
   onDelete,
+  onAddToHome, // 🚀
   isSelected,
   onToggleSelection,
   onRegister,
@@ -54,7 +54,6 @@ export const TableRow = ({
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
       <td className="w-14 text-center">
-        {/* 🚀 3. 替换旧的 span，使用 IndexCell */}
         <IndexCell
           index={index}
           level={record.level || 0}
@@ -74,7 +73,6 @@ export const TableRow = ({
         <OwnerCell record={record} />
       </td>
 
-      {/* 🚀 Insert Market Cell */}
       <td>
         <MarketCell data={marketData} isLoading={isMarketLoading} />
       </td>
@@ -97,26 +95,11 @@ export const TableRow = ({
       </td>
 
       <td className="text-center">
-        <div className="h-12 flex items-center justify-center">
-          <Tooltip
-            content={canDelete ? `删除 ${record.label}.eth` : "不可删除"}
-          >
-            <button
-              disabled={!canDelete}
-              onClick={() => onDelete?.(record)}
-              className={`
-              transition-all duration-200 text-xs
-              ${
-                canDelete
-                  ? "text-link hover:text-link-hover active:scale-95"
-                  : "text-gray-200 cursor-not-allowed"
-              }
-            `}
-            >
-              <FontAwesomeIcon icon={faXmark} size="sm" />
-            </button>
-          </Tooltip>
-        </div>
+        <ControlCell
+          record={record}
+          onDelete={onDelete}
+          onAddToHome={onAddToHome}
+        />
       </td>
     </tr>
   );

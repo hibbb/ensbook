@@ -28,8 +28,10 @@ interface NameTableProps {
   onSort: (field: SortField) => void;
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
-  canDelete?: boolean;
+  // 🗑️ 删除: canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
+  // 🚀 新增: 添加到 Home 的回调
+  onAddToHome?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
   onReminder?: (record: NameRecord) => void;
@@ -37,7 +39,6 @@ interface NameTableProps {
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
   skeletonRows?: number;
-  headerTop?: string | number;
   pendingLabels?: Set<string>;
   totalRecordsCount?: number;
   statusCounts?: Record<string, number>;
@@ -96,8 +97,6 @@ const NameTableComponent = (props: NameTableProps) => {
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
 
-  // 🚀 1. 调用 Market Hook
-  // 传入当前页的数据 (Viewport Driven)
   const { data: marketDataMap, isLoading: isMarketLoading } = useMarketData(
     paginatedBasicRecords,
   );
@@ -130,10 +129,24 @@ const NameTableComponent = (props: NameTableProps) => {
     props.selectedLabels &&
     renewableRecords.every((r) => props.selectedLabels?.has(r.label));
 
+  // 1. 明确判断是否显示分页
+  // 分页显示的条件是：非 Loading 状态 且 数据量大于一页
+  const showPagination = !showSkeleton && safeRecords.length > pageSize;
+
+  // 2. 定义动态圆角类
+  // 解释：
+  // [&_tr:last-child_td:first-child]: 选中 tbody 中最后一行的第一个单元格 -> 左下圆角
+  // [&_tr:last-child_td:last-child]:  选中 tbody 中最后一行的最后一个单元格 -> 右下圆角
+  const bottomRoundedClass = !showPagination
+    ? "[&_tr:last-child_td:first-child]:rounded-bl-xl [&_tr:last-child_td:last-child]:rounded-br-xl"
+    : "";
+
   return (
-    <div className="bg-table-row rounded-xl border border-gray-100 relative flex flex-col">
-      <div className="overflow-x-auto lg:overflow-visible">
-        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-0.5 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3">
+    <div className="rounded-xl border border-gray-100 relative flex flex-col">
+      <div className="overflow-x-auto lg:overflow-visible rounded-t-xl">
+        <table
+          className={`min-w-full border-separate border-spacing-x-0 border-spacing-y-0.5 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3 ${bottomRoundedClass}`}
+        >
           <TableHeader
             sortConfig={props.sortConfig}
             onSort={props.onSort}
@@ -144,9 +157,9 @@ const NameTableComponent = (props: NameTableProps) => {
             onToggleSelectAll={props.onToggleSelectAll}
             hasRenewable={hasRenewableRecords}
             hasRecords={safeRecords.length > 0}
-            showDelete={props.canDelete}
-            topOffset={props.headerTop}
+            // 🚀 逻辑简化：直接传递回调函数，由 Header 内部判断显示什么
             onBatchDelete={props.onBatchDelete}
+            onAddToHome={props.onAddToHome}
             uniqueStatuses={uniqueStatuses}
             filteredCount={safeRecords.length}
             totalCount={props.totalRecordsCount ?? safeRecords.length}
@@ -171,8 +184,9 @@ const NameTableComponent = (props: NameTableProps) => {
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
                   isConnected={props.isConnected}
-                  canDelete={props.canDelete}
+                  // 🚀 逻辑简化：直接传递回调函数
                   onDelete={props.onDelete}
+                  onAddToHome={props.onAddToHome}
                   isSelected={props.selectedLabels?.has(r.label)}
                   onToggleSelection={props.onToggleSelection}
                   onRegister={props.onRegister}
@@ -180,7 +194,6 @@ const NameTableComponent = (props: NameTableProps) => {
                   onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
                   onLevelChange={props.onLevelChange}
-                  // 🚀 2. 传递市场数据
                   marketData={marketDataMap?.[r.label]}
                   isMarketLoading={isMarketLoading}
                 />
@@ -219,5 +232,4 @@ const NameTableComponent = (props: NameTableProps) => {
   );
 };
 
-// 使用 React.memo 导出，只有当 props 发生浅比较变化时，才会重新渲染
 export const NameTable = React.memo(NameTableComponent);

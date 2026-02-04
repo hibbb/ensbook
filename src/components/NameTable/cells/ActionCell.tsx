@@ -141,7 +141,7 @@ export const ActionCell = ({
           <input
             type="checkbox"
             disabled={!isConnected}
-            className="w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all cursor-pointer"
+            className="w-4 h-4 rounded-md border-gray-400 text-link focus:ring-link/20 transition-all cursor-pointer"
             checked={isSelected}
             onChange={() => onToggleSelection(record.label)}
             onClick={(e) => e.stopPropagation()}

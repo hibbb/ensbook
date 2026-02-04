@@ -249,7 +249,8 @@
       "state": "状态",
       "copy_full": "复制完整值",
       "delete_item": "删除 {{label}}.eth",
-      "cannot_delete": "不可删除"
+      "cannot_delete": "不可删除",
+      "add_to_home": "将 {{label}}.eth 添加到首页"
     }
   },
   "market": {
@@ -366,7 +367,7 @@
   },
   "home": {
     "toast": {
-      "all_exist": "所有域名已存在列表中",
+      "all_exist": "相关域名已存在列表中",
       "add_success": "成功添加 {{count}} 个域名",
       "no_valid": "未找到有效的 ENS 域名",
       "parse_error": "解析输入时出错",
@@ -447,8 +448,8 @@
     "error_resolve": "无法解析地址或域名无效",
     "error_fetch": "获取域名失败",
     "empty": "该账户下未找到 ENS 域名",
-    "address_label": "钱包地址",
-    "name_label": "输入域名",
+    "address_label": "账户地址",
+    "name_label": "账户",
     "total_label": "持仓总数"
   }
 }

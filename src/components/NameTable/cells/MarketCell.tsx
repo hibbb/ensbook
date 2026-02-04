@@ -12,6 +12,13 @@ interface MarketCellProps {
   isLoading: boolean;
 }
 
+// 🚀 辅助：获取货币符号
+const getCurrencySymbol = (currency: string) => {
+  if (currency === "ETH" || currency === "WETH") return "Ξ";
+  // USDC, USDT, DAI
+  return "$";
+};
+
 export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
   const { t } = useTranslation();
 
@@ -19,8 +26,8 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
   if (isLoading) {
     return (
       <div className="h-12 flex items-center justify-start gap-3 opacity-50 px-2">
-        <div className="h-4 w-10 bg-gray-200 rounded animate-pulse" />
-        <div className="h-4 w-10 bg-gray-200 rounded animate-pulse" />
+        <div className="h-6 w-10 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-6 w-10 bg-gray-200 rounded-lg animate-pulse" />
       </div>
     );
   }
@@ -34,19 +41,25 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
     );
   }
 
-  // 3. Tooltip 内容 (保持不变)
+  // 3. Tooltip 内容
   const renderTooltip = () => (
     <div className="flex flex-col gap-2 min-w-[180px] p-1">
       {/* Listing Detail */}
       {data.listing ? (
         <div className="flex justify-between items-center text-xs">
-          <span className="text-gray-400 font-sans font-medium flex items-center gap-1.5">
+          <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
             <FontAwesomeIcon icon={faTag} size="xs" />
             {t("market.listed")}
           </span>
           <div className="flex flex-col items-end">
             <span className="text-white">
-              {displayNumber(data.listing.amount)} {data.listing.currency}
+              {/* 🚀 修改：数字用 font-mono font-bold，单位保持原样 */}
+              <span className="font-mono font-light">
+                {displayNumber(data.listing.amount)}
+              </span>
+              <span className="ml-1 font-qs-medium text-gray-300">
+                {data.listing.currency}
+              </span>
             </span>
           </div>
         </div>
@@ -59,14 +72,20 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
       {/* Offer Detail */}
       {data.offer && (
         <div className="flex justify-between items-center text-xs border-t border-white/10 pt-2">
-          <span className="text-gray-400 font-sans font-medium flex items-center gap-1.5">
-            <span className="text-[10px] bg-purple-600/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">
+          <span className="text-gray-400 font-qs-medium flex items-center gap-1.5">
+            <span className="text-[10px] bg-purple-600/20 text-purple-300 px-1.5 py-0.5 rounded-lg border border-purple-500/30">
               Bid
             </span>
           </span>
           <div className="flex flex-col items-end">
-            <span className="text-purple-300 font-sans font-medium">
-              {displayNumber(data.offer.amount)} {data.offer.currency}
+            <span className="text-purple-300">
+              {/* 🚀 修改：数字用 font-mono font-bold */}
+              <span className="font-mono font-light">
+                {displayNumber(data.offer.amount)}
+              </span>
+              <span className="ml-1 font-qs-medium text-purple-400">
+                {data.offer.currency}
+              </span>
             </span>
           </div>
         </div>
@@ -86,20 +105,24 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
             if (!data.listing?.url && !data.offer?.url) e.preventDefault();
           }}
         >
-          {/* A. Listing Price (Primary) */}
+          {/* A. Listing Price */}
           {data.listing ? (
             <div className="flex items-center gap-1 text-xs text-text-main group-hover:text-link transition-colors">
-              <span className="font-sans leading-none">Ξ</span>
+              <span className="font-sans leading-none">
+                {getCurrencySymbol(data.listing.currency)}
+              </span>
               <span className="font-mono font-light">
                 {displayNumber(data.listing.amount)}
               </span>
             </div>
           ) : null}
 
-          {/* B. Offer Price (Badge Style) */}
+          {/* B. Offer Price */}
           {data.offer && (
-            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 text-xs group-hover:bg-purple-100 transition-colors">
-              <span className="font-sans leading-none">Ξ</span>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-purple-50 text-purple-600 text-xs group-hover:bg-purple-100 transition-colors">
+              <span className="font-sans leading-none">
+                {getCurrencySymbol(data.offer.currency)}
+              </span>
               <span className="font-mono font-light">
                 {displayNumber(data.offer.amount)}
               </span>

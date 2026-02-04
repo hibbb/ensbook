@@ -68,7 +68,7 @@ const SidebarItem = ({
     </div>
     <span>{label}</span>
     {disabled && badge && (
-      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-sm font-sans font-semibold">
+      <span className="ml-auto text-[10px] bg-gray-50 text-gray-300 px-1.5 py-0.5 rounded-lg font-sans font-semibold">
         {badge}
       </span>
     )}

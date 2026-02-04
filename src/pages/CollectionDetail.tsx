@@ -1,20 +1,16 @@
 // src/pages/CollectionDetail.tsx
 
 import { useParams } from "react-router-dom";
-import { useAccount } from "wagmi";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 // Components
-import { NameTable } from "../components/NameTable";
-import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar";
-import { ActionModals } from "../components/ActionModals";
+import { NameListView } from "../components/NameListView"; // 🚀
 
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
+import { addToHome, getHomeLabels } from "../services/storage/userStore";
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
@@ -23,41 +19,22 @@ import type { NameRecord } from "../types/ensNames";
 export const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const collection = id ? ENS_COLLECTIONS[id] : null;
-  const { address, isConnected } = useAccount();
   const { t } = useTranslation();
 
   useDocumentTitle(collection ? t(collection.displayName) : undefined);
 
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
 
-  const {
-    processedRecords,
-    sortConfig,
-    filterConfig,
-    handleSort,
-    setFilterConfig,
-    selectedLabels,
-    toggleSelection,
-    toggleSelectAll,
-    clearSelection,
-    statusCounts,
-    actionCounts,
-    nameCounts,
-    levelCounts,
-    isViewStateDirty,
-    resetViewState,
-    ownerCounts, // 🚀
-    ownerStats, // 🚀
-  } = useNameTableView(records, address, "collection", id);
-
-  const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
-
-  const updateLevel = useOptimisticLevelUpdate();
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    updateLevel(record, newLevel);
+  const handleAddToHome = (record: NameRecord) => {
+    const currentList = getHomeLabels();
+    const exists = currentList.includes(record.label);
+    addToHome(record.label);
+    if (exists) {
+      toast(t("home.toast.all_exist"), { icon: "👌" });
+    } else {
+      toast.success(t("home.toast.add_success", { count: 1 }));
+    }
   };
-
-  const selectionCount = selectedLabels.size;
 
   if (!collection)
     return <div className="p-20 text-center">{t("collection.not_found")}</div>;
@@ -77,46 +54,14 @@ export const CollectionDetail = () => {
         <p className="text-gray-400 mt-2 ml-2">{t(collection.description)}</p>
       </header>
 
-      <NameTable
-        key={id}
-        records={processedRecords}
+      {/* 🚀 使用 NameListView */}
+      <NameListView
+        records={records}
         isLoading={isLoading}
-        isConnected={isConnected}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-        filterConfig={filterConfig}
-        onFilterChange={setFilterConfig}
-        canDelete={false}
-        selectedLabels={selectedLabels}
-        onToggleSelection={toggleSelection}
-        onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister}
-        onRenew={actions.onRenew}
-        onReminder={actions.onReminder}
-        pendingLabels={pendingLabels}
-        totalRecordsCount={records?.length || 0}
-        statusCounts={statusCounts}
-        actionCounts={actionCounts}
-        nameCounts={nameCounts}
-        levelCounts={levelCounts}
-        isViewStateDirty={isViewStateDirty}
-        onResetViewState={resetViewState}
-        onLevelChange={handleLevelChange}
-        ownerCounts={ownerCounts} // 🚀
-        ownerStats={ownerStats} // 🚀
+        context="collection"
+        collectionId={id}
+        onAddToHome={handleAddToHome}
       />
-
-      <FloatingBar
-        selectedCount={selectionCount}
-        isBusy={isBusy}
-        isConnected={isConnected}
-        onBatchRenew={() =>
-          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
-        }
-        onClearSelection={clearSelection}
-      />
-
-      <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
 };

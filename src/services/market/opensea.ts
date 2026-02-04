@@ -1,6 +1,6 @@
 // src/services/market/opensea.ts
 
-import { formatEther } from "viem";
+import { formatUnits } from "viem";
 import { MAINNET_CONTRACTS } from "../../config/contracts";
 import type { NameRecord } from "../../types/ensNames";
 import type { MarketDataMap } from "../../types/marketData";
@@ -8,8 +8,10 @@ import type { MarketDataMap } from "../../types/marketData";
 const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
 const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
-// 30 个 ID 的 URL 长度约为 2500 字符，通常是安全的。
 const CHUNK_SIZE = 30;
+
+// 🚀 1. 定义允许的币种白名单
+const ALLOWED_CURRENCIES = ["ETH", "WETH", "USDC", "USDT", "DAI"];
 
 const getTokenId = (record: NameRecord): string => {
   return record.wrapped
@@ -75,7 +77,6 @@ async function fetchBatchOrders(
           const res = await fetch(url, { headers: getHeaders() });
 
           if (!res.ok) {
-            // 仅在非 404 时警告 (404 可能意味着没有订单，不一定是错误)
             if (res.status !== 404) {
               console.warn(`OpenSea ${side} error: ${res.status}`);
             }
@@ -89,7 +90,6 @@ async function fetchBatchOrders(
             if (order.cancelled || order.finalized || order.is_expired)
               continue;
 
-            // 根据 side 决定去哪里找 Token ID
             let item;
             if (side === "listings") {
               item = order.maker_asset_bundle?.assets?.[0];
@@ -105,27 +105,37 @@ async function fetchBatchOrders(
 
             if (!label) continue;
 
+            // 获取币种信息
+            const paymentToken = order.payment_token_contract;
+            const decimals = paymentToken?.decimals ?? 18;
+            const symbol =
+              paymentToken?.symbol ?? (side === "listings" ? "ETH" : "WETH");
+
+            // 🚀 2. 核心过滤：如果不是白名单币种，直接跳过
+            if (!ALLOWED_CURRENCIES.includes(symbol.toUpperCase())) {
+              continue;
+            }
+
             if (!resultMap[label]) resultMap[label] = {};
 
             const priceVal = parseFloat(
-              formatEther(BigInt(order.current_price)),
+              formatUnits(BigInt(order.current_price), decimals),
             );
 
             const priceData = {
               amount: priceVal,
-              currency: side === "listings" ? "ETH" : "WETH",
+              currency: symbol,
               url: `https://opensea.io/assets/ethereum/${contract}/${tokenId}`,
             };
 
             if (side === "listings") {
               const current = resultMap[label].listing;
-              // 取最低价
+              // 简单数值比较 (假设主流币种价值差异在可接受范围内，或者只展示同币种最低)
               if (!current || priceVal < current.amount) {
                 resultMap[label].listing = priceData;
               }
             } else {
               const current = resultMap[label].offer;
-              // 取最高价
               if (!current || priceVal > current.amount) {
                 resultMap[label].offer = priceData;
               }

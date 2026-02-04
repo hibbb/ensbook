@@ -1,23 +1,19 @@
 // src/pages/Home.tsx
 
-import { useState, useMemo, useCallback } from "react"; // 🚀 引入 useCallback
+import { useState, useMemo, useCallback } from "react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { namehash, labelhash } from "viem";
 
 // Components
-import { NameTable } from "../components/NameTable";
-import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { SearchHelpModal } from "../components/SearchHelpModal";
 import { HomeSearchSection } from "./Home/HomeSearchSection";
-import { FloatingBar } from "../components/FloatingBar";
-import { ActionModals } from "../components/ActionModals";
+import { SearchHelpModal } from "../components/SearchHelpModal";
+import { NameListView } from "../components/NameListView"; // 🚀
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import {
@@ -33,7 +29,7 @@ import type { NameRecord } from "../types/ensNames";
 import type { DeleteCriteria } from "../components/NameTable/types";
 
 export const Home = () => {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount(); // 仅用于判断是否连接，传给 NameListView 内部的 Hook 已经不需要了，但这里保留也没事
   const { t } = useTranslation();
   useDocumentTitle("Home");
 
@@ -44,51 +40,32 @@ export const Home = () => {
   const [isResolving, setIsResolving] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  const { data: records, isLoading: isQuerying } =
-    useNameRecords(resolvedLabels);
+  const { data: fetchedRecords } = useNameRecords(resolvedLabels);
 
-  const showSkeleton = isQuerying || isResolving;
+  // 乐观 UI 数据合并
+  const mergedRecords = useMemo(() => {
+    const recordMap = new Map(fetchedRecords?.map((r) => [r.label, r]));
+    return resolvedLabels.map((label) => {
+      const remote = recordMap.get(label);
+      if (remote) return remote;
+      return {
+        label,
+        namehash: namehash(`${label}.eth`),
+        labelhash: labelhash(label),
+        length: label.length,
+        status: "Unknown",
+        owner: null,
+        wrapped: false,
+        registeredTime: 0,
+        expiryTime: 0,
+        releaseTime: 0,
+        level: 0,
+        memo: "",
+      } as NameRecord;
+    });
+  }, [resolvedLabels, fetchedRecords]);
+
   const hasContent = resolvedLabels.length > 0;
-
-  const validRecords = useMemo(() => {
-    if (!records || resolvedLabels.length === 0) return [];
-    const currentLabelSet = new Set(resolvedLabels);
-    return records.filter((r) => currentLabelSet.has(r.label));
-  }, [records, resolvedLabels]);
-
-  const {
-    processedRecords,
-    sortConfig,
-    filterConfig,
-    handleSort,
-    setFilterConfig,
-    selectedLabels,
-    toggleSelection,
-    toggleSelectAll,
-    clearSelection,
-    statusCounts,
-    actionCounts,
-    nameCounts,
-    levelCounts,
-    isViewStateDirty,
-    resetViewState,
-    ownerCounts,
-    ownerStats,
-    ownershipCounts,
-  } = useNameTableView(validRecords, address, "home");
-
-  const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
-
-  const updateLevel = useOptimisticLevelUpdate();
-
-  // 🚀 核心修复：使用 useCallback 稳定函数引用
-  // 这样 NameTable 的 props 在打字期间就不会变化，React.memo 才能生效
-  const handleLevelChange = useCallback(
-    (record: NameRecord, newLevel: number) => {
-      updateLevel(record, newLevel);
-    },
-    [updateLevel],
-  );
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -124,22 +101,14 @@ export const Home = () => {
     }
   };
 
-  // 🚀 修复：添加 useCallback 并补全依赖
-  const handleDelete = useCallback(
-    (record: NameRecord) => {
-      removeFromHome(record.label);
-      setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
-      if (selectedLabels.has(record.label)) {
-        toggleSelection(record.label);
-      }
-    },
-    [selectedLabels, toggleSelection],
-  );
+  const handleDelete = useCallback((record: NameRecord) => {
+    removeFromHome(record.label);
+    setResolvedLabels((prev) => prev.filter((l) => l !== record.label));
+  }, []);
 
-  // 🚀 修复：添加 useCallback 并补全依赖
   const handleBatchDelete = useCallback(
     (criteria: DeleteCriteria) => {
-      const targetRecords = records;
+      const targetRecords = mergedRecords;
       if (!targetRecords) return;
 
       const { type, value } = criteria;
@@ -148,8 +117,6 @@ export const Home = () => {
         if (window.confirm(t("home.toast.clear_confirm"))) {
           clearHomeList();
           setResolvedLabels([]);
-          clearSelection();
-          resetViewState();
         }
         return;
       }
@@ -204,25 +171,9 @@ export const Home = () => {
       setResolvedLabels((prev) =>
         prev.filter((label) => !labelsToDelete.has(label)),
       );
-
-      if (selectedLabels.size > 0) {
-        labelsToDelete.forEach((label) => {
-          if (selectedLabels.has(label)) {
-            toggleSelection(label);
-          }
-        });
-      }
       toast.success(t("home.toast.delete_success"));
     },
-    [
-      records,
-      address,
-      selectedLabels,
-      toggleSelection,
-      resetViewState,
-      clearSelection,
-      t,
-    ],
+    [mergedRecords, address, t],
   );
 
   return (
@@ -238,57 +189,21 @@ export const Home = () => {
 
       {hasContent && (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
-          <NameTable
-            records={processedRecords}
-            isLoading={showSkeleton}
-            isConnected={isConnected}
-            sortConfig={sortConfig}
-            onSort={handleSort}
-            filterConfig={filterConfig}
-            onFilterChange={setFilterConfig}
-            canDelete={true}
+          {/* 🚀 使用 NameListView */}
+          <NameListView
+            records={mergedRecords}
+            isLoading={isResolving} // 这里复用 isResolving 作为 loading 状态
+            context="home"
             onDelete={handleDelete}
             onBatchDelete={handleBatchDelete}
-            selectedLabels={selectedLabels}
-            onToggleSelection={toggleSelection}
-            onToggleSelectAll={toggleSelectAll}
-            pendingLabels={pendingLabels}
-            onRegister={actions.onRegister}
-            onRenew={actions.onRenew}
-            onReminder={actions.onReminder}
-            skeletonRows={5}
-            headerTop="88px"
-            totalRecordsCount={validRecords?.length || 0}
-            statusCounts={statusCounts}
-            actionCounts={actionCounts}
-            nameCounts={nameCounts}
-            levelCounts={levelCounts}
-            isViewStateDirty={isViewStateDirty}
-            onResetViewState={resetViewState}
-            onLevelChange={handleLevelChange} // 🚀 现在它是稳定的
-            ownerCounts={ownerCounts}
-            ownerStats={ownerStats}
-            ownershipCounts={ownershipCounts}
           />
         </div>
       )}
-
-      <FloatingBar
-        selectedCount={selectedLabels.size}
-        isBusy={isBusy}
-        isConnected={isConnected}
-        onBatchRenew={() =>
-          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
-        }
-        onClearSelection={clearSelection}
-      />
 
       <SearchHelpModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
       />
-
-      <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
 };

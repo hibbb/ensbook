@@ -74,7 +74,7 @@ export const BaseModal = ({
     >
       {/* 背景遮罩 */}
       <div
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200"
+        className="absolute inset-0 bg-text-main/20 backdrop-blur-sm animate-in fade-in duration-200"
         // 🚀 修改点击事件：只有允许点击关闭时才触发 onClose
         onClick={() => {
           if (closeOnOverlayClick) onClose();

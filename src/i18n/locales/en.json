@@ -249,7 +249,8 @@
       "state": "State",
       "copy_full": "Copy full value",
       "delete_item": "Delete {{label}}.eth",
-      "cannot_delete": "Cannot delete"
+      "cannot_delete": "Cannot delete",
+      "add_to_home": "Add {{label}}.eth to Home"
     }
   },
   "market": {
@@ -366,7 +367,7 @@
   },
   "home": {
     "toast": {
-      "all_exist": "All names already exist in the list",
+      "all_exist": "The relevant names already exist in the list",
       "add_success": "Successfully added {{count}} names",
       "no_valid": "No valid ENS names found",
       "parse_error": "Error parsing input",
@@ -448,7 +449,7 @@
     "error_fetch": "Failed to fetch names",
     "empty": "No ENS names found for this account",
     "address_label": "Address",
-    "name_label": "Input Name",
+    "name_label": "Account",
     "total_label": "Total Holdings"
   }
 }

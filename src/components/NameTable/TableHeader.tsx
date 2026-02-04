@@ -7,10 +7,11 @@ import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
 import { ActionHeader } from "./headers/ActionHeader";
-import { DeleteHeader } from "./headers/DeleteHeader";
+import { ControlHeader } from "./headers/ControlHeader"; // 🚀 引入新组件
 
 import type { DeleteCriteria } from "./types";
 import { useTranslation } from "react-i18next";
+import type { NameRecord } from "../../types/ensNames";
 
 interface TableHeaderProps {
   sortConfig: SortConfig;
@@ -18,13 +19,12 @@ interface TableHeaderProps {
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
   isConnected: boolean;
-  showDelete?: boolean;
+  onBatchDelete?: (criteria: DeleteCriteria) => void;
+  onAddToHome?: (record: NameRecord) => void;
   isAllSelected?: boolean;
   onToggleSelectAll?: () => void;
   hasRenewable?: boolean;
   hasRecords?: boolean;
-  topOffset?: string | number;
-  onBatchDelete?: (criteria: DeleteCriteria) => void;
   uniqueStatuses?: string[];
   totalCount?: number;
   filteredCount?: number;
@@ -45,7 +45,6 @@ interface TableHeaderProps {
     address: string;
     isMyself: boolean;
   }[];
-  // 🚀 新增: 接收统计数据
   ownerStats?: { total: number; displayed: number };
 }
 
@@ -58,9 +57,8 @@ export const TableHeader = ({
   isAllSelected,
   onToggleSelectAll,
   hasRenewable,
-  showDelete,
-  topOffset = 0,
   onBatchDelete,
+  onAddToHome,
   uniqueStatuses,
   totalCount = 0,
   statusCounts = {},
@@ -75,24 +73,15 @@ export const TableHeader = ({
   ownershipCounts = { mine: 0, others: 0 },
   levelCounts = {},
   ownerCounts = [],
-  // 🚀 解构 ownerStats，给予默认值
   ownerStats = { total: 0, displayed: 0 },
 }: TableHeaderProps) => {
-  const headerStyle = {
-    "--header-offset":
-      typeof topOffset === "number" ? `${topOffset}px` : topOffset,
-  } as React.CSSProperties;
-
   const isControlsDisabled = totalCount <= 1;
   const { t } = useTranslation();
 
   return (
-    <thead
-      className="sticky top-0 z-20 bg-table-header backdrop-blur-sm transition-all duration-300 lg:top-[var(--header-offset)]"
-      style={headerStyle}
-    >
+    <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm transition-all duration-300">
       <tr className="text-left">
-        <th className="w-14 text-center">
+        <th className="w-14 text-center rounded-tl-xl">
           <IndexHeader
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
@@ -130,7 +119,7 @@ export const TableHeader = ({
             onSort={onSort}
             onFilterChange={onFilterChange}
             ownerCounts={ownerCounts}
-            ownerStats={ownerStats} // 🚀 传递给 OwnerHeader
+            ownerStats={ownerStats}
             disabled={isControlsDisabled}
           />
         </th>
@@ -156,10 +145,11 @@ export const TableHeader = ({
           <ThWrapper>{t("table.header.info")}</ThWrapper>
         </th>
 
-        <th className="text-center w-14 relative">
-          <DeleteHeader
-            showDelete={showDelete}
+        <th className="text-center w-14 relative rounded-tr-xl">
+          {/* 🚀 使用统一的 ControlHeader */}
+          <ControlHeader
             onBatchDelete={onBatchDelete}
+            onAddToHome={!!onAddToHome} // 转换为布尔值，仅用于判断模式
             uniqueStatuses={uniqueStatuses}
             statusCounts={statusCounts}
             nameCounts={nameCounts}

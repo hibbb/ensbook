@@ -48,7 +48,7 @@ export const ActionHeader = ({
               <input
                 type="checkbox"
                 disabled={!isConnected || !hasRenewable}
-                className={`w-4 h-4 rounded border-gray-400 text-link focus:ring-link/20 transition-all ${
+                className={`w-4 h-4 rounded-md border-gray-400 text-link focus:ring-link/20 transition-all ${
                   !isConnected || !hasRenewable
                     ? "cursor-not-allowed bg-gray-200"
                     : "cursor-pointer"

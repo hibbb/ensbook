@@ -1,30 +1,25 @@
 // src/pages/Mine.tsx
 
-import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeatherPointed } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation, Trans } from "react-i18next";
+import toast from "react-hot-toast";
 
 // Components
-import { NameTable } from "../components/NameTable";
-import { useNameTableView } from "../components/NameTable/useNameTableView";
-import { FloatingBar } from "../components/FloatingBar";
-import { ActionModals } from "../components/ActionModals";
+import { NameListView } from "../components/NameListView"; // 🚀
 
 // Hooks & Services
 import { useNameRecords } from "../hooks/useEnsData";
-import { useEnsActions } from "../hooks/useEnsActions";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
-import { useOptimisticLevelUpdate } from "../hooks/useOptimisticLevelUpdate";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
+import { addToHome, getHomeLabels } from "../services/storage/userStore";
 
 // Types
 import type { NameRecord } from "../types/ensNames";
 
-// --- 内部 Hook ---
 const useMyCollectionLabels = (source: string) => {
   return useQuery({
     queryKey: ["my-collection-labels", source],
@@ -40,7 +35,6 @@ const useMyCollectionLabels = (source: string) => {
 };
 
 export const Mine = () => {
-  const { address, isConnected } = useAccount();
   const { t } = useTranslation();
   useDocumentTitle("Mine");
 
@@ -64,35 +58,17 @@ export const Mine = () => {
   const isLoading = isResolving || isQuerying;
   const isError = isResolveError || isQueryError;
 
-  const {
-    processedRecords,
-    sortConfig,
-    filterConfig,
-    handleSort,
-    setFilterConfig,
-    selectedLabels,
-    toggleSelection,
-    toggleSelectAll,
-    clearSelection,
-    statusCounts,
-    actionCounts,
-    nameCounts,
-    levelCounts,
-    isViewStateDirty,
-    resetViewState,
-    ownerCounts,
-    ownerStats,
-    ownershipCounts,
-  } = useNameTableView(records, address, "collection", "mine");
-
-  const { pendingLabels, isBusy, modalState, actions } = useEnsActions();
-
-  const updateLevel = useOptimisticLevelUpdate();
-  const handleLevelChange = (record: NameRecord, newLevel: number) => {
-    updateLevel(record, newLevel);
+  // 🚀 处理函数
+  const handleAddToHome = (record: NameRecord) => {
+    const currentList = getHomeLabels();
+    const exists = currentList.includes(record.label);
+    addToHome(record.label);
+    if (exists) {
+      toast(t("home.toast.all_exist"), { icon: "👌" });
+    } else {
+      toast.success(t("home.toast.add_success", { count: 1 }));
+    }
   };
-
-  const selectionCount = selectedLabels.size;
 
   if (!hasSource) {
     return (
@@ -134,7 +110,7 @@ export const Mine = () => {
         <div>
           <h1 className="text-4xl font-sans font-semibold flex items-center gap-3">
             {t("mine.title")}
-            <span className="text-sm bg-black text-white px-2 py-1 rounded-md font-semibold tracking-wide transform -translate-y-4">
+            <span className="text-sm bg-text-main text-white px-2 py-1 rounded-md font-semibold tracking-wide transform -translate-y-4">
               {t("mine.subtitle")}
             </span>
           </h1>
@@ -149,47 +125,14 @@ export const Mine = () => {
         </div>
       </header>
 
-      <NameTable
-        key="mine-table"
-        records={processedRecords}
+      {/* 🚀 使用 NameListView */}
+      <NameListView
+        records={records}
         isLoading={isLoading}
-        isConnected={isConnected}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-        filterConfig={filterConfig}
-        onFilterChange={setFilterConfig}
-        canDelete={false}
-        selectedLabels={selectedLabels}
-        onToggleSelection={toggleSelection}
-        onToggleSelectAll={toggleSelectAll}
-        onRegister={actions.onRegister}
-        onRenew={actions.onRenew}
-        onReminder={actions.onReminder}
-        pendingLabels={pendingLabels}
-        totalRecordsCount={records?.length || 0}
-        statusCounts={statusCounts}
-        actionCounts={actionCounts}
-        nameCounts={nameCounts}
-        levelCounts={levelCounts}
-        isViewStateDirty={isViewStateDirty}
-        onResetViewState={resetViewState}
-        onLevelChange={handleLevelChange}
-        ownerCounts={ownerCounts} // 🚀
-        ownerStats={ownerStats} // 🚀
-        ownershipCounts={ownershipCounts} // 🚀 2. 传递给组件
+        context="collection"
+        collectionId="mine"
+        onAddToHome={handleAddToHome} // 🚀 启用添加功能
       />
-
-      <FloatingBar
-        selectedCount={selectionCount}
-        isBusy={isBusy}
-        isConnected={isConnected}
-        onBatchRenew={() =>
-          actions.onBatchRenew(selectedLabels, records || [], clearSelection)
-        }
-        onClearSelection={clearSelection}
-      />
-
-      <ActionModals modalState={modalState} actions={actions} />
     </div>
   );
 };
