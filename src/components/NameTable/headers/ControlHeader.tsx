@@ -1,17 +1,22 @@
-// src/components/NameTable/headers/DeleteHeader.tsx
+// src/components/NameTable/headers/ControlHeader.tsx
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { ThWrapper } from "./ThWrapper";
 import type { DeleteCriteria } from "../types";
 import { Tooltip } from "../../ui/Tooltip";
 
-interface DeleteHeaderProps {
-  showDelete?: boolean;
+interface ControlHeaderProps {
+  // 模式 A: 批量删除 (Home / Mine)
   onBatchDelete?: (criteria: DeleteCriteria) => void;
+
+  // 模式 B: 添加到首页 (Collection / Account)
+  onAddToHome?: boolean; // 这里只需要知道是否存在这个意图，不需要传函数
+
+  // 统计数据 (用于批量删除菜单)
   uniqueStatuses?: string[];
   statusCounts?: Record<string, number>;
   nameCounts?: {
@@ -22,9 +27,9 @@ interface DeleteHeaderProps {
   ownershipCounts?: { mine: number; others: number };
 }
 
-export const DeleteHeader = ({
-  showDelete,
+export const ControlHeader = ({
   onBatchDelete,
+  onAddToHome,
   uniqueStatuses = [],
   statusCounts = {},
   nameCounts = {
@@ -33,23 +38,35 @@ export const DeleteHeader = ({
     wrappedCounts: { all: 0, wrapped: 0, unwrapped: 0 },
   },
   ownershipCounts = { mine: 0, others: 0 },
-}: DeleteHeaderProps) => {
+}: ControlHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  // Ref 1: 触发按钮
   const containerRef = useRef<HTMLDivElement>(null);
-  // 🚀 Ref 2: 菜单内容 (新增)
   const menuRef = useRef<HTMLDivElement>(null);
-
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const { t } = useTranslation();
 
+  // --- 模式 B: 仅显示添加图标 (静态表头) ---
+  if (!onBatchDelete && onAddToHome) {
+    return (
+      <ThWrapper className="justify-center">
+        <div className="w-6 h-6 flex items-center justify-center text-gray-300 select-none">
+          <FontAwesomeIcon icon={faPlus} size="sm" />
+        </div>
+      </ThWrapper>
+    );
+  }
+
+  // --- 如果没有任何操作，返回 null ---
+  if (!onBatchDelete) {
+    return null;
+  }
+
+  // --- 模式 A: 批量删除逻辑 (原 DeleteHeader 逻辑) ---
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const handleScroll = (event: Event) => {
       if (!isOpen) return;
-
-      // 🚀 修复滚动关闭 Bug:
-      // 如果滚动的目标在菜单内部，说明用户正在查看长列表，不关闭。
       if (
         menuRef.current &&
         event.target instanceof Node &&
@@ -57,14 +74,10 @@ export const DeleteHeader = ({
       ) {
         return;
       }
-
-      // 只有页面背景滚动时，才关闭
       setIsOpen(false);
     };
 
     const handleClickOutside = (e: MouseEvent) => {
-      // 🚀 逻辑同步:
-      // 点击 按钮本身 或 菜单内部 都不触发 Outside 关闭
       if (
         containerRef.current &&
         containerRef.current.contains(e.target as Node)
@@ -74,7 +87,6 @@ export const DeleteHeader = ({
       if (menuRef.current && menuRef.current.contains(e.target as Node)) {
         return;
       }
-
       setIsOpen(false);
     };
 
@@ -89,7 +101,6 @@ export const DeleteHeader = ({
   }, [isOpen]);
 
   const toggleOpen = () => {
-    if (!showDelete) return;
     if (!isOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       setPosition({
@@ -101,7 +112,7 @@ export const DeleteHeader = ({
   };
 
   const handleItemClick = (criteria: DeleteCriteria) => {
-    onBatchDelete?.(criteria);
+    onBatchDelete(criteria);
     setIsOpen(false);
   };
 
@@ -123,14 +134,11 @@ export const DeleteHeader = ({
       <div className="relative inline-block" ref={containerRef}>
         <Tooltip content={t("table.delete.tooltip")}>
           <button
-            disabled={!showDelete}
             onClick={toggleOpen}
             className={`w-6 h-6 flex items-center justify-center rounded-md transition-all duration-200 ${
-              showDelete
-                ? isOpen
-                  ? "bg-red-500 text-white"
-                  : "text-red-400 hover:text-red-500 hover:bg-gray-50 cursor-pointer"
-                : "text-gray-300 cursor-not-allowed"
+              isOpen
+                ? "bg-red-500 text-white"
+                : "text-red-400 hover:text-red-500 hover:bg-gray-50 cursor-pointer"
             }`}
           >
             <FontAwesomeIcon icon={faTrash} size="sm" />
@@ -138,12 +146,9 @@ export const DeleteHeader = ({
         </Tooltip>
 
         {isOpen &&
-          showDelete &&
-          onBatchDelete &&
           createPortal(
             <div
-              ref={menuRef} // 🚀 绑定 Ref
-              // 🚀 样式更新: 增加 max-h-[60vh] 和 overflow-y-auto custom-scrollbar
+              ref={menuRef}
               className="fixed text-sm bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999] animate-in fade-in zoom-in duration-150 w-48 origin-top-right overflow-y-auto custom-scrollbar max-h-[60vh]"
               style={{
                 top: position.top,
@@ -153,8 +158,6 @@ export const DeleteHeader = ({
               onMouseDown={(e) => e.stopPropagation()}
             >
               <div>
-                {" "}
-                {/* 移除内部的 overflow-y-auto，由外层统一控制 */}
                 {activeStatuses.length > 1 && (
                   <>
                     <div className="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">

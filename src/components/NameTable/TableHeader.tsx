@@ -7,14 +7,11 @@ import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
 import { ActionHeader } from "./headers/ActionHeader";
-import { DeleteHeader } from "./headers/DeleteHeader";
-
-import { faPlus } from "@fortawesome/free-solid-svg-icons"; // 🚀
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ControlHeader } from "./headers/ControlHeader"; // 🚀 引入新组件
 
 import type { DeleteCriteria } from "./types";
 import { useTranslation } from "react-i18next";
-import type { NameRecord } from "../../types/ensNames"; // 🚀
+import type { NameRecord } from "../../types/ensNames";
 
 interface TableHeaderProps {
   sortConfig: SortConfig;
@@ -22,9 +19,6 @@ interface TableHeaderProps {
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
   isConnected: boolean;
-  // 🗑️ 删除: showDelete?: boolean;
-  // 🗑️ 删除: showAdd?: boolean;
-  // 🚀 新增: 接收回调函数
   onBatchDelete?: (criteria: DeleteCriteria) => void;
   onAddToHome?: (record: NameRecord) => void;
   isAllSelected?: boolean;
@@ -64,7 +58,6 @@ export const TableHeader = ({
   isAllSelected,
   onToggleSelectAll,
   hasRenewable,
-  // 🚀 解构回调
   onBatchDelete,
   onAddToHome,
   topOffset = 0,
@@ -163,24 +156,15 @@ export const TableHeader = ({
         </th>
 
         <th className="text-center w-14 relative">
-          {/* 🚀 逻辑简化：优先判断是否支持批量删除 */}
-          {onBatchDelete ? (
-            <DeleteHeader
-              showDelete={true} // DeleteHeader 内部可能还需要这个 prop
-              onBatchDelete={onBatchDelete}
-              uniqueStatuses={uniqueStatuses}
-              statusCounts={statusCounts}
-              nameCounts={nameCounts}
-              ownershipCounts={ownershipCounts}
-            />
-          ) : onAddToHome ? (
-            /* 🚀 添加模式：显示静态加号图标作为表头 */
-            <ThWrapper className="justify-center">
-              <div className="w-6 h-6 flex items-center justify-center text-gray-300 select-none">
-                <FontAwesomeIcon icon={faPlus} size="sm" />
-              </div>
-            </ThWrapper>
-          ) : null}
+          {/* 🚀 使用统一的 ControlHeader */}
+          <ControlHeader
+            onBatchDelete={onBatchDelete}
+            onAddToHome={!!onAddToHome} // 转换为布尔值，仅用于判断模式
+            uniqueStatuses={uniqueStatuses}
+            statusCounts={statusCounts}
+            nameCounts={nameCounts}
+            ownershipCounts={ownershipCounts}
+          />
         </th>
       </tr>
     </thead>
