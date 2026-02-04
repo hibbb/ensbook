@@ -25,7 +25,6 @@ interface TableHeaderProps {
   onToggleSelectAll?: () => void;
   hasRenewable?: boolean;
   hasRecords?: boolean;
-  topOffset?: string | number;
   uniqueStatuses?: string[];
   totalCount?: number;
   filteredCount?: number;
@@ -60,7 +59,6 @@ export const TableHeader = ({
   hasRenewable,
   onBatchDelete,
   onAddToHome,
-  topOffset = 0,
   uniqueStatuses,
   totalCount = 0,
   statusCounts = {},
@@ -77,20 +75,12 @@ export const TableHeader = ({
   ownerCounts = [],
   ownerStats = { total: 0, displayed: 0 },
 }: TableHeaderProps) => {
-  const headerStyle = {
-    "--header-offset":
-      typeof topOffset === "number" ? `${topOffset}px` : topOffset,
-  } as React.CSSProperties;
-
   const isControlsDisabled = totalCount <= 1;
   const { t } = useTranslation();
 
   return (
-    <thead
-      className="sticky top-0 z-20 backdrop-blur-sm transition-all duration-300 lg:top-[var(--header-offset)]"
-      style={headerStyle}
-    >
-      <tr className="text-left bg-table-header">
+    <thead className="sticky top-0 z-20 bg-table-header backdrop-blur-sm transition-all duration-300">
+      <tr className="text-left">
         <th className="w-14 text-center rounded-tl-xl">
           <IndexHeader
             filterConfig={filterConfig}

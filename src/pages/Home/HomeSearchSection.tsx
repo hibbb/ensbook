@@ -30,9 +30,9 @@ export const HomeSearchSection = ({
 
   return (
     <div
-      className={`flex flex-col items-center transition-all duration-700 ease-in-out z-40 ${
+      className={`flex flex-col items-center transition-all duration-700 ease-in-out ${
         hasContent
-          ? "top-0 py-4 mb-6 bg-background/80 backdrop-blur-md"
+          ? "py-4 mb-6" // 移除了 sticky 相关样式
           : "flex-1 justify-center -mt-60"
       }`}
     >

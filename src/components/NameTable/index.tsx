@@ -39,7 +39,6 @@ interface NameTableProps {
   onToggleSelection?: (label: string) => void;
   onToggleSelectAll?: () => void;
   skeletonRows?: number;
-  headerTop?: string | number;
   pendingLabels?: Set<string>;
   totalRecordsCount?: number;
   statusCounts?: Record<string, number>;
@@ -147,7 +146,6 @@ const NameTableComponent = (props: NameTableProps) => {
             // 🚀 逻辑简化：直接传递回调函数，由 Header 内部判断显示什么
             onBatchDelete={props.onBatchDelete}
             onAddToHome={props.onAddToHome}
-            topOffset={props.headerTop}
             uniqueStatuses={uniqueStatuses}
             filteredCount={safeRecords.length}
             totalCount={props.totalRecordsCount ?? safeRecords.length}
