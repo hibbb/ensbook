@@ -129,10 +129,24 @@ const NameTableComponent = (props: NameTableProps) => {
     props.selectedLabels &&
     renewableRecords.every((r) => props.selectedLabels?.has(r.label));
 
+  // 1. 明确判断是否显示分页
+  // 分页显示的条件是：非 Loading 状态 且 数据量大于一页
+  const showPagination = !showSkeleton && safeRecords.length > pageSize;
+
+  // 2. 定义动态圆角类
+  // 解释：
+  // [&_tr:last-child_td:first-child]: 选中 tbody 中最后一行的第一个单元格 -> 左下圆角
+  // [&_tr:last-child_td:last-child]:  选中 tbody 中最后一行的最后一个单元格 -> 右下圆角
+  const bottomRoundedClass = !showPagination
+    ? "[&_tr:last-child_td:first-child]:rounded-bl-xl [&_tr:last-child_td:last-child]:rounded-br-xl"
+    : "";
+
   return (
     <div className="rounded-xl border border-gray-100 relative flex flex-col">
       <div className="overflow-x-auto lg:overflow-visible rounded-t-xl">
-        <table className="min-w-full border-separate border-spacing-x-0 border-spacing-y-0.5 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3">
+        <table
+          className={`min-w-full border-separate border-spacing-x-0 border-spacing-y-0.5 bg-background [&_td]:p-0 [&_th]:p-0 [&_td>div]:px-2 [&_td>div]:py-2 [&_th>div]:px-2 [&_th>div]:py-3 ${bottomRoundedClass}`}
+        >
           <TableHeader
             sortConfig={props.sortConfig}
             onSort={props.onSort}
