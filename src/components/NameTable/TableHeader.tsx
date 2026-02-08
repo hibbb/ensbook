@@ -88,6 +88,7 @@ export const TableHeader = ({
             filterConfig={filterConfig}
             onFilterChange={onFilterChange}
             levelCounts={levelCounts}
+            disabled={isControlsDisabled}
           />
         </th>
 

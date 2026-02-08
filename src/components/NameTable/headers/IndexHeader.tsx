@@ -12,12 +12,14 @@ interface IndexHeaderProps {
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
   levelCounts: Record<number, number>;
+  disabled?: boolean;
 }
 
 export const IndexHeader = ({
   filterConfig,
   onFilterChange,
   levelCounts,
+  disabled,
 }: IndexHeaderProps) => {
   const { levelList } = filterConfig;
   const { t } = useTranslation();
@@ -29,6 +31,7 @@ export const IndexHeader = ({
         title={t("table.filter.filter_level")}
         menuWidth="w-40"
         align="start"
+        disabled={disabled}
       >
         <div
           className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-200 flex justify-between items-center transition-colors ${
