@@ -11,9 +11,10 @@ import { truncateAddress } from "../../../utils/format";
 
 interface OwnerCellProps {
   record: NameRecord;
+  disableLink?: boolean; // 🚀 新增属性
 }
 
-export const OwnerCell = ({ record }: OwnerCellProps) => {
+export const OwnerCell = ({ record, disableLink }: OwnerCellProps) => {
   const { t } = useTranslation();
 
   const handleCopy = (e: React.MouseEvent, text: string, label: string) => {
@@ -88,22 +89,30 @@ export const OwnerCell = ({ record }: OwnerCellProps) => {
 
   // 🚀 优先使用 ENS 名称作为链接参数
   const linkTarget = record.ownerPrimaryName || record.owner;
+  const displayText = record.ownerPrimaryName || truncateAddress(record.owner);
 
   return (
     <div className="h-12 flex items-center">
       {record.owner ? (
         <div className="flex items-center gap-1.5 text-sm">
           <Tooltip content={renderTooltipContent()}>
-            <Link
-              to={`/account/${linkTarget}`}
-              className={`
-                transition-colors duration-200
-                hover:underline decoration-text-main/30 underline-offset-2
-                ${record.ownerPrimaryName ? "text-text-main hover:text-text-main" : "text-text-main/50  hover:text-text-main/70"}
-              `}
-            >
-              {record.ownerPrimaryName || truncateAddress(record.owner)}
-            </Link>
+            {/* 🚀 条件渲染：如果是 disableLink，则显示纯文本 */}
+            {disableLink ? (
+              <span className="text-text-main/70 cursor-default">
+                {displayText}
+              </span>
+            ) : (
+              <Link
+                to={`/account/${linkTarget}`}
+                className={`
+                              transition-colors duration-200
+                              hover:underline decoration-text-main/30 underline-offset-2
+                              ${record.ownerPrimaryName ? "text-text-main hover:text-text-main" : "text-text-main/50 hover:text-text-main/70"}
+                            `}
+              >
+                {displayText}
+              </Link>
+            )}
           </Tooltip>
         </div>
       ) : (

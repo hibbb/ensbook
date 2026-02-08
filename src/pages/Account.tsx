@@ -253,10 +253,10 @@ export const Account = () => {
         records={records}
         isLoading={isLoading}
         context="collection"
-        // 🚀 修复：将 null 转换为 undefined
-        // 如果 resolvedAddress 是 null，则传 undefined
         collectionId={resolvedAddress || undefined}
         onAddToHome={handleAddToHome}
+        // 🚀 核心修改：禁用 Owner 列的链接
+        isOwnerColumnReadOnly={true}
       />
     </div>
   );

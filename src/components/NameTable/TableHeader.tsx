@@ -46,6 +46,7 @@ interface TableHeaderProps {
     isMyself: boolean;
   }[];
   ownerStats?: { total: number; displayed: number };
+  isOwnerColumnReadOnly?: boolean; // 🚀 新增接收
 }
 
 export const TableHeader = ({
@@ -74,6 +75,7 @@ export const TableHeader = ({
   levelCounts = {},
   ownerCounts = [],
   ownerStats = { total: 0, displayed: 0 },
+  isOwnerColumnReadOnly, // 🚀 解构
 }: TableHeaderProps) => {
   const isControlsDisabled = totalCount <= 1;
   const { t } = useTranslation();
@@ -120,7 +122,10 @@ export const TableHeader = ({
             onFilterChange={onFilterChange}
             ownerCounts={ownerCounts}
             ownerStats={ownerStats}
-            disabled={isControlsDisabled}
+            // 🚀 核心修改：
+            // 如果全局禁用(isControlsDisabled) 或者 链接被禁用(isOwnerColumnReadOnly)
+            // 则禁用 OwnerHeader 的交互（排序和筛选）
+            disabled={isControlsDisabled || isOwnerColumnReadOnly}
           />
         </th>
 

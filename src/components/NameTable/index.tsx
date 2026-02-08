@@ -28,9 +28,7 @@ interface NameTableProps {
   onSort: (field: SortField) => void;
   filterConfig: FilterConfig;
   onFilterChange: (config: FilterConfig) => void;
-  // 🗑️ 删除: canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
-  // 🚀 新增: 添加到 Home 的回调
   onAddToHome?: (record: NameRecord) => void;
   onRegister?: (record: NameRecord) => void;
   onRenew?: (record: NameRecord) => void;
@@ -63,6 +61,7 @@ interface NameTableProps {
     isMyself: boolean;
   }[];
   ownerStats?: { total: number; displayed: number };
+  isOwnerColumnReadOnly?: boolean; // 🚀 新增
 }
 
 const NameTableComponent = (props: NameTableProps) => {
@@ -157,7 +156,6 @@ const NameTableComponent = (props: NameTableProps) => {
             onToggleSelectAll={props.onToggleSelectAll}
             hasRenewable={hasRenewableRecords}
             hasRecords={safeRecords.length > 0}
-            // 🚀 逻辑简化：直接传递回调函数，由 Header 内部判断显示什么
             onBatchDelete={props.onBatchDelete}
             onAddToHome={props.onAddToHome}
             uniqueStatuses={uniqueStatuses}
@@ -170,6 +168,8 @@ const NameTableComponent = (props: NameTableProps) => {
             levelCounts={props.levelCounts}
             ownerCounts={props.ownerCounts}
             ownerStats={props.ownerStats}
+            // 🚀 新增：将 isOwnerColumnReadOnly 传递给表头
+            isOwnerColumnReadOnly={props.isOwnerColumnReadOnly}
           />
           <tbody>
             {showSkeleton ? (
@@ -184,7 +184,6 @@ const NameTableComponent = (props: NameTableProps) => {
                   index={i + (currentPage - 1) * pageSize}
                   now={now}
                   isConnected={props.isConnected}
-                  // 🚀 逻辑简化：直接传递回调函数
                   onDelete={props.onDelete}
                   onAddToHome={props.onAddToHome}
                   isSelected={props.selectedLabels?.has(r.label)}
@@ -196,6 +195,7 @@ const NameTableComponent = (props: NameTableProps) => {
                   onLevelChange={props.onLevelChange}
                   marketData={marketDataMap?.[r.label]}
                   isMarketLoading={isMarketLoading}
+                  isOwnerColumnReadOnly={props.isOwnerColumnReadOnly} // 🚀 传递
                 />
               ))
             ) : (

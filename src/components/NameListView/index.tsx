@@ -28,6 +28,7 @@ interface NameListViewProps {
   onDelete?: (record: NameRecord) => void;
   onBatchDelete?: (criteria: DeleteCriteria) => void;
   onAddToHome?: (record: NameRecord) => void;
+  isOwnerColumnReadOnly?: boolean; // 🚀 新增
 }
 
 export const NameListView = ({
@@ -38,6 +39,7 @@ export const NameListView = ({
   onDelete,
   onBatchDelete,
   onAddToHome,
+  isOwnerColumnReadOnly, // 🚀 解构
 }: NameListViewProps) => {
   const { address, isConnected } = useAccount();
 
@@ -99,6 +101,7 @@ export const NameListView = ({
         onDelete={onDelete}
         onBatchDelete={onBatchDelete}
         onAddToHome={onAddToHome}
+        isOwnerColumnReadOnly={isOwnerColumnReadOnly} // 🚀 传递
       />
 
       <FloatingBar

@@ -18,9 +18,7 @@ interface TableRowProps {
   index: number;
   now: number;
   isConnected: boolean;
-  // 🗑️ 删除: canDelete?: boolean;
   onDelete?: (record: NameRecord) => void;
-  // 🚀 新增
   onAddToHome?: (record: NameRecord) => void;
   isSelected?: boolean;
   onToggleSelection?: (label: string) => void;
@@ -31,6 +29,7 @@ interface TableRowProps {
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
   marketData?: SimpleMarketData;
   isMarketLoading?: boolean;
+  isOwnerColumnReadOnly?: boolean; // 🚀 新增
 }
 
 export const TableRow = ({
@@ -38,9 +37,8 @@ export const TableRow = ({
   index,
   now,
   isConnected,
-  // 🗑️ 删除: canDelete
   onDelete,
-  onAddToHome, // 🚀
+  onAddToHome,
   isSelected,
   onToggleSelection,
   onRegister,
@@ -50,6 +48,7 @@ export const TableRow = ({
   onLevelChange,
   marketData,
   isMarketLoading = false,
+  isOwnerColumnReadOnly, // 🚀 解构
 }: TableRowProps) => {
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
@@ -70,7 +69,7 @@ export const TableRow = ({
       </td>
 
       <td>
-        <OwnerCell record={record} />
+        <OwnerCell record={record} disableLink={isOwnerColumnReadOnly} />
       </td>
 
       <td>
