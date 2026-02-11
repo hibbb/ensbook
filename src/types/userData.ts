@@ -47,25 +47,21 @@ export interface UserSettings {
 }
 
 /**
- * 核心存储结构 (Root Object) - V2
+ * 核心存储结构 (Root Object) - V3
  */
 export interface EnsBookUserData {
-  version: number;
+  version: number; // 升级为 3
   timestamp: number;
 
-  // 🟢 全局元数据池
-  // 存储所有被用户“触碰过”的域名信息 (Key: label)
+  // 全局元数据池
   metadata: Record<string, UserDomainMeta>;
 
-  // 🟢 Home 关注列表
-  // 仅存储 Label 字符串，作为对 metadata 的引用
+  // Home 关注列表
   homeList: string[];
 
-  // 视图状态
-  viewStates: {
-    home: PageViewState;
-    collections: Record<string, PageViewState>;
-  };
+  // 🟢 视图状态 (统一结构)
+  // Key: "home" | "mine" | "collection-999" | "account-global" | ...
+  viewStates: Record<string, PageViewState>;
 
   // 全局设置
   settings: UserSettings;

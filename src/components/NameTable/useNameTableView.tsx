@@ -5,12 +5,7 @@ import type { NameRecord } from "../../types/ensNames";
 import { isRenewable, isRegistrable } from "../../utils/ens";
 import type { SortField, SortConfig, FilterConfig } from "./types";
 import { processNameRecords } from "./utils";
-import {
-  getHomeViewState,
-  saveHomeViewState,
-  getCollectionViewState,
-  saveCollectionViewState,
-} from "../../services/storage/userStore";
+import { getViewState, saveViewState } from "../../services/storage/userStore";
 import type { PageViewState } from "../../types/userData";
 
 import { useOwnerStats } from "./hooks/useOwnerStats";
@@ -33,13 +28,9 @@ export const useNameTableView = (
   currentAddress: string | undefined,
   viewStateKey: string,
 ) => {
-  // 1. 状态存取逻辑适配
+  // 1. 直接使用通用方法
   const getSavedState = useCallback((): PageViewState => {
-    if (viewStateKey === "home") {
-      return getHomeViewState();
-    }
-    // 对于 mine, account, 999 等，统一使用 collection 的存储槽位
-    return getCollectionViewState(viewStateKey);
+    return getViewState(viewStateKey);
   }, [viewStateKey]);
 
   const [sortConfig, setSortConfig] = useState<SortConfig>(() => {
@@ -63,17 +54,13 @@ export const useNameTableView = (
 
   const isInternalWrite = useRef(false);
 
-  // 保存状态
   useEffect(() => {
     if (!viewStateKey) return;
     const viewState: PageViewState = { sort: sortConfig, filter: filterConfig };
     isInternalWrite.current = true;
     try {
-      if (viewStateKey === "home") {
-        saveHomeViewState(viewState);
-      } else {
-        saveCollectionViewState(viewStateKey, viewState);
-      }
+      // 2. 直接保存
+      saveViewState(viewStateKey, viewState);
     } catch (e) {
       console.warn("Failed to save view state:", e);
     } finally {
@@ -82,8 +69,6 @@ export const useNameTableView = (
       }, 0);
     }
   }, [sortConfig, filterConfig, viewStateKey]);
-
-  // ... (后续逻辑保持不变，直到 return)
 
   // 监听外部更新
   useEffect(() => {
