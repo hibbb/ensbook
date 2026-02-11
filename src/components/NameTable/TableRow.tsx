@@ -29,7 +29,8 @@ interface TableRowProps {
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
   marketData?: SimpleMarketData;
   isMarketLoading?: boolean;
-  isOwnerColumnReadOnly?: boolean; // 🚀 新增
+  isOwnerColumnReadOnly?: boolean;
+  showCollectionTags?: boolean; // 🚀
 }
 
 export const TableRow = ({
@@ -48,7 +49,8 @@ export const TableRow = ({
   onLevelChange,
   marketData,
   isMarketLoading = false,
-  isOwnerColumnReadOnly, // 🚀 解构
+  isOwnerColumnReadOnly,
+  showCollectionTags, // 解构
 }: TableRowProps) => {
   return (
     <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
@@ -61,7 +63,7 @@ export const TableRow = ({
       </td>
 
       <td>
-        <NameCell record={record} />
+        <NameCell record={record} showCollectionTags={showCollectionTags} />
       </td>
 
       <td>

@@ -12,10 +12,21 @@ import type { NameRecord } from "../../../types/ensNames";
 import { MemoEditor } from "../../MemoEditor";
 import { Tooltip } from "../../ui/Tooltip";
 import { Popover, PopoverTrigger, PopoverContent } from "../../ui/Popover";
+import {
+  getCollectionTag,
+  type CollectionTag,
+} from "../../../utils/collectionMatcher";
 
 interface NameCellProps {
   record: NameRecord;
+  showCollectionTags?: boolean; // 🚀 新增控制属性
 }
+
+// 🎨 定义样式映射，方便维护
+const TAG_STYLES: Record<CollectionTag, string> = {
+  bip39: "bg-amber-500 text-amber-50",
+  "999": "bg-blue-500 text-blue-50", // 建议使用蓝色区分
+};
 
 const MetadataRow = ({
   label,
@@ -51,8 +62,17 @@ const MetadataRow = ({
   );
 };
 
-export const NameCell = ({ record }: NameCellProps) => {
+export const NameCell = ({
+  record,
+  showCollectionTags = true,
+}: NameCellProps) => {
   const { t } = useTranslation();
+
+  // 计算标签
+  const tags = useMemo(() => {
+    if (!showCollectionTags) return []; // 如果不显示，直接返回空数组，节省计算
+    return getCollectionTag(record.label);
+  }, [record.label, showCollectionTags]);
 
   const metadata = useMemo(() => {
     try {
@@ -168,6 +188,24 @@ export const NameCell = ({ record }: NameCellProps) => {
             )}
           </a>
         </Tooltip>
+
+        {/* 🚀 渲染标签 */}
+        {tags.map((tag) => (
+          <Tooltip
+            key={tag}
+            content={tag === "999" ? "999 Club (000-999)" : "BIP39 Wordlist"}
+          >
+            <span
+              className={`
+                        text-[8px] px-1.5 py-0.5 rounded-full
+                        font-mono font-semibold cursor-default
+                        ${TAG_STYLES[tag]}
+                      `}
+            >
+              {tag.toUpperCase()}
+            </span>
+          </Tooltip>
+        ))}
 
         {metadata && (
           <Popover>

@@ -1,6 +1,6 @@
 // src/components/NameListView/index.tsx
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
 import type { NameRecord } from "../../types/ensNames";
 import type { DeleteCriteria } from "../NameTable/types";
@@ -28,7 +28,7 @@ interface NameListViewProps {
   onDelete?: (record: NameRecord) => void;
   onBatchDelete?: (criteria: DeleteCriteria) => void;
   onAddToHome?: (record: NameRecord) => void;
-  isOwnerColumnReadOnly?: boolean; // 🚀 新增
+  isOwnerColumnReadOnly?: boolean;
 }
 
 export const NameListView = ({
@@ -59,6 +59,28 @@ export const NameListView = ({
     },
     [updateLevel],
   );
+
+  // 4. 智能判断逻辑：
+  // 4.1. Home 页面：显示
+  // 4.2. Mine 页面 (context='collection' & id='mine')：显示
+  // 4.3. Account 页面 (context='collection' & id=address)：显示
+  // 4.4. 具体集合页面 (context='collection' & id='999'/'bip39')：隐藏
+
+  const shouldShowTags = useMemo(() => {
+    if (context === "home") return true;
+
+    // 如果是 "mine" 或者 是以太坊地址(Account页)，则显示
+    // 注意：Account 页面的 collectionId 是地址
+    if (
+      collectionId === "mine" ||
+      (collectionId && collectionId.startsWith("0x"))
+    ) {
+      return true;
+    }
+
+    // 其他情况（即具体的预置集合页，如 999, bip39），隐藏
+    return false;
+  }, [context, collectionId]);
 
   // --- 渲染 ---
 
@@ -101,7 +123,8 @@ export const NameListView = ({
         onDelete={onDelete}
         onBatchDelete={onBatchDelete}
         onAddToHome={onAddToHome}
-        isOwnerColumnReadOnly={isOwnerColumnReadOnly} // 🚀 传递
+        isOwnerColumnReadOnly={isOwnerColumnReadOnly}
+        showCollectionTags={shouldShowTags}
       />
 
       <FloatingBar

@@ -61,7 +61,8 @@ interface NameTableProps {
     isMyself: boolean;
   }[];
   ownerStats?: { total: number; displayed: number };
-  isOwnerColumnReadOnly?: boolean; // 🚀 新增
+  isOwnerColumnReadOnly?: boolean;
+  showCollectionTags?: boolean;
 }
 
 const NameTableComponent = (props: NameTableProps) => {
@@ -168,7 +169,6 @@ const NameTableComponent = (props: NameTableProps) => {
             levelCounts={props.levelCounts}
             ownerCounts={props.ownerCounts}
             ownerStats={props.ownerStats}
-            // 🚀 新增：将 isOwnerColumnReadOnly 传递给表头
             isOwnerColumnReadOnly={props.isOwnerColumnReadOnly}
           />
           <tbody>
@@ -195,7 +195,8 @@ const NameTableComponent = (props: NameTableProps) => {
                   onLevelChange={props.onLevelChange}
                   marketData={marketDataMap?.[r.label]}
                   isMarketLoading={isMarketLoading}
-                  isOwnerColumnReadOnly={props.isOwnerColumnReadOnly} // 🚀 传递
+                  isOwnerColumnReadOnly={props.isOwnerColumnReadOnly}
+                  showCollectionTags={props.showCollectionTags}
                 />
               ))
             ) : (
