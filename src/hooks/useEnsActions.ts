@@ -18,9 +18,7 @@ import type { ProcessType } from "../components/ProcessModal";
 export const useEnsActions = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
-  const { address } = useAccount(); // 🚀 获取当前连接钱包，作为注册默认 Owner
-
-  // 🚀 引入乐观更新 Hook
+  const { address } = useAccount(); // 获取当前连接钱包，作为注册默认 Owner
   const { updateRenewal, updateRegistration } = useOptimisticNameUpdate();
 
   const [durationTarget, setDurationTarget] = useState<{
@@ -29,7 +27,7 @@ export const useEnsActions = () => {
     labels?: string[];
     expiryTimes?: number[];
     onSuccess?: () => void;
-    // 🚀 新增：暂存用户提交的参数，用于后续更新 UI
+    // 暂存用户提交的参数，用于后续更新 UI
     pendingDurations?: bigint[];
     pendingOwner?: string;
   } | null>(null);
@@ -52,10 +50,10 @@ export const useEnsActions = () => {
     secondsLeft,
     currentHash: regTxHash,
     resetStatus: resetReg,
-    abandonRegistration, // 🚀 引入
+    abandonRegistration,
     checkAndResume,
     startResuming,
-    confirmRegistration, // 🚀 引入
+    confirmRegistration,
   } = useEnsRegistration();
 
   useEffect(() => {
@@ -65,7 +63,7 @@ export const useEnsActions = () => {
     return () => clearTimeout(timer);
   }, [regStatus]);
 
-  // 🚀 核心逻辑：监听交易成功状态
+  // 监听交易成功状态
   useEffect(() => {
     if (regStatus === "success" || renewalStatus === "success") {
       // 1. 立即执行乐观更新 (Optimistic Update)
@@ -180,7 +178,7 @@ export const useEnsActions = () => {
     resetReg();
   }, [resetRenewal, resetReg]);
 
-  // 🚀 封装一个处理函数，同时处理 UI 状态
+  // 封装一个处理函数，同时处理 UI 状态
   const handleAbort = useCallback(() => {
     abandonRegistration();
     setDurationTarget(null); // 关闭 Modal
@@ -192,7 +190,7 @@ export const useEnsActions = () => {
     (durations: bigint[], owner?: Address) => {
       if (!durationTarget) return;
 
-      // 🚀 关键：将用户选择的参数保存到 state，供 useEffect 中的乐观更新使用
+      // 关键：将用户选择的参数保存到 state，供 useEffect 中的乐观更新使用
       setDurationTarget((prev) =>
         prev
           ? {
@@ -276,8 +274,8 @@ export const useEnsActions = () => {
       onCloseModal: handleCloseModal,
       onConfirmDuration: onDurationConfirm,
       setReminderTarget,
-      onAbort: handleAbort, // 🚀 导出给 Modal
-      onConfirmRegistration: confirmRegistration, // 🚀 导出
+      onAbort: handleAbort,
+      onConfirmRegistration: confirmRegistration,
     },
   };
 };

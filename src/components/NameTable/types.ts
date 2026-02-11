@@ -8,7 +8,6 @@ export type SortField =
   | "status"
   | "owner"
   | "registered"
-  // 🚀 新增: 支持按等级排序
   | "level"
   | null;
 
@@ -43,7 +42,6 @@ export const STATUS_OPTIONS = [
   "Unknown",
 ] as const;
 
-// 🚀 新增: Level 选项定义，方便复用
 export const LEVEL_OPTIONS = [
   { value: 0, label: "Default", color: "bg-gray-100 text-gray-500" },
   { value: 1, label: "Blue", color: "bg-blue-50 text-blue-600" },

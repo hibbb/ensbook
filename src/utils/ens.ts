@@ -8,7 +8,6 @@ export function parseLabel(rawLabel: string): string {
   try {
     return normalize(rawLabel).replace(/\.eth$/, "");
   } catch (error) {
-    // 🚀 翻译错误信息
     throw new Error(
       i18n.t("utils.ens.invalid_format", { message: (error as Error).message }),
     );

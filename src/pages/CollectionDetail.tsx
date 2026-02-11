@@ -54,7 +54,6 @@ export const CollectionDetail = () => {
         <p className="text-gray-400 mt-2 ml-2">{t(collection.description)}</p>
       </header>
 
-      {/* 🚀 使用 NameListView */}
       <NameListView
         records={records}
         isLoading={isLoading}

@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { isAddress, type Address } from "viem";
 import { normalize } from "viem/ens";
-import { publicClient } from "../../utils/client"; // 🚀 引入 client
+import { publicClient } from "../../utils/client";
 import {
   MIN_REGISTRATION_DURATION,
   SECONDS_PER_DAY,
@@ -35,13 +35,9 @@ export const useProcessForm = ({
   const [days, setDays] = useState(0);
   const [targetDate, setTargetDate] = useState("");
 
-  // 🚀 接收者输入状态
   const [recipientInput, setRecipientInput] = useState("");
-  // 🚀 解析后的有效地址 (如果输入为空，则为 null)
   const [resolvedAddress, setResolvedAddress] = useState<Address | null>(null);
-  // 🚀 解析状态
   const [isResolving, setIsResolving] = useState(false);
-  // 🚀 解析错误信息
   const [resolveError, setResolveError] = useState<string | null>(null);
 
   const getBaseTime = useCallback(() => {
@@ -77,7 +73,7 @@ export const useProcessForm = ({
     }
   }, [isOpen, type, expiryTimes, currentExpiry]);
 
-  // 🚀 核心逻辑：监听输入并解析 (带防抖)
+  // 核心逻辑：监听输入并解析 (带防抖)
   useEffect(() => {
     const input = recipientInput.trim();
 
@@ -190,7 +186,6 @@ export const useProcessForm = ({
       }
     }
 
-    // 🚀 校验地址逻辑更新
     if (type === "register" && recipientInput.trim() !== "") {
       if (isResolving) return t("common.loading"); // 正在解析中，暂不报错，但也阻止提交
       if (resolveError || !resolvedAddress) {
@@ -222,7 +217,6 @@ export const useProcessForm = ({
     calculatedDurations,
     skippedCount,
     validationError,
-    // 🚀 导出新状态
     recipientInput,
     setRecipientInput,
     resolvedAddress,

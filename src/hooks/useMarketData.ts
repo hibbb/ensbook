@@ -7,7 +7,7 @@ import type { NameRecord } from "../types/ensNames";
 import type { MarketDataMap } from "../types/marketData";
 
 export const useMarketData = (records: NameRecord[] | undefined) => {
-  // 🚀 优化 1: 使用 useMemo 缓存 Key 的计算
+  // 优化 1: 使用 useMemo 缓存 Key 的计算
   // 只有当 records 的长度或内容真正变化时才重新计算字符串
   // 解决了输入框打字卡顿的问题
   const queryKeyLabels = useMemo(() => {
@@ -30,7 +30,7 @@ export const useMarketData = (records: NameRecord[] | undefined) => {
     refetchOnWindowFocus: false,
     retry: false,
 
-    // 🚀 优化 2: 使用 keepPreviousData
+    // 优化 2: 使用 keepPreviousData
     // 当 queryKey 变化（例如添加了一个新域名）时，
     // React Query 会保留上一份数据展示在 UI 上，直到新数据请求回来。
     // 这样用户就不会看到整列变成骨架屏，而是看到旧数据 -> 新数据的平滑切换。

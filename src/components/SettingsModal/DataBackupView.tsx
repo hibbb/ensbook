@@ -6,7 +6,7 @@ import {
   faDownload,
   faUpload,
   faTriangleExclamation,
-  faTrashCan, // 🚀 新增图标
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import {
   getFullUserData,
   importUserData,
-  resetUserCustomData, // 🚀 引入新函数
+  resetUserCustomData,
 } from "../../services/storage/userStore";
 import type { EnsBookBackup } from "../../types/backup";
 
@@ -26,7 +26,6 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  // 🚀 新增状态：控制重置流程
   const [isResetting, setIsResetting] = useState(false);
   const [confirmInput, setConfirmInput] = useState("");
 
@@ -120,7 +119,6 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
     e.target.value = "";
   };
 
-  // 🚀 新增：处理重置
   const handleResetConfirm = () => {
     if (confirmInput !== "DELETE") return;
 
@@ -194,7 +192,7 @@ export const DataBackupView = ({ onClose }: DataBackupViewProps) => {
         </div>
       </section>
 
-      {/* 🚀 新增：危险区域 (Clear Data) */}
+      {/* 危险区域 (Clear Data) */}
       <section className="py-4">
         <div className="flex items-start gap-5">
           <div className="mt-1 text-red-500 text-xl">

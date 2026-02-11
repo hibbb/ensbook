@@ -1,7 +1,7 @@
 // src/components/NameTable/cells/OwnerCell.tsx
 
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom"; // 🚀 引入 Link
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ import { truncateAddress } from "../../../utils/format";
 
 interface OwnerCellProps {
   record: NameRecord;
-  disableLink?: boolean; // 🚀 新增属性
+  disableLink?: boolean;
 }
 
 export const OwnerCell = ({ record, disableLink }: OwnerCellProps) => {
@@ -77,7 +77,7 @@ export const OwnerCell = ({ record, disableLink }: OwnerCellProps) => {
           </div>
         )}
 
-        {/* 🚀 底部提示：点击查看持仓 */}
+        {/* 底部提示：点击查看持仓 */}
         <div className="pt-2 pb-1 border-t border-white/10 text-center">
           <span className="text-[10px] text-white font-sans font-regular flex items-center justify-center gap-1">
             {t("table.cell.view_portfolio")}
@@ -87,7 +87,7 @@ export const OwnerCell = ({ record, disableLink }: OwnerCellProps) => {
     );
   };
 
-  // 🚀 优先使用 ENS 名称作为链接参数
+  // 优先使用 ENS 名称作为链接参数
   const linkTarget = record.ownerPrimaryName || record.owner;
   const displayText = record.ownerPrimaryName || truncateAddress(record.owner);
 
@@ -96,7 +96,7 @@ export const OwnerCell = ({ record, disableLink }: OwnerCellProps) => {
       {record.owner ? (
         <div className="flex items-center gap-1.5 text-sm">
           <Tooltip content={renderTooltipContent()}>
-            {/* 🚀 条件渲染：如果是 disableLink，则显示纯文本 */}
+            {/* 条件渲染：如果是 disableLink，则显示纯文本 */}
             {disableLink ? (
               <span className="text-text-main/70 cursor-default">
                 {displayText}

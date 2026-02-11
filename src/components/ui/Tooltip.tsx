@@ -14,7 +14,7 @@ export function Tooltip({
       <TooltipPrimitive.Root>
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
 
-        {/* 🚀 关键修复：添加 Portal，将内容渲染到 body 根节点，避免被父容器遮挡 */}
+        {/* 添加 Portal，将内容渲染到 body 根节点，避免被父容器遮挡 */}
         <TooltipPrimitive.Portal>
           <TooltipPrimitive.Content
             sideOffset={5}

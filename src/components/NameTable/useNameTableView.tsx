@@ -12,8 +12,6 @@ import {
   saveCollectionViewState,
 } from "../../services/storage/userStore";
 import type { PageViewState } from "../../types/userData";
-
-// 🚀 引入子 Hooks
 import { useOwnerStats } from "./hooks/useOwnerStats";
 import { useTableStats } from "./hooks/useTableStats";
 
@@ -198,7 +196,7 @@ export const useNameTableView = (
     [filterConfig],
   );
 
-  // 🚀 3. 调用子 Hooks 获取统计数据
+  // 3. 调用子 Hooks 获取统计数据
   const { statusCounts, actionCounts, nameCounts, levelCounts } = useTableStats(
     {
       baseRecords,

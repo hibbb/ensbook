@@ -248,14 +248,12 @@ export const Account = () => {
         </div>
       </header>
 
-      {/* 🚀 使用 NameListView */}
       <NameListView
         records={records}
         isLoading={isLoading}
         context="collection"
         collectionId={resolvedAddress || undefined}
         onAddToHome={handleAddToHome}
-        // 🚀 核心修改：禁用 Owner 列的链接
         isOwnerColumnReadOnly={true}
       />
     </div>

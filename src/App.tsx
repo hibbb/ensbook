@@ -7,7 +7,6 @@ import { NavBar } from "./components/NavBar";
 import { Home } from "./pages/Home";
 import { CollectionDetail } from "./pages/CollectionDetail";
 import { Mine } from "./pages/Mine";
-// 🚀 引入新页面
 import { Account } from "./pages/Account";
 import { getUserSettings } from "./services/storage/userStore";
 
@@ -32,8 +31,6 @@ export default function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/mine" element={<Mine />} />
               <Route path="/collection/:id" element={<CollectionDetail />} />
-
-              {/* 🚀 新增 Account 路由 */}
               <Route path="/account/:input" element={<Account />} />
 
               <Route

@@ -12,7 +12,6 @@ interface MarketCellProps {
   isLoading: boolean;
 }
 
-// 🚀 辅助：获取货币符号
 const getCurrencySymbol = (currency: string) => {
   if (currency === "ETH" || currency === "WETH") return "Ξ";
   // USDC, USDT, DAI
@@ -53,7 +52,6 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
           </span>
           <div className="flex flex-col items-end">
             <span className="text-white">
-              {/* 🚀 修改：数字用 font-mono font-bold，单位保持原样 */}
               <span className="font-mono font-light">
                 {displayNumber(data.listing.amount)}
               </span>
@@ -79,7 +77,6 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
           </span>
           <div className="flex flex-col items-end">
             <span className="text-purple-300">
-              {/* 🚀 修改：数字用 font-mono font-bold */}
               <span className="font-mono font-light">
                 {displayNumber(data.offer.amount)}
               </span>

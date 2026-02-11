@@ -10,7 +10,7 @@ const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
 const CHUNK_SIZE = 30;
 
-// 🚀 1. 定义允许的币种白名单
+// 1. 定义允许的币种白名单
 const ALLOWED_CURRENCIES = ["ETH", "WETH", "USDC", "USDT", "DAI"];
 
 const getTokenId = (record: NameRecord): string => {
@@ -111,7 +111,7 @@ async function fetchBatchOrders(
             const symbol =
               paymentToken?.symbol ?? (side === "listings" ? "ETH" : "WETH");
 
-            // 🚀 2. 核心过滤：如果不是白名单币种，直接跳过
+            // 2. 核心过滤：如果不是白名单币种，直接跳过
             if (!ALLOWED_CURRENCIES.includes(symbol.toUpperCase())) {
               continue;
             }

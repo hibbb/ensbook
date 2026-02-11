@@ -7,7 +7,7 @@ import {
   faCheck,
   faFeatherPointed,
   faSpinner,
-  faTrash, // 🚀 1. 引入删除图标
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
@@ -42,7 +42,7 @@ export const MyCollectionSettings = () => {
     );
   };
 
-  // 🚀 2. 新增清空函数
+  // 2. 新增清空函数
   // 逻辑完全复用 handleSave 中处理空输入的部分
   const handleClear = () => {
     if (window.confirm(t("settings.my_collection.confirm.clear"))) {
@@ -192,7 +192,7 @@ export const MyCollectionSettings = () => {
           )}
         </div>
 
-        {/* 🚀 3. 修改按钮区域：增加 flex 容器和 Clear 按钮 */}
+        {/* 3. 修改按钮区域：增加 flex 容器和 Clear 按钮 */}
         <div className="flex items-center gap-3">
           {input.trim().length > 0 && (
             <button

@@ -1,4 +1,4 @@
-import forms from "@tailwindcss/forms"; // 🚀 改用 import
+import forms from "@tailwindcss/forms";
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -8,7 +8,6 @@ export default {
         // Sans 保持 Quicksand
         sans: ['"Quicksand"', "ui-sans-serif", "system-ui", "sans-serif"],
 
-        // 🚀 修改：Mono 改为 DM Mono
         mono: [
           '"DM Mono"',
           "ui-monospace",

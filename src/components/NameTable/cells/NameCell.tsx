@@ -19,7 +19,7 @@ import {
 
 interface NameCellProps {
   record: NameRecord;
-  showCollectionTags?: boolean; // 🚀 新增控制属性
+  showCollectionTags?: boolean;
 }
 
 // 🎨 定义样式映射，方便维护
@@ -90,7 +90,7 @@ export const NameCell = ({
         labelHashHex,
         labelHashDec,
         display: {
-          // 🚀 使用全局 truncateAddress (虽然名字叫 Address，但逻辑通用，也可以用于 Hash)
+          // 使用全局 truncateAddress (虽然名字叫 Address，但逻辑通用，也可以用于 Hash)
           nameHashHex: truncateAddress(nameHashHex),
           nameHashDec: truncateAddress(nameHashDec),
           labelHashHex: truncateAddress(labelHashHex),
@@ -189,7 +189,7 @@ export const NameCell = ({
           </a>
         </Tooltip>
 
-        {/* 🚀 渲染标签 */}
+        {/* 渲染标签 */}
         {tags.map((tag) => (
           <Tooltip
             key={tag}

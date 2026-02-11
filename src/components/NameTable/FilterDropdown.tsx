@@ -40,7 +40,6 @@ export const FilterDropdown = ({
     const handleScroll = (event: Event) => {
       if (!isOpen) return;
 
-      // 🚀 修复滚动问题：
       // 如果滚动的事件源(target)包含在菜单内部，说明用户正在滚动列表，不应该关闭菜单
       if (
         menuRef.current &&
@@ -55,7 +54,7 @@ export const FilterDropdown = ({
     };
 
     const handleClickOutside = (e: MouseEvent) => {
-      // 🚀 UX 优化：点击外部关闭
+      // UX 优化：点击外部关闭
       // 如果点击发生在 触发按钮内 OR 菜单内容内，都不关闭
       if (triggerRef.current && triggerRef.current.contains(e.target as Node)) {
         return;
@@ -120,7 +119,7 @@ export const FilterDropdown = ({
       {isOpen &&
         createPortal(
           <div
-            ref={menuRef} // 🚀 绑定 Ref 到菜单容器
+            ref={menuRef} // 绑定 Ref 到菜单容器
             className={`
               fixed bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl py-2 z-[9999]
               animate-in fade-in zoom-in duration-150
@@ -133,7 +132,7 @@ export const FilterDropdown = ({
               transform: align === "end" ? "translateX(-100%)" : "none",
             }}
             onMouseDown={(e) => e.stopPropagation()}
-            // 🚀 UX 优化：移除了外层的 onClick={() => setIsOpen(false)}
+            // UX 优化：移除了外层的 onClick={() => setIsOpen(false)}
             // 这样点击内部选项时，事件冒泡到这里不会触发关闭
           >
             {children}

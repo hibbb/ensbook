@@ -27,7 +27,6 @@ export default [
       "react-refresh": reactRefresh,
     },
     rules: {
-      // 🚀 修复点：直接访问推荐规则，不通过不存在的 .flat 属性
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
@@ -35,7 +34,6 @@ export default [
       ],
     },
   },
-  // 🚀 新增：专门处理工具配置文件 (.cjs, .js)
   {
     // 匹配 commitlint.config.cjs, tailwind.config.js 等
     files: ["**/*.cjs", "**/*.js"],

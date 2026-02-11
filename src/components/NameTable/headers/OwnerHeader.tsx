@@ -6,7 +6,7 @@ import {
   faCheck,
   faUser,
   faWallet,
-  faUsers, // 🚀 引入统计图标
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,6 @@ interface OwnerHeaderProps {
     address: string;
     isMyself: boolean;
   }[];
-  // 🚀 接收统计信息
   ownerStats: { total: number; displayed: number };
   disabled?: boolean;
 }
@@ -38,7 +37,7 @@ export const OwnerHeader = ({
   onSort,
   onFilterChange,
   ownerCounts,
-  ownerStats, // 🚀 解构
+  ownerStats,
   disabled,
 }: OwnerHeaderProps) => {
   const { t } = useTranslation();
@@ -86,7 +85,7 @@ export const OwnerHeader = ({
               {ownerList.length === 0 && <FontAwesomeIcon icon={faCheck} />}
             </div>
 
-            {/* 🚀 2. Statistics Bar */}
+            {/* 2. Statistics Bar */}
             <div className="bg-gray-50 border-y border-gray-100 px-4 py-1.5 flex justify-between items-center text-[10px] text-gray-400 uppercase tracking-wider font-sans font-semibold select-none my-1">
               <div className="flex items-center gap-1.5">
                 <FontAwesomeIcon icon={faUsers} />

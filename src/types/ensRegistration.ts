@@ -25,7 +25,7 @@ export type RegistrationStatus =
   | "committing"
   | "waiting_commit"
   | "counting_down"
-  | "ready" // 🚀 新增：冷却结束，等待用户点击注册
+  | "ready" // 冷却结束，等待用户点击注册
   | "registering" // 用户已点击，正在请求钱包签名
   | "waiting_register"
   | "success"

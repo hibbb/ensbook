@@ -17,7 +17,7 @@ const getRepoUrl = (url: string | { url: string } | undefined) => {
   return "";
 };
 
-// 🚀 新增：获取 Author URL 的辅助函数
+// 获取 Author URL 的辅助函数
 const getAuthorUrl = (author: string | { url?: string } | undefined) => {
   if (typeof author === "object" && author !== null && "url" in author) {
     return author.url;
@@ -29,7 +29,7 @@ const getAuthorUrl = (author: string | { url?: string } | undefined) => {
 export default defineConfig({
   plugins: [
     react(),
-    // 🚀 新增：一个简单的自定义插件来处理 HTML 转换
+    // 一个简单的自定义插件来处理 HTML 转换
     {
       name: "html-transform",
       transformIndexHtml(html) {
@@ -44,10 +44,8 @@ export default defineConfig({
     // 定义全局常量，注意字符串需要 JSON.stringify 包裹
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __APP_NAME__: JSON.stringify(packageJson.displayName || packageJson.name),
-    // 🚀 1. 注入清洗后的源码地址 (供 "GitHub" 链接使用)
     __APP_REPO_URL__: JSON.stringify(getRepoUrl(packageJson.repository)),
     __APP_HOMEPAGE__: JSON.stringify(packageJson.homepage),
-    // 🚀 新增：注入作者链接常量
     __APP_AUTHOR_URL__: JSON.stringify(getAuthorUrl(packageJson.author)),
   },
   build: {

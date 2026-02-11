@@ -9,7 +9,7 @@ export const formatDateToICS = (date: Date): string => {
 };
 
 /**
- * 🚀 预先配置好的日期格式化对象 (避免重复创建)
+ * 预先配置好的日期格式化对象 (避免重复创建)
  */
 export const zhCNTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
   year: "numeric",
@@ -47,7 +47,7 @@ export const truncateAddress = (
 };
 
 /**
- * 🚀 格式化大数字，添加 K/M 单位
+ * 格式化大数字，添加 K/M 单位
  * @param n - 原始数字
  * @returns 格式化后的字符串 (e.g. "1.23K", "100M")
  */

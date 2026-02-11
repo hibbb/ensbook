@@ -20,7 +20,6 @@ interface BaseModalProps {
     | "max-w-4xl";
   showCloseButton?: boolean;
   zIndex?: number;
-  // 🚀 新增配置项
   closeOnOverlayClick?: boolean; // 是否允许点击遮罩关闭
   closeOnEsc?: boolean; // 是否允许按 ESC 关闭
 }
@@ -33,7 +32,7 @@ export const BaseModal = ({
   maxWidth = "max-w-sm",
   showCloseButton = true,
   zIndex = 100,
-  // 🚀 默认值为 true，保持原有行为
+  // 默认值为 true，保持原有行为
   closeOnOverlayClick = true,
   closeOnEsc = true,
 }: BaseModalProps) => {
@@ -51,7 +50,7 @@ export const BaseModal = ({
   // 2. 键盘交互 (ESC)
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      // 🚀 增加判断：只有当 closeOnEsc 为 true 时才响应
+      // 增加判断：只有当 closeOnEsc 为 true 时才响应
       if (e.key === "Escape" && isOpen && closeOnEsc) {
         onClose();
       }
@@ -75,7 +74,7 @@ export const BaseModal = ({
       {/* 背景遮罩 */}
       <div
         className="absolute inset-0 bg-text-main/20 backdrop-blur-sm animate-in fade-in duration-200"
-        // 🚀 修改点击事件：只有允许点击关闭时才触发 onClose
+        // 修改点击事件：只有允许点击关闭时才触发 onClose
         onClick={() => {
           if (closeOnOverlayClick) onClose();
         }}

@@ -22,8 +22,8 @@ interface ActionModalsProps {
     onCloseModal: () => void;
     onConfirmDuration: (durations: bigint[], owner?: Address) => void;
     setReminderTarget: (record: NameRecord | null) => void;
-    onAbort: () => void; // 🚀 新增
-    onConfirmRegistration: () => void; // 🚀 新增
+    onAbort: () => void;
+    onConfirmRegistration: () => void;
   };
 }
 
@@ -42,8 +42,8 @@ export const ActionModals = ({ modalState, actions }: ActionModalsProps) => {
         onConfirm={actions.onConfirmDuration}
         itemCount={modalState.itemCount}
         expiryTimes={modalState.expiryTimes}
-        onAbort={actions.onAbort} // 🚀 传递
-        onConfirmRegistration={actions.onConfirmRegistration} // 🚀 传递
+        onAbort={actions.onAbort}
+        onConfirmRegistration={actions.onConfirmRegistration}
       />
 
       <ReminderModal

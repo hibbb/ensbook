@@ -58,7 +58,6 @@ export const Mine = () => {
   const isLoading = isResolving || isQuerying;
   const isError = isResolveError || isQueryError;
 
-  // 🚀 处理函数
   const handleAddToHome = (record: NameRecord) => {
     const currentList = getHomeLabels();
     const exists = currentList.includes(record.label);
@@ -125,13 +124,12 @@ export const Mine = () => {
         </div>
       </header>
 
-      {/* 🚀 使用 NameListView */}
       <NameListView
         records={records}
         isLoading={isLoading}
         context="collection"
         collectionId="mine"
-        onAddToHome={handleAddToHome} // 🚀 启用添加功能
+        onAddToHome={handleAddToHome}
       />
     </div>
   );

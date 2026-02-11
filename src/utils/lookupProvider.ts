@@ -18,7 +18,6 @@ import dnsIcon from "../assets/lookups/dnssearch-dark.svg";
  */
 interface LookupItem {
   key: string;
-  // 🚀 2. 修改签名：接收 t 函数
   getLabel: (record: NameRecord, t: TFunction) => string;
   icon: string;
   getLink: (record: NameRecord) => string;
@@ -33,7 +32,6 @@ const getTokenId = (record: NameRecord): string => {
 export const LOOKUP_LINKS: LookupItem[] = [
   {
     key: "Web3bio",
-    // 🚀 3. 使用 t 函数翻译
     getLabel: (r, t) => t("lookup.web3bio", { label: r.label }),
     icon: web3bioIcon,
     shouldShow: (r) => ensUtils.isRenewable(r.status),

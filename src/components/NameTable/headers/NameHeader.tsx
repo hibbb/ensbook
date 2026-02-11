@@ -22,7 +22,6 @@ interface NameHeaderProps {
     availableLengths: number[];
     wrappedCounts: { all: number; wrapped: number; unwrapped: number };
     memosCount?: number;
-    // 🚀 新增字段
     memoTotal?: number;
   };
   disabled?: boolean;
@@ -55,7 +54,6 @@ export const NameHeader = ({
     0,
   );
 
-  // 🚀 获取正确的统计数据
   const memosCount = nameCounts.memosCount || 0;
   // 如果 memoTotal 没传，降级使用 wrappedCounts.all (虽然不太准，但防止崩溃)
   const totalCount = nameCounts.memoTotal ?? nameCounts.wrappedCounts.all;
@@ -138,7 +136,6 @@ export const NameHeader = ({
               </div>
             </div>
 
-            {/* 🚀 Option: No Memo (新增) */}
             <div
               className={`px-4 py-2 text-sm flex justify-between items-center transition-colors
                 ${

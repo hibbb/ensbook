@@ -29,7 +29,6 @@ interface ProcessFormProps {
   minDateValue: string;
   skippedCount: number;
   type: "register" | "renew" | "batch";
-  // 🚀 更新 Props 定义
   recipientInput: string;
   setRecipientInput: (val: string) => void;
   resolvedAddress: string | null;
@@ -49,7 +48,6 @@ export const ProcessForm = ({
   minDateValue,
   skippedCount,
   type,
-  // 🚀 解构新 Props
   recipientInput,
   setRecipientInput,
   resolvedAddress,
@@ -207,7 +205,7 @@ export const ProcessForm = ({
                     `}
                   />
 
-                  {/* 🚀 状态图标 */}
+                  {/* 状态图标 */}
                   <div className="absolute right-3 top-2.5 text-xs">
                     {isResolving && (
                       <FontAwesomeIcon
@@ -231,7 +229,7 @@ export const ProcessForm = ({
                   </div>
                 </div>
 
-                {/* 🚀 解析结果反馈 */}
+                {/* 解析结果反馈 */}
                 <div className="mt-1.5 min-h-[1.25rem]">
                   {isResolving ? (
                     <span className="text-xs text-gray-400">

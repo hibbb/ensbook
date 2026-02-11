@@ -30,7 +30,7 @@ export const SkeletonRow = () => (
       </div>
     </td>
 
-    {/* 🚀 新增：市场数据列 (右对齐) */}
+    {/* 市场数据列 (右对齐) */}
     <td>
       <div className="h-14 flex items-center justify-start gap-2">
         <div className="h-6 w-10 bg-gray-200 rounded-lg"></div>

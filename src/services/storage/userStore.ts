@@ -104,8 +104,7 @@ const createMeta = (partial?: Partial<UserDomainMeta>): UserDomainMeta => {
   };
 };
 
-// 🚀 核心辅助：判断是否为垃圾数据
-// 如果不在 Home 列表，且无备注、无等级，则视为垃圾
+// 判断是否为垃圾数据，如果不在 Home 列表，且无备注、无等级，则视为垃圾
 const tryCleanupMeta = (data: EnsBookUserData, label: string) => {
   const meta = data.metadata[label];
   if (!meta) return;
@@ -151,7 +150,7 @@ export const updateDomainMeta = (
     data.metadata[label] = createMeta(updates);
   }
 
-  // 🚀 每次更新后，尝试清理
+  // 每次更新后，尝试清理
   // (例如用户清空了备注，且该域名不在 Home 列表中，则该元数据应该被删除)
   tryCleanupMeta(data, label);
 
@@ -219,7 +218,6 @@ export const removeFromHome = (label: string) => {
   if (index > -1) {
     data.homeList.splice(index, 1);
 
-    // 🚀 移除后尝试清理元数据
     tryCleanupMeta(data, label);
 
     saveFullUserData(data);
@@ -235,7 +233,6 @@ export const bulkRemoveFromHome = (labels: string[]) => {
   data.homeList = data.homeList.filter((l) => !set.has(l));
 
   if (data.homeList.length !== initialLen) {
-    // 🚀 批量移除后，对涉及的每个 label 尝试清理
     labels.forEach((label) => tryCleanupMeta(data, label));
 
     saveFullUserData(data);
@@ -245,13 +242,12 @@ export const bulkRemoveFromHome = (labels: string[]) => {
 export const clearHomeList = () => {
   const data = getFullUserData();
 
-  // 🚀 在清空列表前，先获取所有待检查的 label
   const labelsToCheck = [...data.homeList];
 
   data.homeList = [];
   data.viewStates.home = {};
 
-  // 🚀 遍历检查并清理
+  // 遍历检查并清理
   // 因为 homeList 已经空了，所以只要没有 memo/level 的都会被删掉
   labelsToCheck.forEach((label) => tryCleanupMeta(data, label));
 

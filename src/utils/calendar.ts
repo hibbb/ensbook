@@ -1,6 +1,6 @@
 // src/utils/calendar.ts
 
-import i18n from "../i18n/config"; // 🚀 引入 i18n 实例
+import i18n from "../i18n/config";
 
 /**
  * 格式化日期为 ICS 格式 (YYYYMMDDTHHMMSSZ)
@@ -22,10 +22,8 @@ export const generateICS = (
   const dtStart = formatDateToICS(expiryDate);
   const dtEnd = formatDateToICS(new Date(expiryTimestamp * 1000 + 3600 * 1000));
 
-  // 🚀 翻译摘要
   const summary = i18n.t("calendar.summary", { name });
 
-  // 🚀 翻译描述 (注意：这里使用了 \n 换行符，i18next 会正确处理)
   const description = i18n.t("calendar.description", {
     name,
     date: expiryDate.toLocaleString(),
@@ -33,10 +31,9 @@ export const generateICS = (
 
   const alarms = reminders
     .map((days) => {
-      // 🚀 翻译报警描述
       const alarmDesc = i18n.t("calendar.alarm_desc", { name, days });
 
-      // 🚀 优化：使用 CRLF (\r\n) 符合 RFC 5545 标准
+      // 优化：使用 CRLF (\r\n) 符合 RFC 5545 标准
       return [
         "BEGIN:VALARM",
         "ACTION:DISPLAY",
@@ -47,7 +44,7 @@ export const generateICS = (
     })
     .join("\r\n");
 
-  // 🚀 优化：整体使用 CRLF 拼接
+  // 优化：整体使用 CRLF 拼接
   const icsLines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -78,10 +75,8 @@ export const generateGoogleCalendarUrl = (
   const start = formatDateToICS(expiryDate);
   const end = formatDateToICS(new Date(expiryTimestamp * 1000 + 3600 * 1000));
 
-  // 🚀 翻译摘要
   const text = encodeURIComponent(i18n.t("calendar.summary", { name }));
 
-  // 🚀 翻译详情
   const details = encodeURIComponent(
     i18n.t("calendar.description", {
       name,

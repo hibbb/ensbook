@@ -13,10 +13,6 @@ const getRegKey = (label: string) => `${STORAGE_KEY_REG_PREFIX}${label}`;
 const bigIntReplacer = (_: string, v: unknown) =>
   typeof v === "bigint" ? v.toString() : v;
 
-/**
- * 🚀 修复 any：定义一个内部接口来描述序列化后的结构
- * 序列化后，BigInt 会变成 string
- */
 interface SerializedRegistrationState extends Omit<
   RegistrationState,
   "registration"
@@ -27,9 +23,6 @@ interface SerializedRegistrationState extends Omit<
   };
 }
 
-/**
- * 🚀 修复 any：使用明确的类型声明和类型检查
- */
 const restoreBigInts = (
   data: SerializedRegistrationState,
 ): RegistrationState => {
@@ -92,7 +85,6 @@ export function getRegistrationState(label: string): RegistrationState | null {
     const serialized = localStorage.getItem(key);
     if (!serialized) return null;
 
-    // 🚀 修复 any：指定解析后的初步类型
     const parsed = JSON.parse(serialized) as SerializedRegistrationState;
 
     const data = restoreBigInts(parsed);
@@ -119,8 +111,7 @@ export function removeRegistrationState(label: string) {
 }
 
 /**
- * 获取所有挂起的注册标签
- * 🚀 优化：增加有效性检查
+ * 获取所有挂起的注册标签，增加有效性检查
  * 1. 必须未过期
  * 2. 必须包含 commitTxHash 或 regTxHash (证明交易已发出)
  * 如果只有 registration 参数但没有 Hash，说明用户在钱包签名阶段取消了，
@@ -137,7 +128,7 @@ export function getAllPendingLabels(): Set<string> {
         const label = key.replace(STORAGE_KEY_REG_PREFIX, "");
         const state = getRegistrationState(label);
 
-        // 🚀 核心过滤逻辑
+        // 核心过滤逻辑
         if (state) {
           // 只有当存在链上交易哈希时，才认为是有效的“断点”
           const hasChainInteraction = !!state.commitTxHash || !!state.regTxHash;

@@ -12,7 +12,6 @@ import { ENS_COLLECTIONS } from "../config/collections";
 export function useNameRecords(labels: string[]) {
   return useQuery({
     queryKey: ["name-records", labels],
-    // 🚀 移除 context 参数
     queryFn: () => fetchNameRecords(labels),
     enabled: labels.length > 0,
     staleTime: 1000 * 30,
@@ -44,7 +43,6 @@ export function useCollectionRecords(collectionId: string) {
 
   return useQuery({
     queryKey: ["collection-records", collectionId, labels.length],
-    // 🚀 移除 context 参数
     queryFn: () => fetchNameRecords(labels),
     enabled: !!collection && labels.length > 0,
     staleTime: 1000 * 60 * 5,

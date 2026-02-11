@@ -43,7 +43,7 @@ export const ProcessModal = ({
   itemCount = 1,
   expiryTimes = [],
   onAbort,
-  onConfirmRegistration, // 🚀 解构
+  onConfirmRegistration,
 }: ProcessModalProps) => {
   const { t } = useTranslation();
 
@@ -84,7 +84,7 @@ export const ProcessModal = ({
 
   const handleConfirm = () => {
     if (!validationError) {
-      // 🚀 核心修改：使用解析后的地址
+      // 使用解析后的地址
       // 如果 resolvedAddress 存在，说明用户输入了有效内容（地址或ENS）
       // 如果不存在（且无错误），说明用户留空，传 undefined 让底层使用当前钱包
       const finalOwner = resolvedAddress || undefined;
@@ -112,7 +112,7 @@ export const ProcessModal = ({
         </div>
       }
       showCloseButton={true}
-      // 🚀 核心修改：禁用遮罩点击和 ESC 关闭
+      // 禁用遮罩点击和 ESC 关闭
       closeOnOverlayClick={false}
       closeOnEsc={false}
     >
@@ -154,7 +154,7 @@ export const ProcessModal = ({
               </button>
               <button
                 onClick={handleConfirm}
-                disabled={!!validationError || isResolving} // 🚀 解析中禁止提交
+                disabled={!!validationError || isResolving}
                 className={`flex-1 py-3 rounded-lg font-sans font-semibold text-sm text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2
                   ${
                     validationError
@@ -177,7 +177,7 @@ export const ProcessModal = ({
             txHash={txHash}
             onClose={handleClose}
             onAbort={type === "register" ? onAbort : undefined}
-            onConfirmRegistration={onConfirmRegistration} // 🚀 传递
+            onConfirmRegistration={onConfirmRegistration}
           />
         )}
 

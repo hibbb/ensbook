@@ -7,7 +7,7 @@ import { NameHeader } from "./headers/NameHeader";
 import { StatusHeader } from "./headers/StatusHeader";
 import { OwnerHeader } from "./headers/OwnerHeader";
 import { ActionHeader } from "./headers/ActionHeader";
-import { ControlHeader } from "./headers/ControlHeader"; // 🚀 引入新组件
+import { ControlHeader } from "./headers/ControlHeader";
 
 import type { DeleteCriteria } from "./types";
 import { useTranslation } from "react-i18next";
@@ -46,7 +46,7 @@ interface TableHeaderProps {
     isMyself: boolean;
   }[];
   ownerStats?: { total: number; displayed: number };
-  isOwnerColumnReadOnly?: boolean; // 🚀 新增接收
+  isOwnerColumnReadOnly?: boolean;
 }
 
 export const TableHeader = ({
@@ -75,7 +75,7 @@ export const TableHeader = ({
   levelCounts = {},
   ownerCounts = [],
   ownerStats = { total: 0, displayed: 0 },
-  isOwnerColumnReadOnly, // 🚀 解构
+  isOwnerColumnReadOnly,
 }: TableHeaderProps) => {
   const isControlsDisabled = totalCount <= 1;
   const { t } = useTranslation();
@@ -123,9 +123,6 @@ export const TableHeader = ({
             onFilterChange={onFilterChange}
             ownerCounts={ownerCounts}
             ownerStats={ownerStats}
-            // 🚀 核心修改：
-            // 如果全局禁用(isControlsDisabled) 或者 链接被禁用(isOwnerColumnReadOnly)
-            // 则禁用 OwnerHeader 的交互（排序和筛选）
             disabled={isControlsDisabled || isOwnerColumnReadOnly}
           />
         </th>
@@ -152,7 +149,7 @@ export const TableHeader = ({
         </th>
 
         <th className="text-center w-14 relative rounded-tr-xl">
-          {/* 🚀 使用统一的 ControlHeader */}
+          {/* 使用统一的 ControlHeader */}
           <ControlHeader
             onBatchDelete={onBatchDelete}
             onAddToHome={!!onAddToHome} // 转换为布尔值，仅用于判断模式

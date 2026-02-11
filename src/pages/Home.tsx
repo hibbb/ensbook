@@ -189,7 +189,6 @@ export const Home = () => {
 
       {hasContent && (
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
-          {/* 🚀 使用 NameListView */}
           <NameListView
             records={mergedRecords}
             isLoading={isResolving} // 这里复用 isResolving 作为 loading 状态

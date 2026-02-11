@@ -28,8 +28,7 @@ export function usePremiumEthPrice(
 
   // 3. 派生状态：在渲染期间计算
   const priceDisplay = useMemo(() => {
-    // 🚀 核心修复：显式引用 now
-    // 这一行有两个作用：
+    // 显式引用 now，这一行有两个作用：
     // 1. 消除 ESLint "unnecessary dependency" 报错
     // 2. 告诉维护者：这个计算块必须随 now 变化而重新执行 (因为 fetchPremiumPrice 内部依赖时间)
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions

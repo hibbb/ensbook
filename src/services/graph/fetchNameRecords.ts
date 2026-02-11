@@ -10,7 +10,6 @@ import {
   GRACE_PERIOD_DURATION,
   PREMIUM_PERIOD_DURATION,
 } from "../../config/constants";
-// 🚀 引入新的存储服务
 import { getFullUserData } from "../../services/storage/userStore";
 
 // ... (常量定义保持不变) ...
@@ -54,13 +53,11 @@ function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
   return "Released";
 }
 
-// 🚀 主函数：移除了 context 参数
 export async function fetchNameRecords(
   labels: string[],
 ): Promise<NameRecord[]> {
   if (!labels || labels.length === 0) return [];
 
-  // 🚀 1. 读取全局元数据
   const userData = getFullUserData();
   const metadata = userData.metadata;
 
@@ -137,7 +134,6 @@ export async function fetchNameRecords(
     const records = validLabels.map((label) => {
       const isFetchSuccess = labelSuccessMap.get(label) ?? false;
 
-      // 🚀 2. 统一从 metadata 读取
       const meta = metadata[label];
       const memo = meta?.memo || "";
       const level = meta?.level || 0;

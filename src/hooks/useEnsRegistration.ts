@@ -71,7 +71,6 @@ export function useEnsRegistration() {
     setStatus("loading");
   }, [resetStatus]);
 
-  // 🚀 核心修改：executeRegister 现在是用户点击按钮后触发的动作
   const executeRegister = useCallback(async () => {
     // 参数直接从 ref 读取，不需要传参
     const params = registrationDataRef.current;
@@ -133,7 +132,6 @@ export function useEnsRegistration() {
     }
   }, [address, publicClient, writeContractAsync, t]);
 
-  // 🚀 修改：倒计时结束不再自动执行，而是进入 ready 状态
   const startCountdown = (seconds: number) => {
     if (timerRef.current) clearInterval(timerRef.current);
 
@@ -316,11 +314,11 @@ export function useEnsRegistration() {
     resetStatus,
     abandonRegistration,
     startResuming,
-    confirmRegistration: executeRegister, // 🚀 导出确认方法
+    confirmRegistration: executeRegister,
     isBusy:
       status !== "idle" &&
       status !== "success" &&
       status !== "error" &&
-      status !== "ready", // 🚀 ready 状态不视为 busy
+      status !== "ready",
   };
 }

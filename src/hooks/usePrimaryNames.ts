@@ -5,7 +5,7 @@ import { fetchPrimaryNames } from "../utils/fetchPrimaryNames";
 import type { NameRecord } from "../types/ensNames";
 
 /**
- * 🚀 渐进式加载主域名 Hook (修复版)
+ * 渐进式加载主域名 Hook
  *
  * 改进点：
  * 1. 修复大小写匹配问题，确保能查找到 Checksum 地址对应的主域名。
@@ -60,7 +60,7 @@ export const usePrimaryNames = (records: NameRecord[] | undefined) => {
     if (!records) return undefined;
 
     return records.map((record) => {
-      // 🚀 核心修复：将 record.owner 转为小写后再去 Map 中查找
+      // 将 record.owner 转为小写后再去 Map 中查找
       // 因为 fetchPrimaryNames 返回的 Map key 全是小写的
       const lowerOwner = record.owner?.toLowerCase();
 

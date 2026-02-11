@@ -138,7 +138,6 @@ export const StatusCell = ({ record, now }: StatusCellProps) => {
 
     return (
       <>
-        {/* 🚀 翻译状态文本 */}
         <span>{t(`status.${record.status.toLowerCase()}`)}</span>
         {remainingTime && (
           <span className="leading-none ml-1.5 font-mono opacity-80 border-l border-current pl-1.5 text-[10px]">

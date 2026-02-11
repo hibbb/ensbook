@@ -10,7 +10,7 @@ import {
   faMinimize,
   faTrashCan,
   faRocket, // 假设有这个图标，或者用 faCheck
-  faArrowRight, // 🚀 用这个做注册按钮
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { truncateAddress } from "../../utils/format";
@@ -21,7 +21,7 @@ interface ProcessingViewProps {
   txHash?: string | null;
   onClose: () => void;
   onAbort?: () => void;
-  onConfirmRegistration?: () => void; // 🚀 新增
+  onConfirmRegistration?: () => void;
 }
 
 export const ProcessingView = ({
@@ -55,7 +55,6 @@ export const ProcessingView = ({
     subMessage = t("transaction.step.cooldown_desc");
     showTimer = true;
   } else if (status === "ready") {
-    // 🚀 新增状态处理
     message = t("transaction.step.register_title"); // "Final Registration"
     subMessage = t("transaction.step.register_desc"); // "Cooldown over..."
     showRegisterBtn = true;
@@ -102,7 +101,7 @@ export const ProcessingView = ({
         {subMessage}
       </p>
 
-      {/* 🚀 核心：注册按钮 */}
+      {/* 注册按钮 */}
       {showRegisterBtn && onConfirmRegistration && (
         <button
           onClick={onConfirmRegistration}
@@ -135,7 +134,7 @@ export const ProcessingView = ({
           {t("common.run_in_background")}
         </button>
 
-        {/* 🚀 放弃任务按钮 (仅当 onAbort 存在时显示) */}
+        {/* 放弃任务按钮 (仅当 onAbort 存在时显示) */}
         {onAbort && (
           <button
             onClick={() => {

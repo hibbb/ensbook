@@ -92,7 +92,6 @@ export function useEnsRenewal() {
     [publicClient, address, writeEthController, t],
   );
 
-  // 🚀 修改：参数 duration 类型改为 bigint[]
   const renewBatch = useCallback(
     async (
       rawLabels: string[],
@@ -107,7 +106,7 @@ export function useEnsRenewal() {
         toast.error(t("transaction.toast.select_one"));
         return;
       }
-      // 🚀 新增：安全检查
+      // 安全检查
       if (rawLabels.length !== durations.length) {
         console.error("Labels and durations length mismatch");
         toast.error(t("transaction.toast.unknown_error"));
@@ -120,7 +119,6 @@ export function useEnsRenewal() {
       try {
         const labels = rawLabels.map((l) => normalize(l).replace(/\.eth$/, ""));
 
-        // 🚀 直接使用传入的 durations 数组
         const totalPrice = (await publicClient.readContract({
           address: contractAddress,
           abi: bulkRenewalAbi,
@@ -136,7 +134,6 @@ export function useEnsRenewal() {
           value: valueWithBuffer,
         });
 
-        // 🚀 交易已提交！立即调用回调
         if (onSubmitted) {
           onSubmitted();
         }

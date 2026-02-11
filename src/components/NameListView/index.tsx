@@ -39,7 +39,7 @@ export const NameListView = ({
   onDelete,
   onBatchDelete,
   onAddToHome,
-  isOwnerColumnReadOnly, // 🚀 解构
+  isOwnerColumnReadOnly,
 }: NameListViewProps) => {
   const { address, isConnected } = useAccount();
 
