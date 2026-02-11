@@ -191,8 +191,11 @@ export const Home = () => {
         <div className="flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-forwards pb-20">
           <NameListView
             records={mergedRecords}
-            isLoading={isResolving} // 这里复用 isResolving 作为 loading 状态
-            context="home"
+            isLoading={isResolving}
+            viewStateKey="home"
+            showCollectionTags={true}
+            isOwnerColumnReadOnly={false}
+            allowAddToHome={false} // Home 不需要添加到 Home
             onDelete={handleDelete}
             onBatchDelete={handleBatchDelete}
           />

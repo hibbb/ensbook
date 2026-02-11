@@ -12,6 +12,7 @@ import {
   saveCollectionViewState,
 } from "../../services/storage/userStore";
 import type { PageViewState } from "../../types/userData";
+
 import { useOwnerStats } from "./hooks/useOwnerStats";
 import { useTableStats } from "./hooks/useTableStats";
 
@@ -26,19 +27,20 @@ export const DEFAULT_FILTER: FilterConfig = {
   ownerList: [],
 };
 
+// 接收 viewStateKey
 export const useNameTableView = (
   records: NameRecord[] | undefined,
-  currentAddress?: string,
-  context?: "home" | "collection",
-  collectionId?: string,
+  currentAddress: string | undefined,
+  viewStateKey: string,
 ) => {
-  // 1. 状态管理与持久化 (保持不变)
+  // 1. 状态存取逻辑适配
   const getSavedState = useCallback((): PageViewState => {
-    if (context === "home") return getHomeViewState();
-    if (context === "collection" && collectionId)
-      return getCollectionViewState(collectionId);
-    return {};
-  }, [context, collectionId]);
+    if (viewStateKey === "home") {
+      return getHomeViewState();
+    }
+    // 对于 mine, account, 999 等，统一使用 collection 的存储槽位
+    return getCollectionViewState(viewStateKey);
+  }, [viewStateKey]);
 
   const [sortConfig, setSortConfig] = useState<SortConfig>(() => {
     const saved = getSavedState();
@@ -50,27 +52,27 @@ export const useNameTableView = (
     return { ...DEFAULT_FILTER, ...(saved.filter || {}) };
   });
 
-  const currentKey = `${context}-${collectionId}`;
-  const [prevKey, setPrevKey] = useState(currentKey);
-
-  if (prevKey !== currentKey) {
+  // 监听 key 变化，重置状态
+  const [prevKey, setPrevKey] = useState(viewStateKey);
+  if (prevKey !== viewStateKey) {
     const saved = getSavedState();
     setSortConfig(saved.sort || DEFAULT_SORT);
     setFilterConfig({ ...DEFAULT_FILTER, ...(saved.filter || {}) });
-    setPrevKey(currentKey);
+    setPrevKey(viewStateKey);
   }
 
   const isInternalWrite = useRef(false);
 
+  // 保存状态
   useEffect(() => {
-    if (!context) return;
+    if (!viewStateKey) return;
     const viewState: PageViewState = { sort: sortConfig, filter: filterConfig };
     isInternalWrite.current = true;
     try {
-      if (context === "home") {
+      if (viewStateKey === "home") {
         saveHomeViewState(viewState);
-      } else if (context === "collection" && collectionId) {
-        saveCollectionViewState(collectionId, viewState);
+      } else {
+        saveCollectionViewState(viewStateKey, viewState);
       }
     } catch (e) {
       console.warn("Failed to save view state:", e);
@@ -79,12 +81,16 @@ export const useNameTableView = (
         isInternalWrite.current = false;
       }, 0);
     }
-  }, [sortConfig, filterConfig, context, collectionId]);
+  }, [sortConfig, filterConfig, viewStateKey]);
 
+  // ... (后续逻辑保持不变，直到 return)
+
+  // 监听外部更新
   useEffect(() => {
     const handleExternalUpdate = () => {
       if (isInternalWrite.current) return;
       const saved = getSavedState();
+      // 简单的深比较或重置逻辑
       const isStorageReset = !saved.filter && !saved.sort;
       if (isStorageReset) {
         setSortConfig(DEFAULT_SORT);
@@ -105,6 +111,7 @@ export const useNameTableView = (
     };
   }, [getSavedState]);
 
+  // ... (isViewStateDirty, resetViewState, selectedLabels 等逻辑完全保持不变)
   const isViewStateDirty = useMemo(() => {
     const isSortDirty = (() => {
       if (sortConfig.direction === null && DEFAULT_SORT.direction === null) {
@@ -136,7 +143,6 @@ export const useNameTableView = (
   const [selectedLabels, setSelectedLabels] = useState<Set<string>>(new Set());
   const baseRecords = useMemo(() => records || [], [records]);
 
-  // 2. 定义通用的 passOthers 逻辑 (供子 Hook 使用)
   const passOthers = useCallback(
     (r: NameRecord, exclude: string[]) => {
       const {
@@ -196,7 +202,6 @@ export const useNameTableView = (
     [filterConfig],
   );
 
-  // 3. 调用子 Hooks 获取统计数据
   const { statusCounts, actionCounts, nameCounts, levelCounts } = useTableStats(
     {
       baseRecords,
@@ -210,7 +215,6 @@ export const useNameTableView = (
     passOthers,
   });
 
-  // 4. 数据处理与操作 (保持不变)
   const processedRecords = useMemo(
     () => processNameRecords(baseRecords, sortConfig, filterConfig),
     [baseRecords, sortConfig, filterConfig],

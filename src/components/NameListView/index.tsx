@@ -1,7 +1,9 @@
 // src/components/NameListView/index.tsx
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useAccount } from "wagmi";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import type { NameRecord } from "../../types/ensNames";
 import type { DeleteCriteria } from "../NameTable/types";
 
@@ -15,38 +17,42 @@ import { NameTable } from "../NameTable";
 import { FloatingBar } from "../FloatingBar";
 import { ActionModals } from "../ActionModals";
 
+// Services
+import { addToHome, getHomeLabels } from "../../services/storage/userStore";
+
 interface NameListViewProps {
   // 1. 数据源
   records: NameRecord[] | undefined;
   isLoading: boolean;
 
-  // 2. 上下文配置
-  context: "home" | "collection";
-  collectionId?: string;
+  // 2. 视图状态 Key (必填)
+  viewStateKey: string;
 
-  // 3. 差异化行为 (可选)
+  // 3. 功能开关 (明确的配置项)
+  showCollectionTags?: boolean; // 是否显示集合标记
+  isOwnerColumnReadOnly?: boolean; // 所有者列是否只读
+  allowAddToHome?: boolean; // 是否允许添加到首页
+
+  // 4. 回调
   onDelete?: (record: NameRecord) => void;
   onBatchDelete?: (criteria: DeleteCriteria) => void;
-  onAddToHome?: (record: NameRecord) => void;
-  isOwnerColumnReadOnly?: boolean;
 }
 
 export const NameListView = ({
   records,
   isLoading,
-  context,
-  collectionId,
+  viewStateKey,
+  showCollectionTags = true,
+  isOwnerColumnReadOnly = false,
+  allowAddToHome = false,
   onDelete,
   onBatchDelete,
-  onAddToHome,
-  isOwnerColumnReadOnly,
 }: NameListViewProps) => {
   const { address, isConnected } = useAccount();
+  const { t } = useTranslation();
 
-  // --- 核心逻辑集成 ---
-
-  // 1. 视图状态管理
-  const tableView = useNameTableView(records, address, context, collectionId);
+  // 1. 视图状态管理 (传入 viewStateKey)
+  const tableView = useNameTableView(records, address, viewStateKey);
 
   // 2. 交易动作管理
   const ensActions = useEnsActions();
@@ -60,29 +66,20 @@ export const NameListView = ({
     [updateLevel],
   );
 
-  // 4. 智能判断逻辑：
-  // 4.1. Home 页面：显示
-  // 4.2. Mine 页面 (context='collection' & id='mine')：显示
-  // 4.3. Account 页面 (context='collection' & id=address)：显示
-  // 4.4. 具体集合页面 (context='collection' & id='999'/'bip39')：隐藏
-
-  const shouldShowTags = useMemo(() => {
-    if (context === "home") return true;
-
-    // 如果是 "mine" 或者 是以太坊地址(Account页)，则显示
-    // 注意：Account 页面的 collectionId 是地址
-    if (
-      collectionId === "mine" ||
-      (collectionId && collectionId.startsWith("0x"))
-    ) {
-      return true;
-    }
-
-    // 其他情况（即具体的预置集合页，如 999, bip39），隐藏
-    return false;
-  }, [context, collectionId]);
-
-  // --- 渲染 ---
+  // 4. 通用处理：添加到首页
+  const handleAddToHome = useCallback(
+    (record: NameRecord) => {
+      const currentList = getHomeLabels();
+      const exists = currentList.includes(record.label);
+      addToHome(record.label);
+      if (exists) {
+        toast(t("home.toast.all_exist"), { icon: "👌" });
+      } else {
+        toast.success(t("home.toast.add_success", { count: 1 }));
+      }
+    },
+    [t],
+  );
 
   return (
     <>
@@ -119,12 +116,12 @@ export const NameListView = ({
         onReminder={ensActions.actions.onReminder}
         // 等级更新
         onLevelChange={handleLevelChange}
-        // 差异化回调
+        // 差异化配置
+        showCollectionTags={showCollectionTags}
+        isOwnerColumnReadOnly={isOwnerColumnReadOnly}
+        onAddToHome={allowAddToHome ? handleAddToHome : undefined}
         onDelete={onDelete}
         onBatchDelete={onBatchDelete}
-        onAddToHome={onAddToHome}
-        isOwnerColumnReadOnly={isOwnerColumnReadOnly}
-        showCollectionTags={shouldShowTags}
       />
 
       <FloatingBar

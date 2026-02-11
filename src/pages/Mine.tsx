@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeatherPointed } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation, Trans } from "react-i18next";
-import toast from "react-hot-toast";
 
 // Components
 import { NameListView } from "../components/NameListView"; // 🚀
@@ -15,10 +14,6 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useMyCollectionSource } from "../hooks/useMyCollectionSource";
 import { parseAndClassifyInputs } from "../utils/parseInputs";
 import { fetchLabels } from "../services/graph/fetchLabels";
-import { addToHome, getHomeLabels } from "../services/storage/userStore";
-
-// Types
-import type { NameRecord } from "../types/ensNames";
 
 const useMyCollectionLabels = (source: string) => {
   return useQuery({
@@ -57,17 +52,6 @@ export const Mine = () => {
 
   const isLoading = isResolving || isQuerying;
   const isError = isResolveError || isQueryError;
-
-  const handleAddToHome = (record: NameRecord) => {
-    const currentList = getHomeLabels();
-    const exists = currentList.includes(record.label);
-    addToHome(record.label);
-    if (exists) {
-      toast(t("home.toast.all_exist"), { icon: "👌" });
-    } else {
-      toast.success(t("home.toast.add_success", { count: 1 }));
-    }
-  };
 
   if (!hasSource) {
     return (
@@ -127,9 +111,10 @@ export const Mine = () => {
       <NameListView
         records={records}
         isLoading={isLoading}
-        context="collection"
-        collectionId="mine"
-        onAddToHome={handleAddToHome}
+        viewStateKey="mine"
+        showCollectionTags={true} // Mine 是杂烩，需要标记
+        isOwnerColumnReadOnly={false}
+        allowAddToHome={true} // 允许添加到 Home
       />
     </div>
   );

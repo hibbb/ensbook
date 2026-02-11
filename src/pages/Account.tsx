@@ -26,10 +26,6 @@ import { useNameRecords } from "../hooks/useEnsData";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { fetchLabels } from "../services/graph/fetchLabels";
 import { publicClient } from "../utils/client";
-import { addToHome, getHomeLabels } from "../services/storage/userStore";
-
-// Types
-import type { NameRecord } from "../types/ensNames";
 
 const useResolveInput = (input: string | undefined) => {
   return useQuery({
@@ -110,17 +106,6 @@ export const Account = () => {
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t("common.copy_success", { label }));
-  };
-
-  const handleAddToHome = (record: NameRecord) => {
-    const currentList = getHomeLabels();
-    const exists = currentList.includes(record.label);
-    addToHome(record.label);
-    if (exists) {
-      toast(t("home.toast.all_exist"), { icon: "👌" });
-    } else {
-      toast.success(t("home.toast.add_success", { count: 1 }));
-    }
   };
 
   const { displayName, fullNameToCopy } = useMemo(() => {
@@ -251,10 +236,11 @@ export const Account = () => {
       <NameListView
         records={records}
         isLoading={isLoading}
-        context="collection"
-        collectionId={resolvedAddress || undefined}
-        onAddToHome={handleAddToHome}
-        isOwnerColumnReadOnly={true}
+        // 建议使用统一的 key，这样所有账户页共享排序状态，体验更好
+        viewStateKey="account-global"
+        showCollectionTags={true}
+        isOwnerColumnReadOnly={true} // 开启只读
+        allowAddToHome={true}
       />
     </div>
   );

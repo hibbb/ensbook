@@ -2,7 +2,6 @@
 
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import toast from "react-hot-toast";
 
 // Components
 import { NameListView } from "../components/NameListView"; // 🚀
@@ -10,11 +9,9 @@ import { NameListView } from "../components/NameListView"; // 🚀
 // Hooks & Services
 import { useCollectionRecords } from "../hooks/useEnsData";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { addToHome, getHomeLabels } from "../services/storage/userStore";
 
 // Config & Utils
 import { ENS_COLLECTIONS } from "../config/collections";
-import type { NameRecord } from "../types/ensNames";
 
 export const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,17 +21,6 @@ export const CollectionDetail = () => {
   useDocumentTitle(collection ? t(collection.displayName) : undefined);
 
   const { data: records, isLoading, isError } = useCollectionRecords(id || "");
-
-  const handleAddToHome = (record: NameRecord) => {
-    const currentList = getHomeLabels();
-    const exists = currentList.includes(record.label);
-    addToHome(record.label);
-    if (exists) {
-      toast(t("home.toast.all_exist"), { icon: "👌" });
-    } else {
-      toast.success(t("home.toast.add_success", { count: 1 }));
-    }
-  };
 
   if (!collection)
     return <div className="p-20 text-center">{t("collection.not_found")}</div>;
@@ -57,9 +43,10 @@ export const CollectionDetail = () => {
       <NameListView
         records={records}
         isLoading={isLoading}
-        context="collection"
-        collectionId={id}
-        onAddToHome={handleAddToHome}
+        viewStateKey={`collection-${id}`}
+        showCollectionTags={false} // 集合页不需要标记
+        isOwnerColumnReadOnly={false}
+        allowAddToHome={true}
       />
     </div>
   );
