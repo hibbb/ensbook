@@ -53,7 +53,7 @@ function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
   return "Released";
 }
 
-export async function fetchNameRecords(
+export async function fetchNameRecordsGraph(
   labels: string[],
 ): Promise<NameRecord[]> {
   if (!labels || labels.length === 0) return [];
@@ -202,7 +202,7 @@ export async function fetchNameRecords(
 
     return records as NameRecord[];
   } catch (error) {
-    console.error("Critical error in fetchNameRecords:", error);
+    console.error("Critical error in fetchNameRecordsGraph:", error);
     // 错误处理：从 metadata 读取
     const userData = getFullUserData();
     const metadata = userData.metadata;

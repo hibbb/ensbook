@@ -51,6 +51,72 @@ export const bulkRenewalConfig = {
 } as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EnsNameWrapper
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401)
+ */
+export const ensNameWrapperAbi = [
+  {
+    type: "function",
+    inputs: [{ name: "id", internalType: "uint256", type: "uint256" }],
+    name: "ownerOf",
+    outputs: [{ name: "owner", internalType: "address", type: "address" }],
+    stateMutability: "view",
+  },
+] as const;
+
+/**
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401)
+ */
+export const ensNameWrapperAddress = {
+  1: "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401",
+} as const;
+
+/**
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401)
+ */
+export const ensNameWrapperConfig = {
+  address: ensNameWrapperAddress,
+  abi: ensNameWrapperAbi,
+} as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EnsRegistry
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e)
+ */
+export const ensRegistryAbi = [
+  {
+    constant: true,
+    payable: false,
+    type: "function",
+    inputs: [{ name: "node", type: "bytes32" }],
+    name: "owner",
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
+] as const;
+
+/**
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e)
+ */
+export const ensRegistryAddress = {
+  1: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+} as const;
+
+/**
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e)
+ */
+export const ensRegistryConfig = {
+  address: ensRegistryAddress,
+  abi: ensRegistryAbi,
+} as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EthControllerV3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -310,6 +376,50 @@ export const useSimulateBulkRenewalRenewAll =
     address: bulkRenewalAddress,
     functionName: "renewAll",
   });
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ensNameWrapperAbi}__
+ *
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401)
+ */
+export const useReadEnsNameWrapper = /*#__PURE__*/ createUseReadContract({
+  abi: ensNameWrapperAbi,
+  address: ensNameWrapperAddress,
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ensNameWrapperAbi}__ and `functionName` set to `"ownerOf"`
+ *
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401)
+ */
+export const useReadEnsNameWrapperOwnerOf = /*#__PURE__*/ createUseReadContract(
+  {
+    abi: ensNameWrapperAbi,
+    address: ensNameWrapperAddress,
+    functionName: "ownerOf",
+  },
+);
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ensRegistryAbi}__
+ *
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e)
+ */
+export const useReadEnsRegistry = /*#__PURE__*/ createUseReadContract({
+  abi: ensRegistryAbi,
+  address: ensRegistryAddress,
+});
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ensRegistryAbi}__ and `functionName` set to `"owner"`
+ *
+ * [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e)
+ */
+export const useReadEnsRegistryOwner = /*#__PURE__*/ createUseReadContract({
+  abi: ensRegistryAbi,
+  address: ensRegistryAddress,
+  functionName: "owner",
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link ethControllerV3Abi}__
