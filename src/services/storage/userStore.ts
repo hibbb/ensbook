@@ -35,7 +35,6 @@ const DEFAULT_DATA: EnsBookUserData = {
 // 3. 数据迁移逻辑 (V2 -> V3)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const migrateData = (oldData: any): EnsBookUserData => {
-  // 如果已经是最新版本，直接返回
   if (oldData.version === CURRENT_VERSION) {
     return oldData as EnsBookUserData;
   }
@@ -44,10 +43,16 @@ const migrateData = (oldData: any): EnsBookUserData => {
     `Migrating user data from v${oldData.version} to v${CURRENT_VERSION}...`,
   );
 
-  const newData = { ...DEFAULT_DATA, ...oldData };
-  newData.version = CURRENT_VERSION;
+  // 1. 基于默认数据构建新对象
+  const newData: EnsBookUserData = { ...DEFAULT_DATA };
 
-  // 处理 V2 -> V3 的 viewStates 结构变化
+  // 2. 安全地迁移核心数据 (Metadata & HomeList & Settings)
+  if (oldData.metadata) newData.metadata = { ...oldData.metadata };
+  if (Array.isArray(oldData.homeList)) newData.homeList = [...oldData.homeList];
+  if (oldData.settings)
+    newData.settings = { ...DEFAULT_DATA.settings, ...oldData.settings };
+
+  // 3. 迁移并扁平化 ViewStates (核心变更)
   if (oldData.viewStates) {
     const flatViewStates: Record<string, PageViewState> = {};
 
@@ -55,14 +60,17 @@ const migrateData = (oldData: any): EnsBookUserData => {
     if (oldData.viewStates.home) {
       flatViewStates["home"] = oldData.viewStates.home;
     }
-
-    // 迁移 Collections (包含 mine, 999 等)
+    // 迁移 Collections
     if (oldData.viewStates.collections) {
       Object.assign(flatViewStates, oldData.viewStates.collections);
     }
 
     newData.viewStates = flatViewStates;
   }
+
+  // 4. 强制更新版本号和时间戳
+  newData.version = CURRENT_VERSION;
+  newData.timestamp = Date.now();
 
   return newData;
 };
