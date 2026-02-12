@@ -4,6 +4,7 @@ import { formatUnits } from "viem";
 import { MAINNET_CONTRACTS } from "../../config/contracts";
 import type { NameRecord } from "../../types/ensNames";
 import type { MarketDataMap } from "../../types/marketData";
+import { getTokenId } from "../../utils/ens";
 
 const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
 const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
@@ -12,12 +13,6 @@ const CHUNK_SIZE = 30;
 
 // 1. 定义允许的币种白名单
 const ALLOWED_CURRENCIES = ["ETH", "WETH", "USDC", "USDT", "DAI"];
-
-const getTokenId = (record: NameRecord): string => {
-  return record.wrapped
-    ? BigInt(record.namehash).toString()
-    : BigInt(record.labelhash).toString();
-};
 
 const getContract = (record: NameRecord): string => {
   return record.wrapped

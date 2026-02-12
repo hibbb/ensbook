@@ -4,6 +4,7 @@ import type { NameRecord } from "../types/ensNames";
 import { MAINNET_CONTRACTS } from "../config/contracts";
 import * as ensUtils from "./ens";
 import type { TFunction } from "i18next";
+import { getTokenId } from "./ens";
 
 import web3bioIcon from "../assets/lookups/web3bio-dark.svg";
 import etherscanIcon from "../assets/lookups/etherscan-dark.svg";
@@ -23,11 +24,6 @@ interface LookupItem {
   getLink: (record: NameRecord) => string;
   shouldShow: (record: NameRecord) => boolean;
 }
-
-const getTokenId = (record: NameRecord): string => {
-  const hex = record.wrapped ? record.namehash : record.labelhash;
-  return BigInt(hex).toString();
-};
 
 export const LOOKUP_LINKS: LookupItem[] = [
   {

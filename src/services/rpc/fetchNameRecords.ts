@@ -4,10 +4,7 @@ import { labelhash, namehash, normalize } from "viem/ens";
 import { type Address } from "viem";
 import { publicClient } from "../../utils/client";
 import { MAINNET_CONTRACTS } from "../../config/contracts";
-import {
-  GRACE_PERIOD_DURATION,
-  PREMIUM_PERIOD_DURATION,
-} from "../../config/constants";
+import { GRACE_PERIOD_DURATION } from "../../config/constants";
 import { getFullUserData } from "../storage/userStore";
 import type { NameRecord } from "../../types/ensNames";
 
@@ -16,18 +13,7 @@ import {
   ensRegistryAbi,
   ensNameWrapperAbi,
 } from "../../wagmi-generated";
-
-function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
-  if (expiryTimestamp === 0) return "Available";
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  const graceEnd = expiryTimestamp + GRACE_PERIOD_DURATION;
-  const premiumEnd = graceEnd + PREMIUM_PERIOD_DURATION;
-
-  if (currentTimestamp <= expiryTimestamp) return "Active";
-  if (currentTimestamp <= graceEnd) return "Grace";
-  if (currentTimestamp <= premiumEnd) return "Premium";
-  return "Released";
-}
+import { deriveNameStatus } from "../../utils/ens";
 
 export async function fetchNameRecordsRPC(
   labels: string[],

@@ -206,10 +206,6 @@ export function useEnsRegistration() {
     [publicClient, t],
   );
 
-  // continueRegistration 在新逻辑下已不再需要，因为 UI 会直接调用 confirmRegistration
-  // 但为了兼容性保留空实现或直接移除
-  const continueRegistration = useCallback(() => {}, []);
-
   const startRegistration = useCallback(
     async (rawLabel: string, duration: bigint, customOwner?: Address) => {
       if (!address || !publicClient) {
@@ -310,7 +306,6 @@ export function useEnsRegistration() {
     currentHash,
     startRegistration,
     checkAndResume,
-    continueRegistration,
     resetStatus,
     abandonRegistration,
     startResuming,

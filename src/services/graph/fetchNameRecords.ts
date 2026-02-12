@@ -5,12 +5,9 @@ import { normalize } from "viem/ens";
 import { queryData, type GraphQLQueryCode } from "./client";
 import type { NameRecord } from "../../types/ensNames";
 import { MAINNET_CONTRACTS } from "../../config/contracts";
-import {
-  GRAPHQL_CONFIG,
-  GRACE_PERIOD_DURATION,
-  PREMIUM_PERIOD_DURATION,
-} from "../../config/constants";
+import { GRAPHQL_CONFIG, GRACE_PERIOD_DURATION } from "../../config/constants";
 import { getFullUserData } from "../../services/storage/userStore";
+import { deriveNameStatus } from "../../utils/ens";
 
 // ... (常量定义保持不变) ...
 const WRAPPER_ADDRESS = MAINNET_CONTRACTS.ENS_NAME_WRAPPER.toLowerCase();
@@ -24,7 +21,6 @@ const chunkArray = <T>(array: T[], size: number): T[][] => {
   return chunks;
 };
 
-// ... (类型定义和 deriveNameStatus 保持不变) ...
 interface SubgraphRegistration {
   id: string;
   labelName: string;
@@ -42,15 +38,6 @@ interface FetchResult {
     registrations: SubgraphRegistration[];
     wrappedDomains: SubgraphWrappedDomain[];
   };
-}
-function deriveNameStatus(expiryTimestamp: number): NameRecord["status"] {
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  const graceEnd = expiryTimestamp + GRACE_PERIOD_DURATION;
-  const premiumEnd = graceEnd + PREMIUM_PERIOD_DURATION;
-  if (currentTimestamp <= expiryTimestamp) return "Active";
-  if (currentTimestamp <= graceEnd) return "Grace";
-  if (currentTimestamp <= premiumEnd) return "Premium";
-  return "Released";
 }
 
 export async function fetchNameRecordsGraph(
