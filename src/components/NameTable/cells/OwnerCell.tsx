@@ -78,11 +78,13 @@ export const OwnerCell = ({ record, disableLink }: OwnerCellProps) => {
         )}
 
         {/* 底部提示：点击查看持仓 */}
-        <div className="pt-2 pb-1 border-t border-white/10 text-center">
-          <span className="text-[10px] text-white font-sans font-regular flex items-center justify-center gap-1">
-            {t("table.cell.view_portfolio")}
-          </span>
-        </div>
+        {!disableLink && (
+          <div className="pt-2 pb-1 border-t border-white/10 text-center">
+            <span className="text-[10px] text-white font-sans font-regular flex items-center justify-center gap-1">
+              {t("table.cell.view_portfolio")}
+            </span>
+          </div>
+        )}
       </div>
     );
   };
