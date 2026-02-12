@@ -11,9 +11,19 @@ export default defineConfig({
 
   contracts: [
     {
+      name: "EnsRegistry",
+      abi: (await import("./src/abis/EnsRegistry.json")).default,
+      address: { 1: MAINNET_CONTRACTS.ENS_REGISTRY },
+    },
+    {
       name: "EthRegistrar",
       abi: (await import("./src/abis/EthRegistrar.json")).default,
       address: { 1: MAINNET_CONTRACTS.ETH_REGISTRAR },
+    },
+    {
+      name: "EnsNameWrapper",
+      abi: (await import("./src/abis/EnsNameWrapper.json")).default,
+      address: { 1: MAINNET_CONTRACTS.ENS_NAME_WRAPPER },
     },
     {
       name: "EthControllerV3",

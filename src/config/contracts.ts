@@ -2,6 +2,7 @@
 import { type Address } from "viem";
 
 export interface ContractAddresses {
+  ENS_REGISTRY: Address;
   ETH_REGISTRAR: Address;
   ETH_CONTROLLER_V3: Address;
   BULK_RENEWAL: Address;
@@ -14,6 +15,7 @@ export interface ContractAddresses {
 // 主网地址配置
 // 注意：只要字符串符合 0x 开头且格式正确，TS 会自动判定它符合 Address 类型
 export const MAINNET_CONTRACTS: ContractAddresses = {
+  ENS_REGISTRY: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
   ETH_REGISTRAR: "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
   ETH_CONTROLLER_V3: "0x59E16fcCd424Cc24e280Be16E11Bcd56fb0CE547",
   BULK_RENEWAL: "0x0735086b17D590c19907E88B6915ecDf47Fe8D88",
