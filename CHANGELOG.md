@@ -3,19 +3,29 @@
 所有重要的变更都会记录在此文件中。
 格式遵循 [Conventional Commits](https://www.conventionalcommits.org/)。
 
-## v3.2.5
+## v3.2.6
 
-### <!-- 1 -->🐛 Bug Fixes
+### <!-- 0 -->🚀 Features
 
-- 当表格数据为空或只有一条时，等级筛选器变灰并禁用，保持 UI 交互的一致性
+- 语义化域名洞察，实现为集合名称打标记
+
+### <!-- 2 -->🚜 Refactor
+
+- 配置化组件，将 “业务逻辑判断” 从底层组件剥离，转交给顶层页面组件（Home, Mine, Account）通过 “配置参数” 来控制
+- 1. 数据结构升级；2. 将存储版本从 v2 升级到 v3，并处理数据迁移
 
 ### <!-- 3 -->📚 Documentation
 
-- update CHANGELOG for v3.2.4
+- update changelog for v3.2.5
+- 清理低价值的注释信息
 
 ### <!-- 4 -->⚡ Performance
 
-- 在 Account 页面中，移除冗余的链接和排序筛选逻辑
+- 增强 userStore 迁移逻辑的健壮性
+
+### <!-- 7 -->⚙️ Miscellaneous Tasks
+
+- 在 Account 页面不显示“点击查看账户持仓”的提示
 
 ---
 
