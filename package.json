@@ -1,7 +1,7 @@
 {
   "name": "ensbook",
   "displayName": "ENSBook",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "description": "Your private, efficient, and intelligent ENS portfolio manager. Local-first architecture.",
   "type": "module",
   "private": true,
