@@ -1,23 +1,20 @@
-/**
- * 全局应用常量配置
- */
+// src/config/constants.ts
 
-// 定义默认时长常量（1年 = 31536000秒）
-export const DEFAULT_DURATION_SECONDS = 365 * 24 * 60 * 60; // 1年
-export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60; // 365 * 24 * 60 * 60
-export const SECONDS_PER_DAY = 24 * 60 * 60;
+import { type Hex, pad } from "viem";
 
-// UI 分页大小
-export const ITEMS_PER_PAGE = 50;
+// ----------------------------------------------------------------
+// 1. 业务逻辑配置 (Business Logic)
+// ----------------------------------------------------------------
 
-// ENS 协议相关的常量
-export const MIN_REGISTRATION_DURATION = 28 * 24 * 60 * 60; // 2419200 秒
-export const GRACE_PERIOD_DURATION = 90 * 24 * 60 * 60;
-export const PREMIUM_PERIOD_DURATION = 21 * 24 * 60 * 60;
-export const COMMITMENT_AGE_SECONDS = 60; // 协议规定最小 60s
-export const REGISTRATION_DELAY_BUFFER = 5; // 前端额外缓冲 5s
-export const ETH_PARENT_HASH =
-  "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
+// Referrer 地址
+const RAW_REFERRER = "0x9c6aa5ce4903aad922ac4dde9b57817c1fc17d9b";
+export const REFERRER_ADDRESS_HASH: Hex = pad(
+  RAW_REFERRER.toLowerCase() as Hex,
+  { size: 32 },
+);
+
+// 系统限制
+export const MAX_MEMO_LENGTH = 200;
 
 export const INPUT_LIMITS = {
   ADDRESS: 20,
@@ -25,10 +22,32 @@ export const INPUT_LIMITS = {
   PURE: 1000,
 };
 
-export const MAX_MEMO_LENGTH = 200;
+// ----------------------------------------------------------------
+// 2. 时间与协议常量 (Time & Protocol)
+// ----------------------------------------------------------------
 
-export const OPENSEA_API_BASE_URL = "https://api.opensea.io/api/v2";
-export const ETHERSCAN_BASE_URL = "https://etherscan.io";
+export const SECONDS_PER_DAY = 24 * 60 * 60;
+export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
+export const DEFAULT_DURATION_SECONDS = SECONDS_PER_YEAR;
+
+// ENS 协议参数
+export const MIN_REGISTRATION_DURATION = 28 * 24 * 60 * 60; // 28天
+export const GRACE_PERIOD_DURATION = 90 * 24 * 60 * 60; // 90天
+export const PREMIUM_PERIOD_DURATION = 21 * 24 * 60 * 60; // 21天
+export const ETH_PARENT_HASH =
+  "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
+
+// 注册流程时间控制
+export const COMMITMENT_AGE_SECONDS = 60;
+export const REGISTRATION_DELAY_BUFFER = 5;
+
+// ----------------------------------------------------------------
+// 3. 性能调优 (Performance Tuning)
+// ----------------------------------------------------------------
+
+export const GRAPHQL_CONFIG = {
+  FETCH_LIMIT: 1000,
+};
 
 export const BATCH_CONFIG = {
   RPC_LOOKUP_SIZE: 50, // viem multicall 建议值
@@ -37,7 +56,12 @@ export const BATCH_CONFIG = {
   GRAPH_CHUNK_SIZE: 1000, // The Graph 分页限制
 };
 
-// 每种状态的标志颜色，与 ens app 的颜色模板保持一致
+export const ITEMS_PER_PAGE = 50;
+
+// ----------------------------------------------------------------
+// 4. UI 样式常量 (UI Styles)
+// ----------------------------------------------------------------
+
 export const STATUS_COLOR_BG: Record<string, string> = {
   Available: "bg-green-100",
   Active: "bg-cyan-100",

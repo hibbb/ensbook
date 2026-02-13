@@ -19,7 +19,7 @@ import {
   useWriteEthControllerV3,
   ethControllerV3Abi,
 } from "../wagmi-generated";
-import { REFERRER_ADDRESS_HASH } from "../config/env";
+import { REFERRER_ADDRESS_HASH } from "../config/constants";
 import { MAINNET_CONTRACTS } from "../config/contracts";
 import { parseLabel, generateSecret } from "../utils/ens";
 import { validateLabel } from "../utils/validate";

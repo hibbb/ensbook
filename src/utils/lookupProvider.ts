@@ -5,6 +5,7 @@ import { MAINNET_CONTRACTS } from "../config/contracts";
 import * as ensUtils from "./ens";
 import type { TFunction } from "i18next";
 import { getTokenId } from "./ens";
+import { ETHERSCAN_BASE_URL, OPENSEA_WEB_BASE_URL } from "../config/env";
 
 import web3bioIcon from "../assets/lookups/web3bio-dark.svg";
 import etherscanIcon from "../assets/lookups/etherscan-dark.svg";
@@ -42,8 +43,7 @@ export const LOOKUP_LINKS: LookupItem[] = [
       const contract = r.wrapped
         ? MAINNET_CONTRACTS.ENS_NAME_WRAPPER
         : MAINNET_CONTRACTS.ETH_REGISTRAR;
-      const baseUrl = "https://etherscan.io";
-      return `${baseUrl}/nft/${contract}/${getTokenId(r)}`;
+      return `${ETHERSCAN_BASE_URL}/nft/${contract}/${getTokenId(r)}`;
     },
   },
   {
@@ -55,7 +55,7 @@ export const LOOKUP_LINKS: LookupItem[] = [
       const contract = r.wrapped
         ? MAINNET_CONTRACTS.ENS_NAME_WRAPPER
         : MAINNET_CONTRACTS.ETH_REGISTRAR;
-      return `https://opensea.io/assets/ethereum/${contract}/${getTokenId(r)}`;
+      return `${OPENSEA_WEB_BASE_URL}/assets/ethereum/${contract}/${getTokenId(r)}`;
     },
   },
   {

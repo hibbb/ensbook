@@ -5,8 +5,8 @@ import { MAINNET_CONTRACTS } from "../../config/contracts";
 import type { NameRecord } from "../../types/ensNames";
 import type { MarketDataMap } from "../../types/marketData";
 import { getTokenId } from "../../utils/ens";
-import { BATCH_CONFIG, OPENSEA_API_BASE_URL } from "../../config/constants";
-const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
+import { BATCH_CONFIG } from "../../config/constants";
+import { OPENSEA_API_BASE_URL, OPENSEA_API_KEY } from "../../config/env";
 
 // 1. 定义允许的币种白名单
 const ALLOWED_CURRENCIES = ["ETH", "WETH", "USDC", "USDT", "DAI"];
@@ -29,8 +29,8 @@ const getHeaders = () => {
   const headers: HeadersInit = {
     accept: "application/json",
   };
-  if (API_KEY) {
-    headers["X-API-KEY"] = API_KEY;
+  if (OPENSEA_API_KEY) {
+    headers["X-API-KEY"] = OPENSEA_API_KEY;
   }
   return headers;
 };
@@ -146,7 +146,7 @@ async function fetchBatchOrders(
 export async function fetchOpenSeaData(
   records: NameRecord[],
 ): Promise<MarketDataMap> {
-  if (!API_KEY || records.length === 0) return {};
+  if (!OPENSEA_API_KEY || records.length === 0) return {};
 
   const resultMap: MarketDataMap = {};
 

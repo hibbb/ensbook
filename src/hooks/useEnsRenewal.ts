@@ -6,7 +6,7 @@ import { normalize } from "viem/ens";
 import { type Hex } from "viem";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { REFERRER_ADDRESS_HASH } from "../config/env";
+import { REFERRER_ADDRESS_HASH } from "../config/constants";
 import {
   useWriteEthControllerV3,
   useWriteBulkRenewal,
