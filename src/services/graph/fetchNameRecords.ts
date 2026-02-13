@@ -5,13 +5,12 @@ import { normalize } from "viem/ens";
 import { queryData, type GraphQLQueryCode } from "./client";
 import type { NameRecord } from "../../types/ensNames";
 import { MAINNET_CONTRACTS } from "../../config/contracts";
-import { GRAPHQL_CONFIG, GRACE_PERIOD_DURATION } from "../../config/constants";
+import { BATCH_CONFIG, GRACE_PERIOD_DURATION } from "../../config/constants";
 import { getFullUserData } from "../../services/storage/userStore";
 import { deriveNameStatus } from "../../utils/ens";
 
 // ... (常量定义保持不变) ...
 const WRAPPER_ADDRESS = MAINNET_CONTRACTS.ENS_NAME_WRAPPER.toLowerCase();
-const CHUNK_SIZE = GRAPHQL_CONFIG.FETCH_LIMIT;
 
 const chunkArray = <T>(array: T[], size: number): T[][] => {
   const chunks: T[][] = [];
@@ -65,20 +64,20 @@ export async function fetchNameRecordsGraph(
 
   if (validLabels.length === 0) return [];
 
-  const labelChunks = chunkArray(validLabels, CHUNK_SIZE);
+  const labelChunks = chunkArray(validLabels, BATCH_CONFIG.GRAPH_CHUNK_SIZE);
 
   const fetchTasks = labelChunks.map(async (chunk): Promise<FetchResult> => {
     const targetNames = chunk.map((label) => `${label}.eth`);
     const query: GraphQLQueryCode = {
       str: `query getNameRecords($labels: [String!]!, $names: [String!]!) {
-        registrations(first: ${CHUNK_SIZE}, where: { labelName_in: $labels }) {
+        registrations(first: ${BATCH_CONFIG.GRAPH_CHUNK_SIZE}, where: { labelName_in: $labels }) {
           id
           labelName
           expiryDate
           registrationDate
           registrant { id }
         }
-        wrappedDomains(first: ${CHUNK_SIZE}, where: { name_in: $names }) {
+        wrappedDomains(first: ${BATCH_CONFIG.GRAPH_CHUNK_SIZE}, where: { name_in: $names }) {
           name
           owner { id }
         }

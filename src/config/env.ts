@@ -13,6 +13,7 @@ export const REFERRER_ADDRESS_HASH: Hex = pad(
 
 // Subgraph API Key 配置
 const subgraphApiKey = import.meta.env.VITE_SUBGRAPH_API_KEY;
+
 if (!subgraphApiKey) {
   // 这里抛出错误是合理的，因为没有它程序无法运行
   throw new Error("The VITE_SUBGRAPH_API_KEY environment variable is missing");

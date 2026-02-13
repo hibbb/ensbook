@@ -14,18 +14,27 @@ export const ITEMS_PER_PAGE = 50;
 export const MIN_REGISTRATION_DURATION = 28 * 24 * 60 * 60; // 2419200 秒
 export const GRACE_PERIOD_DURATION = 90 * 24 * 60 * 60;
 export const PREMIUM_PERIOD_DURATION = 21 * 24 * 60 * 60;
+export const COMMITMENT_AGE_SECONDS = 60; // 协议规定最小 60s
+export const REGISTRATION_DELAY_BUFFER = 5; // 前端额外缓冲 5s
 export const ETH_PARENT_HASH =
   "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
-
-export const GRAPHQL_CONFIG = {
-  // 每次从 Subgraph 获取数据的最大数量限制，默认 1000 是 The Graph 节点的常见分页上限
-  FETCH_LIMIT: 1000,
-};
 
 export const INPUT_LIMITS = {
   ADDRESS: 20,
   SAME: 20,
   PURE: 1000,
+};
+
+export const MAX_MEMO_LENGTH = 200;
+
+export const OPENSEA_API_BASE_URL = "https://api.opensea.io/api/v2";
+export const ETHERSCAN_BASE_URL = "https://etherscan.io";
+
+export const BATCH_CONFIG = {
+  RPC_LOOKUP_SIZE: 50, // viem multicall 建议值
+  RPC_DELAY_MS: 100, // 防止 429 的延迟
+  OPENSEA_CHUNK_SIZE: 30, // OpenSea API 限制
+  GRAPH_CHUNK_SIZE: 1000, // The Graph 分页限制
 };
 
 // 每种状态的标志颜色，与 ens app 的颜色模板保持一致

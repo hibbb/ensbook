@@ -1,17 +1,8 @@
 // src/utils/fetchPrimaryNames.ts
 
+import { BATCH_CONFIG } from "../config/constants";
 import { publicClient } from "./client";
 import { type Address } from "viem";
-
-// ============================================================================
-// 配置常量
-// ============================================================================
-
-// 50 是 Viem Multicall 的甜蜜点，能将 50 个查询打包成 1 个 HTTP 请求
-const BATCH_SIZE = 50;
-
-// 批次间的强制延迟 (毫秒)，防止击穿 RPC 节点的每秒限制 (CUPS)
-const BATCH_DELAY_MS = 100;
 
 // ============================================================================
 // 辅助函数
@@ -42,7 +33,7 @@ export async function fetchPrimaryNames(
   );
 
   const nameMap = new Map<string, string>();
-  const chunks = chunkArray(uniqueAddresses, BATCH_SIZE);
+  const chunks = chunkArray(uniqueAddresses, BATCH_CONFIG.RPC_LOOKUP_SIZE);
 
   // console.log(`[ENS] 开始解析 ${uniqueAddresses.length} 个地址，分 ${chunks.length} 批执行...`);
 
@@ -75,7 +66,7 @@ export async function fetchPrimaryNames(
 
       // 3. 节奏控制：如果不是最后一批，就休息一下
       if (i < chunks.length - 1) {
-        await delay(BATCH_DELAY_MS);
+        await delay(BATCH_CONFIG.RPC_DELAY_MS);
       }
     } catch (batchError) {
       console.error(`[ENS] 第 ${i + 1} 批次发生严重错误:`, batchError);

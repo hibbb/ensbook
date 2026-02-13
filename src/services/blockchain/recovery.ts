@@ -4,8 +4,11 @@ import { type PublicClient } from "viem";
 import { type RegistrationStatus } from "../../types/ensRegistration";
 import { getRegistrationState } from "../storage/registration";
 import { checkTxStatus } from "./transaction";
+import {
+  COMMITMENT_AGE_SECONDS,
+  REGISTRATION_DELAY_BUFFER,
+} from "../../config/constants";
 
-const MIN_COMMITMENT_AGE = 60;
 const MAX_COMMITMENT_AGE = 86400;
 
 export interface RegStatusResult {
@@ -71,7 +74,7 @@ export async function checkRegStatus(
         };
       }
 
-      const waitThreshold = MIN_COMMITMENT_AGE + 5;
+      const waitThreshold = COMMITMENT_AGE_SECONDS + REGISTRATION_DELAY_BUFFER;
       if (elapsed < waitThreshold) {
         const remaining = waitThreshold - elapsed;
         return {

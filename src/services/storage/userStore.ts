@@ -8,11 +8,11 @@ import type {
 } from "../../types/userData";
 import type { EnsBookBackup } from "../../types/backup";
 import i18n from "../../i18n/config";
+import { MAX_MEMO_LENGTH } from "../../config/constants";
 
 // 1. 升级 Key 和 Version
 const STORAGE_KEY = "ensbook_user_data_v3";
 const CURRENT_VERSION = 3;
-const MAX_MEMO_LENGTH = 200;
 
 let cachedData: EnsBookUserData | null = null;
 

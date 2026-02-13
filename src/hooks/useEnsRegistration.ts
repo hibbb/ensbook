@@ -23,6 +23,10 @@ import { REFERRER_ADDRESS_HASH } from "../config/env";
 import { MAINNET_CONTRACTS } from "../config/contracts";
 import { parseLabel, generateSecret } from "../utils/ens";
 import { validateLabel } from "../utils/validate";
+import {
+  COMMITMENT_AGE_SECONDS,
+  REGISTRATION_DELAY_BUFFER,
+} from "../config/constants";
 
 export function useEnsRegistration() {
   const [status, setStatus] = useState<RegistrationStatus>("idle");
@@ -277,11 +281,10 @@ export function useEnsRegistration() {
 
         setStatus("counting_down");
         setCurrentHash(null);
-        const WAIT_SECONDS = 65;
-        setSecondsLeft(WAIT_SECONDS);
+        setSecondsLeft(COMMITMENT_AGE_SECONDS + REGISTRATION_DELAY_BUFFER);
 
         // 启动倒计时，结束后进入 ready
-        startCountdown(WAIT_SECONDS);
+        startCountdown(COMMITMENT_AGE_SECONDS + REGISTRATION_DELAY_BUFFER);
       } catch (err: unknown) {
         console.error(err);
         if (isMounted.current) {

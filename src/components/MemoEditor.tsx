@@ -15,8 +15,7 @@ import { getDomainMeta, updateDomainMeta } from "../services/storage/userStore";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { Tooltip } from "./ui/Tooltip";
 import type { NameRecord } from "../types/ensNames";
-
-const MAX_MEMO_LENGTH = 200;
+import { MAX_MEMO_LENGTH } from "../config/constants";
 
 interface MemoEditorProps {
   label: string;

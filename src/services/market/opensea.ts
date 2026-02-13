@@ -5,11 +5,8 @@ import { MAINNET_CONTRACTS } from "../../config/contracts";
 import type { NameRecord } from "../../types/ensNames";
 import type { MarketDataMap } from "../../types/marketData";
 import { getTokenId } from "../../utils/ens";
-
-const OPENSEA_API_BASE = "https://api.opensea.io/api/v2";
+import { BATCH_CONFIG, OPENSEA_API_BASE_URL } from "../../config/constants";
 const API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
-
-const CHUNK_SIZE = 30;
 
 // 1. 定义允许的币种白名单
 const ALLOWED_CURRENCIES = ["ETH", "WETH", "USDC", "USDT", "DAI"];
@@ -56,7 +53,7 @@ async function fetchBatchOrders(
 
   const promises = Object.entries(groups).flatMap(
     ([contract, groupRecords]) => {
-      const chunks = chunkArray(groupRecords, CHUNK_SIZE);
+      const chunks = chunkArray(groupRecords, BATCH_CONFIG.OPENSEA_CHUNK_SIZE);
 
       return chunks.map(async (chunk) => {
         try {
@@ -67,7 +64,7 @@ async function fetchBatchOrders(
           tokenIds.forEach((id) => params.append("token_ids", id));
           params.append("limit", "50");
 
-          const url = `${OPENSEA_API_BASE}/orders/ethereum/seaport/${side}?${params.toString()}`;
+          const url = `${OPENSEA_API_BASE_URL}/orders/ethereum/seaport/${side}?${params.toString()}`;
 
           const res = await fetch(url, { headers: getHeaders() });
 
