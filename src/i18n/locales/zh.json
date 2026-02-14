@@ -259,7 +259,8 @@
     "listed": "挂单",
     "no_listing": "暂无挂单",
     "ago": "前",
-    "view_on_opensea": "前往 OpenSea 查看"
+    "view_on_opensea": "前往 OpenSea 查看",
+    "grace_warning": "交易前需先续费"
   },
   "transaction": {
     "title": {

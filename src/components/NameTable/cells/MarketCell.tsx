@@ -1,15 +1,21 @@
 // src/components/NameTable/cells/MarketCell.tsx
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTag } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTag,
+  faTriangleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { Tooltip } from "../../ui/Tooltip";
 import type { SimpleMarketData } from "../../../types/marketData";
 import { displayNumber } from "../../../utils/format";
+import { isGrace } from "../../../utils/ens";
+import type { NameRecord } from "../../../types/ensNames";
 
 interface MarketCellProps {
   data?: SimpleMarketData;
   isLoading: boolean;
+  status?: NameRecord["status"];
 }
 
 const getCurrencySymbol = (currency: string) => {
@@ -18,7 +24,7 @@ const getCurrencySymbol = (currency: string) => {
   return "$";
 };
 
-export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
+export const MarketCell = ({ data, isLoading, status }: MarketCellProps) => {
   const { t } = useTranslation();
 
   // 1. Loading 骨架屏
@@ -85,6 +91,15 @@ export const MarketCell = ({ data, isLoading }: MarketCellProps) => {
               </span>
             </span>
           </div>
+        </div>
+      )}
+
+      {isGrace(status) && (data.listing || data.offer) && (
+        <div className="text-[10px] text-orange-300 border-t border-white/10 pt-2 mt-1 flex items-start gap-1.5">
+          <FontAwesomeIcon icon={faTriangleExclamation} className="mt-0.5" />
+          <span className="leading-tight opacity-90">
+            {t("market.grace_warning")}
+          </span>
         </div>
       )}
     </div>

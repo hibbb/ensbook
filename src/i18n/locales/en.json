@@ -259,7 +259,8 @@
     "listed": "List",
     "no_listing": "No Listing",
     "ago": "ago",
-    "view_on_opensea": "View on OpenSea"
+    "view_on_opensea": "View on OpenSea",
+    "grace_warning": "Renew required before trade"
   },
   "transaction": {
     "title": {

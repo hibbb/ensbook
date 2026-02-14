@@ -75,7 +75,11 @@ export const TableRow = ({
       </td>
 
       <td>
-        <MarketCell data={marketData} isLoading={isMarketLoading} />
+        <MarketCell
+          data={marketData}
+          isLoading={isMarketLoading}
+          status={record.status}
+        />
       </td>
 
       <td className="text-right">

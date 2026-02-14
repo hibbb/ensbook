@@ -45,18 +45,16 @@ export function deriveNameStatus(
   return "Released";
 }
 
-export const isActive = (status: NameRecord["status"]) => status === "Active";
-export const isGrace = (status: NameRecord["status"]) => status === "Grace";
-export const isPremium = (status: NameRecord["status"]) => status === "Premium";
-export const isReleased = (status: NameRecord["status"]) =>
-  status === "Released";
-export const isAvailable = (status: NameRecord["status"]) =>
-  status === "Available";
+export const isActive = (status?: string) => status === "Active";
+export const isGrace = (status?: string) => status === "Grace";
+export const isPremium = (status?: string) => status === "Premium";
+export const isReleased = (status?: string) => status === "Released";
+export const isAvailable = (status?: string) => status === "Available";
 
-export const isRenewable = (status: NameRecord["status"]) =>
+export const isRenewable = (status?: string) =>
   status === "Active" || status === "Grace";
 
-export const isRegistrable = (status: NameRecord["status"]) =>
+export const isRegistrable = (status?: string) =>
   status === "Available" || status === "Released" || status === "Premium";
 
 export const fetchPremiumPrice = (
