@@ -21,6 +21,7 @@ interface DomainMetaResponse {
   }[];
 }
 
+// 1. 更新接口定义：增加 registration 字段
 interface OwnerDomainsResponse {
   wrappedDomains: {
     labelName: string | null;
@@ -30,6 +31,10 @@ interface OwnerDomainsResponse {
   legacyDomains: {
     labelName: string | null;
     expiryDate?: string | null;
+    // 新增嵌套对象
+    registration?: {
+      expiryDate: string;
+    } | null;
   }[];
 }
 
@@ -38,7 +43,6 @@ export async function fetchLabels(
 ): Promise<string[]> {
   if (!classified) return [];
 
-  // 🗑️ 移除 linkOwners
   const { sameOwners, pureLabels, ethAddresses } = classified;
 
   const [fetchedFromSame, fetchedFromAddr] = await Promise.all([
@@ -67,6 +71,7 @@ async function fetchDomainsByAddresses(
     addr.toLowerCase(),
   );
 
+  // 2. 更新 GraphQL 查询：请求 registration.expiryDate
   const labelsQuery: GraphQLQueryCode = {
     str: `query getLabelsByOwners($owners: [String!]!, $ethParent: String!) {
       wrappedDomains: domains(
@@ -92,6 +97,9 @@ async function fetchDomainsByAddresses(
       ) {
         labelName
         expiryDate
+        registration {
+          expiryDate
+        }
       }
     }`,
     vars: {
@@ -103,12 +111,7 @@ async function fetchDomainsByAddresses(
   const labelsData = (await queryData(labelsQuery)) as OwnerDomainsResponse;
   const now = Math.floor(Date.now() / 1000);
 
-  const isLegacyNotExpired = (expiryDate?: string | null) => {
-    if (!expiryDate) return true;
-    const exp = parseInt(expiryDate);
-    return exp + GRACE_PERIOD_DURATION >= now;
-  };
-
+  // Wrapped 域名的判断逻辑保持不变 (NameWrapper 的 expiryDate 通常比较可靠)
   const isWrappedNotExpired = (expiryDate?: string | null) => {
     if (!expiryDate) return true;
     const exp = parseInt(expiryDate);
@@ -125,10 +128,26 @@ async function fetchDomainsByAddresses(
     })
     .map((d) => d.labelName as string);
 
+  // 3. 核心修复：Legacy 域名的过滤逻辑
   const validLegacy = labelsData.legacyDomains
     .filter((d) => {
       if (typeof d.labelName !== "string") return false;
-      return isLegacyNotExpired(d.expiryDate);
+
+      // A. 优先使用权威的 registration.expiryDate
+      if (d.registration?.expiryDate) {
+        const exp = parseInt(d.registration.expiryDate);
+        return exp + GRACE_PERIOD_DURATION >= now;
+      }
+
+      // B. 如果没有 registration (极少见情况)，回退到 domain.expiryDate
+      if (d.expiryDate) {
+        const exp = parseInt(d.expiryDate);
+        return exp + GRACE_PERIOD_DURATION >= now;
+      }
+
+      // C. 如果两个都没有，说明数据缺失或已释放，视为无效
+      // 之前这里返回 true，导致了 Released 域名泄露
+      return false;
     })
     .map((d) => d.labelName as string);
 
