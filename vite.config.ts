@@ -40,6 +40,13 @@ export default defineConfig({
       },
     },
   ],
+  // 新增：解析配置
+  resolve: {
+    alias: {
+      // 告诉 Vite：遇到 "events" 导入时，指向 node_modules 中的 "events" 包
+      events: "events",
+    },
+  },
   define: {
     // 定义全局常量，注意字符串需要 JSON.stringify 包裹
     __APP_VERSION__: JSON.stringify(packageJson.version),
@@ -47,8 +54,16 @@ export default defineConfig({
     __APP_REPO_URL__: JSON.stringify(getRepoUrl(packageJson.repository)),
     __APP_HOMEPAGE__: JSON.stringify(packageJson.homepage),
     __APP_AUTHOR_URL__: JSON.stringify(getAuthorUrl(packageJson.author)),
+    // 建议：Web3 项目通常还需要这个 Polyfill，防止某些库报错
+    // 如果你之后遇到 "global is not defined" 错误，请取消下面这行的注释
+    // global: "globalThis",
   },
   build: {
     sourcemap: false, // 生产环境关闭源码映射
+    // 建议：为了兼容某些老旧的加密库 (CommonJS)，有时需要调大 chunk 大小警告
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      // 确保 external 不包含 events，虽然 alias 通常优先级更高，但以防万一
+    },
   },
 });
