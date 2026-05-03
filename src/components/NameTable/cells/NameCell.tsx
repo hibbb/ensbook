@@ -175,7 +175,7 @@ export const NameCell = ({
                 {"["}
               </span>
             )}
-            <span className="text-base font-sans font-medium tracking-tight text-text-main transition-colors">
+            <span className="text-base font-sans font-medium tracking-tight text-text-main transition-colors truncate max-w-[120px] sm:max-w-[200px]">
               {record.label}
             </span>
             <span className="text-sm font-sans font-regular text-gray-400">

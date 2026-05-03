@@ -1,17 +1,15 @@
 // src/hooks/useEnsRenewal.ts
 
 import { useState, useCallback } from "react";
-import { usePublicClient, useAccount } from "wagmi";
+import { usePublicClient, useAccount, useWriteContract } from "wagmi"; // 1. 引入 useWriteContract
 import { normalize } from "viem/ens";
 import { type Hex } from "viem";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { REFERRER_ADDRESS_HASH } from "../config/constants";
 import {
-  useWriteEthControllerV3,
-  useWriteBulkRenewal,
-  ethControllerV3Abi,
-  bulkRenewalAbi,
+  ethControllerV3Abi, // 2. 引入 ABI (不再引入 useWriteEthControllerV3)
+  bulkRenewalAbi, // 2. 引入 ABI (不再引入 useWriteBulkRenewal)
 } from "../wagmi-generated";
 import { MAINNET_CONTRACTS } from "../config/contracts";
 
@@ -29,8 +27,8 @@ export function useEnsRenewal() {
   const { address } = useAccount();
   const { t } = useTranslation();
 
-  const { writeContractAsync: writeEthController } = useWriteEthControllerV3();
-  const { writeContractAsync: writeBulkRenewal } = useWriteBulkRenewal();
+  // 3. 使用通用的 writeContractAsync
+  const { writeContractAsync } = useWriteContract();
 
   const resetStatus = useCallback(() => {
     setStatus("idle");
@@ -39,7 +37,6 @@ export function useEnsRenewal() {
 
   const renewSingle = useCallback(
     async (rawLabel: string, duration: bigint) => {
-      // ... (单域名续费逻辑保持不变) ...
       if (!publicClient || !address) {
         toast.error(t("common.connect_wallet"));
         return;
@@ -63,7 +60,10 @@ export function useEnsRenewal() {
         const totalPrice = priceData.base + priceData.premium;
         const valueWithBuffer = (totalPrice * 110n) / 100n;
 
-        const hash = await writeEthController({
+        // 4. 调用通用方法，传入 ABI 和 Address
+        const hash = await writeContractAsync({
+          address: contractAddress,
+          abi: ethControllerV3Abi,
           functionName: "renew",
           args: [label, duration, referrer],
           value: valueWithBuffer,
@@ -89,7 +89,7 @@ export function useEnsRenewal() {
         );
       }
     },
-    [publicClient, address, writeEthController, t],
+    [publicClient, address, writeContractAsync, t], // 依赖项更新
   );
 
   const renewBatch = useCallback(
@@ -106,7 +106,6 @@ export function useEnsRenewal() {
         toast.error(t("transaction.toast.select_one"));
         return;
       }
-      // 安全检查
       if (rawLabels.length !== durations.length) {
         console.error("Labels and durations length mismatch");
         toast.error(t("transaction.toast.unknown_error"));
@@ -128,7 +127,10 @@ export function useEnsRenewal() {
 
         const valueWithBuffer = (totalPrice * 110n) / 100n;
 
-        const hash = await writeBulkRenewal({
+        // 5. 调用通用方法
+        const hash = await writeContractAsync({
+          address: contractAddress,
+          abi: bulkRenewalAbi,
           functionName: "renewAll",
           args: [labels, durations, REFERRER_ADDRESS_HASH],
           value: valueWithBuffer,
@@ -159,7 +161,7 @@ export function useEnsRenewal() {
         );
       }
     },
-    [publicClient, address, writeBulkRenewal, t],
+    [publicClient, address, writeContractAsync, t], // 依赖项更新
   );
 
   return {

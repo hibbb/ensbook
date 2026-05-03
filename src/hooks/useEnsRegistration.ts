@@ -1,7 +1,7 @@
 // src/hooks/useEnsRegistration.ts
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { usePublicClient, useAccount } from "wagmi";
+import { usePublicClient, useAccount, useWriteContract } from "wagmi"; // 1. 引入 useWriteContract
 import { type Hex, type Address } from "viem";
 import { normalize } from "viem/ens";
 import toast from "react-hot-toast";
@@ -16,17 +16,16 @@ import {
 } from "../services/storage/registration";
 import { checkRegStatus } from "../services/blockchain/recovery";
 import {
-  useWriteEthControllerV3,
-  ethControllerV3Abi,
+  ethControllerV3Abi, // 2. 引入 ABI (不再引入 useWriteEthControllerV3)
 } from "../wagmi-generated";
-import { REFERRER_ADDRESS_HASH } from "../config/constants";
-import { MAINNET_CONTRACTS } from "../config/contracts";
-import { parseLabel, generateSecret } from "../utils/ens";
-import { validateLabel } from "../utils/validate";
 import {
+  REFERRER_ADDRESS_HASH,
   COMMITMENT_AGE_SECONDS,
   REGISTRATION_DELAY_BUFFER,
 } from "../config/constants";
+import { MAINNET_CONTRACTS } from "../config/contracts";
+import { parseLabel, generateSecret } from "../utils/ens";
+import { validateLabel } from "../utils/validate";
 
 export function useEnsRegistration() {
   const [status, setStatus] = useState<RegistrationStatus>("idle");
@@ -35,11 +34,13 @@ export function useEnsRegistration() {
   const { t } = useTranslation();
 
   const registrationDataRef = useRef<RegistrationStruct | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { address } = useAccount();
   const publicClient = usePublicClient();
-  const { writeContractAsync } = useWriteEthControllerV3();
+
+  // 3. 使用通用的 writeContractAsync
+  const { writeContractAsync } = useWriteContract();
 
   const isMounted = useRef(true);
   useEffect(() => {
@@ -76,7 +77,6 @@ export function useEnsRegistration() {
   }, [resetStatus]);
 
   const executeRegister = useCallback(async () => {
-    // 参数直接从 ref 读取，不需要传参
     const params = registrationDataRef.current;
     if (!publicClient || !address || !params) return;
 
@@ -95,7 +95,10 @@ export function useEnsRegistration() {
       const priceWithBuffer =
         ((priceData.base + priceData.premium) * 110n) / 100n;
 
+      // 4. 调用通用方法
       const registerHash = await writeContractAsync({
+        address: contractAddress,
+        abi: ethControllerV3Abi,
         functionName: "register",
         args: [params],
         value: priceWithBuffer,
@@ -121,7 +124,6 @@ export function useEnsRegistration() {
       if (isMounted.current) {
         const error = err as Error & { shortMessage?: string };
         if (error.shortMessage?.includes("User rejected")) {
-          // 如果用户拒绝，回退到 ready 状态，允许再次点击
           setStatus("ready");
           toast.error(t("transaction.toast.register_rejected"));
         } else {
@@ -151,7 +153,6 @@ export function useEnsRegistration() {
       setSecondsLeft(left);
       if (left <= 0) {
         if (timerRef.current) clearInterval(timerRef.current);
-        // 倒计时结束，准备就绪
         setStatus("ready");
       }
     }, 1000);
@@ -194,12 +195,8 @@ export function useEnsRegistration() {
           }
 
           if (result.status === "counting_down") {
-            // 恢复倒计时
             startCountdown(result.secondsLeft);
           }
-          // 注意：如果 checkRegStatus 返回的是 'ready' (即时间已到)，
-          // 上面的 setStatus(result.status) 已经将其设为 ready 了，
-          // UI 会自动显示 "Start Registration" 按钮，无需额外操作。
         }
       } catch (e) {
         console.error("恢复检查失败", e);
@@ -261,7 +258,10 @@ export function useEnsRegistration() {
 
         saveRegistrationState(label, { commitment });
 
+        // 5. 调用通用方法
         const commitHash = await writeContractAsync({
+          address: contractAddress,
+          abi: ethControllerV3Abi,
           functionName: "commit",
           args: [commitment],
         });
@@ -281,10 +281,10 @@ export function useEnsRegistration() {
 
         setStatus("counting_down");
         setCurrentHash(null);
-        setSecondsLeft(COMMITMENT_AGE_SECONDS + REGISTRATION_DELAY_BUFFER);
+        const waitTime = COMMITMENT_AGE_SECONDS + REGISTRATION_DELAY_BUFFER;
+        setSecondsLeft(waitTime);
 
-        // 启动倒计时，结束后进入 ready
-        startCountdown(COMMITMENT_AGE_SECONDS + REGISTRATION_DELAY_BUFFER);
+        startCountdown(waitTime);
       } catch (err: unknown) {
         console.error(err);
         if (isMounted.current) {
@@ -300,7 +300,7 @@ export function useEnsRegistration() {
         }
       }
     },
-    [address, publicClient, writeContractAsync, t],
+    [address, publicClient, writeContractAsync, t], // 依赖项更新
   );
 
   return {
