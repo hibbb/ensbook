@@ -47,115 +47,82 @@ const getHeaders = () => {
   return headers;
 };
 
+// 核心修改：兼容 Listing 和 Offer 不同的 JSON 结构
+async function fetchBestPrice(
+  record: NameRecord,
+  side: "listings" | "offers",
+  resultMap: MarketDataMap,
+) {
+  const tokenId = getTokenId(record);
+  const contract = getContract(record);
+  // ENS 在 OpenSea 上的 collection slug 统一为 'ens'
+  const url = `${OPENSEA_API_BASE_URL}/${side}/collection/ens/nfts/${tokenId}/best`;
+
+  try {
+    const res = await fetch(url, { headers: getHeaders() });
+
+    if (!res.ok) {
+      // 静默处理 404(无挂单/出价) 和 429(限流)，保持浏览器控制台干净
+      if (res.status !== 404 && res.status !== 429) {
+        console.warn(`OpenSea ${side} error: ${res.status}`);
+      }
+      return;
+    }
+
+    const data = await res.json();
+
+    // 🚀 核心修复：动态提取 price 对象
+    // Listing 在 data.price.current，Offer 在 data.price
+    const priceObj = data?.price?.current || data?.price;
+
+    if (!priceObj || !priceObj.value) return;
+
+    const currency =
+      priceObj.currency || (side === "listings" ? "ETH" : "WETH");
+
+    if (!ALLOWED_CURRENCIES.includes(currency.toUpperCase())) {
+      return;
+    }
+
+    const decimals = priceObj.decimals ?? 18;
+    const value = priceObj.value;
+    const amount = parseFloat(formatUnits(BigInt(value), decimals));
+
+    const priceData = {
+      amount,
+      currency: currency.toUpperCase(),
+      url: `${OPENSEA_WEB_BASE_URL}/assets/ethereum/${contract}/${tokenId}`,
+    };
+
+    if (!resultMap[record.label]) resultMap[record.label] = {};
+
+    if (side === "listings") {
+      resultMap[record.label].listing = priceData;
+    } else {
+      resultMap[record.label].offer = priceData;
+    }
+  } catch (e) {
+    // 忽略网络错误
+    console.log(e);
+  }
+}
+
 async function fetchBatchOrders(
   records: NameRecord[],
   side: "listings" | "offers",
   resultMap: MarketDataMap,
 ) {
-  // 如果没有记录，直接返回（防御性编程）
   if (records.length === 0) return;
 
-  const groups: Record<string, NameRecord[]> = {};
-  const idToLabel: Record<string, string> = {};
+  const chunks = chunkArray(records, CHUNK_SIZE);
 
-  for (const r of records) {
-    const contract = getContract(r);
-    const tokenId = getTokenId(r);
-    if (!groups[contract]) groups[contract] = [];
-    groups[contract].push(r);
-
-    // 这里的 key 构造必须与下面 loop 中的一致
-    idToLabel[`${contract}:${tokenId}`] = r.label;
+  // 按批次并发请求，追求极致加载速度
+  for (const chunk of chunks) {
+    const promises = chunk.map((record) =>
+      fetchBestPrice(record, side, resultMap),
+    );
+    await Promise.all(promises);
   }
-
-  const promises = Object.entries(groups).flatMap(
-    ([contract, groupRecords]) => {
-      const chunks = chunkArray(groupRecords, CHUNK_SIZE);
-
-      return chunks.map(async (chunk) => {
-        try {
-          const tokenIds = chunk.map((r) => getTokenId(r));
-          const params = new URLSearchParams();
-
-          params.append("asset_contract_address", contract);
-          tokenIds.forEach((id) => params.append("token_ids", id));
-          params.append("limit", "50");
-
-          const url = `${OPENSEA_API_BASE_URL}/orders/ethereum/seaport/${side}?${params.toString()}`;
-
-          const res = await fetch(url, { headers: getHeaders() });
-
-          if (!res.ok) {
-            if (res.status !== 404) {
-              console.warn(`OpenSea ${side} error: ${res.status}`);
-            }
-            return;
-          }
-
-          const json = await res.json();
-          const orders = json.orders || [];
-
-          for (const order of orders) {
-            if (order.cancelled || order.finalized || order.is_expired)
-              continue;
-
-            let item;
-            if (side === "listings") {
-              item = order.maker_asset_bundle?.assets?.[0];
-            } else {
-              item = order.taker_asset_bundle?.assets?.[0];
-            }
-
-            if (!item) continue;
-
-            const tokenId = item.token_id;
-            const key = `${contract}:${tokenId}`;
-            const label = idToLabel[key];
-
-            // 如果找不到 label，说明这个订单不属于我们查询的范围（或者被过滤了）
-            if (!label) continue;
-
-            const paymentToken = order.payment_token_contract;
-            const decimals = paymentToken?.decimals ?? 18;
-            const symbol =
-              paymentToken?.symbol ?? (side === "listings" ? "ETH" : "WETH");
-
-            if (!ALLOWED_CURRENCIES.includes(symbol.toUpperCase())) {
-              continue;
-            }
-
-            if (!resultMap[label]) resultMap[label] = {};
-
-            const priceVal = parseFloat(
-              formatUnits(BigInt(order.current_price), decimals),
-            );
-
-            const priceData = {
-              amount: priceVal,
-              currency: symbol,
-              url: `${OPENSEA_WEB_BASE_URL}/assets/ethereum/${contract}/${tokenId}`,
-            };
-
-            if (side === "listings") {
-              const current = resultMap[label].listing;
-              if (!current || priceVal < current.amount) {
-                resultMap[label].listing = priceData;
-              }
-            } else {
-              const current = resultMap[label].offer;
-              if (!current || priceVal > current.amount) {
-                resultMap[label].offer = priceData;
-              }
-            }
-          }
-        } catch (e) {
-          console.warn(`OpenSea ${side} chunk failed:`, e);
-        }
-      });
-    },
-  );
-
-  await Promise.all(promises);
 }
 
 export async function fetchOpenSeaData(
@@ -163,15 +130,14 @@ export async function fetchOpenSeaData(
 ): Promise<MarketDataMap> {
   if (!OPENSEA_API_KEY || records.length === 0) return {};
 
-  // 🚀 核心修复：在发起请求前，直接过滤掉“可注册”状态的域名
-  // 只有 Active 和 Grace 状态的域名才需要查询市场数据
-  // Available, Released, Premium 状态的域名，其 OpenSea 挂单是无效的
+  // 过滤掉可注册的域名，只查询已注册的
   const validRecords = records.filter((r) => !isRegistrable(r.status));
 
   if (validRecords.length === 0) return {};
 
   const resultMap: MarketDataMap = {};
 
+  // 同时并发查询挂单和出价
   await Promise.allSettled([
     fetchBatchOrders(validRecords, "listings", resultMap),
     fetchBatchOrders(validRecords, "offers", resultMap),
