@@ -7,14 +7,10 @@ import {
   OPENSEA_API_KEY,
   OPENSEA_WEB_BASE_URL,
 } from "../../config/env";
-import { BATCH_CONFIG } from "../../config/constants";
 import { isRegistrable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
-import type { MarketDataMap } from "../../types/marketData";
+import type { SimpleMarketData } from "../../types/marketData";
 
-const CHUNK_SIZE = BATCH_CONFIG.OPENSEA_CHUNK_SIZE;
-
-// 允许的币种白名单
 const ALLOWED_CURRENCIES = ["ETH", "WETH", "USDC", "USDT", "DAI"];
 
 const getTokenId = (record: NameRecord): string => {
@@ -29,14 +25,6 @@ const getContract = (record: NameRecord): string => {
     : MAINNET_CONTRACTS.ETH_REGISTRAR.toLowerCase();
 };
 
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const res: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    res.push(array.slice(i, i + size));
-  }
-  return res;
-}
-
 const getHeaders = () => {
   const headers: HeadersInit = {
     accept: "application/json",
@@ -47,101 +35,115 @@ const getHeaders = () => {
   return headers;
 };
 
-// 核心修改：兼容 Listing 和 Offer 不同的 JSON 结构
-async function fetchBestPrice(
-  record: NameRecord,
-  side: "listings" | "offers",
-  resultMap: MarketDataMap,
-) {
+// ==========================================
+// 1. 全局限流器 (Rate Limiter)
+// ==========================================
+class RateLimiter {
+  private queue: (() => void)[] = [];
+  private isProcessing = false;
+  // OpenSea 免费 API 限制为 4次/秒
+  private readonly MAX_RPS = 4;
+  private currentRequests = 0;
+
+  async enqueue<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          resolve(await fn());
+        } catch (e) {
+          reject(e);
+        }
+      });
+      this.processQueue();
+    });
+  }
+
+  private async processQueue() {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
+
+    while (this.queue.length > 0) {
+      if (this.currentRequests >= this.MAX_RPS) {
+        // 达到每秒限制，等待 1 秒
+        await new Promise((r) => setTimeout(r, 1000));
+        this.currentRequests = 0;
+      }
+
+      const task = this.queue.shift();
+      if (task) {
+        this.currentRequests++;
+        task(); // 异步执行，不阻塞队列
+      }
+    }
+
+    this.isProcessing = false;
+  }
+}
+
+export const openSeaRateLimiter = new RateLimiter();
+
+// ==========================================
+// 2. 单体查询逻辑
+// ==========================================
+async function fetchBestPrice(record: NameRecord, side: "listings" | "offers") {
   const tokenId = getTokenId(record);
   const contract = getContract(record);
-  // ENS 在 OpenSea 上的 collection slug 统一为 'ens'
   const url = `${OPENSEA_API_BASE_URL}/${side}/collection/ens/nfts/${tokenId}/best`;
 
   try {
     const res = await fetch(url, { headers: getHeaders() });
 
     if (!res.ok) {
-      // 静默处理 404(无挂单/出价) 和 429(限流)，保持浏览器控制台干净
-      if (res.status !== 404 && res.status !== 429) {
-        console.warn(`OpenSea ${side} error: ${res.status}`);
-      }
-      return;
+      // 静默处理 404 和 429，保持控制台干净
+      return null;
     }
 
     const data = await res.json();
-
-    // 🚀 核心修复：动态提取 price 对象
-    // Listing 在 data.price.current，Offer 在 data.price
     const priceObj = data?.price?.current || data?.price;
 
-    if (!priceObj || !priceObj.value) return;
+    if (!priceObj || !priceObj.value) return null;
 
     const currency =
       priceObj.currency || (side === "listings" ? "ETH" : "WETH");
 
     if (!ALLOWED_CURRENCIES.includes(currency.toUpperCase())) {
-      return;
+      return null;
     }
 
     const decimals = priceObj.decimals ?? 18;
     const value = priceObj.value;
     const amount = parseFloat(formatUnits(BigInt(value), decimals));
 
-    const priceData = {
+    return {
       amount,
       currency: currency.toUpperCase(),
       url: `${OPENSEA_WEB_BASE_URL}/assets/ethereum/${contract}/${tokenId}`,
     };
-
-    if (!resultMap[record.label]) resultMap[record.label] = {};
-
-    if (side === "listings") {
-      resultMap[record.label].listing = priceData;
-    } else {
-      resultMap[record.label].offer = priceData;
-    }
   } catch (e) {
-    // 忽略网络错误
     console.log(e);
+    return null;
   }
 }
 
-async function fetchBatchOrders(
-  records: NameRecord[],
-  side: "listings" | "offers",
-  resultMap: MarketDataMap,
-) {
-  if (records.length === 0) return;
+// ==========================================
+// 3. 暴露给 Hook 的单条记录获取函数
+// ==========================================
+export async function fetchSingleMarketData(
+  record: NameRecord,
+): Promise<SimpleMarketData | null> {
+  if (!OPENSEA_API_KEY || isRegistrable(record.status)) return null;
 
-  const chunks = chunkArray(records, CHUNK_SIZE);
-
-  // 按批次并发请求，追求极致加载速度
-  for (const chunk of chunks) {
-    const promises = chunk.map((record) =>
-      fetchBestPrice(record, side, resultMap),
-    );
-    await Promise.all(promises);
-  }
-}
-
-export async function fetchOpenSeaData(
-  records: NameRecord[],
-): Promise<MarketDataMap> {
-  if (!OPENSEA_API_KEY || records.length === 0) return {};
-
-  // 过滤掉可注册的域名，只查询已注册的
-  const validRecords = records.filter((r) => !isRegistrable(r.status));
-
-  if (validRecords.length === 0) return {};
-
-  const resultMap: MarketDataMap = {};
-
-  // 同时并发查询挂单和出价
-  await Promise.allSettled([
-    fetchBatchOrders(validRecords, "listings", resultMap),
-    fetchBatchOrders(validRecords, "offers", resultMap),
+  // 使用全局限流器包裹请求
+  const [listing, offer] = await Promise.all([
+    openSeaRateLimiter.enqueue(() => fetchBestPrice(record, "listings")),
+    openSeaRateLimiter.enqueue(() => fetchBestPrice(record, "offers")),
   ]);
 
-  return resultMap;
+  if (!listing && !offer) return null;
+
+  const result: SimpleMarketData = {};
+  if (listing) result.listing = listing;
+  if (offer) result.offer = offer;
+
+  return result;
 }

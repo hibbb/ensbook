@@ -8,7 +8,6 @@ import { SkeletonRow } from "./SkeletonRow";
 import { Pagination } from "../ui/Pagination";
 import { ViewStateReset } from "./ViewStateReset";
 import { usePrimaryNames } from "../../hooks/usePrimaryNames";
-import { useMarketData } from "../../hooks/useMarketData";
 import { isRenewable } from "../../utils/ens";
 import type { NameRecord } from "../../types/ensNames";
 import type {
@@ -96,10 +95,6 @@ const NameTableComponent = (props: NameTableProps) => {
     const startIndex = (currentPage - 1) * pageSize;
     return safeRecords.slice(startIndex, startIndex + pageSize);
   }, [safeRecords, currentPage, pageSize]);
-
-  const { data: marketDataMap, isLoading: isMarketLoading } = useMarketData(
-    paginatedBasicRecords,
-  );
 
   const displayRecords = usePrimaryNames(paginatedBasicRecords);
 
@@ -193,8 +188,6 @@ const NameTableComponent = (props: NameTableProps) => {
                   onReminder={props.onReminder}
                   isPending={props.pendingLabels?.has(r.label)}
                   onLevelChange={props.onLevelChange}
-                  marketData={marketDataMap?.[r.label]}
-                  isMarketLoading={isMarketLoading}
                   isOwnerColumnReadOnly={props.isOwnerColumnReadOnly}
                   showCollectionTags={props.showCollectionTags}
                 />

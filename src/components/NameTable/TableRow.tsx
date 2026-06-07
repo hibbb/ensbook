@@ -1,5 +1,6 @@
 // src/components/NameTable/TableRow.tsx
 
+import { useRef, useEffect, useState } from "react";
 import type { NameRecord } from "../../types/ensNames";
 
 import { IndexCell } from "./cells/IndexCell";
@@ -11,7 +12,7 @@ import { ActionCell } from "./cells/ActionCell";
 import { LookupsCell } from "./cells/LookupsCell";
 import { ControlCell } from "./cells/ControlCell";
 
-import type { SimpleMarketData } from "../../types/marketData";
+import { useMarketData } from "../../hooks/useMarketData"; // 🚀 新增引入
 
 interface TableRowProps {
   record: NameRecord;
@@ -27,10 +28,8 @@ interface TableRowProps {
   onReminder?: (record: NameRecord) => void;
   isPending?: boolean;
   onLevelChange?: (record: NameRecord, newLevel: number) => void;
-  marketData?: SimpleMarketData;
-  isMarketLoading?: boolean;
   isOwnerColumnReadOnly?: boolean;
-  showCollectionTags?: boolean; // 🚀
+  showCollectionTags?: boolean;
 }
 
 export const TableRow = ({
@@ -47,13 +46,43 @@ export const TableRow = ({
   onReminder,
   isPending = false,
   onLevelChange,
-  marketData,
-  isMarketLoading = false,
   isOwnerColumnReadOnly,
-  showCollectionTags, // 解构
+  showCollectionTags,
 }: TableRowProps) => {
+  // 🚀 懒加载逻辑：Intersection Observer
+  const rowRef = useRef<HTMLTableRowElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // 一旦进入过可视区域，就断开观察，保持数据加载状态
+          if (rowRef.current) observer.unobserve(rowRef.current);
+        }
+      },
+      { rootMargin: "200px" }, // 提前 200px 触发加载，体验更平滑
+    );
+
+    if (rowRef.current) {
+      observer.observe(rowRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 🚀 将市场数据的获取下放到每一行
+  const { data: marketData, isLoading: isMarketLoading } = useMarketData(
+    record,
+    isVisible,
+  );
+
   return (
-    <tr className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row">
+    <tr
+      ref={rowRef}
+      className="group transition-colors duration-150 last:border-0 hover:bg-cyan-50 bg-table-row"
+    >
       <td className="w-14 text-center">
         <IndexCell
           index={index}
@@ -76,8 +105,8 @@ export const TableRow = ({
 
       <td>
         <MarketCell
-          data={marketData}
-          isLoading={isMarketLoading}
+          data={marketData || undefined}
+          isLoading={isMarketLoading && isVisible} // 只有可见时才显示 loading 动画
           status={record.status}
         />
       </td>
