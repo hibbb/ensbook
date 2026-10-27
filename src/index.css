@@ -153,3 +153,22 @@ a:hover {
     background-color: #d1d5db;
   }
 }
+
+/* 2026.10 temp: adapting for ensv2 */
+
+.maintenance-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.maintenance-page h1 {
+  margin: 0;
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 500;
+  line-height: 1.4;
+}
